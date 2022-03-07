@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.service
 
+import com.ampnet.blockchainapiservice.util.UtcDateTime
 import org.springframework.stereotype.Service
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -13,11 +14,11 @@ class RandomUuidProvider : UuidProvider {
     override fun getUuid(): UUID = UUID.randomUUID()
 }
 
-interface OffsetDateTimeProvider {
-    fun getOffsetDateTime(): OffsetDateTime
+interface UtcDateTimeProvider {
+    fun getUtcDateTime(): UtcDateTime
 }
 
 @Service
-class CurrentOffsetDateTimeProvider : OffsetDateTimeProvider {
-    override fun getOffsetDateTime(): OffsetDateTime = OffsetDateTime.now()
+class CurrentUtcDateTimeProvider : UtcDateTimeProvider {
+    override fun getUtcDateTime(): UtcDateTime = UtcDateTime(OffsetDateTime.now())
 }

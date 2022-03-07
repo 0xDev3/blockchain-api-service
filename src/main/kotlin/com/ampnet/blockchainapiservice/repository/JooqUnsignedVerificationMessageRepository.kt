@@ -2,7 +2,8 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UnsignedVerificationMessageRecord
 import com.ampnet.blockchainapiservice.model.result.UnsignedVerificationMessage
-import com.ampnet.blockchainapiservice.service.OffsetDateTimeProvider
+import com.ampnet.blockchainapiservice.service.UtcDateTimeProvider
+import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.jooq.DSLContext
@@ -13,7 +14,7 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.UnsignedVerificatio
 @Repository
 class JooqUnsignedVerificationMessageRepository(
     private val dslContext: DSLContext,
-    private val offsetDateTimeProvider: OffsetDateTimeProvider
+    private val utcDateTimeProvider: UtcDateTimeProvider
 ) : UnsignedVerificationMessageRepository {
 
     companion object : KLogging()
@@ -39,10 +40,10 @@ class JooqUnsignedVerificationMessageRepository(
     }
 
     override fun deleteAllExpired(): Int {
-        val now = offsetDateTimeProvider.getOffsetDateTime()
+        val now = utcDateTimeProvider.getUtcDateTime()
         logger.info { "Delete all unsigned verification messages expired at: $now" }
         return dslContext.deleteFrom(UnsignedVerificationMessageTable.UNSIGNED_VERIFICATION_MESSAGE)
-            .where(UnsignedVerificationMessageTable.UNSIGNED_VERIFICATION_MESSAGE.VALID_UNTIL.le(now))
+            .where(UnsignedVerificationMessageTable.UNSIGNED_VERIFICATION_MESSAGE.VALID_UNTIL.le(now.value))
             .execute()
     }
 
@@ -50,15 +51,15 @@ class JooqUnsignedVerificationMessageRepository(
         UnsignedVerificationMessageRecord(
             id = id,
             walletAddress = walletAddress.rawValue,
-            createdAt = createdAt,
-            validUntil = validUntil
+            createdAt = createdAt.value,
+            validUntil = validUntil.value
         )
 
     private fun UnsignedVerificationMessageRecord.toModel(): UnsignedVerificationMessage =
         UnsignedVerificationMessage(
             id = id!!,
             walletAddress = WalletAddress(walletAddress!!),
-            createdAt = createdAt!!,
-            validUntil = validUntil!!
+            createdAt = UtcDateTime(createdAt!!),
+            validUntil = UtcDateTime(validUntil!!)
         )
 }

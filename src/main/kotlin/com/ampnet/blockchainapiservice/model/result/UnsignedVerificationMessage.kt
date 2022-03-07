@@ -1,20 +1,20 @@
 package com.ampnet.blockchainapiservice.model.result
 
+import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import java.time.Duration
-import java.time.OffsetDateTime
 import java.util.UUID
 
 data class UnsignedVerificationMessage(
     val id: UUID,
     val walletAddress: WalletAddress,
-    val createdAt: OffsetDateTime,
-    val validUntil: OffsetDateTime
+    val createdAt: UtcDateTime,
+    val validUntil: UtcDateTime
 ) {
-    constructor(id: UUID, walletAddress: WalletAddress, createdAt: OffsetDateTime, validityDuration: Duration) :
-        this(id, walletAddress, createdAt, createdAt.plus(validityDuration))
+    constructor(id: UUID, walletAddress: WalletAddress, createdAt: UtcDateTime, validityDuration: Duration) :
+        this(id, walletAddress, createdAt, createdAt + validityDuration)
 
-    fun isValid(now: OffsetDateTime): Boolean {
+    fun isValid(now: UtcDateTime): Boolean {
         return now.isBefore(validUntil)
     }
 }
