@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  blockchain-api-service-postgres:
+    container_name: blockchain-api-service-postgres
+    image: "postgres:13.4-alpine"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"

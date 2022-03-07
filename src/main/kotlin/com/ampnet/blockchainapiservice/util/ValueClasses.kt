@@ -1,0 +1,43 @@
+package com.ampnet.blockchainapiservice.util
+
+import org.web3j.abi.datatypes.Address
+import org.web3j.abi.datatypes.Uint
+import java.math.BigInteger
+
+@JvmInline
+value class WalletAddress private constructor(val value: Address) {
+    companion object {
+        operator fun invoke(value: Address) = WalletAddress(value.toString())
+    }
+
+    constructor(value: String) : this(Address(value.lowercase()))
+
+    val rawValue: String
+        get() = value.value
+}
+
+@JvmInline
+value class ContractAddress private constructor(val value: Address) {
+    companion object {
+        operator fun invoke(value: Address) = ContractAddress(value.toString())
+    }
+
+    constructor(value: String) : this(Address(value.lowercase()))
+
+    val rawValue: String
+        get() = value.value
+}
+
+@JvmInline
+value class Balance(val value: Uint) {
+    constructor(value: BigInteger) : this(Uint(value))
+
+    val rawValue: BigInteger
+        get() = value.value
+}
+
+@JvmInline
+value class ChainId(val value: Long)
+
+@JvmInline
+value class BlockNumber(val value: BigInteger)
