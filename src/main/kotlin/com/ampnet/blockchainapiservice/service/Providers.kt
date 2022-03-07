@@ -1,7 +1,7 @@
 package com.ampnet.blockchainapiservice.service
 
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.UUID
 
 interface UuidProvider {
@@ -13,11 +13,11 @@ class RandomUuidProvider : UuidProvider {
     override fun getUuid(): UUID = UUID.randomUUID()
 }
 
-interface LocalDateTimeProvider {
-    fun getLocalDateTime(): LocalDateTime
+interface OffsetDateTimeProvider {
+    fun getOffsetDateTime(): OffsetDateTime
 }
 
 @Service
-class CurrentLocalDateTimeProvider : LocalDateTimeProvider {
-    override fun getLocalDateTime(): LocalDateTime = LocalDateTime.now()
+class CurrentOffsetDateTimeProvider : OffsetDateTimeProvider {
+    override fun getOffsetDateTime(): OffsetDateTime = OffsetDateTime.now()
 }

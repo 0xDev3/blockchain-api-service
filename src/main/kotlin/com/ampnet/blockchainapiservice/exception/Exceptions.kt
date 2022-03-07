@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.exception
 
+import com.ampnet.blockchainapiservice.util.ChainId
 import org.springframework.http.HttpStatus
 
 abstract class ServiceException(
@@ -19,5 +20,15 @@ class ResourceNotFoundException(message: String) : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = 8937915498141342807L
+    }
+}
+
+class UnsupportedChainIdException(chainId: ChainId) : ServiceException(
+    errorCode = ErrorCode.UNSUPPORTED_CHAIN_ID,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Blockchain id: $chainId not supported"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -8803854722161717146L
     }
 }
