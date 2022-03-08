@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service
 
 @Service
 class VerificationServiceImpl(
-    private val applicationProperties: ApplicationProperties,
     private val unsignedVerificationMessageRepository: UnsignedVerificationMessageRepository,
     private val uuidProvider: UuidProvider,
-    private val utcDateTimeProvider: UtcDateTimeProvider
+    private val utcDateTimeProvider: UtcDateTimeProvider,
+    private val applicationProperties: ApplicationProperties
 ) : VerificationService {
 
     companion object : KLogging()
