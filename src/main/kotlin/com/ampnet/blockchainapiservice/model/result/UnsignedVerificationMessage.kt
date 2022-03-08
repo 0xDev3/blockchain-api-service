@@ -17,4 +17,8 @@ data class UnsignedVerificationMessage(
     fun isValid(now: UtcDateTime): Boolean {
         return now.isBefore(validUntil)
     }
+
+    fun toStringMessage(): String =
+        "By signing this message, I verify that I'm the owner of wallet address ${walletAddress.rawValue}." +
+            " Message ID: $id, timestamp: ${createdAt.value.toInstant().toEpochMilli()}"
 }
