@@ -26,6 +26,7 @@ class ChainProperties {
     var startBlockNumber: BigInteger? = null
 }
 
+@Suppress("MagicNumber")
 class VerificationProperties {
     var unsignedMessageValidity: Duration = Duration.ofMinutes(15L)
 }

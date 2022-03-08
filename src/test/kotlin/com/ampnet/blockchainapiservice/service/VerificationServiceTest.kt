@@ -37,7 +37,6 @@ class VerificationServiceTest : TestBase() {
                 .willReturn(message)
         }
 
-
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID is returned") {
