@@ -23,7 +23,7 @@ import java.util.UUID
 @JooqTest
 @Import(JooqUnsignedVerificationMessageRepository::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JooqUnsignedVerificationMessageRepositoryTest : TestBase() {
+class JooqUnsignedVerificationMessageRepositoryIntegTest : TestBase() {
 
     companion object {
         private val WALLET_ADDRESS = WalletAddress("0")
