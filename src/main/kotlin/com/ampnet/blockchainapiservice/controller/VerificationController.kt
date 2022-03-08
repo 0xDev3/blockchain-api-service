@@ -15,7 +15,7 @@ class VerificationController(private val verificationService: VerificationServic
     companion object : KLogging()
 
     @PostMapping("/verification/{walletAddress}/generate")
-    fun createVerificationMessage(
+    fun generateVerificationMessage(
         @PathVariable walletAddress: String
     ): ResponseEntity<GenerateVerificationMessageResponse> {
         logger.info { "Request generation of verification message for wallet address: $walletAddress" }
