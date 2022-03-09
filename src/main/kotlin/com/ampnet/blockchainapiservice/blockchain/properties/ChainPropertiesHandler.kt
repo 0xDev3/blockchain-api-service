@@ -2,8 +2,7 @@ package com.ampnet.blockchainapiservice.blockchain.properties
 
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.config.ChainProperties
-import com.ampnet.blockchainapiservice.exception.ErrorCode
-import com.ampnet.blockchainapiservice.exception.InternalException
+import com.ampnet.blockchainapiservice.exception.UnsupportedChainIdException
 import com.ampnet.blockchainapiservice.util.ChainId
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
@@ -12,7 +11,6 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
 
     private val blockchainPropertiesMap = mutableMapOf<ChainId, ChainPropertiesWithServices>()
 
-    @Throws(InternalException::class)
     fun getBlockchainProperties(chainId: ChainId): ChainPropertiesWithServices {
         return blockchainPropertiesMap.computeIfAbsent(chainId) {
             generateBlockchainProperties(getChain(it))
@@ -45,5 +43,5 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
     }
 
     private fun getChain(chainId: ChainId) = Chain.fromId(chainId)
-        ?: throw InternalException(ErrorCode.BLOCKCHAIN_ID, "Blockchain id: $chainId not supported")
+        ?: throw UnsupportedChainIdException(chainId)
 }
