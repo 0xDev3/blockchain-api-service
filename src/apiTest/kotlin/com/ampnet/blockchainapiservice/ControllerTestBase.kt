@@ -1,12 +1,10 @@
 package com.ampnet.blockchainapiservice
 
 import com.ampnet.blockchainapiservice.TestBase.Companion.VerifyMessage
-import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.exception.ErrorResponse
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
-import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -35,11 +33,7 @@ import org.springframework.web.context.WebApplicationContext
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class ControllerTestBase : TestBase() {
 
-    protected final val userAddress = WalletAddress("0x8f52B0cC50967fc59C6289f8FDB3E356EdeEBD23")
-    protected final val secondUserAddress = WalletAddress("0xd43e088622404A5A21267033EC200383d39C22ca")
-    protected final val contractAddress = ContractAddress("0x5BF28A1E60Eb56107FAd2dE1F2AA51FC7A60C690")
-    protected final val issuerAddress = ContractAddress("0x1BC7B42173C68073FF168C53A667E0AD2952897B")
-    protected final val chainId = Chain.HARDHAT_TESTNET.id
+    protected final val walletAddress = WalletAddress("0x8f52B0cC50967fc59C6289f8FDB3E356EdeEBD23")
 
     @Suppress("unused")
     protected val postgresContainer = PostgresTestContainer()
