@@ -5,7 +5,7 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainPropertiesHandler
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.ErrorCode
-import com.ampnet.blockchainapiservice.exception.InternalException
+import com.ampnet.blockchainapiservice.exception.UnsupportedChainIdException
 import com.ampnet.blockchainapiservice.util.ChainId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -32,10 +32,10 @@ class ChainPropertiesHandlerTest : TestBase() {
         }
 
         verify("InternalException is thrown") {
-            val exception = assertThrows<InternalException>(message) {
+            val exception = assertThrows<UnsupportedChainIdException>(message) {
                 chainPropertiesHandler.getBlockchainProperties(ChainId(-1))
             }
-            assertThat(exception.errorCode).withMessage().isEqualTo(ErrorCode.BLOCKCHAIN_ID)
+            assertThat(exception.errorCode).withMessage().isEqualTo(ErrorCode.UNSUPPORTED_CHAIN_ID)
         }
     }
 
