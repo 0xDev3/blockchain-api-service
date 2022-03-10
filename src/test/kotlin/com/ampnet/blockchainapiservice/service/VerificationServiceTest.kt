@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.service
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.model.result.UnsignedVerificationMessage
+import com.ampnet.blockchainapiservice.repository.SignedVerificationMessageRepository
 import com.ampnet.blockchainapiservice.repository.UnsignedVerificationMessageRepository
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -30,10 +31,10 @@ class VerificationServiceTest : TestBase() {
             validUntil = now + validityDuration
         )
 
-        val repository = mock<UnsignedVerificationMessageRepository>()
+        val unsignedMessageRepository = mock<UnsignedVerificationMessageRepository>()
 
         suppose("unsigned verification message will be stored into database") {
-            given(repository.store(message))
+            given(unsignedMessageRepository.store(message))
                 .willReturn(message)
         }
 
@@ -55,7 +56,14 @@ class VerificationServiceTest : TestBase() {
             ApplicationProperties().apply { verification.unsignedMessageValidity = validityDuration }
         }
 
-        val service = VerificationServiceImpl(repository, uuidProvider, utcDateTimeProvider, applicationProperties)
+        val signedMessageRepository = mock<SignedVerificationMessageRepository>()
+        val service = VerificationServiceImpl(
+            unsignedMessageRepository,
+            signedMessageRepository,
+            uuidProvider,
+            utcDateTimeProvider,
+            applicationProperties
+        )
 
         verify("unsigned verification message is correctly created") {
             val result = service.createUnsignedVerificationMessage(walletAddress)

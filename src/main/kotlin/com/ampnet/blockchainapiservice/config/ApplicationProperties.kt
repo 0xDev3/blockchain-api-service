@@ -29,4 +29,5 @@ class ChainProperties {
 @Suppress("MagicNumber")
 class VerificationProperties {
     var unsignedMessageValidity: Duration = Duration.ofMinutes(15L)
+    var signedMessageValidity: Duration = Duration.ofMinutes(5L)
 }

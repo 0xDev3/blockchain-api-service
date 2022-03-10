@@ -32,6 +32,7 @@ object Versions {
 
     object Dependencies {
         const val web3j = "4.8.9"
+        const val kethereum = "0.85.7"
         const val okHttp = "4.9.3"
         const val kotlinCoroutines = "1.6.0"
         const val kotlinLogging = "2.1.21"
