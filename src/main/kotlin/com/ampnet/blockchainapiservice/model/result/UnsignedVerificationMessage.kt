@@ -18,7 +18,6 @@ data class UnsignedVerificationMessage(
         return now.isBefore(validUntil)
     }
 
-    // TODO add validation here in SD-612
     fun withSignature(signature: String, now: UtcDateTime, validityDuration: Duration): SignedVerificationMessage =
         SignedVerificationMessage(
             id = id,
