@@ -18,7 +18,7 @@ data class UnsignedVerificationMessage(
         return now.isBefore(validUntil)
     }
 
-    fun withSignature(signature: String, now: UtcDateTime, validityDuration: Duration): SignedVerificationMessage =
+    fun toSignedMessage(signature: String, now: UtcDateTime, validityDuration: Duration): SignedVerificationMessage =
         SignedVerificationMessage(
             id = id,
             walletAddress = walletAddress,
