@@ -60,7 +60,7 @@ class VerificationServiceImpl(
 
         val now = utcDateTimeProvider.getUtcDateTime()
 
-        if (!unsignedMessage.isValid(now)) {
+        if (unsignedMessage.isExpired(now)) {
             throw ExpiredValidationMessageException(messageId)
         }
 

@@ -17,7 +17,7 @@ value class UtcDateTime private constructor(val value: OffsetDateTime) {
     operator fun plus(duration: Duration): UtcDateTime = UtcDateTime(value + duration)
     operator fun minus(duration: Duration): UtcDateTime = UtcDateTime(value - duration)
 
-    fun isBefore(other: UtcDateTime): Boolean = value.isBefore(other.value)
+    fun isAfter(other: UtcDateTime): Boolean = value.isAfter(other.value)
 }
 
 @JvmInline
