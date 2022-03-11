@@ -24,3 +24,11 @@ is the user wallet address.
 include::{snippets}/VerificationControllerApiTest/mustCorrectlyGenerateVerificationMessageAndStoreItInDatabase/http-request.adoc[]
 .Response
 include::{snippets}/VerificationControllerApiTest/mustCorrectlyGenerateVerificationMessageAndStoreItInDatabase/http-response.adoc[]
+
+=== Verify message signature
+Verifies verification message signature. Path argument is the message ID.
+
+.Request
+include::{snippets}/VerificationControllerApiTest/mustCorrectlyVerifyValidMessageSignature/http-request.adoc[]
+.Response
+include::{snippets}/VerificationControllerApiTest/mustCorrectlyVerifyValidMessageSignature/http-response.adoc[]
