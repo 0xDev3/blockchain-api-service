@@ -3,6 +3,7 @@ CREATE TABLE blockchain_api_service.signed_verification_message (
     wallet_address VARCHAR                  NOT NULL,
     signature      VARCHAR                  NOT NULL,
     created_at     TIMESTAMP WITH TIME ZONE NOT NULL,
+    verified_at    TIMESTAMP WITH TIME ZONE NOT NULL,
     valid_until    TIMESTAMP WITH TIME ZONE NOT NULL
 );
 

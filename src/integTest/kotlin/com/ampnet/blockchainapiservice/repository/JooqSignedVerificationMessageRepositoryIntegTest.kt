@@ -28,7 +28,8 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
     companion object {
         private val WALLET_ADDRESS = WalletAddress("0")
         private val CREATED_AT = UtcDateTime(OffsetDateTime.parse("2022-01-01T00:00:00Z"))
-        private val VALID_UNTIL = CREATED_AT + Duration.ofDays(1L)
+        private val VERIFIED_AT = CREATED_AT + Duration.ofMinutes(1L)
+        private val VALID_UNTIL = VERIFIED_AT + Duration.ofDays(1L)
         private const val SIGNATURE = "test_signature"
     }
 
@@ -55,6 +56,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
                     walletAddress = WALLET_ADDRESS.rawValue,
                     signature = SIGNATURE,
                     createdAt = CREATED_AT.value,
+                    verifiedAt = VERIFIED_AT.value,
                     validUntil = VALID_UNTIL.value
                 )
             )
@@ -70,6 +72,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
                         walletAddress = WALLET_ADDRESS,
                         signature = SIGNATURE,
                         createdAt = CREATED_AT,
+                        verifiedAt = VERIFIED_AT,
                         validUntil = VALID_UNTIL
                     )
                 )
@@ -120,6 +123,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
                     walletAddress = WALLET_ADDRESS.rawValue,
                     signature = SIGNATURE,
                     createdAt = CREATED_AT.value,
+                    verifiedAt = VERIFIED_AT.value,
                     validUntil = VALID_UNTIL.value
                 )
             )
@@ -197,6 +201,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
             walletAddress = WALLET_ADDRESS,
             signature = SIGNATURE,
             createdAt = CREATED_AT,
+            verifiedAt = VERIFIED_AT,
             validUntil = validUntil
         )
 }

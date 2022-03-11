@@ -9,6 +9,7 @@ data class SignedVerificationMessage(
     val walletAddress: WalletAddress,
     val signature: String,
     val createdAt: UtcDateTime,
+    val verifiedAt: UtcDateTime,
     val validUntil: UtcDateTime
 ) {
     fun isValid(now: UtcDateTime): Boolean {

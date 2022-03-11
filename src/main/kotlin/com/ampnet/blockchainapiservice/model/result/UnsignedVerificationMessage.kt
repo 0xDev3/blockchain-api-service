@@ -23,7 +23,8 @@ data class UnsignedVerificationMessage(
             id = id,
             walletAddress = walletAddress,
             signature = signature,
-            createdAt = now,
+            createdAt = createdAt,
+            verifiedAt = now,
             validUntil = now + validityDuration
         )
 
