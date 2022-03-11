@@ -30,7 +30,7 @@ class VerificationServiceImpl(
         private const val EIP_191_MAGIC_BYTE = 0x19.toByte()
         private const val SIGNATURE_LENGTH = 132
         private const val R_START = 2
-        private const val R_END = 2
+        private const val R_END = 66
         private const val S_START = 66
         private const val S_END = 130
         private const val V_START = 130
