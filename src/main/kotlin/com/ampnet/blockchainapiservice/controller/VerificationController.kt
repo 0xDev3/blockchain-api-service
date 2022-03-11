@@ -44,7 +44,7 @@ class VerificationController(private val verificationService: VerificationServic
             VerifySignedMessageResponse(
                 id = signedMessage.id,
                 signature = signedMessage.signature,
-                validUntil = signedMessage.validUntil
+                validUntil = signedMessage.validUntil.value
             )
         )
     }
