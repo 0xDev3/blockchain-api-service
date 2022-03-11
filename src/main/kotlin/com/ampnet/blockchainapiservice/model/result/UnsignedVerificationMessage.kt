@@ -18,6 +18,16 @@ data class UnsignedVerificationMessage(
         return now.isBefore(validUntil)
     }
 
+    fun toSignedMessage(signature: String, now: UtcDateTime, validityDuration: Duration): SignedVerificationMessage =
+        SignedVerificationMessage(
+            id = id,
+            walletAddress = walletAddress,
+            signature = signature,
+            createdAt = createdAt,
+            verifiedAt = now,
+            validUntil = now + validityDuration
+        )
+
     fun toStringMessage(): String =
         "By signing this message, I verify that I'm the owner of wallet address ${walletAddress.rawValue}." +
             " Message ID: $id, timestamp: ${createdAt.value.toInstant().toEpochMilli()}"
