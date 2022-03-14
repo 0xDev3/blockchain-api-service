@@ -2,6 +2,8 @@ package com.ampnet.blockchainapiservice.util
 
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Uint
+import org.web3j.protocol.core.DefaultBlockParameter
+import org.web3j.protocol.core.DefaultBlockParameterName
 import java.math.BigInteger
 import java.time.Duration
 import java.time.OffsetDateTime
@@ -55,5 +57,19 @@ value class Balance(val value: Uint) {
 @JvmInline
 value class ChainId(val value: Long)
 
+sealed interface BlockParameter {
+    fun toWeb3Parameter(): DefaultBlockParameter
+}
+
 @JvmInline
-value class BlockNumber(val value: BigInteger)
+value class BlockNumber(val value: BigInteger) : BlockParameter {
+    override fun toWeb3Parameter() = DefaultBlockParameter.valueOf(value)
+}
+
+enum class BlockName(private val web3BlockName: DefaultBlockParameterName) : BlockParameter {
+    EARLIEST(DefaultBlockParameterName.EARLIEST),
+    LATEST(DefaultBlockParameterName.LATEST),
+    PENDING(DefaultBlockParameterName.PENDING);
+
+    override fun toWeb3Parameter() = web3BlockName
+}
