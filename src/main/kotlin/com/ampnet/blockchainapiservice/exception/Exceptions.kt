@@ -27,7 +27,7 @@ class ResourceNotFoundException(message: String) : ServiceException(
 class UnsupportedChainIdException(chainId: ChainId) : ServiceException(
     errorCode = ErrorCode.UNSUPPORTED_CHAIN_ID,
     httpStatus = HttpStatus.BAD_REQUEST,
-    message = "Blockchain id: $chainId not supported"
+    message = "Blockchain id: ${chainId.value} not supported"
 ) {
     companion object {
         private const val serialVersionUID: Long = -8803854722161717146L
@@ -51,5 +51,15 @@ class BadSignatureException(message: String) : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = 1135423205237947970L
+    }
+}
+
+class BlockchainReadException(message: String) : ServiceException(
+    errorCode = ErrorCode.BLOCKCHAIN_READ_ERROR,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = message
+) {
+    companion object {
+        private const val serialVersionUID: Long = -5979025245655611755L
     }
 }
