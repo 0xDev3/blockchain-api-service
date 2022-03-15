@@ -14,8 +14,8 @@ data class UnsignedVerificationMessage(
     constructor(id: UUID, walletAddress: WalletAddress, createdAt: UtcDateTime, validityDuration: Duration) :
         this(id, walletAddress, createdAt, createdAt + validityDuration)
 
-    fun isValid(now: UtcDateTime): Boolean {
-        return now.isBefore(validUntil)
+    fun isExpired(now: UtcDateTime): Boolean {
+        return now.isAfter(validUntil)
     }
 
     fun toSignedMessage(signature: String, now: UtcDateTime, validityDuration: Duration): SignedVerificationMessage =

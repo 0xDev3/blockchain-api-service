@@ -12,7 +12,7 @@ data class SignedVerificationMessage(
     val verifiedAt: UtcDateTime,
     val validUntil: UtcDateTime
 ) {
-    fun isValid(now: UtcDateTime): Boolean {
-        return now.isBefore(validUntil)
+    fun isExpired(now: UtcDateTime): Boolean {
+        return now.isAfter(validUntil)
     }
 }
