@@ -7,5 +7,5 @@ import java.util.UUID
 
 interface VerificationService {
     fun createUnsignedVerificationMessage(walletAddress: WalletAddress): UnsignedVerificationMessage
-    fun verifyMessageSignature(messageId: UUID, signature: String): SignedVerificationMessage
+    fun verifyAndStoreMessageSignature(messageId: UUID, signature: String): SignedVerificationMessage
 }

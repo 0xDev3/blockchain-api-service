@@ -119,7 +119,7 @@ class VerificationServiceTest : TestBase() {
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
-                service.verifyMessageSignature(SIGNED_MESSAGE.id, SIGNED_MESSAGE.signature)
+                service.verifyAndStoreMessageSignature(SIGNED_MESSAGE.id, SIGNED_MESSAGE.signature)
             }
         }
     }
@@ -159,7 +159,7 @@ class VerificationServiceTest : TestBase() {
 
         verify("ExpiredValidationMessageException is thrown") {
             assertThrows<ExpiredValidationMessageException>(message) {
-                service.verifyMessageSignature(SIGNED_MESSAGE.id, SIGNED_MESSAGE.signature)
+                service.verifyAndStoreMessageSignature(SIGNED_MESSAGE.id, SIGNED_MESSAGE.signature)
             }
         }
     }
@@ -199,7 +199,7 @@ class VerificationServiceTest : TestBase() {
 
         verify("BadSignatureException is thrown") {
             assertThrows<BadSignatureException>(message) {
-                service.verifyMessageSignature(SIGNED_MESSAGE.id, "too short signature")
+                service.verifyAndStoreMessageSignature(SIGNED_MESSAGE.id, "too short signature")
             }
         }
     }
@@ -239,7 +239,10 @@ class VerificationServiceTest : TestBase() {
 
         verify("BadSignatureException is thrown") {
             assertThrows<BadSignatureException>(message) {
-                service.verifyMessageSignature(SIGNED_MESSAGE.id, SIGNED_MESSAGE.signature.replace(".".toRegex(), "x"))
+                service.verifyAndStoreMessageSignature(
+                    SIGNED_MESSAGE.id,
+                    SIGNED_MESSAGE.signature.replace(".".toRegex(), "x")
+                )
             }
         }
     }
@@ -279,7 +282,7 @@ class VerificationServiceTest : TestBase() {
 
         verify("BadSignatureException is thrown") {
             assertThrows<BadSignatureException>(message) {
-                service.verifyMessageSignature(SIGNED_MESSAGE.id, OTHER_SIGNATURE)
+                service.verifyAndStoreMessageSignature(SIGNED_MESSAGE.id, OTHER_SIGNATURE)
             }
         }
     }
@@ -331,7 +334,7 @@ class VerificationServiceTest : TestBase() {
         )
 
         verify("valid message is correctly verified") {
-            val result = service.verifyMessageSignature(SIGNED_MESSAGE.id, SIGNED_MESSAGE.signature)
+            val result = service.verifyAndStoreMessageSignature(SIGNED_MESSAGE.id, SIGNED_MESSAGE.signature)
 
             assertThat(result).withMessage()
                 .isEqualTo(SIGNED_MESSAGE)
