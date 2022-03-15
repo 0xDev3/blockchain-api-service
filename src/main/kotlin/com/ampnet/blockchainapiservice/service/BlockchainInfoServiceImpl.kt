@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
+import com.ampnet.blockchainapiservice.exception.ExpiredValidationMessageException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.repository.SignedVerificationMessageRepository
 import com.ampnet.blockchainapiservice.util.AccountBalance
@@ -14,7 +15,8 @@ import java.util.UUID
 @Service
 class BlockchainInfoServiceImpl(
     private val signedVerificationMessageRepository: SignedVerificationMessageRepository,
-    private val blockchainService: BlockchainService
+    private val blockchainService: BlockchainService,
+    private val utcDateTimeProvider: UtcDateTimeProvider
 ) : BlockchainInfoService {
 
     companion object : KLogging()
@@ -32,6 +34,12 @@ class BlockchainInfoServiceImpl(
 
         val signedMessage = signedVerificationMessageRepository.getById(messageId)
             ?: throw ResourceNotFoundException("Message not found for ID: $messageId")
+
+        val now = utcDateTimeProvider.getUtcDateTime()
+
+        if (signedMessage.isExpired(now)) {
+            throw ExpiredValidationMessageException(messageId)
+        }
 
         logger.debug { "Message with ID $messageId was signed by ${signedMessage.walletAddress}" }
 
