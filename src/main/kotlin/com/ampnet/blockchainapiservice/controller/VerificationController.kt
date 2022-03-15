@@ -39,7 +39,7 @@ class VerificationController(private val verificationService: VerificationServic
         @RequestBody requestBody: VerifySignedMessageRequest
     ): ResponseEntity<VerifySignedMessageResponse> {
         logger.info { "Validating signature for messageId: $messageId, signature: ${requestBody.signature}" }
-        val signedMessage = verificationService.verifyMessageSignature(messageId, requestBody.signature)
+        val signedMessage = verificationService.verifyAndStoreMessageSignature(messageId, requestBody.signature)
         return ResponseEntity.ok(
             VerifySignedMessageResponse(
                 id = signedMessage.id,

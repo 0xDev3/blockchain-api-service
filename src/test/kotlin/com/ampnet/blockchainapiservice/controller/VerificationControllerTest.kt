@@ -73,7 +73,7 @@ class VerificationControllerTest : TestBase() {
         val service = mock<VerificationService>()
 
         suppose("service will return some signed verification message") {
-            given(service.verifyMessageSignature(messageId, signature))
+            given(service.verifyAndStoreMessageSignature(messageId, signature))
                 .willReturn(message)
         }
 
