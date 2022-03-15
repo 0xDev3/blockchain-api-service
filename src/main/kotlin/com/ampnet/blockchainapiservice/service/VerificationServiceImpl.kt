@@ -52,7 +52,7 @@ class VerificationServiceImpl(
         return unsignedVerificationMessageRepository.store(message)
     }
 
-    override fun verifyMessageSignature(messageId: UUID, signature: String): SignedVerificationMessage {
+    override fun verifyAndStoreMessageSignature(messageId: UUID, signature: String): SignedVerificationMessage {
         logger.info { "Verifying message signature, messageId: $messageId, signature: $signature" }
 
         val unsignedMessage = unsignedVerificationMessageRepository.getById(messageId)
