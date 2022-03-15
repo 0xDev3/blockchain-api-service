@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice
 
 import com.ampnet.blockchainapiservice.TestBase.Companion.VerifyMessage
+import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.exception.ErrorResponse
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
@@ -34,6 +35,7 @@ import org.springframework.web.context.WebApplicationContext
 class ControllerTestBase : TestBase() {
 
     protected final val walletAddress = WalletAddress("0x8f52B0cC50967fc59C6289f8FDB3E356EdeEBD23")
+    protected final val chainId = Chain.HARDHAT_TESTNET.id
 
     @Suppress("unused")
     protected val postgresContainer = PostgresTestContainer()
