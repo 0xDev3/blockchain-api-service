@@ -81,6 +81,7 @@ class VerificationServiceImpl(
         return signedVerificationMessageRepository.store(
             unsignedMessage.toSignedMessage(
                 signature = signature,
+                messageId = uuidProvider.getUuid(),
                 now = now,
                 validityDuration = applicationProperties.verification.signedMessageValidity
             )

@@ -272,6 +272,12 @@ class VerificationServiceTest : TestBase() {
         }
 
         val uuidProvider = mock<UuidProvider>()
+
+        suppose("new UUID will be used for signed message") {
+            given(uuidProvider.getUuid())
+                .willReturn(TestData.SIGNED_MESSAGE.id)
+        }
+
         val applicationProperties = ApplicationProperties().apply {
             verification.signedMessageValidity = Duration.ofHours(1L)
         }
