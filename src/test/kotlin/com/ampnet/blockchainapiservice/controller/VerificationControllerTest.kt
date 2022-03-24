@@ -58,6 +58,7 @@ class VerificationControllerTest : TestBase() {
 
     @Test
     fun mustReturnVerifiedSignedMessage() {
+        val signedId = UUID.randomUUID()
         val messageId = UUID.randomUUID()
         val validUntil = UtcDateTime(OffsetDateTime.parse("2022-01-01T02:00:00Z"))
         val signature = "test-signature"
@@ -66,6 +67,7 @@ class VerificationControllerTest : TestBase() {
             id = messageId,
             walletAddress = WalletAddress("123"),
             signature = signature,
+            signedId = signedId,
             createdAt = UtcDateTime(OffsetDateTime.parse("2022-01-01T00:00:00Z")),
             verifiedAt = UtcDateTime(OffsetDateTime.parse("2022-01-01T01:00:00Z")),
             validUntil = validUntil
@@ -73,14 +75,14 @@ class VerificationControllerTest : TestBase() {
         val service = mock<VerificationService>()
 
         suppose("service will return some signed verification message") {
-            given(service.verifyAndStoreMessageSignature(messageId, signature))
+            given(service.verifyAndStoreMessageSignature(signedId, signature))
                 .willReturn(message)
         }
 
         val controller = VerificationController(service)
 
         verify("controller returns correct response") {
-            val result = controller.verifySignedMessage(messageId, VerifySignedMessageRequest(signature))
+            val result = controller.verifySignedMessage(signedId, VerifySignedMessageRequest(signature))
 
             assertThat(result).withMessage()
                 .isEqualTo(
