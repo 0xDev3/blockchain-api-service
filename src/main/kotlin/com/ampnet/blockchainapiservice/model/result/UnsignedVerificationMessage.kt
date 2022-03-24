@@ -18,11 +18,17 @@ data class UnsignedVerificationMessage(
         return now.isAfter(validUntil)
     }
 
-    fun toSignedMessage(signature: String, now: UtcDateTime, validityDuration: Duration): SignedVerificationMessage =
+    fun toSignedMessage(
+        signature: String,
+        messageId: UUID,
+        now: UtcDateTime,
+        validityDuration: Duration
+    ): SignedVerificationMessage =
         SignedVerificationMessage(
-            id = id,
+            id = messageId,
             walletAddress = walletAddress,
             signature = signature,
+            signedId = id, // original message ID is the one which is used in the message to sign
             createdAt = createdAt,
             verifiedAt = now,
             validUntil = now + validityDuration

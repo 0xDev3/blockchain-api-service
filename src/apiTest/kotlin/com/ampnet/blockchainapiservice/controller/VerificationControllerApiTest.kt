@@ -10,6 +10,7 @@ import com.ampnet.blockchainapiservice.model.result.UnsignedVerificationMessage
 import com.ampnet.blockchainapiservice.repository.SignedVerificationMessageRepository
 import com.ampnet.blockchainapiservice.repository.UnsignedVerificationMessageRepository
 import com.ampnet.blockchainapiservice.service.UtcDateTimeProvider
+import com.ampnet.blockchainapiservice.service.UuidProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.time.Duration
+import java.util.UUID
 import com.ampnet.blockchainapiservice.generated.jooq.tables.SignedVerificationMessage as SignedVerificationMessageTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.UnsignedVerificationMessage as UnsignedVerificationMessageTable
 
@@ -38,6 +40,9 @@ class VerificationControllerApiTest : ControllerTestBase() {
     @MockBean
     private lateinit var utcDateTimeProvider: UtcDateTimeProvider
 
+    @MockBean
+    private lateinit var uuidProvider: UuidProvider
+
     @BeforeEach
     fun beforeEach() {
         dslContext.deleteFrom(UnsignedVerificationMessageTable.UNSIGNED_VERIFICATION_MESSAGE).execute()
@@ -51,6 +56,13 @@ class VerificationControllerApiTest : ControllerTestBase() {
                 .willReturn(TestData.UNSIGNED_MESSAGE.createdAt)
         }
 
+        val messageId = UUID.randomUUID()
+
+        suppose("some UUID will be returned") {
+            given(uuidProvider.getUuid())
+                .willReturn(messageId)
+        }
+
         val generatedMessage = suppose("request to generate verification message is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/verification/generate/${walletAddress.rawValue}")
@@ -61,16 +73,16 @@ class VerificationControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(response.response.contentAsString, GenerateVerificationMessageResponse::class.java)
         }
 
-        val databaseMessage = unsignedVerificationMessageRepository.getById(generatedMessage.id)
+        val databaseMessage = unsignedVerificationMessageRepository.getById(messageId)
 
         verify("generated verification message is present in database") {
             assertThat(databaseMessage).withMessage()
                 .isNotNull()
                 .isEqualTo(
                     UnsignedVerificationMessage(
-                        id = databaseMessage!!.id,
+                        id = messageId,
                         walletAddress = walletAddress,
-                        createdAt = databaseMessage.createdAt,
+                        createdAt = databaseMessage!!.createdAt,
                         validUntil = databaseMessage.validUntil
                     )
                 )
@@ -80,8 +92,8 @@ class VerificationControllerApiTest : ControllerTestBase() {
             assertThat(generatedMessage).withMessage()
                 .isEqualTo(
                     GenerateVerificationMessageResponse(
-                        id = databaseMessage!!.id,
-                        message = databaseMessage.toStringMessage(),
+                        id = messageId,
+                        message = databaseMessage!!.toStringMessage(),
                         validUntil = databaseMessage.validUntil.value
                     )
                 )
@@ -213,6 +225,11 @@ class VerificationControllerApiTest : ControllerTestBase() {
         suppose("some fixed date-time will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.UNSIGNED_MESSAGE.createdAt)
+        }
+
+        suppose("signed message ID will returned") {
+            given(uuidProvider.getUuid())
+                .willReturn(TestData.SIGNED_MESSAGE.id)
         }
 
         suppose("non-expired unsigned verification message exists in database") {

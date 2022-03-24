@@ -48,6 +48,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchSignedVerificationMessageById() {
         val id = UUID.randomUUID()
+        val signedId = UUID.randomUUID()
 
         suppose("some signed verification message exists in database") {
             dslContext.executeInsert(
@@ -55,6 +56,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
                     id = id,
                     walletAddress = WALLET_ADDRESS.rawValue,
                     signature = SIGNATURE,
+                    signedId = signedId,
                     createdAt = CREATED_AT.value,
                     verifiedAt = VERIFIED_AT.value,
                     validUntil = VALID_UNTIL.value
@@ -71,6 +73,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
                         id = id,
                         walletAddress = WALLET_ADDRESS,
                         signature = SIGNATURE,
+                        signedId = signedId,
                         createdAt = CREATED_AT,
                         verifiedAt = VERIFIED_AT,
                         validUntil = VALID_UNTIL
@@ -122,6 +125,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
                     id = id,
                     walletAddress = WALLET_ADDRESS.rawValue,
                     signature = SIGNATURE,
+                    signedId = UUID.randomUUID(),
                     createdAt = CREATED_AT.value,
                     verifiedAt = VERIFIED_AT.value,
                     validUntil = VALID_UNTIL.value
@@ -200,6 +204,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
             id = UUID.randomUUID(),
             walletAddress = WALLET_ADDRESS,
             signature = SIGNATURE,
+            signedId = UUID.randomUUID(),
             createdAt = CREATED_AT,
             verifiedAt = VERIFIED_AT,
             validUntil = validUntil

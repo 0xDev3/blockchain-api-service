@@ -20,6 +20,7 @@ object TestData {
     val SIGNED_MESSAGE = UNSIGNED_MESSAGE.toSignedMessage(
         signature = "0x2601a91eed301102ca423ffc36e43b4dc096bb556ecfb83f508047b34ab7236f4cd1eaaae98ee8eac9cde62988f062" +
             "891f3c84e241d320cf338bdfc17a51bc131b",
+        messageId = UUID.randomUUID(),
         now = UtcDateTime(OffsetDateTime.parse("2022-01-01T01:00:00Z")),
         validityDuration = Duration.ofHours(1L)
     )

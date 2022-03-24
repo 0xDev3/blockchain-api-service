@@ -8,6 +8,7 @@ data class SignedVerificationMessage(
     val id: UUID,
     val walletAddress: WalletAddress,
     val signature: String,
+    val signedId: UUID,
     val createdAt: UtcDateTime,
     val verifiedAt: UtcDateTime,
     val validUntil: UtcDateTime
