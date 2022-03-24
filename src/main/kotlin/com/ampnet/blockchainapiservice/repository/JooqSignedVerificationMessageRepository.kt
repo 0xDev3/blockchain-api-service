@@ -52,6 +52,7 @@ class JooqSignedVerificationMessageRepository(
             id = id,
             walletAddress = walletAddress.rawValue,
             signature = signature,
+            signedId = signedId,
             createdAt = createdAt.value,
             verifiedAt = verifiedAt.value,
             validUntil = validUntil.value
@@ -62,6 +63,7 @@ class JooqSignedVerificationMessageRepository(
             id = id!!,
             walletAddress = WalletAddress(walletAddress!!),
             signature = signature!!,
+            signedId = signedId!!,
             createdAt = UtcDateTime(createdAt!!),
             verifiedAt = UtcDateTime(verifiedAt!!),
             validUntil = UtcDateTime(validUntil!!)
