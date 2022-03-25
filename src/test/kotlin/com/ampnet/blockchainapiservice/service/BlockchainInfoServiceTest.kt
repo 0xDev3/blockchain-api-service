@@ -4,12 +4,14 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
+import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.exception.ExpiredValidationMessageException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.repository.SignedVerificationMessageRepository
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -39,7 +41,7 @@ class BlockchainInfoServiceTest : TestBase() {
                 .willReturn(TestData.SIGNED_MESSAGE.verifiedAt)
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
+        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
         val contractAddress = ContractAddress("a")
         val block = BlockNumber(BigInteger("123"))
         val accountBalance = AccountBalance(TestData.SIGNED_MESSAGE.walletAddress, Balance(BigInteger("10000")))
@@ -48,7 +50,7 @@ class BlockchainInfoServiceTest : TestBase() {
         suppose("blockchain service will return ERC20 balance of account") {
             given(
                 blockchainService.fetchErc20AccountBalance(
-                    chainId = chainId,
+                    chainSpec = chainSpec,
                     contractAddress = contractAddress,
                     walletAddress = TestData.SIGNED_MESSAGE.walletAddress,
                     block = block
@@ -65,7 +67,7 @@ class BlockchainInfoServiceTest : TestBase() {
         verify("correct ERC20 balance is fetched") {
             val result = service.fetchErc20AccountBalanceFromSignedMessage(
                 messageId = TestData.SIGNED_MESSAGE.id,
-                chainId = chainId,
+                chainSpec = chainSpec,
                 contractAddress = contractAddress,
                 block = block
             )
@@ -91,7 +93,7 @@ class BlockchainInfoServiceTest : TestBase() {
                 .willReturn(TestData.SIGNED_MESSAGE.validUntil + Duration.ofMinutes(1L))
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
+        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
         val contractAddress = ContractAddress("a")
         val block = BlockNumber(BigInteger("123"))
         val blockchainService = mock<BlockchainService>()
@@ -106,7 +108,7 @@ class BlockchainInfoServiceTest : TestBase() {
             assertThrows<ExpiredValidationMessageException>(message) {
                 service.fetchErc20AccountBalanceFromSignedMessage(
                     messageId = TestData.SIGNED_MESSAGE.id,
-                    chainId = chainId,
+                    chainSpec = chainSpec,
                     contractAddress = contractAddress,
                     block = block
                 )
@@ -135,10 +137,12 @@ class BlockchainInfoServiceTest : TestBase() {
             assertThrows<ResourceNotFoundException>(message) {
                 service.fetchErc20AccountBalanceFromSignedMessage(
                     messageId = UUID.randomUUID(),
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                     contractAddress = ContractAddress("a")
                 )
             }
         }
     }
+
+    private fun ChainId.toSpec() = ChainSpec(this, null)
 }

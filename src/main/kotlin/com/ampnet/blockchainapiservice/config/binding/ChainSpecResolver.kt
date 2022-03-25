@@ -13,6 +13,10 @@ import javax.servlet.http.HttpServletRequest
 
 class ChainSpecResolver : HandlerMethodArgumentResolver {
 
+    companion object {
+        const val RPC_URL_HEADER = "X-RPC-URL"
+    }
+
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.parameterType == ChainSpec::class.java &&
             parameter.hasParameterAnnotation(ChainBinding::class.java)
@@ -34,9 +38,11 @@ class ChainSpecResolver : HandlerMethodArgumentResolver {
 
         // chainId is a mandatory path variable
         val chainId = pathVariables?.get(chainIdPathVariable)?.let { ChainId(it.toLong()) }
-            ?: throw IllegalStateException("Path variable \"chainId\" is missing from the controller specification.")
+            ?: throw IllegalStateException(
+                "Path variable \"$chainIdPathVariable\" is missing from the controller specification."
+            )
         // RPC URL is an optional header
-        val rpcUrl = httpServletRequest.getHeader("X-RPC-URL")
+        val rpcUrl = httpServletRequest.getHeader(RPC_URL_HEADER)
 
         return ChainSpec(chainId, rpcUrl)
     }

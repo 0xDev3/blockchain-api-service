@@ -9,6 +9,7 @@ import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockName
 import com.ampnet.blockchainapiservice.util.BlockNumber
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
@@ -25,7 +26,7 @@ class BlockchainInfoControllerTest : TestBase() {
     fun mustReturnCorrectErc20TokenBalanceWhenBlockNumberIsNotProvided() {
         val accountBalance = AccountBalance(WalletAddress("123"), Balance(BigInteger("10000")))
         val messageId = UUID.randomUUID()
-        val chainId = Chain.HARDHAT_TESTNET.id
+        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
         val contractAddress = ContractAddress("abc")
 
         val service = mock<BlockchainInfoService>()
@@ -34,7 +35,7 @@ class BlockchainInfoControllerTest : TestBase() {
             given(
                 service.fetchErc20AccountBalanceFromSignedMessage(
                     messageId = messageId,
-                    chainId = chainId,
+                    chainSpec = chainSpec,
                     contractAddress = contractAddress,
                     block = BlockName.LATEST
                 )
@@ -46,7 +47,7 @@ class BlockchainInfoControllerTest : TestBase() {
 
         verify("controller returns correct response") {
             val result = controller.fetchErc20TokenBalance(
-                chainSpec = ChainSpec(chainId, null),
+                chainSpec = chainSpec,
                 messageId = messageId,
                 contractAddress = contractAddress,
                 blockNumber = null
@@ -69,7 +70,7 @@ class BlockchainInfoControllerTest : TestBase() {
     fun mustReturnCorrectErc20TokenBalanceForSpecifiedBlockNumber() {
         val accountBalance = AccountBalance(WalletAddress("123"), Balance(BigInteger("10000")))
         val messageId = UUID.randomUUID()
-        val chainId = Chain.HARDHAT_TESTNET.id
+        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
         val contractAddress = ContractAddress("abc")
         val blockNumber = BlockNumber(BigInteger("456"))
 
@@ -79,7 +80,7 @@ class BlockchainInfoControllerTest : TestBase() {
             given(
                 service.fetchErc20AccountBalanceFromSignedMessage(
                     messageId = messageId,
-                    chainId = chainId,
+                    chainSpec = chainSpec,
                     contractAddress = contractAddress,
                     block = blockNumber
                 )
@@ -91,7 +92,7 @@ class BlockchainInfoControllerTest : TestBase() {
 
         verify("controller returns correct response") {
             val result = controller.fetchErc20TokenBalance(
-                chainSpec = ChainSpec(chainId, null),
+                chainSpec = chainSpec,
                 messageId = messageId,
                 contractAddress = contractAddress,
                 blockNumber = blockNumber
@@ -109,4 +110,6 @@ class BlockchainInfoControllerTest : TestBase() {
                 )
         }
     }
+
+    private fun ChainId.toSpec() = ChainSpec(this, null)
 }
