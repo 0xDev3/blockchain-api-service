@@ -1,12 +1,12 @@
 package com.ampnet.blockchainapiservice.blockchain
 
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainPropertiesHandler
+import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockParameter
-import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
@@ -23,16 +23,16 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
     private val chainHandler = ChainPropertiesHandler(applicationProperties)
 
     override fun fetchErc20AccountBalance(
-        chainId: ChainId,
+        chainSpec: ChainSpec,
         contractAddress: ContractAddress,
         walletAddress: WalletAddress,
         block: BlockParameter
     ): AccountBalance {
         logger.debug {
-            "Fetching ERC20 balance, chainId: $chainId, contractAddress: $contractAddress," +
+            "Fetching ERC20 balance, chainSpec: $chainSpec, contractAddress: $contractAddress," +
                 " walletAddress: $walletAddress, block: $block"
         }
-        val blockchainProperties = chainHandler.getBlockchainProperties(chainId)
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
         val contract = IERC20.load(
             contractAddress.rawValue,
             blockchainProperties.web3j,
@@ -45,7 +45,8 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
         return contract.balanceOf(walletAddress.rawValue).sendSafely()
             ?.let { AccountBalance(walletAddress, Balance(it)) }
             ?: throw BlockchainReadException(
-                "Unable to read ERC20 contract at address: ${contractAddress.rawValue} on chain ID: ${chainId.value}"
+                "Unable to read ERC20 contract at address: ${contractAddress.rawValue}" +
+                    " on chain ID: ${chainSpec.chainId.value}"
             )
     }
 

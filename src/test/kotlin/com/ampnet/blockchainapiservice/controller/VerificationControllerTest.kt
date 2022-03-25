@@ -41,7 +41,7 @@ class VerificationControllerTest : TestBase() {
         val controller = VerificationController(service)
 
         verify("controller returns correct response") {
-            val result = controller.generateVerificationMessage(walletAddress.rawValue)
+            val result = controller.generateVerificationMessage(walletAddress)
 
             assertThat(result).withMessage()
                 .isEqualTo(

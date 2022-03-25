@@ -34,12 +34,13 @@ include::{snippets}/VerificationControllerApiTest/mustCorrectlyVerifyValidMessag
 include::{snippets}/VerificationControllerApiTest/mustCorrectlyVerifyValidMessageSignature/http-response.adoc[]
 
 == Blockchain Into API
-All endpoints are public and do not require `Authorization: Bearer JWT` header.
+All endpoints are public and do not require `Authorization: Bearer JWT` header. Custom RPC URL can be specified via
+optional `X-RPC-URL` header - this will override the default RPC URL for the specified chain ID.
 
 === Fetch ERC20 balance for verified account
 Fetches ERC20 balance of specified contract address for the account which signed verification message with given ID.
 Chain ID, message ID and contract address are provided as path arguments, in that order. Block number can be provided as
-an optional query parameter.
+an optional query parameter `blockNumber`.
 
 .Request
 include::{snippets}/BlockchainInfoControllerApiTest/mustCorrectlyFetchErc20Balance/http-request.adoc[]

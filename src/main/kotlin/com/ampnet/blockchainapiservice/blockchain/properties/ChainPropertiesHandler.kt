@@ -11,9 +11,15 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
 
     private val blockchainPropertiesMap = mutableMapOf<ChainId, ChainPropertiesWithServices>()
 
-    fun getBlockchainProperties(chainId: ChainId): ChainPropertiesWithServices {
-        return blockchainPropertiesMap.computeIfAbsent(chainId) {
-            generateBlockchainProperties(getChain(it))
+    fun getBlockchainProperties(chainSpec: ChainSpec): ChainPropertiesWithServices {
+        return if (chainSpec.rpcUrl != null) {
+            ChainPropertiesWithServices(
+                web3j = Web3j.build(HttpService(chainSpec.rpcUrl))
+            )
+        } else {
+            blockchainPropertiesMap.computeIfAbsent(chainSpec.chainId) {
+                generateBlockchainProperties(getChain(it))
+            }
         }
     }
 
