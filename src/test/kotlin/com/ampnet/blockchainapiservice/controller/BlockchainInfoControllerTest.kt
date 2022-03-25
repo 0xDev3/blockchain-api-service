@@ -45,9 +45,9 @@ class BlockchainInfoControllerTest : TestBase() {
 
         verify("controller returns correct response") {
             val result = controller.fetchErc20TokenBalance(
-                rawChainId = chainId.value,
+                chainId = chainId,
                 messageId = messageId,
-                rawContractAddress = contractAddress.rawValue,
+                contractAddress = contractAddress,
                 blockNumber = null
             )
 
@@ -90,10 +90,10 @@ class BlockchainInfoControllerTest : TestBase() {
 
         verify("controller returns correct response") {
             val result = controller.fetchErc20TokenBalance(
-                rawChainId = chainId.value,
+                chainId = chainId,
                 messageId = messageId,
-                rawContractAddress = contractAddress.rawValue,
-                blockNumber = blockNumber.value
+                contractAddress = contractAddress,
+                blockNumber = blockNumber
             )
 
             assertThat(result).withMessage()
