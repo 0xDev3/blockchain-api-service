@@ -36,7 +36,7 @@ class BlockchainInfoController(private val blockchainInfoService: BlockchainInfo
 
         val accountBalance = blockchainInfoService.fetchErc20AccountBalanceFromSignedMessage(
             messageId = messageId,
-            chainId = chainSpec.chainId,
+            chainSpec = chainSpec,
             contractAddress = contractAddress,
             block = block
         )

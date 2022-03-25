@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.ControllerTestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
+import com.ampnet.blockchainapiservice.config.binding.ChainSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.model.response.FetchErc20TokenBalanceResponse
 import com.ampnet.blockchainapiservice.repository.SignedVerificationMessageRepository
@@ -78,6 +79,60 @@ class BlockchainInfoControllerApiTest : ControllerTestBase() {
                     "/info/${chainId.value}/${TestData.SIGNED_MESSAGE.id}/erc20-balance/${contractAddress.rawValue}"
                 )
                     .queryParam("blockNumber", blockNumber.value.toString())
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, FetchErc20TokenBalanceResponse::class.java)
+        }
+
+        verify("correct ERC20 balance is returned") {
+            assertThat(erc20AccountBalance).withMessage()
+                .isEqualTo(
+                    FetchErc20TokenBalanceResponse(
+                        walletAddress = accountBalance.address.rawValue,
+                        tokenBalance = accountBalance.balance.rawValue,
+                        tokenAddress = contractAddress.rawValue
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20BalanceWhenCustomRpcIsSpecified() {
+        suppose("some fixed date-time will be returned") {
+            given(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(TestData.SIGNED_MESSAGE.createdAt)
+        }
+
+        val mainAccount = accounts[0]
+        val accountBalance = AccountBalance(TestData.SIGNED_MESSAGE.walletAddress, Balance(BigInteger("10000")))
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(accountBalance.address.rawValue),
+                listOf(accountBalance.balance.rawValue),
+                mainAccount.address
+            ).sendAndMine()
+        }
+
+        suppose("some signed message is in the database") {
+            signedVerificationMessageRepository.store(TestData.SIGNED_MESSAGE)
+        }
+
+        val blockNumber = hardhatContainer.blockNumber()
+        val contractAddress = ContractAddress(contract.contractAddress)
+
+        val erc20AccountBalance = suppose("request to fetch ERC20 balance is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get(
+                    "/info/123456/${TestData.SIGNED_MESSAGE.id}/erc20-balance/${contractAddress.rawValue}"
+                )
+                    .queryParam("blockNumber", blockNumber.value.toString())
+                    .header(ChainSpecResolver.RPC_URL_HEADER, "http://localhost:${hardhatContainer.mappedPort}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()

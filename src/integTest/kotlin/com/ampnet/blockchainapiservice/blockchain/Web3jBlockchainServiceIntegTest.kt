@@ -2,11 +2,13 @@ package com.ampnet.blockchainapiservice.blockchain
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
+import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
@@ -42,7 +44,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct ERC20 balance is fetched for latest block") {
             val service = Web3jBlockchainService(hardhatProperties())
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
-                chainId = Chain.HARDHAT_TESTNET.id,
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 walletAddress = accountBalance.address
             )
@@ -78,7 +80,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ERC20 balance is fetched for block number before ERC20 transfer is made") {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
-                chainId = Chain.HARDHAT_TESTNET.id,
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 walletAddress = accountBalance.address,
                 block = blockNumberBeforeSendingBalance
@@ -92,7 +94,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ERC20 balance is fetched for block number after ERC20 transfer is made") {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
-                chainId = Chain.HARDHAT_TESTNET.id,
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 walletAddress = accountBalance.address,
                 block = blockNumberAfterSendingBalance
@@ -110,7 +112,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
             assertThrows<BlockchainReadException>(message) {
                 service.fetchErc20AccountBalance(
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                     contractAddress = ContractAddress(accounts[0].address),
                     walletAddress = WalletAddress(accounts[0].address)
                 )
@@ -132,4 +134,6 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     }
 
     private fun hardhatProperties() = ApplicationProperties().apply { infuraId = hardhatContainer.mappedPort }
+
+    private fun ChainId.toSpec() = ChainSpec(this, null)
 }
