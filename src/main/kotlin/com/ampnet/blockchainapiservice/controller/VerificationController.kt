@@ -20,10 +20,10 @@ class VerificationController(private val verificationService: VerificationServic
 
     @PostMapping("/verification/generate/{walletAddress}")
     fun generateVerificationMessage(
-        @PathVariable walletAddress: String
+        @PathVariable walletAddress: WalletAddress
     ): ResponseEntity<GenerateVerificationMessageResponse> {
         logger.info { "Request generation of verification message for wallet address: $walletAddress" }
-        val unsignedMessage = verificationService.createUnsignedVerificationMessage(WalletAddress(walletAddress))
+        val unsignedMessage = verificationService.createUnsignedVerificationMessage(walletAddress)
         return ResponseEntity.ok(
             GenerateVerificationMessageResponse(
                 id = unsignedMessage.id,
