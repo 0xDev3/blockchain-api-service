@@ -1,10 +1,11 @@
 package com.ampnet.blockchainapiservice.controller
 
+import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
+import com.ampnet.blockchainapiservice.config.binding.annotation.ChainBinding
 import com.ampnet.blockchainapiservice.model.response.FetchErc20TokenBalanceResponse
 import com.ampnet.blockchainapiservice.service.BlockchainInfoService
 import com.ampnet.blockchainapiservice.util.BlockName
 import com.ampnet.blockchainapiservice.util.BlockNumber
-import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.springframework.http.ResponseEntity
@@ -21,7 +22,7 @@ class BlockchainInfoController(private val blockchainInfoService: BlockchainInfo
 
     @GetMapping("/info/{chainId}/{messageId}/erc20-balance/{contractAddress}")
     fun fetchErc20TokenBalance(
-        @PathVariable chainId: ChainId,
+        @ChainBinding chainSpec: ChainSpec,
         @PathVariable messageId: UUID,
         @PathVariable contractAddress: ContractAddress,
         @RequestParam(required = false) blockNumber: BlockNumber?
@@ -29,13 +30,13 @@ class BlockchainInfoController(private val blockchainInfoService: BlockchainInfo
         val block = blockNumber ?: BlockName.LATEST
 
         logger.debug {
-            "Fetching ERC20 balance, chainId: $chainId, messageId: $messageId," +
+            "Fetching ERC20 balance, chainSpec: $chainSpec, messageId: $messageId," +
                 " contractAddress: $contractAddress, block: $block"
         }
 
         val accountBalance = blockchainInfoService.fetchErc20AccountBalanceFromSignedMessage(
             messageId = messageId,
-            chainId = chainId,
+            chainId = chainSpec.chainId,
             contractAddress = contractAddress,
             block = block
         )
