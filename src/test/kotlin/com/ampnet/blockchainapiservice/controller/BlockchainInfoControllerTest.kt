@@ -2,6 +2,7 @@ package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
+import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.model.response.FetchErc20TokenBalanceResponse
 import com.ampnet.blockchainapiservice.service.BlockchainInfoService
 import com.ampnet.blockchainapiservice.util.AccountBalance
@@ -45,7 +46,7 @@ class BlockchainInfoControllerTest : TestBase() {
 
         verify("controller returns correct response") {
             val result = controller.fetchErc20TokenBalance(
-                chainId = chainId,
+                chainSpec = ChainSpec(chainId, null),
                 messageId = messageId,
                 contractAddress = contractAddress,
                 blockNumber = null
@@ -90,7 +91,7 @@ class BlockchainInfoControllerTest : TestBase() {
 
         verify("controller returns correct response") {
             val result = controller.fetchErc20TokenBalance(
-                chainId = chainId,
+                chainSpec = ChainSpec(chainId, null),
                 messageId = messageId,
                 contractAddress = contractAddress,
                 blockNumber = blockNumber
