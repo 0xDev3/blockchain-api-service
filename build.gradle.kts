@@ -65,7 +65,7 @@ jib {
     }
     container {
         creationTime = "USE_CURRENT_TIMESTAMP"
-        mainClass = "com.ampnet.blockchainapiservice.BlockchainApiServiceApplication"
+        mainClass = "com.ampnet.blockchainapiservice.BlockchainApiServiceApplicationKt"
     }
     from {
         image = "${Configurations.Docker.baseImage}:${Configurations.Docker.tag}@${Configurations.Docker.digest}"
