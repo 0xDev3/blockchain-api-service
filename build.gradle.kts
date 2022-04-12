@@ -2,6 +2,10 @@ import io.gitlab.arturbosch.detekt.Detekt
 import nu.studer.gradle.jooq.JooqGenerate
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jooq.meta.jaxb.MatcherRule
+import org.jooq.meta.jaxb.MatcherTransformType
+import org.jooq.meta.jaxb.Matchers
+import org.jooq.meta.jaxb.MatchersTableType
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -162,7 +166,19 @@ jooq {
                         packageName = "com.ampnet.blockchainapiservice.generated.jooq"
                         directory = "$buildDir/generated/sources/jooq/main/kotlin"
                     }
-                    strategy.name = "org.jooq.codegen.DefaultGeneratorStrategy"
+                    strategy.apply {
+                        name = "org.jooq.codegen.DefaultGeneratorStrategy"
+                        matchers = Matchers().apply {
+                            tables = listOf(
+                                MatchersTableType().apply {
+                                    tableClass = MatcherRule().apply {
+                                        transform = MatcherTransformType.PASCAL
+                                        expression = "$0_table"
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
