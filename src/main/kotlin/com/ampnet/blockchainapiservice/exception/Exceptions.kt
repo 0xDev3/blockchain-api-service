@@ -36,7 +36,7 @@ class UnsupportedChainIdException(chainId: ChainId) : ServiceException(
 
 class ExpiredValidationMessageException(messageId: UUID) : ServiceException(
     errorCode = ErrorCode.VALIDATION_MESSAGE_EXPIRED,
-    httpStatus = HttpStatus.PRECONDITION_FAILED,
+    httpStatus = HttpStatus.BAD_REQUEST,
     message = "Validation message with ID: $messageId has expired"
 ) {
     companion object {
@@ -61,5 +61,15 @@ class BlockchainReadException(message: String) : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = -5979025245655611755L
+    }
+}
+
+class CannotAttachTxHashException(message: String) : ServiceException(
+    errorCode = ErrorCode.TX_HASH_ALREADY_SET,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = message
+) {
+    companion object {
+        private const val serialVersionUID: Long = 2487635142233013917L
     }
 }
