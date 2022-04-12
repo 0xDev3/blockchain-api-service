@@ -175,7 +175,7 @@ class BlockchainInfoControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn412PreconditionFailedWhenFetchingErc20BalanceOfExpiredMessage() {
+    fun mustReturn400BadRequestWhenFetchingErc20BalanceOfExpiredMessage() {
         suppose("some fixed date-time will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.SIGNED_MESSAGE.validUntil + Duration.ofMinutes(1L))
@@ -187,13 +187,13 @@ class BlockchainInfoControllerApiTest : ControllerTestBase() {
 
         val contractAddress = ContractAddress("abc")
 
-        verify("412 is returned for expired message") {
+        verify("400 is returned for expired message") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.get(
                     "/info/${chainId.value}/${TestData.SIGNED_MESSAGE.id}/erc20-balance/${contractAddress.rawValue}"
                 )
             )
-                .andExpect(MockMvcResultMatchers.status().isPreconditionFailed)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
             verifyResponseErrorCode(response, ErrorCode.VALIDATION_MESSAGE_EXPIRED)
