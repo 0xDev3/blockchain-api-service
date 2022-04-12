@@ -26,7 +26,7 @@ class JooqSendErc20RequestRepository(
 
     companion object : KLogging()
 
-    override fun storeSendErc20Request(params: StoreSendErc20RequestParams): SendErc20Request {
+    override fun store(params: StoreSendErc20RequestParams): SendErc20Request {
         logger.info { "Store send ERC20 request, params: $params" }
         val record = SendErc20RequestRecord(
             id = params.id,
