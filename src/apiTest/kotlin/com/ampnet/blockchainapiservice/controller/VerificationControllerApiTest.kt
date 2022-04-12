@@ -121,7 +121,7 @@ class VerificationControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn412PreconditionFailedWhenVerifyingExpiredMessage() {
+    fun mustReturn400BadRequestWhenVerifyingExpiredMessage() {
         suppose("some fixed date-time will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.UNSIGNED_MESSAGE.createdAt)
@@ -135,13 +135,13 @@ class VerificationControllerApiTest : ControllerTestBase() {
             )
         }
 
-        verify("412 is returned for expired message") {
+        verify("400 is returned for expired message") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/verification/signature/${TestData.UNSIGNED_MESSAGE.id}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("{\n    \"signature\":\"${TestData.SIGNED_MESSAGE.signature}\"\n}")
             )
-                .andExpect(MockMvcResultMatchers.status().isPreconditionFailed)
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
             verifyResponseErrorCode(response, ErrorCode.VALIDATION_MESSAGE_EXPIRED)
