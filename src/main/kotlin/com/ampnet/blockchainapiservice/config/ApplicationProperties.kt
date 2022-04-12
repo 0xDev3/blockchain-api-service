@@ -14,6 +14,7 @@ class ApplicationProperties {
     val chainMatic = ChainProperties()
     val chainMumbai = ChainProperties()
     val chainHardhatTestnet = ChainProperties()
+    val chainPoa = ChainProperties()
     val verification = VerificationProperties()
     var infuraId: String = ""
 }

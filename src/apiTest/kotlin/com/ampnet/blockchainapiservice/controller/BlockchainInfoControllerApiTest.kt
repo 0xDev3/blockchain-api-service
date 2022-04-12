@@ -5,6 +5,7 @@ import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
 import com.ampnet.blockchainapiservice.config.binding.ChainSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
+import com.ampnet.blockchainapiservice.generated.jooq.tables.SignedVerificationMessageTable
 import com.ampnet.blockchainapiservice.model.response.FetchErc20TokenBalanceResponse
 import com.ampnet.blockchainapiservice.repository.SignedVerificationMessageRepository
 import com.ampnet.blockchainapiservice.service.UtcDateTimeProvider
@@ -25,7 +26,6 @@ import org.web3j.protocol.core.RemoteCall
 import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
 import java.time.Duration
-import com.ampnet.blockchainapiservice.generated.jooq.tables.SignedVerificationMessage as SignedVerificationMessageTable
 
 class BlockchainInfoControllerApiTest : ControllerTestBase() {
 

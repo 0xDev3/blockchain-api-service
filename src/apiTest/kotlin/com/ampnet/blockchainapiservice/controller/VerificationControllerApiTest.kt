@@ -4,6 +4,8 @@ import com.ampnet.blockchainapiservice.ControllerTestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.ErrorCode
+import com.ampnet.blockchainapiservice.generated.jooq.tables.SignedVerificationMessageTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.UnsignedVerificationMessageTable
 import com.ampnet.blockchainapiservice.model.response.GenerateVerificationMessageResponse
 import com.ampnet.blockchainapiservice.model.response.VerifySignedMessageResponse
 import com.ampnet.blockchainapiservice.model.result.UnsignedVerificationMessage
@@ -23,8 +25,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import java.time.Duration
 import java.util.UUID
-import com.ampnet.blockchainapiservice.generated.jooq.tables.SignedVerificationMessage as SignedVerificationMessageTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UnsignedVerificationMessage as UnsignedVerificationMessageTable
 
 class VerificationControllerApiTest : ControllerTestBase() {
 
