@@ -44,7 +44,7 @@ class JooqUnsignedVerificationMessageRepositoryIntegTest : TestBase() {
     private lateinit var utcDateTimeProvider: UtcDateTimeProvider
 
     @Test
-    fun mustCorrectlyFetchUnsignedVerificationMessageById() {
+    fun mustCorrectlyFetchingUnsignedVerificationMessageById() {
         val id = UUID.randomUUID()
 
         suppose("some unsigned verification message exists in database") {
