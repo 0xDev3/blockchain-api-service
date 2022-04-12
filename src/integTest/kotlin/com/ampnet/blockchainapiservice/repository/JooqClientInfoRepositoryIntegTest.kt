@@ -56,7 +56,7 @@ class JooqClientInfoRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustReturnNullWhenFetchNonExistentClientInfoByClientId() {
+    fun mustReturnNullWhenFetchingNonExistentClientInfoByClientId() {
         verify("null is returned when fetching non-existent client info") {
             val result = repository.getById("non-existent-client-id")
 

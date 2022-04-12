@@ -46,7 +46,7 @@ class JooqSignedVerificationMessageRepositoryIntegTest : TestBase() {
     private lateinit var utcDateTimeProvider: UtcDateTimeProvider
 
     @Test
-    fun mustCorrectlyFetchSignedVerificationMessageById() {
+    fun mustCorrectlyFetchingSignedVerificationMessageById() {
         val id = UUID.randomUUID()
         val signedId = UUID.randomUUID()
 
