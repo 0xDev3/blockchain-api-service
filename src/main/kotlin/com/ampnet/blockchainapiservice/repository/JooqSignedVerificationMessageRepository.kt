@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
+import com.ampnet.blockchainapiservice.generated.jooq.tables.SignedVerificationMessageTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.SignedVerificationMessageRecord
 import com.ampnet.blockchainapiservice.model.result.SignedVerificationMessage
 import com.ampnet.blockchainapiservice.service.UtcDateTimeProvider
@@ -9,7 +10,6 @@ import mu.KLogging
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 import java.util.UUID
-import com.ampnet.blockchainapiservice.generated.jooq.tables.SignedVerificationMessage as SignedVerificationMessageTable
 
 @Repository
 class JooqSignedVerificationMessageRepository(
