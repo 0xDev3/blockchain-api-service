@@ -73,3 +73,6 @@ enum class BlockName(private val web3BlockName: DefaultBlockParameterName) : Blo
 
     override fun toWeb3Parameter() = web3BlockName
 }
+
+@JvmInline
+value class FunctionData(val value: String)
