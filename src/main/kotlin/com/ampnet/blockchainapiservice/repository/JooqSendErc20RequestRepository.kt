@@ -36,7 +36,7 @@ class JooqSendErc20RequestRepository(
             amount = params.amount.rawValue,
             fromAddress = params.fromAddress?.rawValue,
             toAddress = params.toAddress.rawValue,
-            arbitraryData = JSON.valueOf(objectMapper.writeValueAsString(params.arbitraryData)),
+            arbitraryData = params.arbitraryData?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) },
             sendScreenTitle = params.screenConfig.title,
             sendScreenMessage = params.screenConfig.message,
             sendScreenLogo = params.screenConfig.logo,
@@ -73,7 +73,7 @@ class JooqSendErc20RequestRepository(
             redirectUrl = redirectUrl!!,
             tokenAddress = ContractAddress(tokenAddress!!),
             amount = Balance(amount!!),
-            arbitraryData = objectMapper.readTree(arbitraryData!!.data()),
+            arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
             sendScreenConfig = SendScreenConfig(
                 title = sendScreenTitle,
                 message = sendScreenMessage,
