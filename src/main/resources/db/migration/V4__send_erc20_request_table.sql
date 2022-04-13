@@ -6,7 +6,7 @@ CREATE TABLE blockchain_api_service.send_erc20_request (
     amount              NUMERIC(78) NOT NULL,
     from_address        VARCHAR,
     to_address          VARCHAR     NOT NULL,
-    arbitrary_data      JSON        NOT NULL,
+    arbitrary_data      JSON,
     send_screen_title   VARCHAR,
     send_screen_message VARCHAR,
     send_screen_logo    VARCHAR,
