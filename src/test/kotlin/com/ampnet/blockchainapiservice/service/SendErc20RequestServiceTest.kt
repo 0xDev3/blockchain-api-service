@@ -19,45 +19,55 @@ class SendErc20RequestServiceTest : TestBase() {
 
     @Test
     fun mustSuccessfullyAttachTxHash() {
-        val repository = mock<SendErc20RequestRepository>()
+        val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
         val id = UUID.randomUUID()
 
         suppose("txHash will be successfully attached to the request") {
-            given(repository.setTxHash(id, TX_HASH))
+            given(sendErc20RequestRepository.setTxHash(id, TX_HASH))
                 .willReturn(true)
         }
 
-        val service = SendErc20RequestServiceImpl(repository)
+        val service = SendErc20RequestServiceImpl(
+            uuidProvider = mock(),
+            functionEncoderService = mock(),
+            clientInfoRepository = mock(),
+            sendErc20RequestRepository = sendErc20RequestRepository
+        )
 
         verify("txHash was successfully attached") {
             service.attachTxHash(id, TX_HASH)
 
-            verifyMock(repository)
+            verifyMock(sendErc20RequestRepository)
                 .setTxHash(id, TX_HASH)
-            verifyNoMoreInteractions(repository)
+            verifyNoMoreInteractions(sendErc20RequestRepository)
         }
     }
 
     @Test
     fun mustThrowCannotAttachTxHashExceptionWhenAttachingTxHashFails() {
-        val repository = mock<SendErc20RequestRepository>()
+        val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
         val id = UUID.randomUUID()
 
         suppose("attaching txHash will fails") {
-            given(repository.setTxHash(id, TX_HASH))
+            given(sendErc20RequestRepository.setTxHash(id, TX_HASH))
                 .willReturn(false)
         }
 
-        val service = SendErc20RequestServiceImpl(repository)
+        val service = SendErc20RequestServiceImpl(
+            uuidProvider = mock(),
+            functionEncoderService = mock(),
+            clientInfoRepository = mock(),
+            sendErc20RequestRepository = sendErc20RequestRepository
+        )
 
         verify("CannotAttachTxHashException is thrown") {
             assertThrows<CannotAttachTxHashException>(message) {
                 service.attachTxHash(id, TX_HASH)
             }
 
-            verifyMock(repository)
+            verifyMock(sendErc20RequestRepository)
                 .setTxHash(id, TX_HASH)
-            verifyNoMoreInteractions(repository)
+            verifyNoMoreInteractions(sendErc20RequestRepository)
         }
     }
 }

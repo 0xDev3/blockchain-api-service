@@ -64,6 +64,26 @@ class BlockchainReadException(message: String) : ServiceException(
     }
 }
 
+class NonExistentClientIdException(clientId: String) : ServiceException(
+    errorCode = ErrorCode.NON_EXISTENT_CLIENT_ID,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "No client info for client ID: $clientId"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -4336261431216079400L
+    }
+}
+
+class IncompleteSendErc20RequestException(message: String) : ServiceException(
+    errorCode = ErrorCode.INCOMPLETE_SEND_REQUEST,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = message
+) {
+    companion object {
+        private const val serialVersionUID: Long = -1417774323990169443L
+    }
+}
+
 class CannotAttachTxHashException(message: String) : ServiceException(
     errorCode = ErrorCode.TX_HASH_ALREADY_SET,
     httpStatus = HttpStatus.BAD_REQUEST,

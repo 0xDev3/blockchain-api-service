@@ -16,6 +16,21 @@ data class StoreSendErc20RequestParams(
     val amount: Balance,
     val fromAddress: WalletAddress?,
     val toAddress: WalletAddress,
-    val arbitraryData: JsonNode,
+    val arbitraryData: JsonNode?,
     val screenConfig: SendScreenConfig
-)
+) {
+    companion object {
+        fun fromCreateParams(params: CreateSendErc20RequestParams, id: UUID, chainId: ChainId, redirectUrl: String) =
+            StoreSendErc20RequestParams(
+                id = id,
+                chainId = chainId,
+                redirectUrl = redirectUrl,
+                tokenAddress = params.tokenAddress,
+                amount = params.amount,
+                fromAddress = params.fromAddress,
+                toAddress = params.toAddress,
+                arbitraryData = params.arbitraryData,
+                screenConfig = params.screenConfig
+            )
+    }
+}
