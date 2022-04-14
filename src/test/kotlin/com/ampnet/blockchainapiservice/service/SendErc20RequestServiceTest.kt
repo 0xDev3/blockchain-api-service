@@ -17,6 +17,7 @@ import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
+import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithFunctionData
 import org.assertj.core.api.Assertions.assertThat
@@ -49,7 +50,7 @@ class SendErc20RequestServiceTest : TestBase() {
                 logo = "logo"
             )
         )
-        private const val TX_HASH = "tx-hash"
+        private val TX_HASH = TransactionHash("tx-hash")
     }
 
     @Test

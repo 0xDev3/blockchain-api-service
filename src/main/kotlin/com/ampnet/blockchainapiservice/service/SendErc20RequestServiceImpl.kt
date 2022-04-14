@@ -5,11 +5,13 @@ import com.ampnet.blockchainapiservice.exception.IncompleteSendErc20RequestExcep
 import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
 import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
+import com.ampnet.blockchainapiservice.model.result.FullSendErc20Request
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.SendErc20RequestRepository
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WithFunctionData
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -48,7 +50,9 @@ class SendErc20RequestServiceImpl(
         return WithFunctionData(sendErc20Request, data)
     }
 
-    override fun attachTxHash(id: UUID, txHash: String) {
+    override fun getSendErc20Request(id: UUID, rpcUrl: String?): FullSendErc20Request = TODO()
+
+    override fun attachTxHash(id: UUID, txHash: TransactionHash) {
         logger.info { "Attach txHash to send ERC20 request, id: $id, txHash: $txHash" }
 
         val txHashAttached = sendErc20RequestRepository.setTxHash(id, txHash)
