@@ -71,7 +71,7 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.toAddress),
+                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.toAddress.rawValue),
                         FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.amount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
@@ -165,7 +165,7 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.toAddress),
+                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.toAddress.rawValue),
                         FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.amount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),

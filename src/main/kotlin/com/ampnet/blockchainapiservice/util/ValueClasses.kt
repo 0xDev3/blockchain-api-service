@@ -75,7 +75,15 @@ enum class BlockName(private val web3BlockName: DefaultBlockParameterName) : Blo
 }
 
 @JvmInline
-value class FunctionData(val value: String)
+value class FunctionData private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = FunctionData(value.lowercase())
+    }
+}
 
 @JvmInline
-value class TransactionHash(val value: String)
+value class TransactionHash private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = TransactionHash(value.lowercase())
+    }
+}

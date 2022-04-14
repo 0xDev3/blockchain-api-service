@@ -37,7 +37,7 @@ class SendErc20RequestServiceImpl(
         val data = functionEncoderService.encode(
             functionName = "transfer",
             arguments = listOf(
-                FunctionArgument(abiType = "address", value = params.toAddress),
+                FunctionArgument(abiType = "address", value = params.toAddress.rawValue),
                 FunctionArgument(abiType = "uint256", value = params.amount.rawValue)
             ),
             abiOutputTypes = listOf("bool"),
