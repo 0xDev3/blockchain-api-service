@@ -22,7 +22,33 @@ data class FullSendErc20Request(
     val arbitraryData: JsonNode?,
     val sendScreenConfig: SendScreenConfig,
     val transactionData: FullTransactionData
-)
+) {
+    companion object {
+        fun fromSendErc20Request(
+            request: SendErc20Request,
+            status: Status,
+            redirectPath: String,
+            data: FunctionData,
+            blockConfirmations: BigInteger?
+        ) = FullSendErc20Request(
+            id = request.id,
+            status = status,
+            chainId = request.chainId,
+            redirectUrl = request.redirectUrl + redirectPath,
+            tokenAddress = request.tokenAddress,
+            amount = request.amount,
+            arbitraryData = request.arbitraryData,
+            sendScreenConfig = request.sendScreenConfig,
+            transactionData = FullTransactionData(
+                txHash = request.transactionData.txHash,
+                fromAddress = request.transactionData.fromAddress,
+                toAddress = request.transactionData.toAddress,
+                data = data,
+                blockConfirmations = blockConfirmations
+            )
+        )
+    }
+}
 
 data class FullTransactionData(
     val txHash: TransactionHash?,

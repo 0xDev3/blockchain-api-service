@@ -17,5 +17,5 @@ interface BlockchainService {
         block: BlockParameter = BlockName.LATEST
     ): AccountBalance
 
-    fun fetchTransaction(chainSpec: ChainSpec, txHash: TransactionHash): BlockchainTransactionInfo?
+    fun fetchTransactionInfo(chainSpec: ChainSpec, txHash: TransactionHash): BlockchainTransactionInfo?
 }
