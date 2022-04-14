@@ -32,6 +32,8 @@ value class WalletAddress private constructor(val value: Address) {
 
     val rawValue: String
         get() = value.value
+
+    fun toContractAddress(): ContractAddress = ContractAddress(value)
 }
 
 @JvmInline

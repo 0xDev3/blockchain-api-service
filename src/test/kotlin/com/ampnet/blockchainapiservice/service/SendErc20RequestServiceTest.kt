@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
 import com.ampnet.blockchainapiservice.exception.IncompleteSendErc20RequestException
 import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
@@ -133,8 +134,10 @@ class SendErc20RequestServiceTest : TestBase() {
         val service = SendErc20RequestServiceImpl(
             uuidProvider = uuidProvider,
             functionEncoderService = functionEncoderService,
+            blockchainService = mock(),
             clientInfoRepository = clientInfoRepository,
-            sendErc20RequestRepository = sendErc20RequestRepository
+            sendErc20RequestRepository = sendErc20RequestRepository,
+            applicationProperties = ApplicationProperties()
         )
 
         verify("send ERC20 request is correctly created") {
@@ -218,8 +221,10 @@ class SendErc20RequestServiceTest : TestBase() {
         val service = SendErc20RequestServiceImpl(
             uuidProvider = uuidProvider,
             functionEncoderService = functionEncoderService,
+            blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository
+            sendErc20RequestRepository = sendErc20RequestRepository,
+            applicationProperties = ApplicationProperties()
         )
 
         verify("send ERC20 request is correctly created") {
@@ -244,8 +249,10 @@ class SendErc20RequestServiceTest : TestBase() {
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = mock(),
+            blockchainService = mock(),
             clientInfoRepository = clientInfoRepository,
-            sendErc20RequestRepository = mock()
+            sendErc20RequestRepository = mock(),
+            applicationProperties = ApplicationProperties()
         )
 
         verify("NonExistentClientIdException is thrown") {
@@ -264,8 +271,10 @@ class SendErc20RequestServiceTest : TestBase() {
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = mock(),
+            blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = mock()
+            sendErc20RequestRepository = mock(),
+            applicationProperties = ApplicationProperties()
         )
 
         verify("IncompleteSendErc20RequestException is thrown") {
@@ -284,8 +293,10 @@ class SendErc20RequestServiceTest : TestBase() {
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = mock(),
+            blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = mock()
+            sendErc20RequestRepository = mock(),
+            applicationProperties = ApplicationProperties()
         )
 
         verify("IncompleteSendErc20RequestException is thrown") {
@@ -308,8 +319,10 @@ class SendErc20RequestServiceTest : TestBase() {
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = mock(),
+            blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository
+            sendErc20RequestRepository = sendErc20RequestRepository,
+            applicationProperties = ApplicationProperties()
         )
 
         verify("txHash was successfully attached") {
@@ -334,8 +347,10 @@ class SendErc20RequestServiceTest : TestBase() {
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = mock(),
+            blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository
+            sendErc20RequestRepository = sendErc20RequestRepository,
+            applicationProperties = ApplicationProperties()
         )
 
         verify("CannotAttachTxHashException is thrown") {

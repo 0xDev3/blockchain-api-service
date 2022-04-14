@@ -131,7 +131,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchContractTransaction() {
+    fun mustCorrectlyFetchContractTransactionInfo() {
         val mainAccount = accounts[0]
         val accountBalance = AccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("10000")))
 
@@ -157,7 +157,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct transaction info is fetched") {
             val service = Web3jBlockchainService(hardhatProperties())
-            val transactionInfo = service.fetchTransaction(
+            val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 txHash = txHash
             )
@@ -195,7 +195,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchNonContractTransaction() {
+    fun mustCorrectlyFetchNonContractTransactionInfo() {
         val mainAccount = accounts[0]
         val txHash = suppose("some ERC20 transfer transaction is made") {
             Transfer.sendFunds(
@@ -213,7 +213,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct transaction info is fetched") {
             val service = Web3jBlockchainService(hardhatProperties())
-            val transactionInfo = service.fetchTransaction(
+            val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 txHash = txHash
             )
@@ -238,10 +238,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     }
 
     @Test
-    fun mustReturnNullWhenFetchingNonExistentTransaction() {
+    fun mustReturnNullWhenFetchingNonExistentTransactionInfo() {
         verify("null is returned for non existent transaction") {
             val service = Web3jBlockchainService(hardhatProperties())
-            val transactionInfo = service.fetchTransaction(
+            val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 txHash = TransactionHash("0x123456")
             )

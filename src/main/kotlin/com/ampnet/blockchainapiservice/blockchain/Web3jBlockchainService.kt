@@ -56,7 +56,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
             )
     }
 
-    override fun fetchTransaction(chainSpec: ChainSpec, txHash: TransactionHash): BlockchainTransactionInfo? {
+    override fun fetchTransactionInfo(chainSpec: ChainSpec, txHash: TransactionHash): BlockchainTransactionInfo? {
         logger.debug { "Fetching transaction, chainSpec: $chainSpec, txHash: $txHash" }
         val web3j = chainHandler.getBlockchainProperties(chainSpec).web3j
         val transaction = web3j.ethGetTransactionByHash(txHash.value).sendSafely()?.transaction?.orElse(null)

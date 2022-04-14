@@ -16,6 +16,7 @@ class ApplicationProperties {
     val chainHardhatTestnet = ChainProperties()
     val chainPoa = ChainProperties()
     val verification = VerificationProperties()
+    val sendRequest = SendErc20RequestProperties()
     var infuraId: String = ""
 }
 
@@ -31,4 +32,8 @@ class ChainProperties {
 class VerificationProperties {
     var unsignedMessageValidity: Duration = Duration.ofMinutes(15L)
     var signedMessageValidity: Duration = Duration.ofMinutes(5L)
+}
+
+class SendErc20RequestProperties {
+    var redirectPath = "/send/{id}"
 }
