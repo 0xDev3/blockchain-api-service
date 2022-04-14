@@ -11,6 +11,7 @@ import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.assertj.core.api.Assertions.assertThat
@@ -40,7 +41,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
         private const val SEND_SCREEN_TITLE = "send-screen-title"
         private const val SEND_SCREEN_MESSAGE = "send-screen-message"
         private const val SEND_SCREEN_LOGO = "send-screen-logo"
-        private const val TX_HASH = "tx-hash"
+        private val TX_HASH = TransactionHash("tx-hash")
     }
 
     @Suppress("unused")
@@ -73,7 +74,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                     sendScreenTitle = SEND_SCREEN_TITLE,
                     sendScreenMessage = SEND_SCREEN_MESSAGE,
                     sendScreenLogo = SEND_SCREEN_LOGO,
-                    txHash = TX_HASH
+                    txHash = TX_HASH.value
                 )
             )
         }
@@ -254,7 +255,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting another txHash will not succeed") {
-            assertThat(repository.setTxHash(id, "different-tx-hash")).withMessage()
+            assertThat(repository.setTxHash(id, TransactionHash("different-tx-hash"))).withMessage()
                 .isFalse()
         }
 

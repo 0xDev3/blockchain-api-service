@@ -76,3 +76,6 @@ enum class BlockName(private val web3BlockName: DefaultBlockParameterName) : Blo
 
 @JvmInline
 value class FunctionData(val value: String)
+
+@JvmInline
+value class TransactionHash(val value: String)
