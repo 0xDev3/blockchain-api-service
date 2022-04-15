@@ -145,12 +145,17 @@ class SendErc20RequestServiceTest : TestBase() {
             blockchainService = mock(),
             clientInfoRepository = clientInfoRepository,
             sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties()
+            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = "/test/{id}" }
         )
 
         verify("send ERC20 request is correctly created") {
             assertThat(service.createSendErc20Request(CREATE_PARAMS)).withMessage()
-                .isEqualTo(WithFunctionData(storedRequest, encodedData))
+                .isEqualTo(
+                    WithFunctionData(
+                        storedRequest.copy(redirectUrl = storedRequest.redirectUrl + "/test/$uuid"),
+                        encodedData
+                    )
+                )
 
             verifyMock(sendErc20RequestRepository)
                 .store(storeParams)
@@ -232,12 +237,17 @@ class SendErc20RequestServiceTest : TestBase() {
             blockchainService = mock(),
             clientInfoRepository = mock(),
             sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties()
+            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = "/test/{id}" }
         )
 
         verify("send ERC20 request is correctly created") {
             assertThat(service.createSendErc20Request(createParams)).withMessage()
-                .isEqualTo(WithFunctionData(storedRequest, encodedData))
+                .isEqualTo(
+                    WithFunctionData(
+                        storedRequest.copy(redirectUrl = storedRequest.redirectUrl + "/test/$uuid"),
+                        encodedData
+                    )
+                )
 
             verifyMock(sendErc20RequestRepository)
                 .store(storeParams)
