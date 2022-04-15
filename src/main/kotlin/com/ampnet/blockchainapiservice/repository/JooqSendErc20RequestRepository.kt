@@ -9,6 +9,7 @@ import com.ampnet.blockchainapiservice.model.result.TransactionData
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
@@ -53,10 +54,10 @@ class JooqSendErc20RequestRepository(
             .fetchOne { it.toModel() }
     }
 
-    override fun setTxHash(id: UUID, txHash: String): Boolean {
+    override fun setTxHash(id: UUID, txHash: TransactionHash): Boolean {
         logger.info { "Set txHash for send ERC20 request, id: $id, txHash: $txHash" }
         return dslContext.update(SendErc20RequestTable.SEND_ERC20_REQUEST)
-            .set(SendErc20RequestTable.SEND_ERC20_REQUEST.TX_HASH, txHash)
+            .set(SendErc20RequestTable.SEND_ERC20_REQUEST.TX_HASH, txHash.value)
             .where(
                 DSL.and(
                     SendErc20RequestTable.SEND_ERC20_REQUEST.ID.eq(id),
@@ -80,7 +81,7 @@ class JooqSendErc20RequestRepository(
                 logo = sendScreenLogo
             ),
             transactionData = TransactionData(
-                txHash = txHash,
+                txHash = txHash?.let { TransactionHash(it) },
                 fromAddress = fromAddress?.let { WalletAddress(it) },
                 toAddress = WalletAddress(toAddress!!)
             )
