@@ -1,15 +1,26 @@
 package com.ampnet.blockchainapiservice.service
 
+import com.ampnet.blockchainapiservice.blockchain.BlockchainService
+import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
+import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
 import com.ampnet.blockchainapiservice.exception.IncompleteSendErc20RequestException
 import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
+import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
+import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
+import com.ampnet.blockchainapiservice.model.result.FullSendErc20Request
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.SendErc20RequestRepository
+import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.FunctionData
+import com.ampnet.blockchainapiservice.util.Status
+import com.ampnet.blockchainapiservice.util.TransactionHash
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithFunctionData
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -20,8 +31,10 @@ import java.util.UUID
 class SendErc20RequestServiceImpl(
     private val uuidProvider: UuidProvider,
     private val functionEncoderService: FunctionEncoderService,
+    private val blockchainService: BlockchainService,
     private val clientInfoRepository: ClientInfoRepository,
-    private val sendErc20RequestRepository: SendErc20RequestRepository
+    private val sendErc20RequestRepository: SendErc20RequestRepository,
+    private val applicationProperties: ApplicationProperties
 ) : SendErc20RequestService {
 
     companion object : KLogging()
@@ -32,15 +45,7 @@ class SendErc20RequestServiceImpl(
         val (chainId, redirectUrl) = params.getChainIdAndRedirectUrl()
 
         val id = uuidProvider.getUuid()
-        val data = functionEncoderService.encode(
-            functionName = "transfer",
-            arguments = listOf(
-                FunctionArgument(abiType = "address", value = params.toAddress),
-                FunctionArgument(abiType = "uint256", value = params.amount.rawValue)
-            ),
-            abiOutputTypes = listOf("bool"),
-            additionalData = listOf(Utf8String(id.toString()))
-        )
+        val data = encodeFunctionData(params.toAddress, params.amount, id)
 
         val databaseParams = StoreSendErc20RequestParams.fromCreateParams(params, id, chainId, redirectUrl)
         val sendErc20Request = sendErc20RequestRepository.store(databaseParams)
@@ -48,7 +53,34 @@ class SendErc20RequestServiceImpl(
         return WithFunctionData(sendErc20Request, data)
     }
 
-    override fun attachTxHash(id: UUID, txHash: String) {
+    override fun getSendErc20Request(id: UUID, rpcUrl: String?): FullSendErc20Request {
+        logger.debug { "Fetching send ERC20 request, id: $id" }
+
+        val sendErc20Request = sendErc20RequestRepository.getById(id)
+            ?: throw ResourceNotFoundException("Send request not found for ID: $id")
+
+        val transactionInfo = sendErc20Request.transactionData.txHash?.let {
+            blockchainService.fetchTransactionInfo(
+                chainSpec = ChainSpec(
+                    chainId = sendErc20Request.chainId,
+                    rpcUrl = rpcUrl
+                ),
+                txHash = sendErc20Request.transactionData.txHash
+            )
+        }
+        val data = encodeFunctionData(sendErc20Request.transactionData.toAddress, sendErc20Request.amount, id)
+        val status = sendErc20Request.determineStatus(transactionInfo, data)
+
+        return FullSendErc20Request.fromSendErc20Request(
+            request = sendErc20Request,
+            status = status,
+            redirectPath = applicationProperties.sendRequest.redirectPath.replace("{id}", id.toString()),
+            data = data,
+            blockConfirmations = transactionInfo?.blockConfirmations
+        )
+    }
+
+    override fun attachTxHash(id: UUID, txHash: TransactionHash) {
         logger.info { "Attach txHash to send ERC20 request, id: $id, txHash: $txHash" }
 
         val txHashAttached = sendErc20RequestRepository.setTxHash(id, txHash)
@@ -71,4 +103,39 @@ class SendErc20RequestServiceImpl(
                 this.redirectUrl ?: throw IncompleteSendErc20RequestException("Missing redirectUrl")
             )
         }
+
+    private fun encodeFunctionData(toAddress: WalletAddress, amount: Balance, id: UUID): FunctionData =
+        functionEncoderService.encode(
+            functionName = "transfer",
+            arguments = listOf(
+                FunctionArgument(abiType = "address", value = toAddress.rawValue),
+                FunctionArgument(abiType = "uint256", value = amount.rawValue)
+            ),
+            abiOutputTypes = listOf("bool"),
+            additionalData = listOf(Utf8String(id.toString()))
+        )
+
+    private fun SendErc20Request.determineStatus(
+        transactionInfo: BlockchainTransactionInfo?,
+        expectedData: FunctionData
+    ): Status =
+        if (transactionInfo == null) { // implies that either txHash is null or transaction is not yet mined
+            Status.PENDING
+        } else if (isSuccess(transactionInfo, expectedData)) {
+            Status.SUCCESS
+        } else {
+            Status.FAILED
+        }
+
+    private fun SendErc20Request.isSuccess(
+        transactionInfo: BlockchainTransactionInfo,
+        expectedData: FunctionData
+    ): Boolean =
+        tokenAddress == transactionInfo.to.toContractAddress() &&
+            transactionData.txHash == transactionInfo.hash &&
+            fromAddressMatches(transactionData.fromAddress, transactionInfo.from) &&
+            transactionInfo.data == expectedData
+
+    private fun fromAddressMatches(expectedFromAddress: WalletAddress?, actualFromAddress: WalletAddress): Boolean =
+        expectedFromAddress == null || expectedFromAddress == actualFromAddress
 }

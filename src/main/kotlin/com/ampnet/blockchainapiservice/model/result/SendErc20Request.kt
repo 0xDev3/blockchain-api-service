@@ -4,6 +4,7 @@ import com.ampnet.blockchainapiservice.model.SendScreenConfig
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
 import java.util.UUID
@@ -20,7 +21,7 @@ data class SendErc20Request(
 )
 
 data class TransactionData(
-    val txHash: String?,
+    val txHash: TransactionHash?,
     val fromAddress: WalletAddress?,
     val toAddress: WalletAddress
 )
