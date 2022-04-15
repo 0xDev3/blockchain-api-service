@@ -50,7 +50,13 @@ class SendErc20RequestServiceImpl(
         val databaseParams = StoreSendErc20RequestParams.fromCreateParams(params, id, chainId, redirectUrl)
         val sendErc20Request = sendErc20RequestRepository.store(databaseParams)
 
-        return WithFunctionData(sendErc20Request, data)
+        return WithFunctionData(
+            sendErc20Request.copy(
+                redirectUrl = sendErc20Request.redirectUrl +
+                    applicationProperties.sendRequest.redirectPath.replace("{id}", id.toString())
+            ),
+            data
+        )
     }
 
     override fun getSendErc20Request(id: UUID, rpcUrl: String?): FullSendErc20Request {
