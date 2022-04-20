@@ -5,7 +5,6 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.records.SendErc20Re
 import com.ampnet.blockchainapiservice.model.SendScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
-import com.ampnet.blockchainapiservice.model.result.TransactionData
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -34,9 +33,9 @@ class JooqSendErc20RequestRepository(
             chainId = params.chainId.value,
             redirectUrl = params.redirectUrl,
             tokenAddress = params.tokenAddress.rawValue,
-            amount = params.amount.rawValue,
-            fromAddress = params.fromAddress?.rawValue,
-            toAddress = params.toAddress.rawValue,
+            tokenAmount = params.tokenAmount.rawValue,
+            tokenSenderAddress = params.tokenSenderAddress?.rawValue,
+            tokenRecipientAddress = params.tokenRecipientAddress.rawValue,
             arbitraryData = params.arbitraryData?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) },
             sendScreenTitle = params.screenConfig.title,
             sendScreenMessage = params.screenConfig.message,
@@ -73,17 +72,15 @@ class JooqSendErc20RequestRepository(
             chainId = ChainId(chainId!!),
             redirectUrl = redirectUrl!!,
             tokenAddress = ContractAddress(tokenAddress!!),
-            amount = Balance(amount!!),
+            tokenAmount = Balance(tokenAmount!!),
+            tokenSenderAddress = tokenSenderAddress?.let { WalletAddress(it) },
+            tokenRecipientAddress = WalletAddress(tokenRecipientAddress!!),
+            txHash = txHash?.let { TransactionHash(it) },
             arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
             sendScreenConfig = SendScreenConfig(
                 title = sendScreenTitle,
                 message = sendScreenMessage,
                 logo = sendScreenLogo
-            ),
-            transactionData = TransactionData(
-                txHash = txHash?.let { TransactionHash(it) },
-                fromAddress = fromAddress?.let { WalletAddress(it) },
-                toAddress = WalletAddress(toAddress!!)
             )
         )
 }

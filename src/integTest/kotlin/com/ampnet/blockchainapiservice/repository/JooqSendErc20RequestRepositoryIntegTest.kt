@@ -6,7 +6,6 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.records.SendErc20Re
 import com.ampnet.blockchainapiservice.model.SendScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
-import com.ampnet.blockchainapiservice.model.result.TransactionData
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -34,9 +33,9 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
         private val CHAIN_ID = ChainId(1337L)
         private const val REDIRECT_URL = "redirect-url"
         private val TOKEN_ADDRESS = ContractAddress("a")
-        private val AMOUNT = Balance(BigInteger.valueOf(123456L))
-        private val FROM_ADDRESS = WalletAddress("b")
-        private val TO_ADDRESS = WalletAddress("c")
+        private val TOKEN_AMOUNT = Balance(BigInteger.valueOf(123456L))
+        private val TOKEN_SENDER_ADDRESS = WalletAddress("b")
+        private val TOKEN_RECIPIENT_ADDRESS = WalletAddress("c")
         private const val ARBITRARY_DATA = "{}"
         private const val SEND_SCREEN_TITLE = "send-screen-title"
         private const val SEND_SCREEN_MESSAGE = "send-screen-message"
@@ -67,9 +66,9 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                     chainId = CHAIN_ID.value,
                     redirectUrl = REDIRECT_URL,
                     tokenAddress = TOKEN_ADDRESS.rawValue,
-                    amount = AMOUNT.rawValue,
-                    fromAddress = FROM_ADDRESS.rawValue,
-                    toAddress = TO_ADDRESS.rawValue,
+                    tokenAmount = TOKEN_AMOUNT.rawValue,
+                    tokenSenderAddress = TOKEN_SENDER_ADDRESS.rawValue,
+                    tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS.rawValue,
                     arbitraryData = JSON.valueOf(ARBITRARY_DATA),
                     sendScreenTitle = SEND_SCREEN_TITLE,
                     sendScreenMessage = SEND_SCREEN_MESSAGE,
@@ -89,17 +88,15 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
-                        amount = AMOUNT,
+                        tokenAmount = TOKEN_AMOUNT,
+                        tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                        tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                        txHash = TX_HASH,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
                         sendScreenConfig = SendScreenConfig(
                             title = SEND_SCREEN_TITLE,
                             message = SEND_SCREEN_MESSAGE,
                             logo = SEND_SCREEN_LOGO
-                        ),
-                        transactionData = TransactionData(
-                            txHash = TX_HASH,
-                            fromAddress = FROM_ADDRESS,
-                            toAddress = TO_ADDRESS
                         )
                     )
                 )
@@ -124,9 +121,9 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
-            amount = AMOUNT,
-            fromAddress = FROM_ADDRESS,
-            toAddress = TO_ADDRESS,
+            tokenAmount = TOKEN_AMOUNT,
+            tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+            tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = SendScreenConfig(
                 title = SEND_SCREEN_TITLE,
@@ -144,17 +141,15 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
-            amount = AMOUNT,
+            tokenAmount = TOKEN_AMOUNT,
+            tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+            tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+            txHash = null,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             sendScreenConfig = SendScreenConfig(
                 title = SEND_SCREEN_TITLE,
                 message = SEND_SCREEN_MESSAGE,
                 logo = SEND_SCREEN_LOGO
-            ),
-            transactionData = TransactionData(
-                txHash = null,
-                fromAddress = FROM_ADDRESS,
-                toAddress = TO_ADDRESS
             )
         )
 
@@ -179,9 +174,9 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
-            amount = AMOUNT,
-            fromAddress = FROM_ADDRESS,
-            toAddress = TO_ADDRESS,
+            tokenAmount = TOKEN_AMOUNT,
+            tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+            tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = SendScreenConfig(
                 title = SEND_SCREEN_TITLE,
@@ -209,17 +204,15 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
-                        amount = AMOUNT,
+                        tokenAmount = TOKEN_AMOUNT,
+                        tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                        tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                        txHash = TX_HASH,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
                         sendScreenConfig = SendScreenConfig(
                             title = SEND_SCREEN_TITLE,
                             message = SEND_SCREEN_MESSAGE,
                             logo = SEND_SCREEN_LOGO
-                        ),
-                        transactionData = TransactionData(
-                            txHash = TX_HASH,
-                            fromAddress = FROM_ADDRESS,
-                            toAddress = TO_ADDRESS
                         )
                     )
                 )
@@ -234,9 +227,9 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
-            amount = AMOUNT,
-            fromAddress = FROM_ADDRESS,
-            toAddress = TO_ADDRESS,
+            tokenAmount = TOKEN_AMOUNT,
+            tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+            tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = SendScreenConfig(
                 title = SEND_SCREEN_TITLE,
@@ -269,17 +262,15 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
-                        amount = AMOUNT,
+                        tokenAmount = TOKEN_AMOUNT,
+                        tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                        tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                        txHash = TX_HASH,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
                         sendScreenConfig = SendScreenConfig(
                             title = SEND_SCREEN_TITLE,
                             message = SEND_SCREEN_MESSAGE,
                             logo = SEND_SCREEN_LOGO
-                        ),
-                        transactionData = TransactionData(
-                            txHash = TX_HASH,
-                            fromAddress = FROM_ADDRESS,
-                            toAddress = TO_ADDRESS
                         )
                     )
                 )
