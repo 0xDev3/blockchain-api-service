@@ -11,11 +11,7 @@ import org.springframework.web.method.support.ModelAndViewContainer
 import org.springframework.web.servlet.HandlerMapping
 import javax.servlet.http.HttpServletRequest
 
-class ChainSpecResolver : HandlerMethodArgumentResolver {
-
-    companion object {
-        const val RPC_URL_HEADER = "X-RPC-URL"
-    }
+class ChainSpecResolver(private val rpcUrlSpecResolver: RpcUrlSpecResolver) : HandlerMethodArgumentResolver {
 
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.parameterType == ChainSpec::class.java &&
@@ -41,9 +37,8 @@ class ChainSpecResolver : HandlerMethodArgumentResolver {
             ?: throw IllegalStateException(
                 "Path variable \"$chainIdPathVariable\" is missing from the controller specification."
             )
-        // RPC URL is an optional header
-        val rpcUrl = httpServletRequest.getHeader(RPC_URL_HEADER)
+        val rpcUrlSpec = rpcUrlSpecResolver.resolveArgument(parameter, mavContainer, nativeWebRequest, binderFactory)
 
-        return ChainSpec(chainId, rpcUrl)
+        return ChainSpec(chainId, rpcUrlSpec)
     }
 }

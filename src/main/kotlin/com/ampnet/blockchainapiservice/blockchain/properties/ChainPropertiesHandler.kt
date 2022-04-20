@@ -12,14 +12,22 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
     private val blockchainPropertiesMap = mutableMapOf<ChainId, ChainPropertiesWithServices>()
 
     fun getBlockchainProperties(chainSpec: ChainSpec): ChainPropertiesWithServices {
-        return if (chainSpec.rpcUrl != null) {
+        val chain = Chain.fromId(chainSpec.chainId)
+
+        return if (chainSpec.rpcSpec.urlOverride != null) {
             ChainPropertiesWithServices(
-                web3j = Web3j.build(HttpService(chainSpec.rpcUrl))
+                web3j = Web3j.build(HttpService(chainSpec.rpcSpec.urlOverride))
+            )
+        } else if (chain != null) {
+            blockchainPropertiesMap.computeIfAbsent(chain.id) {
+                generateBlockchainProperties(chain)
+            }
+        } else if (chainSpec.rpcSpec.url != null) {
+            ChainPropertiesWithServices(
+                web3j = Web3j.build(HttpService(chainSpec.rpcSpec.url))
             )
         } else {
-            blockchainPropertiesMap.computeIfAbsent(chainSpec.chainId) {
-                generateBlockchainProperties(getChain(it))
-            }
+            throw UnsupportedChainIdException(chainSpec.chainId)
         }
     }
 
@@ -48,7 +56,4 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
             web3j = Web3j.build(HttpService(rpcUrl))
         )
     }
-
-    private fun getChain(chainId: ChainId) = Chain.fromId(chainId)
-        ?: throw UnsupportedChainIdException(chainId)
 }

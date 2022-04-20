@@ -35,7 +35,8 @@ include::{snippets}/VerificationControllerApiTest/mustCorrectlyVerifyValidMessag
 
 == Blockchain Into API
 All endpoints are public and do not require `Authorization: Bearer JWT` header. Custom RPC URL can be specified via
-optional `X-RPC-URL` header - this will override the default RPC URL for the specified chain ID.
+optional `X-RPC-URL` header - this will NOT override the default RPC URL for the specified chain ID, it only allows you
+to specify RPC URL for non-natively supported chains. To override the default RPC URL, use `X-RPC-URL-OVERRIDE` header.
 
 === Fetch ERC20 balance for verified account
 Fetches ERC20 balance of specified contract address for the account which signed verification message with given ID.
@@ -77,8 +78,9 @@ any mismatches between specified request data and state on blockchain, the reque
 no attached transaction hash or if transaction for attached hash is not yet mined on blockchain, request will be in
 pending state.
 
-Custom RPC URL can be specified via optional `X-RPC-URL` header - this will override the default RPC URL for the
-specified chain ID.
+Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
+specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC
+URL, use `X-RPC-URL-OVERRIDE` header.
 
 .Request
 include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyFetchSendErc20Request/http-request.adoc[]

@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.config.binding.ChainSpecResolver
+import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
+import com.ampnet.blockchainapiservice.config.binding.annotation.RpcUrlBinding
 import com.ampnet.blockchainapiservice.model.SendScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
@@ -71,9 +71,9 @@ class SendErc20RequestController(private val sendErc20RequestService: SendErc20R
     @GetMapping("/send/{id}")
     fun getSendErc20Request(
         @PathVariable("id") id: UUID,
-        @RequestHeader(name = ChainSpecResolver.RPC_URL_HEADER, required = false) rpcUrl: String?
+        @RpcUrlBinding rpcSpec: RpcUrlSpec
     ): ResponseEntity<SendErc20RequestResponse> {
-        val sendRequest = sendErc20RequestService.getSendErc20Request(id, rpcUrl)
+        val sendRequest = sendErc20RequestService.getSendErc20Request(id, rpcSpec)
 
         return ResponseEntity.ok(
             SendErc20RequestResponse(

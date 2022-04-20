@@ -3,7 +3,7 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.ControllerTestBase
 import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
-import com.ampnet.blockchainapiservice.config.binding.ChainSpecResolver
+import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ClientInfoTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.SendErc20RequestTable
@@ -551,7 +551,10 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val fetchResponse = suppose("request to fetch send ERC20 request is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get("/send/${createResponse.id}")
-                    .header(ChainSpecResolver.RPC_URL_HEADER, "http://localhost:${hardhatContainer.mappedPort}")
+                    .header(
+                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
+                        "http://localhost:${hardhatContainer.mappedPort}"
+                    )
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
