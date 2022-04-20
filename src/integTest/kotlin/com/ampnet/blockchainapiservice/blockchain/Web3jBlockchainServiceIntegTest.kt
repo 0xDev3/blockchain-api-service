@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.blockchain
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
+import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
@@ -270,5 +271,5 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
     private fun hardhatProperties() = ApplicationProperties().apply { infuraId = hardhatContainer.mappedPort }
 
-    private fun ChainId.toSpec() = ChainSpec(this, null)
+    private fun ChainId.toSpec() = ChainSpec(this, RpcUrlSpec(null, null))
 }

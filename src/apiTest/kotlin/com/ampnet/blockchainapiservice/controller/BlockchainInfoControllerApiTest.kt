@@ -3,7 +3,7 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.ControllerTestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
-import com.ampnet.blockchainapiservice.config.binding.ChainSpecResolver
+import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.tables.SignedVerificationMessageTable
 import com.ampnet.blockchainapiservice.model.response.FetchErc20TokenBalanceResponse
@@ -132,7 +132,10 @@ class BlockchainInfoControllerApiTest : ControllerTestBase() {
                     "/info/123456/${TestData.SIGNED_MESSAGE.id}/erc20-balance/${contractAddress.rawValue}"
                 )
                     .queryParam("blockNumber", blockNumber.value.toString())
-                    .header(ChainSpecResolver.RPC_URL_HEADER, "http://localhost:${hardhatContainer.mappedPort}")
+                    .header(
+                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
+                        "http://localhost:${hardhatContainer.mappedPort}"
+                    )
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
