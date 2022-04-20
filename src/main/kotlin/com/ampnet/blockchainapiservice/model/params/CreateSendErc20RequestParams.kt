@@ -12,9 +12,9 @@ data class CreateSendErc20RequestParams(
     val chainId: ChainId?,
     val redirectUrl: String?,
     val tokenAddress: ContractAddress,
-    val amount: Balance,
-    val fromAddress: WalletAddress?,
-    val toAddress: WalletAddress,
+    val tokenAmount: Balance,
+    val tokenSenderAddress: WalletAddress?,
+    val tokenRecipientAddress: WalletAddress,
     val arbitraryData: JsonNode?,
     val screenConfig: SendScreenConfig
 )

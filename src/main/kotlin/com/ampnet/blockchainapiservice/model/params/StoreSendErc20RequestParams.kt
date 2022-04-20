@@ -26,9 +26,9 @@ data class StoreSendErc20RequestParams(
                 chainId = chainId,
                 redirectUrl = redirectUrl,
                 tokenAddress = params.tokenAddress,
-                tokenAmount = params.amount,
-                tokenSenderAddress = params.fromAddress,
-                tokenRecipientAddress = params.toAddress,
+                tokenAmount = params.tokenAmount,
+                tokenSenderAddress = params.tokenSenderAddress,
+                tokenRecipientAddress = params.tokenRecipientAddress,
                 arbitraryData = params.arbitraryData,
                 screenConfig = params.screenConfig
             )

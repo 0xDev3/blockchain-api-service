@@ -18,7 +18,9 @@ data class FullSendErc20Request(
     val chainId: ChainId,
     val redirectUrl: String,
     val tokenAddress: ContractAddress,
-    val amount: Balance,
+    val tokenAmount: Balance,
+    val tokenSenderAddress: WalletAddress?,
+    val tokenRecipientAddress: WalletAddress,
     val arbitraryData: JsonNode?,
     val sendScreenConfig: SendScreenConfig,
     val transactionData: FullTransactionData
@@ -29,22 +31,24 @@ data class FullSendErc20Request(
             status: Status,
             redirectPath: String,
             data: FunctionData,
-            blockConfirmations: BigInteger?
+            transactionInfo: BlockchainTransactionInfo?
         ) = FullSendErc20Request(
             id = request.id,
             status = status,
             chainId = request.chainId,
             redirectUrl = request.redirectUrl + redirectPath,
             tokenAddress = request.tokenAddress,
-            amount = request.amount,
+            tokenAmount = request.tokenAmount,
+            tokenSenderAddress = request.tokenSenderAddress,
+            tokenRecipientAddress = request.tokenRecipientAddress,
             arbitraryData = request.arbitraryData,
             sendScreenConfig = request.sendScreenConfig,
             transactionData = FullTransactionData(
-                txHash = request.transactionData.txHash,
-                fromAddress = request.transactionData.fromAddress,
-                toAddress = request.transactionData.toAddress,
+                txHash = request.txHash,
+                fromAddress = transactionInfo?.from,
+                toAddress = transactionInfo?.to?.toContractAddress() ?: request.tokenAddress,
                 data = data,
-                blockConfirmations = blockConfirmations
+                blockConfirmations = transactionInfo?.blockConfirmations
             )
         )
     }
@@ -53,7 +57,7 @@ data class FullSendErc20Request(
 data class FullTransactionData(
     val txHash: TransactionHash?,
     val fromAddress: WalletAddress?,
-    val toAddress: WalletAddress,
+    val toAddress: ContractAddress,
     val data: FunctionData,
     val blockConfirmations: BigInteger?
 )
