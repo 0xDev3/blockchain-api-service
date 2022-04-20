@@ -11,7 +11,6 @@ import com.ampnet.blockchainapiservice.model.response.TransactionResponse
 import com.ampnet.blockchainapiservice.model.result.FullSendErc20Request
 import com.ampnet.blockchainapiservice.model.result.FullTransactionData
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
-import com.ampnet.blockchainapiservice.model.result.TransactionData
 import com.ampnet.blockchainapiservice.service.SendErc20RequestService
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -40,9 +39,9 @@ class SendErc20RequestControllerTest : TestBase() {
             chainId = ChainId(123L),
             redirectUrl = "redirect-url",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
-            fromAddress = WalletAddress("b"),
-            toAddress = WalletAddress("c"),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
             arbitraryData = null,
             screenConfig = SendScreenConfig(
                 title = "title",
@@ -55,14 +54,12 @@ class SendErc20RequestControllerTest : TestBase() {
             chainId = params.chainId!!,
             redirectUrl = params.redirectUrl!!,
             tokenAddress = params.tokenAddress,
-            amount = params.amount,
+            tokenAmount = params.tokenAmount,
+            tokenSenderAddress = params.tokenSenderAddress,
+            tokenRecipientAddress = params.tokenRecipientAddress,
+            txHash = null,
             arbitraryData = params.arbitraryData,
-            sendScreenConfig = params.screenConfig,
-            transactionData = TransactionData(
-                txHash = null,
-                fromAddress = params.fromAddress,
-                toAddress = params.tokenAddress.toWalletAddress()
-            )
+            sendScreenConfig = params.screenConfig
         )
         val data = FunctionData("data")
         val service = mock<SendErc20RequestService>()
@@ -81,9 +78,9 @@ class SendErc20RequestControllerTest : TestBase() {
                     chainId = params.chainId?.value,
                     redirectUrl = params.redirectUrl,
                     tokenAddress = params.tokenAddress.rawValue,
-                    amount = params.amount.rawValue,
-                    fromAddress = params.fromAddress?.rawValue,
-                    toAddress = params.toAddress.rawValue,
+                    amount = params.tokenAmount.rawValue,
+                    senderAddress = params.tokenSenderAddress?.rawValue,
+                    recipientAddress = params.tokenRecipientAddress.rawValue,
                     arbitraryData = params.arbitraryData,
                     screenConfig = params.screenConfig
                 )
@@ -97,15 +94,15 @@ class SendErc20RequestControllerTest : TestBase() {
                             status = Status.PENDING,
                             chainId = result.chainId.value,
                             tokenAddress = result.tokenAddress.rawValue,
-                            amount = result.amount.rawValue,
-                            fromAddress = result.transactionData.fromAddress?.rawValue,
-                            toAddress = result.transactionData.toAddress.rawValue,
+                            amount = result.tokenAmount.rawValue,
+                            senderAddress = result.tokenSenderAddress?.rawValue,
+                            recipientAddress = result.tokenRecipientAddress.rawValue,
                             arbitraryData = result.arbitraryData,
                             screenConfig = result.sendScreenConfig,
                             redirectUrl = result.redirectUrl,
                             sendTx = TransactionResponse(
                                 txHash = null,
-                                from = result.transactionData.fromAddress?.rawValue,
+                                from = result.tokenSenderAddress?.rawValue,
                                 to = result.tokenAddress.rawValue,
                                 data = data.value,
                                 blockConfirmations = null
@@ -127,7 +124,9 @@ class SendErc20RequestControllerTest : TestBase() {
             chainId = ChainId(123L),
             redirectUrl = "redirect-url",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
             arbitraryData = null,
             sendScreenConfig = SendScreenConfig(
                 title = "title",
@@ -137,7 +136,7 @@ class SendErc20RequestControllerTest : TestBase() {
             transactionData = FullTransactionData(
                 txHash = TransactionHash("tx-hash"),
                 fromAddress = WalletAddress("b"),
-                toAddress = WalletAddress("c"),
+                toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
                 blockConfirmations = BigInteger.ONE
             )
@@ -159,9 +158,9 @@ class SendErc20RequestControllerTest : TestBase() {
                             status = result.status,
                             chainId = result.chainId.value,
                             tokenAddress = result.tokenAddress.rawValue,
-                            amount = result.amount.rawValue,
-                            fromAddress = result.transactionData.fromAddress?.rawValue,
-                            toAddress = result.transactionData.toAddress.rawValue,
+                            amount = result.tokenAmount.rawValue,
+                            senderAddress = result.tokenSenderAddress?.rawValue,
+                            recipientAddress = result.tokenRecipientAddress.rawValue,
                             arbitraryData = result.arbitraryData,
                             screenConfig = result.sendScreenConfig,
                             redirectUrl = result.redirectUrl,

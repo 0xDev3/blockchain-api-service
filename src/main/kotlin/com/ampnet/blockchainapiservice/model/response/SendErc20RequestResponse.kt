@@ -15,8 +15,8 @@ data class SendErc20RequestResponse(
     val tokenAddress: String,
     @JsonSerialize(using = ToStringSerializer::class)
     val amount: BigInteger,
-    val fromAddress: String?,
-    val toAddress: String,
+    val senderAddress: String?,
+    val recipientAddress: String,
     val arbitraryData: JsonNode?,
     val screenConfig: SendScreenConfig?,
     val redirectUrl: String,
