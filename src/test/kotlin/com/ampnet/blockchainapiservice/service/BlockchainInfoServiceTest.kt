@@ -5,6 +5,7 @@ import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
+import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.ExpiredValidationMessageException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.repository.SignedVerificationMessageRepository
@@ -144,5 +145,5 @@ class BlockchainInfoServiceTest : TestBase() {
         }
     }
 
-    private fun ChainId.toSpec() = ChainSpec(this, null)
+    private fun ChainId.toSpec() = ChainSpec(this, RpcUrlSpec(null, null))
 }

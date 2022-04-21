@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.SendScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
@@ -118,7 +119,7 @@ class SendErc20RequestControllerTest : TestBase() {
     @Test
     fun mustCorrectlyFetchSendErc20Request() {
         val id = UUID.randomUUID()
-        val rpcUrl = "rpc-url"
+        val rpcSpec = RpcUrlSpec("url", "url-override")
         val service = mock<SendErc20RequestService>()
         val result = FullSendErc20Request(
             id = id,
@@ -143,14 +144,14 @@ class SendErc20RequestControllerTest : TestBase() {
         )
 
         suppose("some send ERC20 request will be fetched") {
-            given(service.getSendErc20Request(id, rpcUrl))
+            given(service.getSendErc20Request(id, rpcSpec))
                 .willReturn(result)
         }
 
         val controller = SendErc20RequestController(service)
 
         verify("controller returns correct response") {
-            assertThat(controller.getSendErc20Request(id, rpcUrl)).withMessage()
+            assertThat(controller.getSendErc20Request(id, rpcSpec)).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(
                         SendErc20RequestResponse(

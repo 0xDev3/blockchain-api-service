@@ -4,6 +4,7 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainPropertiesHandler
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
+import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.exception.UnsupportedChainIdException
@@ -36,7 +37,24 @@ class ChainPropertiesHandlerTest : TestBase() {
             val chainProperties = chainPropertiesHandler.getBlockchainProperties(
                 ChainSpec(
                     chainId = ChainId(123L),
-                    rpcUrl = "http://localhost:1234/"
+                    rpcSpec = RpcUrlSpec(url = "http://localhost:1234/", urlOverride = null)
+                )
+            )
+            assertThat(chainProperties.web3j).withMessage().isNotNull()
+        }
+    }
+
+    @Test
+    fun mustCorrectlyCreateChainPropertiesWithServicesWhenRpcUrlOverrideIsSpecified() {
+        val chainPropertiesHandler = suppose("chain properties handler is created from application properties") {
+            ChainPropertiesHandler(ApplicationProperties().apply { infuraId = "" })
+        }
+
+        verify("chain properties with services are correctly created") {
+            val chainProperties = chainPropertiesHandler.getBlockchainProperties(
+                ChainSpec(
+                    chainId = ChainId(123L),
+                    rpcSpec = RpcUrlSpec(url = null, urlOverride = "http://localhost:1234/")
                 )
             )
             assertThat(chainProperties.web3j).withMessage().isNotNull()
@@ -101,5 +119,5 @@ class ChainPropertiesHandlerTest : TestBase() {
         }
     }
 
-    private fun ChainId.toSpec() = ChainSpec(this, null)
+    private fun ChainId.toSpec() = ChainSpec(this, RpcUrlSpec(null, null))
 }
