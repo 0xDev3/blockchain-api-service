@@ -17,7 +17,6 @@ import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.model.result.FullSendErc20Request
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
-import com.ampnet.blockchainapiservice.model.result.TransactionData
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.SendErc20RequestRepository
 import com.ampnet.blockchainapiservice.util.Balance
@@ -50,9 +49,9 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = ChainId(1337L),
             redirectUrl = "redirect-url",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.valueOf(123456L)),
-            fromAddress = WalletAddress("b"),
-            toAddress = WalletAddress("c"),
+            tokenAmount = Balance(BigInteger.valueOf(123456L)),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
             arbitraryData = null,
             screenConfig = SendScreenConfig(
                 title = "title",
@@ -81,8 +80,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(uuid.toString()))
@@ -113,9 +112,9 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = chainId,
             redirectUrl = redirectUrl,
             tokenAddress = CREATE_PARAMS.tokenAddress,
-            amount = CREATE_PARAMS.amount,
-            fromAddress = CREATE_PARAMS.fromAddress,
-            toAddress = CREATE_PARAMS.toAddress,
+            tokenAmount = CREATE_PARAMS.tokenAmount,
+            tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
+            tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
             arbitraryData = CREATE_PARAMS.arbitraryData,
             screenConfig = CREATE_PARAMS.screenConfig
         )
@@ -125,14 +124,12 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = chainId,
             redirectUrl = redirectUrl,
             tokenAddress = CREATE_PARAMS.tokenAddress,
-            amount = CREATE_PARAMS.amount,
+            tokenAmount = CREATE_PARAMS.tokenAmount,
+            tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
+            tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
+            txHash = null,
             arbitraryData = CREATE_PARAMS.arbitraryData,
-            sendScreenConfig = CREATE_PARAMS.screenConfig,
-            transactionData = TransactionData(
-                txHash = null,
-                fromAddress = CREATE_PARAMS.fromAddress,
-                toAddress = CREATE_PARAMS.toAddress
-            )
+            sendScreenConfig = CREATE_PARAMS.screenConfig
         )
 
         suppose("send ERC20 request is stored in database") {
@@ -182,8 +179,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(uuid.toString()))
@@ -201,9 +198,9 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = chainId,
             redirectUrl = redirectUrl,
             tokenAddress = CREATE_PARAMS.tokenAddress,
-            amount = CREATE_PARAMS.amount,
-            fromAddress = CREATE_PARAMS.fromAddress,
-            toAddress = CREATE_PARAMS.toAddress,
+            tokenAmount = CREATE_PARAMS.tokenAmount,
+            tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
+            tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
             arbitraryData = CREATE_PARAMS.arbitraryData,
             screenConfig = CREATE_PARAMS.screenConfig
         )
@@ -213,14 +210,12 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = chainId,
             redirectUrl = redirectUrl,
             tokenAddress = CREATE_PARAMS.tokenAddress,
-            amount = CREATE_PARAMS.amount,
+            tokenAmount = CREATE_PARAMS.tokenAmount,
+            tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
+            tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
+            txHash = null,
             arbitraryData = CREATE_PARAMS.arbitraryData,
-            sendScreenConfig = CREATE_PARAMS.screenConfig,
-            transactionData = TransactionData(
-                txHash = null,
-                fromAddress = CREATE_PARAMS.fromAddress,
-                toAddress = CREATE_PARAMS.toAddress
-            )
+            sendScreenConfig = CREATE_PARAMS.screenConfig
         )
 
         suppose("send ERC20 request is stored in database") {
@@ -358,17 +353,15 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
+            txHash = null,
             arbitraryData = null,
             sendScreenConfig = SendScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
-            ),
-            transactionData = TransactionData(
-                txHash = null,
-                fromAddress = WalletAddress("b"),
-                toAddress = WalletAddress("c")
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -386,8 +379,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.transactionData.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(id.toString()))
@@ -414,7 +407,7 @@ class SendErc20RequestServiceTest : TestBase() {
                         status = Status.PENDING,
                         redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
-                        blockConfirmations = null
+                        transactionInfo = null
                     )
                 )
         }
@@ -428,17 +421,15 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
+            txHash = TX_HASH,
             arbitraryData = null,
             sendScreenConfig = SendScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
-            ),
-            transactionData = TransactionData(
-                txHash = TX_HASH,
-                fromAddress = WalletAddress("b"),
-                toAddress = WalletAddress("c")
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -464,8 +455,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.transactionData.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(id.toString()))
@@ -492,7 +483,7 @@ class SendErc20RequestServiceTest : TestBase() {
                         status = Status.PENDING,
                         redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
-                        blockConfirmations = null
+                        transactionInfo = null
                     )
                 )
         }
@@ -506,17 +497,15 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
+            txHash = TX_HASH,
             arbitraryData = null,
             sendScreenConfig = SendScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
-            ),
-            transactionData = TransactionData(
-                txHash = TX_HASH,
-                fromAddress = WalletAddress("b"),
-                toAddress = WalletAddress("c")
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -531,7 +520,7 @@ class SendErc20RequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
-            from = sendRequest.transactionData.fromAddress!!,
+            from = sendRequest.tokenSenderAddress!!,
             to = WalletAddress("dead"),
             data = encodedData,
             blockConfirmations = BigInteger.ONE
@@ -549,8 +538,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.transactionData.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(id.toString()))
@@ -577,7 +566,7 @@ class SendErc20RequestServiceTest : TestBase() {
                         status = Status.FAILED,
                         redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
-                        blockConfirmations = transactionInfo.blockConfirmations
+                        transactionInfo = transactionInfo
                     )
                 )
         }
@@ -591,17 +580,15 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
+            txHash = TX_HASH,
             arbitraryData = null,
             sendScreenConfig = SendScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
-            ),
-            transactionData = TransactionData(
-                txHash = TX_HASH,
-                fromAddress = WalletAddress("b"),
-                toAddress = WalletAddress("c")
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -616,7 +603,7 @@ class SendErc20RequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TransactionHash("wrong-hash"),
-            from = sendRequest.transactionData.fromAddress!!,
+            from = sendRequest.tokenSenderAddress!!,
             to = sendRequest.tokenAddress.toWalletAddress(),
             data = encodedData,
             blockConfirmations = BigInteger.ONE
@@ -634,8 +621,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.transactionData.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(id.toString()))
@@ -662,7 +649,7 @@ class SendErc20RequestServiceTest : TestBase() {
                         status = Status.FAILED,
                         redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
-                        blockConfirmations = transactionInfo.blockConfirmations
+                        transactionInfo = transactionInfo
                     )
                 )
         }
@@ -676,17 +663,15 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
+            txHash = TX_HASH,
             arbitraryData = null,
             sendScreenConfig = SendScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
-            ),
-            transactionData = TransactionData(
-                txHash = TX_HASH,
-                fromAddress = WalletAddress("b"),
-                toAddress = WalletAddress("c")
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -719,8 +704,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.transactionData.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(id.toString()))
@@ -747,7 +732,7 @@ class SendErc20RequestServiceTest : TestBase() {
                         status = Status.FAILED,
                         redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
-                        blockConfirmations = transactionInfo.blockConfirmations
+                        transactionInfo = transactionInfo
                     )
                 )
         }
@@ -761,17 +746,15 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
+            txHash = TX_HASH,
             arbitraryData = null,
             sendScreenConfig = SendScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
-            ),
-            transactionData = TransactionData(
-                txHash = TX_HASH,
-                fromAddress = WalletAddress("b"),
-                toAddress = WalletAddress("c")
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -786,7 +769,7 @@ class SendErc20RequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
-            from = sendRequest.transactionData.fromAddress!!,
+            from = sendRequest.tokenSenderAddress!!,
             to = sendRequest.tokenAddress.toWalletAddress(),
             data = FunctionData("wrong-data"),
             blockConfirmations = BigInteger.ONE
@@ -804,8 +787,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.transactionData.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(id.toString()))
@@ -832,7 +815,7 @@ class SendErc20RequestServiceTest : TestBase() {
                         status = Status.FAILED,
                         redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
-                        blockConfirmations = transactionInfo.blockConfirmations
+                        transactionInfo = transactionInfo
                     )
                 )
         }
@@ -846,17 +829,15 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = null,
+            tokenRecipientAddress = WalletAddress("c"),
+            txHash = TX_HASH,
             arbitraryData = null,
             sendScreenConfig = SendScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
-            ),
-            transactionData = TransactionData(
-                txHash = TX_HASH,
-                fromAddress = null,
-                toAddress = WalletAddress("c")
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -889,8 +870,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.transactionData.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(id.toString()))
@@ -917,7 +898,7 @@ class SendErc20RequestServiceTest : TestBase() {
                         status = Status.SUCCESS,
                         redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
-                        blockConfirmations = transactionInfo.blockConfirmations
+                        transactionInfo = transactionInfo
                     )
                 )
         }
@@ -931,17 +912,15 @@ class SendErc20RequestServiceTest : TestBase() {
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
-            amount = Balance(BigInteger.TEN),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
+            txHash = TX_HASH,
             arbitraryData = null,
             sendScreenConfig = SendScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
-            ),
-            transactionData = TransactionData(
-                txHash = TX_HASH,
-                fromAddress = WalletAddress("b"),
-                toAddress = WalletAddress("c")
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -956,7 +935,7 @@ class SendErc20RequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
-            from = sendRequest.transactionData.fromAddress!!,
+            from = sendRequest.tokenSenderAddress!!,
             to = sendRequest.tokenAddress.toWalletAddress(),
             data = encodedData,
             blockConfirmations = BigInteger.ONE
@@ -974,8 +953,8 @@ class SendErc20RequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.transactionData.toAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.amount.rawValue)
+                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
+                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
                     ),
                     abiOutputTypes = listOf("bool"),
                     additionalData = listOf(Utf8String(id.toString()))
@@ -1002,7 +981,7 @@ class SendErc20RequestServiceTest : TestBase() {
                         status = Status.SUCCESS,
                         redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
-                        blockConfirmations = transactionInfo.blockConfirmations
+                        transactionInfo = transactionInfo
                     )
                 )
         }
