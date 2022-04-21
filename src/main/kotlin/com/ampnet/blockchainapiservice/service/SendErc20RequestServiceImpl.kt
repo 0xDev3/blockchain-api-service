@@ -2,6 +2,7 @@ package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
+import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
 import com.ampnet.blockchainapiservice.exception.IncompleteSendErc20RequestException
@@ -59,7 +60,7 @@ class SendErc20RequestServiceImpl(
         )
     }
 
-    override fun getSendErc20Request(id: UUID, rpcUrl: String?): FullSendErc20Request {
+    override fun getSendErc20Request(id: UUID, rpcSpec: RpcUrlSpec): FullSendErc20Request {
         logger.debug { "Fetching send ERC20 request, id: $id" }
 
         val sendErc20Request = sendErc20RequestRepository.getById(id)
@@ -69,7 +70,7 @@ class SendErc20RequestServiceImpl(
             blockchainService.fetchTransactionInfo(
                 chainSpec = ChainSpec(
                     chainId = sendErc20Request.chainId,
-                    rpcUrl = rpcUrl
+                    rpcSpec = rpcSpec
                 ),
                 txHash = sendErc20Request.transactionData.txHash
             )
