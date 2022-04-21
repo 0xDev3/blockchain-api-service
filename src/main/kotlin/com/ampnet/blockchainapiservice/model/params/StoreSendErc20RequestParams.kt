@@ -13,9 +13,9 @@ data class StoreSendErc20RequestParams(
     val chainId: ChainId,
     val redirectUrl: String,
     val tokenAddress: ContractAddress,
-    val amount: Balance,
-    val fromAddress: WalletAddress?,
-    val toAddress: WalletAddress,
+    val tokenAmount: Balance,
+    val tokenSenderAddress: WalletAddress?,
+    val tokenRecipientAddress: WalletAddress,
     val arbitraryData: JsonNode?,
     val screenConfig: SendScreenConfig
 ) {
@@ -26,9 +26,9 @@ data class StoreSendErc20RequestParams(
                 chainId = chainId,
                 redirectUrl = redirectUrl,
                 tokenAddress = params.tokenAddress,
-                amount = params.amount,
-                fromAddress = params.fromAddress,
-                toAddress = params.toAddress,
+                tokenAmount = params.tokenAmount,
+                tokenSenderAddress = params.tokenSenderAddress,
+                tokenRecipientAddress = params.tokenRecipientAddress,
                 arbitraryData = params.arbitraryData,
                 screenConfig = params.screenConfig
             )

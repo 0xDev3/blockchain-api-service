@@ -13,7 +13,6 @@ import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.response.SendErc20RequestResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
-import com.ampnet.blockchainapiservice.model.result.TransactionData
 import com.ampnet.blockchainapiservice.repository.SendErc20RequestRepository
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
@@ -72,8 +71,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
 
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
-        val fromAddress = WalletAddress("b")
-        val toAddress = WalletAddress("c")
+        val senderAddress = WalletAddress("b")
+        val recipientAddress = WalletAddress("c")
 
         val response = suppose("request to create send ERC20 request is made") {
             val response = mockMvc.perform(
@@ -85,8 +84,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                 "client_id": "$clientId",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
-                                "from_address": "${fromAddress.rawValue}",
-                                "to_address": "${toAddress.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
                                 "arbitrary_data": {
                                     "test": true
                                 },
@@ -114,8 +113,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
-                        fromAddress = fromAddress.rawValue,
-                        toAddress = toAddress.rawValue,
+                        senderAddress = senderAddress.rawValue,
+                        recipientAddress = recipientAddress.rawValue,
                         arbitraryData = response.arbitraryData,
                         screenConfig = SendScreenConfig(
                             title = "title",
@@ -125,7 +124,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         redirectUrl = redirectUrl + "/send/${response.id}",
                         sendTx = TransactionResponse(
                             txHash = null,
-                            from = fromAddress.rawValue,
+                            from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.sendTx.data,
                             blockConfirmations = null
@@ -144,17 +143,15 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         chainId = chainId,
                         redirectUrl = redirectUrl,
                         tokenAddress = tokenAddress,
-                        amount = amount,
+                        tokenAmount = amount,
+                        tokenSenderAddress = senderAddress,
+                        tokenRecipientAddress = recipientAddress,
+                        txHash = null,
                         arbitraryData = response.arbitraryData,
                         sendScreenConfig = SendScreenConfig(
                             title = "title",
                             message = "message",
                             logo = "logo"
-                        ),
-                        transactionData = TransactionData(
-                            txHash = null,
-                            fromAddress = fromAddress,
-                            toAddress = toAddress
                         )
                     )
                 )
@@ -167,8 +164,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val redirectUrl = "https://example.com"
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
-        val fromAddress = WalletAddress("b")
-        val toAddress = WalletAddress("c")
+        val senderAddress = WalletAddress("b")
+        val recipientAddress = WalletAddress("c")
 
         val response = suppose("request to create send ERC20 request is made") {
             val response = mockMvc.perform(
@@ -181,8 +178,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
-                                "from_address": "${fromAddress.rawValue}",
-                                "to_address": "${toAddress.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
                                 "arbitrary_data": {
                                     "test": true
                                 },
@@ -210,8 +207,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
-                        fromAddress = fromAddress.rawValue,
-                        toAddress = toAddress.rawValue,
+                        senderAddress = senderAddress.rawValue,
+                        recipientAddress = recipientAddress.rawValue,
                         arbitraryData = response.arbitraryData,
                         screenConfig = SendScreenConfig(
                             title = "title",
@@ -221,7 +218,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         redirectUrl = redirectUrl + "/send/${response.id}",
                         sendTx = TransactionResponse(
                             txHash = null,
-                            from = fromAddress.rawValue,
+                            from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.sendTx.data,
                             blockConfirmations = null
@@ -240,17 +237,15 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         chainId = chainId,
                         redirectUrl = redirectUrl,
                         tokenAddress = tokenAddress,
-                        amount = amount,
+                        tokenAmount = amount,
+                        tokenSenderAddress = senderAddress,
+                        tokenRecipientAddress = recipientAddress,
+                        txHash = null,
                         arbitraryData = response.arbitraryData,
                         sendScreenConfig = SendScreenConfig(
                             title = "title",
                             message = "message",
                             logo = "logo"
-                        ),
-                        transactionData = TransactionData(
-                            txHash = null,
-                            fromAddress = fromAddress,
-                            toAddress = toAddress
                         )
                     )
                 )
@@ -261,8 +256,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     fun mustReturn400BadRequestForNonExistentClientId() {
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
-        val fromAddress = WalletAddress("b")
-        val toAddress = WalletAddress("c")
+        val senderAddress = WalletAddress("b")
+        val recipientAddress = WalletAddress("c")
 
         verify("400 is returned for non-existent clientId") {
             val response = mockMvc.perform(
@@ -274,8 +269,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                 "client_id": "non-existent-client-id",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
-                                "from_address": "${fromAddress.rawValue}",
-                                "to_address": "${toAddress.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
                                 "arbitrary_data": {
                                     "test": true
                                 },
@@ -300,8 +295,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val redirectUrl = "https://example.com"
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
-        val fromAddress = WalletAddress("b")
-        val toAddress = WalletAddress("c")
+        val senderAddress = WalletAddress("b")
+        val recipientAddress = WalletAddress("c")
 
         verify("400 is returned for missing chainId") {
             val response = mockMvc.perform(
@@ -313,8 +308,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
-                                "from_address": "${fromAddress.rawValue}",
-                                "to_address": "${toAddress.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
                                 "arbitrary_data": {
                                     "test": true
                                 },
@@ -339,8 +334,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val chainId = Chain.HARDHAT_TESTNET.id
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
-        val fromAddress = WalletAddress("b")
-        val toAddress = WalletAddress("c")
+        val senderAddress = WalletAddress("b")
+        val recipientAddress = WalletAddress("c")
 
         verify("400 is returned for missing redirectUrl") {
             val response = mockMvc.perform(
@@ -352,8 +347,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                 "chain_id": ${chainId.value},
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
-                                "from_address": "${fromAddress.rawValue}",
-                                "to_address": "${toAddress.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
                                 "arbitrary_data": {
                                     "test": true
                                 },
@@ -392,8 +387,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val redirectUrl = "https://example.com"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
-        val fromAddress = WalletAddress(mainAccount.address)
-        val toAddress = WalletAddress(accounts[1].address)
+        val senderAddress = WalletAddress(mainAccount.address)
+        val recipientAddress = WalletAddress(accounts[1].address)
 
         val createResponse = suppose("request to create send ERC20 request is made") {
             val createResponse = mockMvc.perform(
@@ -406,8 +401,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
-                                "from_address": "${fromAddress.rawValue}",
-                                "to_address": "${toAddress.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
                                 "arbitrary_data": {
                                     "test": true
                                 },
@@ -427,7 +422,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
-            contract.transferAndMine(toAddress.rawValue, amount.rawValue)
+            contract.transferAndMine(recipientAddress.rawValue, amount.rawValue)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
@@ -458,8 +453,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
-                        fromAddress = fromAddress.rawValue,
-                        toAddress = toAddress.rawValue,
+                        senderAddress = senderAddress.rawValue,
+                        recipientAddress = recipientAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
                         screenConfig = SendScreenConfig(
                             title = "title",
@@ -469,7 +464,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         redirectUrl = redirectUrl + "/send/${createResponse.id}",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
-                            from = fromAddress.rawValue,
+                            from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = createResponse.sendTx.data,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations
@@ -501,8 +496,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val redirectUrl = "https://example.com"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
-        val fromAddress = WalletAddress(mainAccount.address)
-        val toAddress = WalletAddress(accounts[1].address)
+        val senderAddress = WalletAddress(mainAccount.address)
+        val recipientAddress = WalletAddress(accounts[1].address)
 
         val createResponse = suppose("request to create send ERC20 request is made") {
             val createResponse = mockMvc.perform(
@@ -515,8 +510,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
-                                "from_address": "${fromAddress.rawValue}",
-                                "to_address": "${toAddress.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
                                 "arbitrary_data": {
                                     "test": true
                                 },
@@ -536,7 +531,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
-            contract.transferAndMine(toAddress.rawValue, amount.rawValue)
+            contract.transferAndMine(recipientAddress.rawValue, amount.rawValue)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
@@ -571,8 +566,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
-                        fromAddress = fromAddress.rawValue,
-                        toAddress = toAddress.rawValue,
+                        senderAddress = senderAddress.rawValue,
+                        recipientAddress = recipientAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
                         screenConfig = SendScreenConfig(
                             title = "title",
@@ -582,7 +577,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         redirectUrl = redirectUrl + "/send/${createResponse.id}",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
-                            from = fromAddress.rawValue,
+                            from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = createResponse.sendTx.data,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations
@@ -619,9 +614,9 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     chainId = Chain.HARDHAT_TESTNET.id,
                     redirectUrl = "https://example.com",
                     tokenAddress = ContractAddress("a"),
-                    amount = Balance(BigInteger.TEN),
-                    fromAddress = WalletAddress("b"),
-                    toAddress = WalletAddress("c"),
+                    tokenAmount = Balance(BigInteger.TEN),
+                    tokenSenderAddress = WalletAddress("b"),
+                    tokenRecipientAddress = WalletAddress("c"),
                     arbitraryData = null,
                     screenConfig = SendScreenConfig(
                         title = "title",
@@ -653,7 +648,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         verify("transaction hash is correctly attached to send ERC20 request") {
             val storedRequest = sendErc20RequestRepository.getById(id)
 
-            assertThat(storedRequest?.transactionData?.txHash)
+            assertThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }
@@ -670,9 +665,9 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     chainId = Chain.HARDHAT_TESTNET.id,
                     redirectUrl = "https://example.com",
                     tokenAddress = ContractAddress("a"),
-                    amount = Balance(BigInteger.TEN),
-                    fromAddress = WalletAddress("b"),
-                    toAddress = WalletAddress("c"),
+                    tokenAmount = Balance(BigInteger.TEN),
+                    tokenSenderAddress = WalletAddress("b"),
+                    tokenRecipientAddress = WalletAddress("c"),
                     arbitraryData = null,
                     screenConfig = SendScreenConfig(
                         title = "title",
@@ -705,7 +700,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         verify("transaction hash is not changed in database") {
             val storedRequest = sendErc20RequestRepository.getById(id)
 
-            assertThat(storedRequest?.transactionData?.txHash)
+            assertThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }

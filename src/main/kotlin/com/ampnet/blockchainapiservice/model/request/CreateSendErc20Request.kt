@@ -10,8 +10,8 @@ data class CreateSendErc20Request(
     val redirectUrl: String?,
     val tokenAddress: String,
     val amount: BigInteger,
-    val fromAddress: String?,
-    val toAddress: String,
+    val senderAddress: String?,
+    val recipientAddress: String,
     val arbitraryData: JsonNode?,
     val screenConfig: SendScreenConfig?
 )

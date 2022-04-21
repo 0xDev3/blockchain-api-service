@@ -46,7 +46,7 @@ class SendErc20RequestServiceImpl(
         val (chainId, redirectUrl) = params.getChainIdAndRedirectUrl()
 
         val id = uuidProvider.getUuid()
-        val data = encodeFunctionData(params.toAddress, params.amount, id)
+        val data = encodeFunctionData(params.tokenRecipientAddress, params.tokenAmount, id)
 
         val databaseParams = StoreSendErc20RequestParams.fromCreateParams(params, id, chainId, redirectUrl)
         val sendErc20Request = sendErc20RequestRepository.store(databaseParams)
@@ -61,21 +61,21 @@ class SendErc20RequestServiceImpl(
     }
 
     override fun getSendErc20Request(id: UUID, rpcSpec: RpcUrlSpec): FullSendErc20Request {
-        logger.debug { "Fetching send ERC20 request, id: $id" }
+        logger.debug { "Fetching send ERC20 request, id: $id, rpcSpec: $rpcSpec" }
 
         val sendErc20Request = sendErc20RequestRepository.getById(id)
             ?: throw ResourceNotFoundException("Send request not found for ID: $id")
 
-        val transactionInfo = sendErc20Request.transactionData.txHash?.let {
+        val transactionInfo = sendErc20Request.txHash?.let {
             blockchainService.fetchTransactionInfo(
                 chainSpec = ChainSpec(
                     chainId = sendErc20Request.chainId,
                     rpcSpec = rpcSpec
                 ),
-                txHash = sendErc20Request.transactionData.txHash
+                txHash = sendErc20Request.txHash
             )
         }
-        val data = encodeFunctionData(sendErc20Request.transactionData.toAddress, sendErc20Request.amount, id)
+        val data = encodeFunctionData(sendErc20Request.tokenRecipientAddress, sendErc20Request.tokenAmount, id)
         val status = sendErc20Request.determineStatus(transactionInfo, data)
 
         return FullSendErc20Request.fromSendErc20Request(
@@ -83,7 +83,7 @@ class SendErc20RequestServiceImpl(
             status = status,
             redirectPath = applicationProperties.sendRequest.redirectPath.replace("{id}", id.toString()),
             data = data,
-            blockConfirmations = transactionInfo?.blockConfirmations
+            transactionInfo = transactionInfo
         )
     }
 
@@ -111,12 +111,12 @@ class SendErc20RequestServiceImpl(
             )
         }
 
-    private fun encodeFunctionData(toAddress: WalletAddress, amount: Balance, id: UUID): FunctionData =
+    private fun encodeFunctionData(tokenRecipientAddress: WalletAddress, tokenAmount: Balance, id: UUID): FunctionData =
         functionEncoderService.encode(
             functionName = "transfer",
             arguments = listOf(
-                FunctionArgument(abiType = "address", value = toAddress.rawValue),
-                FunctionArgument(abiType = "uint256", value = amount.rawValue)
+                FunctionArgument(abiType = "address", value = tokenRecipientAddress.rawValue),
+                FunctionArgument(abiType = "uint256", value = tokenAmount.rawValue)
             ),
             abiOutputTypes = listOf("bool"),
             additionalData = listOf(Utf8String(id.toString()))
@@ -139,10 +139,10 @@ class SendErc20RequestServiceImpl(
         expectedData: FunctionData
     ): Boolean =
         tokenAddress == transactionInfo.to.toContractAddress() &&
-            transactionData.txHash == transactionInfo.hash &&
-            fromAddressMatches(transactionData.fromAddress, transactionInfo.from) &&
+            txHash == transactionInfo.hash &&
+            senderAddressMatches(tokenSenderAddress, transactionInfo.from) &&
             transactionInfo.data == expectedData
 
-    private fun fromAddressMatches(expectedFromAddress: WalletAddress?, actualFromAddress: WalletAddress): Boolean =
-        expectedFromAddress == null || expectedFromAddress == actualFromAddress
+    private fun senderAddressMatches(senderAddress: WalletAddress?, fromAddress: WalletAddress): Boolean =
+        senderAddress == null || senderAddress == fromAddress
 }
