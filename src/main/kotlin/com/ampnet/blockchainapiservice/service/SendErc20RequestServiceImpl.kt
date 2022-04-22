@@ -3,7 +3,6 @@ package com.ampnet.blockchainapiservice.service
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
-import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
 import com.ampnet.blockchainapiservice.exception.IncompleteSendErc20RequestException
 import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
@@ -34,8 +33,7 @@ class SendErc20RequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val blockchainService: BlockchainService,
     private val clientInfoRepository: ClientInfoRepository,
-    private val sendErc20RequestRepository: SendErc20RequestRepository,
-    private val applicationProperties: ApplicationProperties
+    private val sendErc20RequestRepository: SendErc20RequestRepository
 ) : SendErc20RequestService {
 
     companion object : KLogging()
@@ -51,13 +49,7 @@ class SendErc20RequestServiceImpl(
         val databaseParams = StoreSendErc20RequestParams.fromCreateParams(params, id, chainId, redirectUrl)
         val sendErc20Request = sendErc20RequestRepository.store(databaseParams)
 
-        return WithFunctionData(
-            sendErc20Request.copy(
-                redirectUrl = sendErc20Request.redirectUrl +
-                    applicationProperties.sendRequest.redirectPath.replace("{id}", id.toString())
-            ),
-            data
-        )
+        return WithFunctionData(sendErc20Request, data)
     }
 
     override fun getSendErc20Request(id: UUID, rpcSpec: RpcUrlSpec): FullSendErc20Request {
@@ -81,7 +73,6 @@ class SendErc20RequestServiceImpl(
         return FullSendErc20Request.fromSendErc20Request(
             request = sendErc20Request,
             status = status,
-            redirectPath = applicationProperties.sendRequest.redirectPath.replace("{id}", id.toString()),
             data = data,
             transactionInfo = transactionInfo
         )
