@@ -54,7 +54,9 @@ All endpoints are public and do not require `Authorization: Bearer JWT` header.
 === Create Send ERC20 Request
 Creates send ERC20 request with specified parameters. Either `client_id` or both `chain_id` and `redirect_url` must be
 provided as request body parameters. `sender_address`, `arbitrary_data`, `screen_config` and all its child fields are
-optional. `arbitrary_data` field can contain any desired JSON value.
+optional. `arbitrary_data` field can contain any desired JSON value. Send request ID can be interpolated into the
+`redirect_url` by placing `${id}` placeholder in the place where request ID is desired in the URL. The placeholder must
+strictly have dollar sign and brackets to be interpolated, and only `id` field can be interpolated.
 
 Example request using `client_id` field:
 
