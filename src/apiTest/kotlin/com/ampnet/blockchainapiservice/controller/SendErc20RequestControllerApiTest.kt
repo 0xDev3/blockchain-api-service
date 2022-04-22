@@ -55,7 +55,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateSendErc20RequestViaClientId() {
         val clientId = "client-id"
         val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com"
+        val redirectUrl = "https://example.com/\${id}"
 
         suppose("some client info exists in database") {
             dslContext.insertInto(ClientInfoTable.CLIENT_INFO)
@@ -121,7 +121,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                             message = "message",
                             logo = "logo"
                         ),
-                        redirectUrl = redirectUrl + "/send/${response.id}",
+                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
                         sendTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -141,7 +141,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     SendErc20Request(
                         id = response.id,
                         chainId = chainId,
-                        redirectUrl = redirectUrl,
+                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
                         tokenAddress = tokenAddress,
                         tokenAmount = amount,
                         tokenSenderAddress = senderAddress,
@@ -161,7 +161,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     @Test
     fun mustCorrectlyCreateSendErc20RequestViaChainIdAndRedirectUrl() {
         val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com"
+        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress("b")
@@ -215,7 +215,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                             message = "message",
                             logo = "logo"
                         ),
-                        redirectUrl = redirectUrl + "/send/${response.id}",
+                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
                         sendTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -235,7 +235,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     SendErc20Request(
                         id = response.id,
                         chainId = chainId,
-                        redirectUrl = redirectUrl,
+                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
                         tokenAddress = tokenAddress,
                         tokenAmount = amount,
                         tokenSenderAddress = senderAddress,
@@ -384,7 +384,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         }
 
         val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com"
+        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress(mainAccount.address)
@@ -461,7 +461,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                             message = "message",
                             logo = "logo"
                         ),
-                        redirectUrl = redirectUrl + "/send/${createResponse.id}",
+                        redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -493,7 +493,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         }
 
         val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com"
+        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress(mainAccount.address)
@@ -574,7 +574,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                             message = "message",
                             logo = "logo"
                         ),
-                        redirectUrl = redirectUrl + "/send/${createResponse.id}",
+                        redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -612,7 +612,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 StoreSendErc20RequestParams(
                     id = id,
                     chainId = Chain.HARDHAT_TESTNET.id,
-                    redirectUrl = "https://example.com",
+                    redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     tokenAmount = Balance(BigInteger.TEN),
                     tokenSenderAddress = WalletAddress("b"),
@@ -663,7 +663,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 StoreSendErc20RequestParams(
                     id = id,
                     chainId = Chain.HARDHAT_TESTNET.id,
-                    redirectUrl = "https://example.com",
+                    redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     tokenAmount = Balance(BigInteger.TEN),
                     tokenSenderAddress = WalletAddress("b"),
