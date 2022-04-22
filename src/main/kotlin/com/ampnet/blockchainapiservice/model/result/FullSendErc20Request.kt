@@ -29,14 +29,13 @@ data class FullSendErc20Request(
         fun fromSendErc20Request(
             request: SendErc20Request,
             status: Status,
-            redirectPath: String,
             data: FunctionData,
             transactionInfo: BlockchainTransactionInfo?
         ) = FullSendErc20Request(
             id = request.id,
             status = status,
             chainId = request.chainId,
-            redirectUrl = request.redirectUrl + redirectPath,
+            redirectUrl = request.redirectUrl,
             tokenAddress = request.tokenAddress,
             tokenAmount = request.tokenAmount,
             tokenSenderAddress = request.tokenSenderAddress,

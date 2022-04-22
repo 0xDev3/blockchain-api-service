@@ -24,7 +24,7 @@ data class StoreSendErc20RequestParams(
             StoreSendErc20RequestParams(
                 id = id,
                 chainId = chainId,
-                redirectUrl = redirectUrl,
+                redirectUrl = redirectUrl.replace("\${id}", id.toString()),
                 tokenAddress = params.tokenAddress,
                 tokenAmount = params.tokenAmount,
                 tokenSenderAddress = params.tokenSenderAddress,

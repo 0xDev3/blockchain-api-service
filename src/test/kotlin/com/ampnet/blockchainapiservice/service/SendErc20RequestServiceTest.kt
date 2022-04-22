@@ -5,7 +5,6 @@ import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
-import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
 import com.ampnet.blockchainapiservice.exception.IncompleteSendErc20RequestException
 import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
@@ -47,7 +46,7 @@ class SendErc20RequestServiceTest : TestBase() {
         private val CREATE_PARAMS = CreateSendErc20RequestParams(
             clientId = CLIENT_ID,
             chainId = ChainId(1337L),
-            redirectUrl = "redirect-url",
+            redirectUrl = "redirect-url/\${id}",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.valueOf(123456L)),
             tokenSenderAddress = WalletAddress("b"),
@@ -91,7 +90,7 @@ class SendErc20RequestServiceTest : TestBase() {
         }
 
         val chainId = ChainId(123456789L)
-        val redirectUrl = "different-redirect-url"
+        val redirectUrl = "different-redirect-url/\${id}/rest"
         val clientInfoRepository = mock<ClientInfoRepository>()
 
         suppose("client info will be fetched from database") {
@@ -110,7 +109,7 @@ class SendErc20RequestServiceTest : TestBase() {
         val storeParams = StoreSendErc20RequestParams(
             id = uuid,
             chainId = chainId,
-            redirectUrl = redirectUrl,
+            redirectUrl = redirectUrl.replace("\${id}", uuid.toString()),
             tokenAddress = CREATE_PARAMS.tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
@@ -122,7 +121,7 @@ class SendErc20RequestServiceTest : TestBase() {
         val storedRequest = SendErc20Request(
             id = uuid,
             chainId = chainId,
-            redirectUrl = redirectUrl,
+            redirectUrl = storeParams.redirectUrl,
             tokenAddress = CREATE_PARAMS.tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
@@ -142,15 +141,14 @@ class SendErc20RequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             blockchainService = mock(),
             clientInfoRepository = clientInfoRepository,
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = "/test/{id}" }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request is correctly created") {
             assertThat(service.createSendErc20Request(CREATE_PARAMS)).withMessage()
                 .isEqualTo(
                     WithFunctionData(
-                        storedRequest.copy(redirectUrl = storedRequest.redirectUrl + "/test/$uuid"),
+                        storedRequest.copy(redirectUrl = storedRequest.redirectUrl.replace("\${id}", uuid.toString())),
                         encodedData
                     )
                 )
@@ -196,7 +194,7 @@ class SendErc20RequestServiceTest : TestBase() {
         val storeParams = StoreSendErc20RequestParams(
             id = uuid,
             chainId = chainId,
-            redirectUrl = redirectUrl,
+            redirectUrl = redirectUrl.replace("\${id}", uuid.toString()),
             tokenAddress = CREATE_PARAMS.tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
@@ -208,7 +206,7 @@ class SendErc20RequestServiceTest : TestBase() {
         val storedRequest = SendErc20Request(
             id = uuid,
             chainId = chainId,
-            redirectUrl = redirectUrl,
+            redirectUrl = storeParams.redirectUrl,
             tokenAddress = CREATE_PARAMS.tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
@@ -232,18 +230,12 @@ class SendErc20RequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = "/test/{id}" }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request is correctly created") {
             assertThat(service.createSendErc20Request(createParams)).withMessage()
-                .isEqualTo(
-                    WithFunctionData(
-                        storedRequest.copy(redirectUrl = storedRequest.redirectUrl + "/test/$uuid"),
-                        encodedData
-                    )
-                )
+                .isEqualTo(WithFunctionData(storedRequest, encodedData))
 
             verifyMock(sendErc20RequestRepository)
                 .store(storeParams)
@@ -265,8 +257,7 @@ class SendErc20RequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             blockchainService = mock(),
             clientInfoRepository = clientInfoRepository,
-            sendErc20RequestRepository = mock(),
-            applicationProperties = ApplicationProperties()
+            sendErc20RequestRepository = mock()
         )
 
         verify("NonExistentClientIdException is thrown") {
@@ -287,8 +278,7 @@ class SendErc20RequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = mock(),
-            applicationProperties = ApplicationProperties()
+            sendErc20RequestRepository = mock()
         )
 
         verify("IncompleteSendErc20RequestException is thrown") {
@@ -309,8 +299,7 @@ class SendErc20RequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = mock(),
-            applicationProperties = ApplicationProperties()
+            sendErc20RequestRepository = mock()
         )
 
         verify("IncompleteSendErc20RequestException is thrown") {
@@ -334,8 +323,7 @@ class SendErc20RequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties()
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -389,14 +377,12 @@ class SendErc20RequestServiceTest : TestBase() {
                 .willReturn(encodedData)
         }
 
-        val redirectPath = "/test/{id}"
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
             blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = redirectPath }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request with pending status is returned") {
@@ -405,7 +391,6 @@ class SendErc20RequestServiceTest : TestBase() {
                     FullSendErc20Request.fromSendErc20Request(
                         request = sendRequest,
                         status = Status.PENDING,
-                        redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
                         transactionInfo = null
                     )
@@ -465,14 +450,12 @@ class SendErc20RequestServiceTest : TestBase() {
                 .willReturn(encodedData)
         }
 
-        val redirectPath = "/test/{id}"
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
             blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = redirectPath }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request with pending status is returned") {
@@ -481,7 +464,6 @@ class SendErc20RequestServiceTest : TestBase() {
                     FullSendErc20Request.fromSendErc20Request(
                         request = sendRequest,
                         status = Status.PENDING,
-                        redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
                         transactionInfo = null
                     )
@@ -548,14 +530,12 @@ class SendErc20RequestServiceTest : TestBase() {
                 .willReturn(encodedData)
         }
 
-        val redirectPath = "/test/{id}"
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
             blockchainService = blockchainService,
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = redirectPath }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request with failed status is returned") {
@@ -564,7 +544,6 @@ class SendErc20RequestServiceTest : TestBase() {
                     FullSendErc20Request.fromSendErc20Request(
                         request = sendRequest,
                         status = Status.FAILED,
-                        redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
                         transactionInfo = transactionInfo
                     )
@@ -631,14 +610,12 @@ class SendErc20RequestServiceTest : TestBase() {
                 .willReturn(encodedData)
         }
 
-        val redirectPath = "/test/{id}"
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
             blockchainService = blockchainService,
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = redirectPath }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request with failed status is returned") {
@@ -647,7 +624,6 @@ class SendErc20RequestServiceTest : TestBase() {
                     FullSendErc20Request.fromSendErc20Request(
                         request = sendRequest,
                         status = Status.FAILED,
-                        redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
                         transactionInfo = transactionInfo
                     )
@@ -714,14 +690,12 @@ class SendErc20RequestServiceTest : TestBase() {
                 .willReturn(encodedData)
         }
 
-        val redirectPath = "/test/{id}"
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
             blockchainService = blockchainService,
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = redirectPath }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request with failed status is returned") {
@@ -730,7 +704,6 @@ class SendErc20RequestServiceTest : TestBase() {
                     FullSendErc20Request.fromSendErc20Request(
                         request = sendRequest,
                         status = Status.FAILED,
-                        redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
                         transactionInfo = transactionInfo
                     )
@@ -797,14 +770,12 @@ class SendErc20RequestServiceTest : TestBase() {
                 .willReturn(encodedData)
         }
 
-        val redirectPath = "/test/{id}"
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
             blockchainService = blockchainService,
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = redirectPath }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request with failed status is returned") {
@@ -813,7 +784,6 @@ class SendErc20RequestServiceTest : TestBase() {
                     FullSendErc20Request.fromSendErc20Request(
                         request = sendRequest,
                         status = Status.FAILED,
-                        redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
                         transactionInfo = transactionInfo
                     )
@@ -880,14 +850,12 @@ class SendErc20RequestServiceTest : TestBase() {
                 .willReturn(encodedData)
         }
 
-        val redirectPath = "/test/{id}"
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
             blockchainService = blockchainService,
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = redirectPath }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request with successful status is returned") {
@@ -896,7 +864,6 @@ class SendErc20RequestServiceTest : TestBase() {
                     FullSendErc20Request.fromSendErc20Request(
                         request = sendRequest,
                         status = Status.SUCCESS,
-                        redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
                         transactionInfo = transactionInfo
                     )
@@ -963,14 +930,12 @@ class SendErc20RequestServiceTest : TestBase() {
                 .willReturn(encodedData)
         }
 
-        val redirectPath = "/test/{id}"
         val service = SendErc20RequestServiceImpl(
             uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
             blockchainService = blockchainService,
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties().apply { this.sendRequest.redirectPath = redirectPath }
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("send ERC20 request with successful status is returned") {
@@ -979,7 +944,6 @@ class SendErc20RequestServiceTest : TestBase() {
                     FullSendErc20Request.fromSendErc20Request(
                         request = sendRequest,
                         status = Status.SUCCESS,
-                        redirectPath = redirectPath.replace("{id}", id.toString()),
                         data = encodedData,
                         transactionInfo = transactionInfo
                     )
@@ -1002,8 +966,7 @@ class SendErc20RequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties()
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("txHash was successfully attached") {
@@ -1030,8 +993,7 @@ class SendErc20RequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             blockchainService = mock(),
             clientInfoRepository = mock(),
-            sendErc20RequestRepository = sendErc20RequestRepository,
-            applicationProperties = ApplicationProperties()
+            sendErc20RequestRepository = sendErc20RequestRepository
         )
 
         verify("CannotAttachTxHashException is thrown") {
