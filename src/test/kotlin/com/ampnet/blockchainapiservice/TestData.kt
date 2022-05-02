@@ -1,11 +1,5 @@
 package com.ampnet.blockchainapiservice
 
-import com.ampnet.blockchainapiservice.util.UtcDateTime
-import com.ampnet.blockchainapiservice.util.WalletAddress
-import java.time.Duration
-import java.time.OffsetDateTime
-import java.util.UUID
-
 object TestData {
 
     // TODO SD-771
