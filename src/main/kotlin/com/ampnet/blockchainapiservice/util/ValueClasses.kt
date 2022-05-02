@@ -91,3 +91,10 @@ value class TransactionHash private constructor(val value: String) {
         operator fun invoke(value: String) = TransactionHash(value.lowercase())
     }
 }
+
+@JvmInline
+value class SignedMessage private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = SignedMessage(value.lowercase())
+    }
+}
