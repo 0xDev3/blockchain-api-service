@@ -2,7 +2,7 @@ package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.config.binding.annotation.RpcUrlBinding
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
 import com.ampnet.blockchainapiservice.model.request.CreateSendErc20Request
@@ -40,7 +40,7 @@ class SendErc20RequestController(private val sendErc20RequestService: SendErc20R
             tokenSenderAddress = requestBody.senderAddress?.let { WalletAddress(it) },
             tokenRecipientAddress = WalletAddress(requestBody.recipientAddress),
             arbitraryData = requestBody.arbitraryData,
-            screenConfig = requestBody.screenConfig ?: SendScreenConfig.EMPTY
+            screenConfig = requestBody.screenConfig ?: ScreenConfig.EMPTY
         )
 
         val createdRequest = sendErc20RequestService.createSendErc20Request(params)
@@ -55,7 +55,7 @@ class SendErc20RequestController(private val sendErc20RequestService: SendErc20R
                 senderAddress = createdRequest.value.tokenSenderAddress?.rawValue,
                 recipientAddress = createdRequest.value.tokenRecipientAddress.rawValue,
                 arbitraryData = createdRequest.value.arbitraryData,
-                screenConfig = createdRequest.value.sendScreenConfig.orEmpty(),
+                screenConfig = createdRequest.value.screenConfig.orEmpty(),
                 redirectUrl = createdRequest.value.redirectUrl,
                 sendTx = TransactionResponse(
                     txHash = null,
@@ -85,7 +85,7 @@ class SendErc20RequestController(private val sendErc20RequestService: SendErc20R
                 senderAddress = sendRequest.tokenSenderAddress?.rawValue,
                 recipientAddress = sendRequest.tokenRecipientAddress.rawValue,
                 arbitraryData = sendRequest.arbitraryData,
-                screenConfig = sendRequest.sendScreenConfig.orEmpty(),
+                screenConfig = sendRequest.screenConfig.orEmpty(),
                 redirectUrl = sendRequest.redirectUrl,
                 sendTx = TransactionResponse(
                     txHash = sendRequest.transactionData.txHash?.value,

@@ -9,7 +9,7 @@ import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
 import com.ampnet.blockchainapiservice.exception.IncompleteSendErc20RequestException
 import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
@@ -52,7 +52,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             arbitraryData = null,
-            screenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -130,7 +130,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
             txHash = null,
             arbitraryData = CREATE_PARAMS.arbitraryData,
-            sendScreenConfig = CREATE_PARAMS.screenConfig
+            screenConfig = CREATE_PARAMS.screenConfig
         )
 
         suppose("send ERC20 request is stored in database") {
@@ -215,7 +215,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
             txHash = null,
             arbitraryData = CREATE_PARAMS.arbitraryData,
-            sendScreenConfig = CREATE_PARAMS.screenConfig
+            screenConfig = CREATE_PARAMS.screenConfig
         )
 
         suppose("send ERC20 request is stored in database") {
@@ -348,7 +348,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             txHash = null,
             arbitraryData = null,
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -413,7 +413,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
             arbitraryData = null,
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -486,7 +486,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
             arbitraryData = null,
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -566,7 +566,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
             arbitraryData = null,
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -646,7 +646,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
             arbitraryData = null,
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -726,7 +726,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
             arbitraryData = null,
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -806,7 +806,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
             arbitraryData = null,
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -886,7 +886,7 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
             arbitraryData = null,
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"

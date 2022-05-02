@@ -2,7 +2,7 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.SendErc20RequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.SendErc20RequestRecord
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
 import com.ampnet.blockchainapiservice.util.Balance
@@ -77,7 +77,7 @@ class JooqSendErc20RequestRepository(
             tokenRecipientAddress = WalletAddress(tokenRecipientAddress!!),
             txHash = txHash?.let { TransactionHash(it) },
             arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = sendScreenTitle,
                 message = sendScreenMessage,
                 logo = sendScreenLogo

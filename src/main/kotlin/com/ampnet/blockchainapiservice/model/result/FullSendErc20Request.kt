@@ -1,6 +1,6 @@
 package com.ampnet.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -22,7 +22,7 @@ data class FullSendErc20Request(
     val tokenSenderAddress: WalletAddress?,
     val tokenRecipientAddress: WalletAddress,
     val arbitraryData: JsonNode?,
-    val sendScreenConfig: SendScreenConfig,
+    val screenConfig: ScreenConfig,
     val transactionData: FullTransactionData
 ) {
     companion object {
@@ -41,7 +41,7 @@ data class FullSendErc20Request(
             tokenSenderAddress = request.tokenSenderAddress,
             tokenRecipientAddress = request.tokenRecipientAddress,
             arbitraryData = request.arbitraryData,
-            sendScreenConfig = request.sendScreenConfig,
+            screenConfig = request.screenConfig,
             transactionData = FullTransactionData(
                 txHash = request.txHash,
                 fromAddress = transactionInfo?.from,

@@ -9,9 +9,9 @@ CREATE TABLE blockchain_api_service.erc20_balance_request (
     block_number             NUMERIC(78),
     requested_wallet_address VARCHAR,
     arbitrary_data           JSON,
-    send_screen_title        VARCHAR,
-    send_screen_message      VARCHAR,
-    send_screen_logo         VARCHAR,
+    balance_screen_title     VARCHAR,
+    balance_screen_message   VARCHAR,
+    balance_screen_logo      VARCHAR,
     actual_wallet_address    VARCHAR,
     signed_message           VARCHAR
 );

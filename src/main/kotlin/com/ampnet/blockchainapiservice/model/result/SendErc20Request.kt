@@ -1,6 +1,6 @@
 package com.ampnet.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -19,5 +19,5 @@ data class SendErc20Request(
     val tokenRecipientAddress: WalletAddress,
     val txHash: TransactionHash?,
     val arbitraryData: JsonNode?,
-    val sendScreenConfig: SendScreenConfig
+    val screenConfig: ScreenConfig
 )
