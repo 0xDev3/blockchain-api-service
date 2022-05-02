@@ -99,7 +99,9 @@ class SendErc20RequestServiceTest : TestBase() {
                     ClientInfo(
                         clientId = CLIENT_ID,
                         chainId = chainId,
-                        redirectUrl = redirectUrl
+                        sendRedirectUrl = redirectUrl,
+                        balanceRedirectUrl = null, // TODO SD-769 test more cases
+                        tokenAddress = null
                     )
                 )
         }
