@@ -5,6 +5,7 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ClientInfoR
 import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.ChainId
+import com.ampnet.blockchainapiservice.util.ContractAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.Test
@@ -32,15 +33,19 @@ class JooqClientInfoRepositoryIntegTest : TestBase() {
         val clientInfo = ClientInfo(
             clientId = "example-client",
             chainId = ChainId(1337L),
-            redirectUrl = "example-url"
+            sendRedirectUrl = "example-send-url",
+            balanceRedirectUrl = "example-balance-url",
+            tokenAddress = ContractAddress("abc")
         )
 
         suppose("some client info exists in database") {
             dslContext.executeInsert(
                 ClientInfoRecord(
                     clientId = clientInfo.clientId,
-                    chainId = clientInfo.chainId.value,
-                    redirectUrl = clientInfo.redirectUrl
+                    chainId = clientInfo.chainId?.value,
+                    sendRedirectUrl = clientInfo.sendRedirectUrl,
+                    balanceRedirectUrl = clientInfo.balanceRedirectUrl,
+                    tokenAddress = clientInfo.tokenAddress?.rawValue
                 )
             )
         }
@@ -49,9 +54,7 @@ class JooqClientInfoRepositoryIntegTest : TestBase() {
             val result = repository.getById(clientInfo.clientId)
 
             assertThat(result).withMessage()
-                .isEqualTo(
-                    clientInfo
-                )
+                .isEqualTo(clientInfo)
         }
     }
 
