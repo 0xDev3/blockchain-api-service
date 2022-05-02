@@ -8,7 +8,7 @@ import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ClientInfoTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.SendErc20RequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ClientInfoRecord
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.response.SendErc20RequestResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
@@ -118,7 +118,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         senderAddress = senderAddress.rawValue,
                         recipientAddress = recipientAddress.rawValue,
                         arbitraryData = response.arbitraryData,
-                        screenConfig = SendScreenConfig(
+                        screenConfig = ScreenConfig(
                             title = "title",
                             message = "message",
                             logo = "logo"
@@ -150,7 +150,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         tokenRecipientAddress = recipientAddress,
                         txHash = null,
                         arbitraryData = response.arbitraryData,
-                        sendScreenConfig = SendScreenConfig(
+                        screenConfig = ScreenConfig(
                             title = "title",
                             message = "message",
                             logo = "logo"
@@ -212,7 +212,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         senderAddress = senderAddress.rawValue,
                         recipientAddress = recipientAddress.rawValue,
                         arbitraryData = response.arbitraryData,
-                        screenConfig = SendScreenConfig(
+                        screenConfig = ScreenConfig(
                             title = "title",
                             message = "message",
                             logo = "logo"
@@ -244,7 +244,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         tokenRecipientAddress = recipientAddress,
                         txHash = null,
                         arbitraryData = response.arbitraryData,
-                        sendScreenConfig = SendScreenConfig(
+                        screenConfig = ScreenConfig(
                             title = "title",
                             message = "message",
                             logo = "logo"
@@ -458,7 +458,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         senderAddress = senderAddress.rawValue,
                         recipientAddress = recipientAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
-                        screenConfig = SendScreenConfig(
+                        screenConfig = ScreenConfig(
                             title = "title",
                             message = "message",
                             logo = "logo"
@@ -571,7 +571,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         senderAddress = senderAddress.rawValue,
                         recipientAddress = recipientAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
-                        screenConfig = SendScreenConfig(
+                        screenConfig = ScreenConfig(
                             title = "title",
                             message = "message",
                             logo = "logo"
@@ -620,7 +620,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     tokenSenderAddress = WalletAddress("b"),
                     tokenRecipientAddress = WalletAddress("c"),
                     arbitraryData = null,
-                    screenConfig = SendScreenConfig(
+                    screenConfig = ScreenConfig(
                         title = "title",
                         message = "message",
                         logo = "logo"
@@ -671,7 +671,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     tokenSenderAddress = WalletAddress("b"),
                     tokenRecipientAddress = WalletAddress("c"),
                     arbitraryData = null,
-                    screenConfig = SendScreenConfig(
+                    screenConfig = ScreenConfig(
                         title = "title",
                         message = "message",
                         logo = "logo"

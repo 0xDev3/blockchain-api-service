@@ -2,7 +2,7 @@ package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
 import com.ampnet.blockchainapiservice.model.request.CreateSendErc20Request
@@ -43,7 +43,7 @@ class SendErc20RequestControllerTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             arbitraryData = null,
-            screenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -59,7 +59,7 @@ class SendErc20RequestControllerTest : TestBase() {
             tokenRecipientAddress = params.tokenRecipientAddress,
             txHash = null,
             arbitraryData = params.arbitraryData,
-            sendScreenConfig = params.screenConfig
+            screenConfig = params.screenConfig
         )
         val data = FunctionData("data")
         val service = mock<SendErc20RequestService>()
@@ -98,7 +98,7 @@ class SendErc20RequestControllerTest : TestBase() {
                             senderAddress = result.tokenSenderAddress?.rawValue,
                             recipientAddress = result.tokenRecipientAddress.rawValue,
                             arbitraryData = result.arbitraryData,
-                            screenConfig = result.sendScreenConfig,
+                            screenConfig = result.screenConfig,
                             redirectUrl = result.redirectUrl,
                             sendTx = TransactionResponse(
                                 txHash = null,
@@ -128,7 +128,7 @@ class SendErc20RequestControllerTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             arbitraryData = null,
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = "title",
                 message = "message",
                 logo = "logo"
@@ -162,7 +162,7 @@ class SendErc20RequestControllerTest : TestBase() {
                             senderAddress = result.tokenSenderAddress?.rawValue,
                             recipientAddress = result.tokenRecipientAddress.rawValue,
                             arbitraryData = result.arbitraryData,
-                            screenConfig = result.sendScreenConfig,
+                            screenConfig = result.screenConfig,
                             redirectUrl = result.redirectUrl,
                             sendTx = TransactionResponse(
                                 txHash = result.transactionData.txHash?.value,

@@ -2,7 +2,7 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20BalanceRequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20BalanceRequestRecord
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.util.BlockNumber
@@ -36,9 +36,9 @@ class JooqErc20BalanceRequestRepository(
             blockNumber = params.blockNumber?.value,
             requestedWalletAddress = params.requestedWalletAddress?.rawValue,
             arbitraryData = params.arbitraryData?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) },
-            sendScreenTitle = params.screenConfig.title,
-            sendScreenMessage = params.screenConfig.message,
-            sendScreenLogo = params.screenConfig.logo,
+            balanceScreenTitle = params.screenConfig.title,
+            balanceScreenMessage = params.screenConfig.message,
+            balanceScreenLogo = params.screenConfig.logo,
             actualWalletAddress = null,
             signedMessage = null
         )
@@ -82,10 +82,10 @@ class JooqErc20BalanceRequestRepository(
             actualWalletAddress = actualWalletAddress?.let { WalletAddress(it) },
             signedMessage = signedMessage?.let { SignedMessage(it) },
             arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
-            sendScreenConfig = SendScreenConfig(
-                title = sendScreenTitle,
-                message = sendScreenMessage,
-                logo = sendScreenLogo
+            screenConfig = ScreenConfig(
+                title = balanceScreenTitle,
+                message = balanceScreenMessage,
+                logo = balanceScreenLogo
             )
         )
 }

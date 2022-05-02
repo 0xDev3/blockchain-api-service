@@ -1,14 +1,14 @@
 package com.ampnet.blockchainapiservice.model
 
-data class SendScreenConfig(
+data class ScreenConfig(
     val title: String?,
     val message: String?,
     val logo: String?
 ) {
     companion object {
-        val EMPTY = SendScreenConfig(null, null, null)
+        val EMPTY = ScreenConfig(null, null, null)
     }
 
-    fun orEmpty(): SendScreenConfig? =
+    fun orEmpty(): ScreenConfig? =
         if (this == EMPTY) null else this
 }
