@@ -63,7 +63,9 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     ClientInfoRecord(
                         clientId = "client-id",
                         chainId = chainId.value,
-                        redirectUrl = redirectUrl
+                        sendRedirectUrl = redirectUrl,
+                        balanceRedirectUrl = null, // TODO SD-769 test more cases
+                        tokenAddress = null
                     )
                 )
                 .execute()
