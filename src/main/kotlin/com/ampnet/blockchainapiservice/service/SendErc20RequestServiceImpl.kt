@@ -93,7 +93,7 @@ class SendErc20RequestServiceImpl(
             logger.debug { "Fetching info for clientId: $clientId" }
             val clientInfo = clientInfoRepository.getById(this.clientId)
                 ?: throw NonExistentClientIdException(this.clientId)
-            Pair(clientInfo.chainId, clientInfo.redirectUrl)
+            Pair(clientInfo.chainId!!, clientInfo.sendRedirectUrl!!) // TODO will be handled in SD-769
         } else {
             logger.debug { "No clientId provided, using specified chainId and redirectUrl" }
             Pair(
