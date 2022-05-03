@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.model.params
 
 import com.ampnet.blockchainapiservice.model.ScreenConfig
+import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -20,12 +21,12 @@ data class StoreSendErc20RequestParams(
     val screenConfig: ScreenConfig
 ) {
     companion object {
-        fun fromCreateParams(params: CreateSendErc20RequestParams, id: UUID, chainId: ChainId, redirectUrl: String) =
+        fun fromCreateParams(id: UUID, params: CreateSendErc20RequestParams, clientInfo: ClientInfo) =
             StoreSendErc20RequestParams(
                 id = id,
-                chainId = chainId,
-                redirectUrl = redirectUrl.replace("\${id}", id.toString()),
-                tokenAddress = params.tokenAddress,
+                chainId = clientInfo.chainId.resolve(params.chainId),
+                redirectUrl = clientInfo.sendRedirectUrl.resolve(params.redirectUrl).replace("\${id}", id.toString()),
+                tokenAddress = clientInfo.tokenAddress.resolve(params.tokenAddress),
                 tokenAmount = params.tokenAmount,
                 tokenSenderAddress = params.tokenSenderAddress,
                 tokenRecipientAddress = params.tokenRecipientAddress,
