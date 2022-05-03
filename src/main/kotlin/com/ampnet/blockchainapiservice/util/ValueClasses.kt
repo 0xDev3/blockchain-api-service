@@ -6,6 +6,7 @@ import org.web3j.protocol.core.DefaultBlockParameter
 import org.web3j.protocol.core.DefaultBlockParameterName
 import java.math.BigInteger
 import java.time.Duration
+import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
@@ -14,6 +15,9 @@ value class UtcDateTime private constructor(val value: OffsetDateTime) {
     companion object {
         private val ZONE_OFFSET = ZoneOffset.UTC
         operator fun invoke(value: OffsetDateTime) = UtcDateTime(value.withOffsetSameInstant(ZONE_OFFSET))
+        fun ofEpochSeconds(value: Long) = UtcDateTime(
+            OffsetDateTime.ofInstant(Instant.ofEpochSecond(value), ZONE_OFFSET)
+        )
     }
 
     operator fun plus(duration: Duration): UtcDateTime = UtcDateTime(value + duration)
