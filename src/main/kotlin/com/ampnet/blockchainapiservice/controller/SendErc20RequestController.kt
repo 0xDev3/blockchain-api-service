@@ -35,7 +35,7 @@ class SendErc20RequestController(private val sendErc20RequestService: SendErc20R
             clientId = requestBody.clientId,
             chainId = requestBody.chainId?.let { ChainId(it) },
             redirectUrl = requestBody.redirectUrl,
-            tokenAddress = ContractAddress(requestBody.tokenAddress),
+            tokenAddress = requestBody.tokenAddress?.let { ContractAddress(it) },
             tokenAmount = Balance(requestBody.amount),
             tokenSenderAddress = requestBody.senderAddress?.let { WalletAddress(it) },
             tokenRecipientAddress = WalletAddress(requestBody.recipientAddress),

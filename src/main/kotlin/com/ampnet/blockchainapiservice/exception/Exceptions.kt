@@ -53,8 +53,8 @@ class NonExistentClientIdException(clientId: String) : ServiceException(
     }
 }
 
-class IncompleteSendErc20RequestException(message: String) : ServiceException(
-    errorCode = ErrorCode.INCOMPLETE_SEND_REQUEST,
+class IncompleteRequestException(message: String) : ServiceException(
+    errorCode = ErrorCode.INCOMPLETE_REQUEST,
     httpStatus = HttpStatus.BAD_REQUEST,
     message = message
 ) {

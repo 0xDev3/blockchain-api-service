@@ -8,7 +8,7 @@ data class CreateSendErc20Request(
     val clientId: String?,
     val chainId: Long?,
     val redirectUrl: String?,
-    val tokenAddress: String,
+    val tokenAddress: String?,
     val amount: BigInteger,
     val senderAddress: String?,
     val recipientAddress: String,
