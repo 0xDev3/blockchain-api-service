@@ -6,7 +6,7 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
-import com.ampnet.blockchainapiservice.exception.IncompleteSendErc20RequestException
+import com.ampnet.blockchainapiservice.exception.IncompleteRequestException
 import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
@@ -91,6 +91,7 @@ class SendErc20RequestServiceTest : TestBase() {
 
         val chainId = ChainId(123456789L)
         val redirectUrl = "different-redirect-url/\${id}/rest"
+        val tokenAddress = ContractAddress("cafebabe")
         val clientInfoRepository = mock<ClientInfoRepository>()
 
         suppose("client info will be fetched from database") {
@@ -100,8 +101,8 @@ class SendErc20RequestServiceTest : TestBase() {
                         clientId = CLIENT_ID,
                         chainId = chainId,
                         sendRedirectUrl = redirectUrl,
-                        balanceRedirectUrl = null, // TODO SD-769 test more cases
-                        tokenAddress = null
+                        balanceRedirectUrl = null,
+                        tokenAddress = tokenAddress
                     )
                 )
         }
@@ -112,7 +113,7 @@ class SendErc20RequestServiceTest : TestBase() {
             id = uuid,
             chainId = chainId,
             redirectUrl = redirectUrl.replace("\${id}", uuid.toString()),
-            tokenAddress = CREATE_PARAMS.tokenAddress,
+            tokenAddress = tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
@@ -124,7 +125,7 @@ class SendErc20RequestServiceTest : TestBase() {
             id = uuid,
             chainId = chainId,
             redirectUrl = storeParams.redirectUrl,
-            tokenAddress = CREATE_PARAMS.tokenAddress,
+            tokenAddress = tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
@@ -146,8 +147,14 @@ class SendErc20RequestServiceTest : TestBase() {
             sendErc20RequestRepository = sendErc20RequestRepository
         )
 
+        val createParams = CREATE_PARAMS.copy(
+            chainId = null,
+            redirectUrl = null,
+            tokenAddress = null
+        )
+
         verify("send ERC20 request is correctly created") {
-            assertThat(service.createSendErc20Request(CREATE_PARAMS)).withMessage()
+            assertThat(service.createSendErc20Request(createParams)).withMessage()
                 .isEqualTo(
                     WithFunctionData(
                         storedRequest.copy(redirectUrl = storedRequest.redirectUrl.replace("\${id}", uuid.toString())),
@@ -197,7 +204,7 @@ class SendErc20RequestServiceTest : TestBase() {
             id = uuid,
             chainId = chainId,
             redirectUrl = redirectUrl.replace("\${id}", uuid.toString()),
-            tokenAddress = CREATE_PARAMS.tokenAddress,
+            tokenAddress = CREATE_PARAMS.tokenAddress!!,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
@@ -209,7 +216,7 @@ class SendErc20RequestServiceTest : TestBase() {
             id = uuid,
             chainId = chainId,
             redirectUrl = storeParams.redirectUrl,
-            tokenAddress = CREATE_PARAMS.tokenAddress,
+            tokenAddress = CREATE_PARAMS.tokenAddress!!,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             tokenRecipientAddress = CREATE_PARAMS.tokenRecipientAddress,
@@ -270,42 +277,87 @@ class SendErc20RequestServiceTest : TestBase() {
     }
 
     @Test
-    fun mustThrowIncompleteSendErc20RequestExceptionWhenClientIdAndChainIdAreMissing() {
+    fun mustThrowIncompleteRequestExceptionWhenClientIdAndChainIdAreMissing() {
         val params = suppose("clientId and chainId are missing from params") {
             CREATE_PARAMS.copy(clientId = null, chainId = null)
         }
 
+        val uuidProvider = mock<UuidProvider>()
+        val uuid = UUID.randomUUID()
+
+        suppose("some UUID will be generated") {
+            given(uuidProvider.getUuid())
+                .willReturn(uuid)
+        }
+
         val service = SendErc20RequestServiceImpl(
-            uuidProvider = mock(),
+            uuidProvider = uuidProvider,
             functionEncoderService = mock(),
             blockchainService = mock(),
             clientInfoRepository = mock(),
             sendErc20RequestRepository = mock()
         )
 
-        verify("IncompleteSendErc20RequestException is thrown") {
-            assertThrows<IncompleteSendErc20RequestException> {
+        verify("IncompleteRequestException is thrown") {
+            assertThrows<IncompleteRequestException> {
                 service.createSendErc20Request(params)
             }
         }
     }
 
     @Test
-    fun mustThrowIncompleteSendErc20RequestExceptionWhenClientIdAndRedirectUrlAreMissing() {
+    fun mustThrowIncompleteRequestExceptionWhenClientIdAndRedirectUrlAreMissing() {
         val params = suppose("clientId and redirectUrl are missing from params") {
             CREATE_PARAMS.copy(clientId = null, redirectUrl = null)
         }
 
+        val uuidProvider = mock<UuidProvider>()
+        val uuid = UUID.randomUUID()
+
+        suppose("some UUID will be generated") {
+            given(uuidProvider.getUuid())
+                .willReturn(uuid)
+        }
+
         val service = SendErc20RequestServiceImpl(
-            uuidProvider = mock(),
+            uuidProvider = uuidProvider,
             functionEncoderService = mock(),
             blockchainService = mock(),
             clientInfoRepository = mock(),
             sendErc20RequestRepository = mock()
         )
 
-        verify("IncompleteSendErc20RequestException is thrown") {
-            assertThrows<IncompleteSendErc20RequestException> {
+        verify("IncompleteRequestException is thrown") {
+            assertThrows<IncompleteRequestException> {
+                service.createSendErc20Request(params)
+            }
+        }
+    }
+
+    @Test
+    fun mustThrowIncompleteRequestExceptionWhenClientIdAndTokenAddressAreMissing() {
+        val params = suppose("clientId and tokenAddress are missing from params") {
+            CREATE_PARAMS.copy(clientId = null, tokenAddress = null)
+        }
+
+        val uuidProvider = mock<UuidProvider>()
+        val uuid = UUID.randomUUID()
+
+        suppose("some UUID will be generated") {
+            given(uuidProvider.getUuid())
+                .willReturn(uuid)
+        }
+
+        val service = SendErc20RequestServiceImpl(
+            uuidProvider = uuidProvider,
+            functionEncoderService = mock(),
+            blockchainService = mock(),
+            clientInfoRepository = mock(),
+            sendErc20RequestRepository = mock()
+        )
+
+        verify("IncompleteRequestException is thrown") {
+            assertThrows<IncompleteRequestException> {
                 service.createSendErc20Request(params)
             }
         }
