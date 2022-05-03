@@ -1,6 +1,6 @@
 package com.ampnet.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.util.Status
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -18,7 +18,7 @@ data class SendErc20RequestResponse(
     val senderAddress: String?,
     val recipientAddress: String,
     val arbitraryData: JsonNode?,
-    val screenConfig: SendScreenConfig?,
+    val screenConfig: ScreenConfig?,
     val redirectUrl: String,
     val sendTx: TransactionResponse
 )

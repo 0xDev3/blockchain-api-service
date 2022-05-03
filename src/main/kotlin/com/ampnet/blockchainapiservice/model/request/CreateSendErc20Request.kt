@@ -1,6 +1,6 @@
 package com.ampnet.blockchainapiservice.model.request
 
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.fasterxml.jackson.databind.JsonNode
 import java.math.BigInteger
 
@@ -13,5 +13,5 @@ data class CreateSendErc20Request(
     val senderAddress: String?,
     val recipientAddress: String,
     val arbitraryData: JsonNode?,
-    val screenConfig: SendScreenConfig?
+    val screenConfig: ScreenConfig?
 )

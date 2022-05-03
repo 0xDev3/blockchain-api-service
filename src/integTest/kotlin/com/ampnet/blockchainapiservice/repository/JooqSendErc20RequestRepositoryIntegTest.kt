@@ -3,7 +3,7 @@ package com.ampnet.blockchainapiservice.repository
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.config.JsonConfig
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.SendErc20RequestRecord
-import com.ampnet.blockchainapiservice.model.SendScreenConfig
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
@@ -93,7 +93,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                         tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
                         txHash = TX_HASH,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
-                        sendScreenConfig = SendScreenConfig(
+                        screenConfig = ScreenConfig(
                             title = SEND_SCREEN_TITLE,
                             message = SEND_SCREEN_MESSAGE,
                             logo = SEND_SCREEN_LOGO
@@ -114,7 +114,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlySendErc20Request() {
+    fun mustCorrectlyStoreSendErc20Request() {
         val id = UUID.randomUUID()
         val params = StoreSendErc20RequestParams(
             id = id,
@@ -125,7 +125,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             tokenSenderAddress = TOKEN_SENDER_ADDRESS,
             tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
-            screenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = SEND_SCREEN_TITLE,
                 message = SEND_SCREEN_MESSAGE,
                 logo = SEND_SCREEN_LOGO
@@ -146,7 +146,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             txHash = null,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
-            sendScreenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = SEND_SCREEN_TITLE,
                 message = SEND_SCREEN_MESSAGE,
                 logo = SEND_SCREEN_LOGO
@@ -178,7 +178,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             tokenSenderAddress = TOKEN_SENDER_ADDRESS,
             tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
-            screenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = SEND_SCREEN_TITLE,
                 message = SEND_SCREEN_MESSAGE,
                 logo = SEND_SCREEN_LOGO
@@ -209,7 +209,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                         tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
                         txHash = TX_HASH,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
-                        sendScreenConfig = SendScreenConfig(
+                        screenConfig = ScreenConfig(
                             title = SEND_SCREEN_TITLE,
                             message = SEND_SCREEN_MESSAGE,
                             logo = SEND_SCREEN_LOGO
@@ -231,7 +231,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             tokenSenderAddress = TOKEN_SENDER_ADDRESS,
             tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
-            screenConfig = SendScreenConfig(
+            screenConfig = ScreenConfig(
                 title = SEND_SCREEN_TITLE,
                 message = SEND_SCREEN_MESSAGE,
                 logo = SEND_SCREEN_LOGO
@@ -267,7 +267,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                         tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
                         txHash = TX_HASH,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
-                        sendScreenConfig = SendScreenConfig(
+                        screenConfig = ScreenConfig(
                             title = SEND_SCREEN_TITLE,
                             message = SEND_SCREEN_MESSAGE,
                             logo = SEND_SCREEN_LOGO
