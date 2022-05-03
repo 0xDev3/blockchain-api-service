@@ -29,7 +29,7 @@ data class FullErc20BalanceRequest(
         fun fromErc20BalanceRequest(
             request: Erc20BalanceRequest,
             status: Status,
-            balance: Erc20Balance
+            balance: Erc20Balance?
         ) = FullErc20BalanceRequest(
             id = request.id,
             status = status,
