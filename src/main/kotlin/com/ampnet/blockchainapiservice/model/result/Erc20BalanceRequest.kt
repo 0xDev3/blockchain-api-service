@@ -22,5 +22,5 @@ data class Erc20BalanceRequest(
     val screenConfig: ScreenConfig
 ) {
     val messageToSign: String
-        get() = "" // TODO
+        get() = "Verification message ID to sign: $id"
 }
