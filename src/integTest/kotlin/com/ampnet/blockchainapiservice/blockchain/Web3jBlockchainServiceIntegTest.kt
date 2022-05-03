@@ -9,15 +9,18 @@ import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.service.EthereumFunctionEncoderService
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
-import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.BlockNumber
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.Erc20Balance
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
+import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
@@ -28,6 +31,7 @@ import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.utils.Convert
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.CompletableFuture
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -39,15 +43,20 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchErc20BalanceForLatestBlock() {
         val mainAccount = accounts[0]
-        val accountBalance = AccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("10000")))
+        val accountBalance = Erc20Balance(
+            wallet = WalletAddress(mainAccount.address),
+            blockNumber = BlockNumber(BigInteger.ZERO),
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(BigInteger("10000"))
+        )
 
         val contract = suppose("simple ERC20 contract is deployed") {
             SimpleERC20.deploy(
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider(),
-                listOf(accountBalance.address.rawValue),
-                listOf(accountBalance.balance.rawValue),
+                listOf(accountBalance.wallet.rawValue),
+                listOf(accountBalance.amount.rawValue),
                 mainAccount.address
             ).sendAndMine()
         }
@@ -57,26 +66,40 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
-                walletAddress = accountBalance.address
+                walletAddress = accountBalance.wallet
             )
 
             assertThat(fetchedAccountBalance).withMessage()
-                .isEqualTo(accountBalance)
+                .isEqualTo(
+                    accountBalance.copy(
+                        blockNumber = fetchedAccountBalance.blockNumber,
+                        timestamp = fetchedAccountBalance.timestamp
+                    )
+                )
+            assertThat(fetchedAccountBalance.blockNumber.value)
+                .isPositive()
+            assertThat(fetchedAccountBalance.timestamp.value)
+                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
         }
     }
 
     @Test
     fun mustCorrectlyFetchErc20BalanceForSpecifiedBlockNumber() {
         val mainAccount = accounts[0]
-        val accountBalance = AccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("10000")))
+        val accountBalance = Erc20Balance(
+            wallet = WalletAddress(mainAccount.address),
+            blockNumber = BlockNumber(BigInteger.ZERO),
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(BigInteger("10000"))
+        )
 
         val contract = suppose("simple ERC20 contract is deployed") {
             SimpleERC20.deploy(
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider(),
-                listOf(accountBalance.address.rawValue),
-                listOf(accountBalance.balance.rawValue),
+                listOf(accountBalance.wallet.rawValue),
+                listOf(accountBalance.amount.rawValue),
                 mainAccount.address
             ).sendAndMine()
         }
@@ -84,7 +107,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         val blockNumberBeforeSendingBalance = hardhatContainer.blockNumber()
 
         suppose("some ERC20 transaction is made") {
-            contract.transferAndMine(accounts[1].address, accountBalance.balance.rawValue)
+            contract.transferAndMine(accounts[1].address, accountBalance.amount.rawValue)
         }
 
         val service = Web3jBlockchainService(hardhatProperties())
@@ -93,12 +116,19 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
-                walletAddress = accountBalance.address,
-                block = blockNumberBeforeSendingBalance
+                walletAddress = accountBalance.wallet,
+                blockParameter = blockNumberBeforeSendingBalance
             )
 
             assertThat(fetchedAccountBalance).withMessage()
-                .isEqualTo(accountBalance)
+                .isEqualTo(
+                    accountBalance.copy(
+                        blockNumber = blockNumberBeforeSendingBalance,
+                        timestamp = fetchedAccountBalance.timestamp
+                    )
+                )
+            assertThat(fetchedAccountBalance.timestamp.value)
+                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
         }
 
         val blockNumberAfterSendingBalance = hardhatContainer.blockNumber()
@@ -107,12 +137,20 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
-                walletAddress = accountBalance.address,
-                block = blockNumberAfterSendingBalance
+                walletAddress = accountBalance.wallet,
+                blockParameter = blockNumberAfterSendingBalance
             )
 
             assertThat(fetchedAccountBalance).withMessage()
-                .isEqualTo(accountBalance.copy(balance = Balance(BigInteger.ZERO)))
+                .isEqualTo(
+                    accountBalance.copy(
+                        amount = Balance(BigInteger.ZERO),
+                        blockNumber = blockNumberAfterSendingBalance,
+                        timestamp = fetchedAccountBalance.timestamp
+                    )
+                )
+            assertThat(fetchedAccountBalance.timestamp.value)
+                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
         }
     }
 
@@ -134,21 +172,26 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchContractTransactionInfo() {
         val mainAccount = accounts[0]
-        val accountBalance = AccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("10000")))
+        val accountBalance = Erc20Balance(
+            wallet = WalletAddress(mainAccount.address),
+            blockNumber = BlockNumber(BigInteger.ZERO),
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(BigInteger("10000"))
+        )
 
         val contract = suppose("simple ERC20 contract is deployed") {
             SimpleERC20.deploy(
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider(),
-                listOf(accountBalance.address.rawValue),
-                listOf(accountBalance.balance.rawValue),
+                listOf(accountBalance.wallet.rawValue),
+                listOf(accountBalance.amount.rawValue),
                 mainAccount.address
             ).sendAndMine()
         }
 
         val txHash = suppose("some ERC20 transfer transaction is made") {
-            contract.transferAndMine(accounts[1].address, accountBalance.balance.rawValue)
+            contract.transferAndMine(accounts[1].address, accountBalance.amount.rawValue)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
@@ -181,7 +224,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 functionName = "transfer",
                 arguments = listOf(
                     FunctionArgument(abiType = "address", value = accounts[1].address),
-                    FunctionArgument(abiType = "uint256", value = accountBalance.balance.rawValue)
+                    FunctionArgument(abiType = "uint256", value = accountBalance.amount.rawValue)
                 ),
                 abiOutputTypes = listOf("bool"),
                 additionalData = listOf()

@@ -20,4 +20,7 @@ data class Erc20BalanceRequest(
     val signedMessage: SignedMessage?,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig
-)
+) {
+    val messageToSign: String
+        get() = "" // TODO
+}
