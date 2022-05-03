@@ -56,6 +56,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val clientId = "client-id"
         val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
+        val tokenAddress = ContractAddress("cafebabe")
 
         suppose("some client info exists in database") {
             dslContext.insertInto(ClientInfoTable.CLIENT_INFO)
@@ -64,14 +65,13 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         clientId = "client-id",
                         chainId = chainId.value,
                         sendRedirectUrl = redirectUrl,
-                        balanceRedirectUrl = null, // TODO SD-769 test more cases
-                        tokenAddress = null
+                        balanceRedirectUrl = null,
+                        tokenAddress = tokenAddress.rawValue
                     )
                 )
                 .execute()
         }
 
-        val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress("b")
         val recipientAddress = WalletAddress("c")
@@ -84,7 +84,6 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         """
                             {
                                 "client_id": "$clientId",
-                                "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
                                 "recipient_address": "${recipientAddress.rawValue}",
@@ -161,7 +160,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyCreateSendErc20RequestViaChainIdAndRedirectUrl() {
+    fun mustCorrectlyCreateSendErc20RequestViaChainIdRedirectUrlAndTokenAddress() {
         val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress("a")
@@ -327,7 +326,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_SEND_REQUEST)
+            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_REQUEST)
         }
     }
 
@@ -366,7 +365,46 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_SEND_REQUEST)
+            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_REQUEST)
+        }
+    }
+
+    @Test
+    fun mustReturn400BadRequestForMissingTokenAddress() {
+        val redirectUrl = "https://example.com"
+        val chainId = Chain.HARDHAT_TESTNET.id
+        val amount = Balance(BigInteger.TEN)
+        val senderAddress = WalletAddress("b")
+        val recipientAddress = WalletAddress("c")
+
+        verify("400 is returned for missing redirectUrl") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/send")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "chain_id": ${chainId.value},
+                                "redirect_url": "$redirectUrl",
+                                "amount": "${amount.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "title": "title",
+                                    "message": "message",
+                                    "logo": "logo"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_REQUEST)
         }
     }
 

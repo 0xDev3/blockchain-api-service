@@ -4,18 +4,17 @@ import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
-import com.ampnet.blockchainapiservice.exception.IncompleteSendErc20RequestException
 import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
+import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.model.result.FullSendErc20Request
 import com.ampnet.blockchainapiservice.model.result.SendErc20Request
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.SendErc20RequestRepository
 import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -41,12 +40,11 @@ class SendErc20RequestServiceImpl(
     override fun createSendErc20Request(params: CreateSendErc20RequestParams): WithFunctionData<SendErc20Request> {
         logger.info { "Creating send ERC20 request, params: $params" }
 
-        val (chainId, redirectUrl) = params.getChainIdAndRedirectUrl()
-
+        val clientInfo = params.getClientInfo()
         val id = uuidProvider.getUuid()
-        val data = encodeFunctionData(params.tokenRecipientAddress, params.tokenAmount, id)
+        val databaseParams = StoreSendErc20RequestParams.fromCreateParams(id, params, clientInfo)
 
-        val databaseParams = StoreSendErc20RequestParams.fromCreateParams(params, id, chainId, redirectUrl)
+        val data = encodeFunctionData(params.tokenRecipientAddress, params.tokenAmount, id)
         val sendErc20Request = sendErc20RequestRepository.store(databaseParams)
 
         return WithFunctionData(sendErc20Request, data)
@@ -88,18 +86,12 @@ class SendErc20RequestServiceImpl(
         }
     }
 
-    private fun CreateSendErc20RequestParams.getChainIdAndRedirectUrl(): Pair<ChainId, String> =
+    private fun CreateSendErc20RequestParams.getClientInfo(): ClientInfo =
         if (this.clientId != null) {
             logger.debug { "Fetching info for clientId: $clientId" }
-            val clientInfo = clientInfoRepository.getById(this.clientId)
-                ?: throw NonExistentClientIdException(this.clientId)
-            Pair(clientInfo.chainId!!, clientInfo.sendRedirectUrl!!) // TODO will be handled in SD-769
+            clientInfoRepository.getById(this.clientId) ?: throw NonExistentClientIdException(this.clientId)
         } else {
-            logger.debug { "No clientId provided, using specified chainId and redirectUrl" }
-            Pair(
-                this.chainId ?: throw IncompleteSendErc20RequestException("Missing chainId"),
-                this.redirectUrl ?: throw IncompleteSendErc20RequestException("Missing redirectUrl")
-            )
+            ClientInfo.EMPTY
         }
 
     private fun encodeFunctionData(tokenRecipientAddress: WalletAddress, tokenAmount: Balance, id: UUID): FunctionData =
