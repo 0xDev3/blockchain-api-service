@@ -13,50 +13,68 @@ This document contains generated documentation for `AMPnet blockchain-api-servic
 endpoints to verify user wallet ownership as well as endpoints to fetch data from blockchain for verified wallets.
 Source code is available on https://github.com/AMPnet/blockchain-api-service[Github].
 
-== Verification API
+== ERC20 Balance Checking API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
-=== Generate verification message
-Generates new verification message which must be signed by the user to verify wallet address ownership. Path argument
-is the user wallet address.
+=== Create ERC20 Balance Check Request
+Creates ERC20 balance request with specified parameters. Either `client_id` or `chain_id`, `redirect_url` and
+`token_address` must be provided as request body parameters. `block_number`, `wallet_address`, `arbitrary_data`,
+`screen_config` and all its child fields are optional. `arbitrary_data` field can contain any desired JSON value.
+Balance check request ID can be interpolated into the `redirect_url` by placing `${id}` placeholder in the place where
+request ID is desired in the URL. The placeholder must strictly have dollar sign and brackets to be interpolated,
+and only `id` field can be interpolated.
+
+Example request using `client_id` field:
 
 .Request
-include::{snippets}/VerificationControllerApiTest/mustCorrectlyGenerateVerificationMessageAndStoreItInDatabase/http-request.adoc[]
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaClientId/http-request.adoc[]
 .Response
-include::{snippets}/VerificationControllerApiTest/mustCorrectlyGenerateVerificationMessageAndStoreItInDatabase/http-response.adoc[]
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaClientId/http-response.adoc[]
 
-=== Verify message signature
-Verifies verification message signature. Path argument is the message ID.
+Example request using `chain_id`, `redirect_url` and `token_address` fields:
 
 .Request
-include::{snippets}/VerificationControllerApiTest/mustCorrectlyVerifyValidMessageSignature/http-request.adoc[]
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaChainIdRedirectUrlAndTokenAddress/http-request.adoc[]
 .Response
-include::{snippets}/VerificationControllerApiTest/mustCorrectlyVerifyValidMessageSignature/http-response.adoc[]
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaChainIdRedirectUrlAndTokenAddress/http-response.adoc[]
 
-== Blockchain Into API
-All endpoints are public and do not require `Authorization: Bearer JWT` header. Custom RPC URL can be specified via
-optional `X-RPC-URL` header - this will NOT override the default RPC URL for the specified chain ID, it only allows you
-to specify RPC URL for non-natively supported chains. To override the default RPC URL, use `X-RPC-URL-OVERRIDE` header.
+=== Fetch ERC20 Balance Check Request by ID
+Fetches stored ERC20 balance check request with its current status. Possible statuses are `PENDING`, `SUCCESS` and
+`FAILED`. The request is considered successful if the attached signed message is valid and was signed by
+`wallet_address`. If `wallet_address` was not specified when the request was created, then any valid signature will be
+accepted. For successful requests, `balance` field will contain info about requested ERC20 balance. For pending
+requests, `balance` and `signed_message` fields will always be `null`. If the signed message is invalid or does not
+match specified `wallet_address`, request will be considered as failed. If `block_number` was specified during request
+creation, then ERC20 balance will be fetched only for that block number, and if `block_number` was not specified then
+the latest ERC20 balance will be fetched every time this resource is requested.
 
-=== Fetch ERC20 balance for verified account
-Fetches ERC20 balance of specified contract address for the account which signed verification message with given ID.
-Chain ID, message ID and contract address are provided as path arguments, in that order. Block number can be provided as
-an optional query parameter `blockNumber`.
+Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
+specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC
+URL, use `X-RPC-URL-OVERRIDE` header.
 
 .Request
-include::{snippets}/BlockchainInfoControllerApiTest/mustCorrectlyFetchErc20Balance/http-request.adoc[]
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequest/http-request.adoc[]
 .Response
-include::{snippets}/BlockchainInfoControllerApiTest/mustCorrectlyFetchErc20Balance/http-response.adoc[]
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequest/http-response.adoc[]
+
+=== Attach WalletAddress and Signed Message to ERC20 Balance Check Request
+Attaches wallet address and signed message to existing ERC20 balance check request. Once the wallet address and signed
+message are attached to the request, any subsequent attempts to attach a new values will fail.
+
+.Request
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyAttachSignedMessage/http-request.adoc[]
+.Response
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyAttachSignedMessage/http-response.adoc[]
 
 == Send ERC20 Request API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
 === Create Send ERC20 Request
-Creates send ERC20 request with specified parameters. Either `client_id` or both `chain_id` and `redirect_url` must be
-provided as request body parameters. `sender_address`, `arbitrary_data`, `screen_config` and all its child fields are
-optional. `arbitrary_data` field can contain any desired JSON value. Send request ID can be interpolated into the
-`redirect_url` by placing `${id}` placeholder in the place where request ID is desired in the URL. The placeholder must
-strictly have dollar sign and brackets to be interpolated, and only `id` field can be interpolated.
+Creates send ERC20 request with specified parameters. Either `client_id` or `chain_id`, `redirect_url` and
+`token_address` must be provided as request body parameters. `sender_address`, `arbitrary_data`, `screen_config` and all
+its child fields are optional. `arbitrary_data` field can contain any desired JSON value. Send request ID can be
+interpolated into the `redirect_url` by placing `${id}` placeholder in the place where request ID is desired in the URL.
+The placeholder must strictly have dollar sign and brackets to be interpolated, and only `id` field can be interpolated.
 
 Example request using `client_id` field:
 
@@ -65,12 +83,12 @@ include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc
 .Response
 include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc20RequestViaClientId/http-response.adoc[]
 
-Example request using `chain_id` and `redirect_url` fields:
+Example request using `chain_id`, `redirect_url` and `token_address` fields:
 
 .Request
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc20RequestViaChainIdAndRedirectUrl/http-request.adoc[]
+include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc20RequestViaChainIdRedirectUrlAndTokenAddress/http-request.adoc[]
 .Response
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc20RequestViaChainIdAndRedirectUrl/http-response.adoc[]
+include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc20RequestViaChainIdRedirectUrlAndTokenAddress/http-response.adoc[]
 
 === Fetch Send ERC20 Request by ID
 Fetches stored send ERC20 request with its current status. Possible statuses are `PENDING`, `SUCCESS` and `FAILED`. The
