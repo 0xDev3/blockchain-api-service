@@ -19,33 +19,19 @@ import com.ampnet.blockchainapiservice.util.SignedMessage
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
-import org.kethereum.crypto.signedMessageToKey
-import org.kethereum.crypto.toAddress
-import org.kethereum.model.SignatureData
 import org.springframework.stereotype.Service
-import java.math.BigInteger
 import java.util.UUID
 
 @Service
-class Erc20BalanceRequestServiceImpl( // TODO test
+class Erc20BalanceRequestServiceImpl(
     private val uuidProvider: UuidProvider,
+    private val signatureCheckerService: SignatureCheckerService,
     private val blockchainService: BlockchainService,
     private val clientInfoRepository: ClientInfoRepository,
     private val erc20BalanceRequestRepository: Erc20BalanceRequestRepository
 ) : Erc20BalanceRequestService {
 
-    companion object : KLogging() {
-        private const val EIP_191_MAGIC_BYTE = 0x19.toByte()
-        private const val SIGNATURE_LENGTH = 132
-        private const val R_START = 2
-        private const val R_END = 66
-        private const val S_START = 66
-        private const val S_END = 130
-        private const val V_START = 130
-        private const val V_END = 132
-        private const val HEX_RADIX = 16
-        private val V_OFFSET = BigInteger.valueOf(27L)
-    }
+    companion object : KLogging()
 
     override fun createErc20BalanceRequest(params: CreateErc20BalanceRequestParams): Erc20BalanceRequest {
         logger.info { "Creating ERC20 balance request, params: $params" }
@@ -119,41 +105,11 @@ class Erc20BalanceRequestServiceImpl( // TODO test
         }
 
     private fun Erc20BalanceRequest.isSuccess(): Boolean {
-        val signatureData = this.signedMessage?.let { getSignatureData(it.value) }
-        val eip919 = generateEip191Message(this.messageToSign.toByteArray())
-        val publicKey = signatureData?.let { signedMessageToKey(eip919, it) }
-        val signatureAddress = publicKey?.let { WalletAddress(it.toAddress().toString()) }
-
         return walletAddressMatches(this.requestedWalletAddress, this.actualWalletAddress) &&
-            signatureAddress != null && // signature is valid
-            signatureAddress == this.actualWalletAddress // signature wallet matches
+            signedMessage != null && actualWalletAddress != null &&
+            signatureCheckerService.signatureMatches(messageToSign, signedMessage, actualWalletAddress)
     }
 
     private fun walletAddressMatches(requestedAddress: WalletAddress?, actualAddress: WalletAddress?): Boolean =
         requestedAddress == null || requestedAddress == actualAddress
-
-    private fun generateEip191Message(message: ByteArray): ByteArray =
-        byteArrayOf(EIP_191_MAGIC_BYTE) + ("Ethereum Signed Message:\n" + message.size).toByteArray() + message
-
-    private fun BigInteger.withVOffset(): BigInteger =
-        if (this == BigInteger.ZERO || this == BigInteger.ONE) {
-            this + V_OFFSET
-        } else {
-            this
-        }
-
-    private fun getSignatureData(signature: String): SignatureData? =
-        if (signature.length != SIGNATURE_LENGTH) null else try {
-            val r = signature.substring(R_START, R_END)
-            val s = signature.substring(S_START, S_END)
-            val v = signature.substring(V_START, V_END)
-
-            SignatureData(
-                r = BigInteger(r, HEX_RADIX),
-                s = BigInteger(s, HEX_RADIX),
-                v = BigInteger(v, HEX_RADIX).withVOffset()
-            )
-        } catch (ex: NumberFormatException) {
-            null
-        }
 }
