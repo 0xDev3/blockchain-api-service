@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice
 
 import com.ampnet.blockchainapiservice.TestBase.Companion.VerifyMessage
+import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.exception.ErrorResponse
@@ -27,6 +28,10 @@ import org.springframework.test.web.servlet.MvcResult
 import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
+import org.web3j.protocol.core.RemoteCall
+import org.web3j.protocol.core.methods.response.TransactionReceipt
+import java.math.BigInteger
+import java.util.concurrent.CompletableFuture
 
 @ExtendWith(value = [SpringExtension::class, RestDocumentationExtension::class])
 @SpringBootTest
@@ -68,5 +73,22 @@ class ControllerTestBase : TestBase() {
 
         assertThat(response.errorCode).withMessage()
             .isEqualTo(expectedErrorCode)
+    }
+
+    protected fun <T> RemoteCall<T>.sendAndMine(): T {
+        val future = sendAsync()
+        hardhatContainer.waitAndMine()
+        return future.get()
+    }
+
+    protected fun SimpleERC20.transferAndMine(
+        address: String,
+        amount: BigInteger
+    ): CompletableFuture<TransactionReceipt?>? {
+        val txReceiptFuture = transfer(address, amount).sendAsync()
+        hardhatContainer.mineUntil {
+            balanceOf(address).send() == amount
+        }
+        return txReceiptFuture
     }
 }
