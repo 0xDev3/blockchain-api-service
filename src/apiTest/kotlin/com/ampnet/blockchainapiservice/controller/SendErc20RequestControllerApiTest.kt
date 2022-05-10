@@ -88,9 +88,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -115,9 +114,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         recipientAddress = recipientAddress.rawValue,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         ),
                         redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
                         sendTx = TransactionResponse(
@@ -147,9 +145,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         txHash = null,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         )
                     )
                 )
@@ -182,9 +179,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -209,9 +205,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         recipientAddress = recipientAddress.rawValue,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         ),
                         redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
                         sendTx = TransactionResponse(
@@ -241,9 +236,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         txHash = null,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         )
                     )
                 )
@@ -271,9 +265,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -310,9 +303,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -349,9 +341,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -388,9 +379,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -442,9 +432,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -492,9 +481,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         recipientAddress = recipientAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         ),
                         redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
                         sendTx = TransactionResponse(
@@ -551,9 +539,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -605,9 +592,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                         recipientAddress = recipientAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         ),
                         redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
                         sendTx = TransactionResponse(
@@ -654,9 +640,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     tokenRecipientAddress = WalletAddress("c"),
                     arbitraryData = null,
                     screenConfig = ScreenConfig(
-                        title = "title",
-                        message = "message",
-                        logo = "logo"
+                        beforeActionMessage = "before-action-message",
+                        afterActionMessage = "after-action-message"
                     )
                 )
             )
@@ -705,9 +690,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     tokenRecipientAddress = WalletAddress("c"),
                     arbitraryData = null,
                     screenConfig = ScreenConfig(
-                        title = "title",
-                        message = "message",
-                        logo = "logo"
+                        beforeActionMessage = "before-action-message",
+                        afterActionMessage = "after-action-message"
                     )
                 )
             )
