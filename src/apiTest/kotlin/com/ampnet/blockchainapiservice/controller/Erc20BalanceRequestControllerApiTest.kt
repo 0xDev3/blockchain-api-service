@@ -87,9 +87,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -114,9 +113,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                         walletAddress = walletAddress.rawValue,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         ),
                         balance = null,
                         messageToSign = "Verification message ID to sign: ${response.id}",
@@ -141,9 +139,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                         signedMessage = null,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         )
                     )
                 )
@@ -174,9 +171,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -201,9 +197,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                         walletAddress = walletAddress.rawValue,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         ),
                         balance = null,
                         messageToSign = "Verification message ID to sign: ${response.id}",
@@ -228,9 +223,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                         signedMessage = null,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         )
                     )
                 )
@@ -256,9 +250,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -293,9 +286,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -330,9 +322,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -367,9 +358,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -420,9 +410,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -476,9 +465,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                         walletAddress = walletAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         ),
                         balance = BalanceResponse(
                             wallet = walletAddress.rawValue,
@@ -531,9 +519,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                                     "test": true
                                 },
                                 "screen_config": {
-                                    "title": "title",
-                                    "message": "message",
-                                    "logo": "logo"
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
                                 }
                             }
                         """.trimIndent()
@@ -591,9 +578,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                         walletAddress = walletAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
                         screenConfig = ScreenConfig(
-                            title = "title",
-                            message = "message",
-                            logo = "logo"
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
                         ),
                         balance = BalanceResponse(
                             wallet = walletAddress.rawValue,
@@ -636,9 +622,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                     requestedWalletAddress = WalletAddress("b"),
                     arbitraryData = null,
                     screenConfig = ScreenConfig(
-                        title = "title",
-                        message = "message",
-                        logo = "logo"
+                        beforeActionMessage = "before-action-message",
+                        afterActionMessage = "after-action-message"
                     )
                 )
             )
@@ -691,9 +676,8 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                     requestedWalletAddress = WalletAddress("b"),
                     arbitraryData = null,
                     screenConfig = ScreenConfig(
-                        title = "title",
-                        message = "message",
-                        logo = "logo"
+                        beforeActionMessage = "before-action-message",
+                        afterActionMessage = "after-action-message"
                     )
                 )
             )

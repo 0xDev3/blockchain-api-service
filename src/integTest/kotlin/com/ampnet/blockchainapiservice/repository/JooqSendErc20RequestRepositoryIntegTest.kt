@@ -37,9 +37,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
         private val TOKEN_SENDER_ADDRESS = WalletAddress("b")
         private val TOKEN_RECIPIENT_ADDRESS = WalletAddress("c")
         private const val ARBITRARY_DATA = "{}"
-        private const val SEND_SCREEN_TITLE = "send-screen-title"
-        private const val SEND_SCREEN_MESSAGE = "send-screen-message"
-        private const val SEND_SCREEN_LOGO = "send-screen-logo"
+        private const val SEND_SCREEN_BEFORE_ACTION_MESSAGE = "send-screen-before-action-message"
+        private const val SEND_SCREEN_AFTER_ACTION_MESSAGE = "send-screen-after-action-message"
         private val TX_HASH = TransactionHash("tx-hash")
     }
 
@@ -70,9 +69,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                     tokenSenderAddress = TOKEN_SENDER_ADDRESS.rawValue,
                     tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS.rawValue,
                     arbitraryData = JSON.valueOf(ARBITRARY_DATA),
-                    sendScreenTitle = SEND_SCREEN_TITLE,
-                    sendScreenMessage = SEND_SCREEN_MESSAGE,
-                    sendScreenLogo = SEND_SCREEN_LOGO,
+                    sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                    sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
                     txHash = TX_HASH.value
                 )
             )
@@ -94,9 +92,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                         txHash = TX_HASH,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
                         screenConfig = ScreenConfig(
-                            title = SEND_SCREEN_TITLE,
-                            message = SEND_SCREEN_MESSAGE,
-                            logo = SEND_SCREEN_LOGO
+                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
                         )
                     )
                 )
@@ -126,9 +123,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = ScreenConfig(
-                title = SEND_SCREEN_TITLE,
-                message = SEND_SCREEN_MESSAGE,
-                logo = SEND_SCREEN_LOGO
+                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
             )
         )
 
@@ -147,9 +143,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             txHash = null,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = ScreenConfig(
-                title = SEND_SCREEN_TITLE,
-                message = SEND_SCREEN_MESSAGE,
-                logo = SEND_SCREEN_LOGO
+                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
             )
         )
 
@@ -179,9 +174,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = ScreenConfig(
-                title = SEND_SCREEN_TITLE,
-                message = SEND_SCREEN_MESSAGE,
-                logo = SEND_SCREEN_LOGO
+                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
             )
         )
 
@@ -210,9 +204,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                         txHash = TX_HASH,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
                         screenConfig = ScreenConfig(
-                            title = SEND_SCREEN_TITLE,
-                            message = SEND_SCREEN_MESSAGE,
-                            logo = SEND_SCREEN_LOGO
+                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
                         )
                     )
                 )
@@ -232,9 +225,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = ScreenConfig(
-                title = SEND_SCREEN_TITLE,
-                message = SEND_SCREEN_MESSAGE,
-                logo = SEND_SCREEN_LOGO
+                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
             )
         )
 
@@ -268,9 +260,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
                         txHash = TX_HASH,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
                         screenConfig = ScreenConfig(
-                            title = SEND_SCREEN_TITLE,
-                            message = SEND_SCREEN_MESSAGE,
-                            logo = SEND_SCREEN_LOGO
+                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
                         )
                     )
                 )

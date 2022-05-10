@@ -43,9 +43,8 @@ class Erc20BalanceRequestControllerTest : TestBase() {
             requestedWalletAddress = WalletAddress("b"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val result = Erc20BalanceRequest(
@@ -120,9 +119,8 @@ class Erc20BalanceRequestControllerTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             ),
             balance = Erc20Balance(
                 wallet = WalletAddress("def"),
