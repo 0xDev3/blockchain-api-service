@@ -4,7 +4,7 @@ import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.fasterxml.jackson.databind.JsonNode
 import java.math.BigInteger
 
-data class CreateSendErc20Request(
+data class CreateErc20SendRequest(
     val clientId: String?,
     val chainId: Long?,
     val redirectUrl: String?,

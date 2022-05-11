@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
 import java.util.UUID
 
-data class SendErc20RequestResponse(
+data class Erc20SendRequestResponse(
     val id: UUID,
     val status: Status,
     val chainId: Long,
