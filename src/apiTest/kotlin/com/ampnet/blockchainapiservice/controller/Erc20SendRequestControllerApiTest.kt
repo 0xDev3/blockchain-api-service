@@ -6,14 +6,14 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ClientInfoTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.SendErc20RequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20SendRequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ClientInfoRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
-import com.ampnet.blockchainapiservice.model.response.SendErc20RequestResponse
+import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
+import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
-import com.ampnet.blockchainapiservice.model.result.SendErc20Request
-import com.ampnet.blockchainapiservice.repository.SendErc20RequestRepository
+import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
+import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -32,12 +32,12 @@ import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
 import java.util.UUID
 
-class SendErc20RequestControllerApiTest : ControllerTestBase() {
+class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
     private val accounts = HardhatTestContainer.accounts
 
     @Autowired
-    private lateinit var sendErc20RequestRepository: SendErc20RequestRepository
+    private lateinit var erc20SendRequestRepository: Erc20SendRequestRepository
 
     @Autowired
     private lateinit var dslContext: DSLContext
@@ -45,11 +45,11 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     @BeforeEach
     fun beforeEach() {
         dslContext.deleteFrom(ClientInfoTable.CLIENT_INFO).execute()
-        dslContext.deleteFrom(SendErc20RequestTable.SEND_ERC20_REQUEST).execute()
+        dslContext.deleteFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST).execute()
     }
 
     @Test
-    fun mustCorrectlyCreateSendErc20RequestViaClientId() {
+    fun mustCorrectlyCreateErc20SendRequestViaClientId() {
         val clientId = "client-id"
         val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
@@ -73,7 +73,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val senderAddress = WalletAddress("b")
         val recipientAddress = WalletAddress("c")
 
-        val response = suppose("request to create send ERC20 request is made") {
+        val response = suppose("request to create ERC20 send request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/send")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -98,13 +98,13 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(response.response.contentAsString, SendErc20RequestResponse::class.java)
+            objectMapper.readValue(response.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
         verify("correct response is returned") {
             assertThat(response).withMessage()
                 .isEqualTo(
-                    SendErc20RequestResponse(
+                    Erc20SendRequestResponse(
                         id = response.id,
                         status = Status.PENDING,
                         chainId = chainId.value,
@@ -129,12 +129,12 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 )
         }
 
-        verify("send ERC20 request is correctly stored in database") {
-            val storedRequest = sendErc20RequestRepository.getById(response.id)
+        verify("ERC20 send request is correctly stored in database") {
+            val storedRequest = erc20SendRequestRepository.getById(response.id)
 
             assertThat(storedRequest).withMessage()
                 .isEqualTo(
-                    SendErc20Request(
+                    Erc20SendRequest(
                         id = response.id,
                         chainId = chainId,
                         redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
@@ -154,7 +154,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyCreateSendErc20RequestViaChainIdRedirectUrlAndTokenAddress() {
+    fun mustCorrectlyCreateErc20SendRequestViaChainIdRedirectUrlAndTokenAddress() {
         val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress("a")
@@ -162,7 +162,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val senderAddress = WalletAddress("b")
         val recipientAddress = WalletAddress("c")
 
-        val response = suppose("request to create send ERC20 request is made") {
+        val response = suppose("request to create ERC20 send request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/send")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -189,13 +189,13 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(response.response.contentAsString, SendErc20RequestResponse::class.java)
+            objectMapper.readValue(response.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
         verify("correct response is returned") {
             assertThat(response).withMessage()
                 .isEqualTo(
-                    SendErc20RequestResponse(
+                    Erc20SendRequestResponse(
                         id = response.id,
                         status = Status.PENDING,
                         chainId = chainId.value,
@@ -220,12 +220,12 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 )
         }
 
-        verify("send ERC20 request is correctly stored in database") {
-            val storedRequest = sendErc20RequestRepository.getById(response.id)
+        verify("ERC20 send request is correctly stored in database") {
+            val storedRequest = erc20SendRequestRepository.getById(response.id)
 
             assertThat(storedRequest).withMessage()
                 .isEqualTo(
-                    SendErc20Request(
+                    Erc20SendRequest(
                         id = response.id,
                         chainId = chainId,
                         redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
@@ -394,7 +394,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchSendErc20Request() {
+    fun mustCorrectlyFetchErc20SendRequest() {
         val mainAccount = accounts[0]
 
         val contract = suppose("simple ERC20 contract is deployed") {
@@ -415,7 +415,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val senderAddress = WalletAddress(mainAccount.address)
         val recipientAddress = WalletAddress(accounts[1].address)
 
-        val createResponse = suppose("request to create send ERC20 request is made") {
+        val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/send")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -442,7 +442,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(createResponse.response.contentAsString, SendErc20RequestResponse::class.java)
+            objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
         val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
@@ -454,24 +454,24 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to send ERC20 request") {
-            sendErc20RequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction hash is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
         }
 
-        val fetchResponse = suppose("request to fetch send ERC20 request is made") {
+        val fetchResponse = suppose("request to fetch ERC20 send request is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get("/send/${createResponse.id}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(fetchResponse.response.contentAsString, SendErc20RequestResponse::class.java)
+            objectMapper.readValue(fetchResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
         verify("correct response is returned") {
             assertThat(fetchResponse).withMessage()
                 .isEqualTo(
-                    SendErc20RequestResponse(
+                    Erc20SendRequestResponse(
                         id = createResponse.id,
                         status = Status.FAILED,
                         chainId = chainId.value,
@@ -501,7 +501,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchSendErc20RequestWhenCustomRpcUrlIsSpecified() {
+    fun mustCorrectlyFetchErc20SendRequestWhenCustomRpcUrlIsSpecified() {
         val mainAccount = accounts[0]
 
         val contract = suppose("simple ERC20 contract is deployed") {
@@ -522,7 +522,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val senderAddress = WalletAddress(mainAccount.address)
         val recipientAddress = WalletAddress(accounts[1].address)
 
-        val createResponse = suppose("request to create send ERC20 request is made") {
+        val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/send")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -549,7 +549,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(createResponse.response.contentAsString, SendErc20RequestResponse::class.java)
+            objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
         val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
@@ -561,11 +561,11 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to send ERC20 request") {
-            sendErc20RequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction hash is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
         }
 
-        val fetchResponse = suppose("request to fetch send ERC20 request is made") {
+        val fetchResponse = suppose("request to fetch ERC20 send request is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get("/send/${createResponse.id}")
                     .header(
@@ -576,13 +576,13 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(fetchResponse.response.contentAsString, SendErc20RequestResponse::class.java)
+            objectMapper.readValue(fetchResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
         verify("correct response is returned") {
             assertThat(fetchResponse).withMessage()
                 .isEqualTo(
-                    SendErc20RequestResponse(
+                    Erc20SendRequestResponse(
                         id = createResponse.id,
                         status = Status.FAILED,
                         chainId = chainId.value,
@@ -612,8 +612,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn404NotFoundForNonExistentSendErc20Request() {
-        verify("404 is returned for non-existent send ERC20 request") {
+    fun mustReturn404NotFoundForNonExistentErc20SendRequest() {
+        verify("404 is returned for non-existent ERC20 send request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.get("/send/${UUID.randomUUID()}")
             )
@@ -628,9 +628,9 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyAttachTransactionHash() {
         val id = UUID.randomUUID()
 
-        suppose("some send ERC20 request without transaction hash exists in database") {
-            sendErc20RequestRepository.store(
-                StoreSendErc20RequestParams(
+        suppose("some ERC20 send request without transaction hash exists in database") {
+            erc20SendRequestRepository.store(
+                StoreErc20SendRequestParams(
                     id = id,
                     chainId = Chain.HARDHAT_TESTNET.id,
                     redirectUrl = "https://example.com/$id",
@@ -649,7 +649,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
 
         val txHash = TransactionHash("tx-hash")
 
-        suppose("request to attach transaction hash to send ERC20 request is made") {
+        suppose("request to attach transaction hash to ERC20 send request is made") {
             mockMvc.perform(
                 MockMvcRequestBuilders.put("/send/$id")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -665,8 +665,8 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                 .andReturn()
         }
 
-        verify("transaction hash is correctly attached to send ERC20 request") {
-            val storedRequest = sendErc20RequestRepository.getById(id)
+        verify("transaction hash is correctly attached to ERC20 send request") {
+            val storedRequest = erc20SendRequestRepository.getById(id)
 
             assertThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
@@ -678,9 +678,9 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         val id = UUID.randomUUID()
         val txHash = TransactionHash("tx-hash")
 
-        suppose("some send ERC20 request with transaction hash exists in database") {
-            sendErc20RequestRepository.store(
-                StoreSendErc20RequestParams(
+        suppose("some ERC20 send request with transaction hash exists in database") {
+            erc20SendRequestRepository.store(
+                StoreErc20SendRequestParams(
                     id = id,
                     chainId = Chain.HARDHAT_TESTNET.id,
                     redirectUrl = "https://example.com/$id",
@@ -695,7 +695,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
                     )
                 )
             )
-            sendErc20RequestRepository.setTxHash(id, txHash)
+            erc20SendRequestRepository.setTxHash(id, txHash)
         }
 
         verify("400 is returned when attaching transaction hash") {
@@ -717,7 +717,7 @@ class SendErc20RequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("transaction hash is not changed in database") {
-            val storedRequest = sendErc20RequestRepository.getById(id)
+            val storedRequest = erc20SendRequestRepository.getById(id)
 
             assertThat(storedRequest?.txHash)
                 .isEqualTo(txHash)

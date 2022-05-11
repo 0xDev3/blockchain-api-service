@@ -1,10 +1,10 @@
 package com.ampnet.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.generated.jooq.tables.SendErc20RequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.SendErc20RequestRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20SendRequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20SendRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
-import com.ampnet.blockchainapiservice.model.result.SendErc20Request
+import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
+import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -19,16 +19,16 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-class JooqSendErc20RequestRepository(
+class JooqErc20SendRequestRepository(
     private val dslContext: DSLContext,
     private val objectMapper: ObjectMapper
-) : SendErc20RequestRepository {
+) : Erc20SendRequestRepository {
 
     companion object : KLogging()
 
-    override fun store(params: StoreSendErc20RequestParams): SendErc20Request {
-        logger.info { "Store send ERC20 request, params: $params" }
-        val record = SendErc20RequestRecord(
+    override fun store(params: StoreErc20SendRequestParams): Erc20SendRequest {
+        logger.info { "Store ERC20 send request, params: $params" }
+        val record = Erc20SendRequestRecord(
             id = params.id,
             chainId = params.chainId.value,
             redirectUrl = params.redirectUrl,
@@ -45,28 +45,28 @@ class JooqSendErc20RequestRepository(
         return record.toModel()
     }
 
-    override fun getById(id: UUID): SendErc20Request? {
-        logger.debug { "Get send ERC20 request by id: $id" }
-        return dslContext.selectFrom(SendErc20RequestTable.SEND_ERC20_REQUEST)
-            .where(SendErc20RequestTable.SEND_ERC20_REQUEST.ID.eq(id))
+    override fun getById(id: UUID): Erc20SendRequest? {
+        logger.debug { "Get ERC20 send request by id: $id" }
+        return dslContext.selectFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST)
+            .where(Erc20SendRequestTable.ERC20_SEND_REQUEST.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun setTxHash(id: UUID, txHash: TransactionHash): Boolean {
-        logger.info { "Set txHash for send ERC20 request, id: $id, txHash: $txHash" }
-        return dslContext.update(SendErc20RequestTable.SEND_ERC20_REQUEST)
-            .set(SendErc20RequestTable.SEND_ERC20_REQUEST.TX_HASH, txHash.value)
+        logger.info { "Set txHash for ERC20 send request, id: $id, txHash: $txHash" }
+        return dslContext.update(Erc20SendRequestTable.ERC20_SEND_REQUEST)
+            .set(Erc20SendRequestTable.ERC20_SEND_REQUEST.TX_HASH, txHash.value)
             .where(
                 DSL.and(
-                    SendErc20RequestTable.SEND_ERC20_REQUEST.ID.eq(id),
-                    SendErc20RequestTable.SEND_ERC20_REQUEST.TX_HASH.isNull()
+                    Erc20SendRequestTable.ERC20_SEND_REQUEST.ID.eq(id),
+                    Erc20SendRequestTable.ERC20_SEND_REQUEST.TX_HASH.isNull()
                 )
             )
             .execute() > 0
     }
 
-    private fun SendErc20RequestRecord.toModel(): SendErc20Request =
-        SendErc20Request(
+    private fun Erc20SendRequestRecord.toModel(): Erc20SendRequest =
+        Erc20SendRequest(
             id = id!!,
             chainId = ChainId(chainId!!),
             redirectUrl = redirectUrl!!,

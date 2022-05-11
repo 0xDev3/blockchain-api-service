@@ -2,10 +2,10 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.config.JsonConfig
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.SendErc20RequestRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20SendRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
-import com.ampnet.blockchainapiservice.model.result.SendErc20Request
+import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
+import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -25,9 +25,9 @@ import java.math.BigInteger
 import java.util.UUID
 
 @JooqTest
-@Import(JooqSendErc20RequestRepository::class, JsonConfig::class)
+@Import(JooqErc20SendRequestRepository::class, JsonConfig::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
+class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
 
     companion object {
         private val CHAIN_ID = ChainId(1337L)
@@ -46,7 +46,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
     private val postgresContainer = PostgresTestContainer()
 
     @Autowired
-    private lateinit var repository: JooqSendErc20RequestRepository
+    private lateinit var repository: JooqErc20SendRequestRepository
 
     @Autowired
     private lateinit var dslContext: DSLContext
@@ -55,12 +55,12 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
     private lateinit var objectMapper: ObjectMapper
 
     @Test
-    fun mustCorrectlyFetchSendErc20RequestById() {
+    fun mustCorrectlyFetchErc20SendRequestById() {
         val id = UUID.randomUUID()
 
-        suppose("some send ERC20 request exists in database") {
+        suppose("some ERC20 send request exists in database") {
             dslContext.executeInsert(
-                SendErc20RequestRecord(
+                Erc20SendRequestRecord(
                     id = id,
                     chainId = CHAIN_ID.value,
                     redirectUrl = REDIRECT_URL,
@@ -76,12 +76,12 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             )
         }
 
-        verify("send ERC20 request is correctly fetched by ID") {
+        verify("ERC20 send request is correctly fetched by ID") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
                 .isEqualTo(
-                    SendErc20Request(
+                    Erc20SendRequest(
                         id = id,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
@@ -101,8 +101,8 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustReturnNullWhenFetchingNonExistentSendErc20RequestById() {
-        verify("null is returned when fetching non-existent send ERC20 request") {
+    fun mustReturnNullWhenFetchingNonExistentErc20SendRequestById() {
+        verify("null is returned when fetching non-existent ERC20 send request") {
             val result = repository.getById(UUID.randomUUID())
 
             assertThat(result).withMessage()
@@ -111,9 +111,9 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyStoreSendErc20Request() {
+    fun mustCorrectlyStoreErc20SendRequest() {
         val id = UUID.randomUUID()
-        val params = StoreSendErc20RequestParams(
+        val params = StoreErc20SendRequestParams(
             id = id,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
@@ -128,11 +128,11 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             )
         )
 
-        val storedSendErc20Request = suppose("send ERC20 request is stored in database") {
+        val storedErc20SendRequest = suppose("ERC20 send request is stored in database") {
             repository.store(params)
         }
 
-        val expectedSendErc20Request = SendErc20Request(
+        val expectedErc20SendRequest = Erc20SendRequest(
             id = id,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
@@ -148,23 +148,23 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             )
         )
 
-        verify("storing send ERC20 request returns correct result") {
-            assertThat(storedSendErc20Request).withMessage()
-                .isEqualTo(expectedSendErc20Request)
+        verify("storing ERC20 send request returns correct result") {
+            assertThat(storedErc20SendRequest).withMessage()
+                .isEqualTo(expectedErc20SendRequest)
         }
 
-        verify("send ERC20 request was stored in database") {
+        verify("ERC20 send request was stored in database") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
-                .isEqualTo(expectedSendErc20Request)
+                .isEqualTo(expectedErc20SendRequest)
         }
     }
 
     @Test
-    fun mustCorrectlySetTxHashForSendErc20RequestWithNullTxHash() {
+    fun mustCorrectlySetTxHashForErc20SendRequestWithNullTxHash() {
         val id = UUID.randomUUID()
-        val params = StoreSendErc20RequestParams(
+        val params = StoreErc20SendRequestParams(
             id = id,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
@@ -179,7 +179,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             )
         )
 
-        suppose("send ERC20 request is stored in database") {
+        suppose("ERC20 send request is stored in database") {
             repository.store(params)
         }
 
@@ -193,7 +193,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
 
             assertThat(result).withMessage()
                 .isEqualTo(
-                    SendErc20Request(
+                    Erc20SendRequest(
                         id = id,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
@@ -213,9 +213,9 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustNotSetTxHashForSendErc20RequestWhenTxHashIsAlreadySet() {
+    fun mustNotSetTxHashForErc20SendRequestWhenTxHashIsAlreadySet() {
         val id = UUID.randomUUID()
-        val params = StoreSendErc20RequestParams(
+        val params = StoreErc20SendRequestParams(
             id = id,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
@@ -230,7 +230,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
             )
         )
 
-        suppose("send ERC20 request is stored in database") {
+        suppose("ERC20 send request is stored in database") {
             repository.store(params)
         }
 
@@ -249,7 +249,7 @@ class JooqSendErc20RequestRepositoryIntegTest : TestBase() {
 
             assertThat(result).withMessage()
                 .isEqualTo(
-                    SendErc20Request(
+                    Erc20SendRequest(
                         id = id,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,

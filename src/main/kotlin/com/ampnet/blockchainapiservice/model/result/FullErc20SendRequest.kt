@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import java.math.BigInteger
 import java.util.UUID
 
-data class FullSendErc20Request(
+data class FullErc20SendRequest(
     val id: UUID,
     val status: Status,
     val chainId: ChainId,
@@ -26,12 +26,12 @@ data class FullSendErc20Request(
     val transactionData: FullTransactionData
 ) {
     companion object {
-        fun fromSendErc20Request(
-            request: SendErc20Request,
+        fun fromErc20SendRequest(
+            request: Erc20SendRequest,
             status: Status,
             data: FunctionData,
             transactionInfo: BlockchainTransactionInfo?
-        ) = FullSendErc20Request(
+        ) = FullErc20SendRequest(
             id = request.id,
             status = status,
             chainId = request.chainId,

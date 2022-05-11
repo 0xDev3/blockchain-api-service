@@ -9,7 +9,7 @@ import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
 import java.util.UUID
 
-data class StoreSendErc20RequestParams(
+data class StoreErc20SendRequestParams(
     val id: UUID,
     val chainId: ChainId,
     val redirectUrl: String,
@@ -21,8 +21,8 @@ data class StoreSendErc20RequestParams(
     val screenConfig: ScreenConfig
 ) {
     companion object {
-        fun fromCreateParams(id: UUID, params: CreateSendErc20RequestParams, clientInfo: ClientInfo) =
-            StoreSendErc20RequestParams(
+        fun fromCreateParams(id: UUID, params: CreateErc20SendRequestParams, clientInfo: ClientInfo) =
+            StoreErc20SendRequestParams(
                 id = id,
                 chainId = clientInfo.chainId.resolve(params.chainId),
                 redirectUrl = clientInfo.sendRedirectUrl.resolve(params.redirectUrl).replace("\${id}", id.toString()),
