@@ -36,9 +36,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
         private val BLOCK_NUMBER = BlockNumber(BigInteger.valueOf(123L))
         private val REQUESTED_WALLET_ADDRESS = WalletAddress("b")
         private const val ARBITRARY_DATA = "{}"
-        private const val BALANCE_SCREEN_TITLE = "balance-screen-title"
-        private const val BALANCE_SCREEN_MESSAGE = "balance-screen-message"
-        private const val BALANCE_SCREEN_LOGO = "balance-screen-logo"
+        private const val BALANCE_SCREEN_BEFORE_ACTION_MESSAGE = "balance-screen-before-action-message"
+        private const val BALANCE_SCREEN_AFTER_ACTION_MESSAGE = "balance-screen-after-action-message"
         private val ACTUAL_WALLET_ADDRESS = WalletAddress("c")
         private val SIGNED_MESSAGE = SignedMessage("signed-message")
     }
@@ -69,9 +68,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
                     blockNumber = BLOCK_NUMBER.value,
                     requestedWalletAddress = REQUESTED_WALLET_ADDRESS.rawValue,
                     arbitraryData = JSON.valueOf(ARBITRARY_DATA),
-                    balanceScreenTitle = BALANCE_SCREEN_TITLE,
-                    balanceScreenMessage = BALANCE_SCREEN_MESSAGE,
-                    balanceScreenLogo = BALANCE_SCREEN_LOGO,
+                    balanceScreenBeforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                    balanceScreenAfterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE,
                     actualWalletAddress = ACTUAL_WALLET_ADDRESS.rawValue,
                     signedMessage = SIGNED_MESSAGE.value
                 )
@@ -94,9 +92,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
                         signedMessage = SIGNED_MESSAGE,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
                         screenConfig = ScreenConfig(
-                            title = BALANCE_SCREEN_TITLE,
-                            message = BALANCE_SCREEN_MESSAGE,
-                            logo = BALANCE_SCREEN_LOGO
+                            beforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE
                         )
                     )
                 )
@@ -125,9 +122,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
             requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = ScreenConfig(
-                title = BALANCE_SCREEN_TITLE,
-                message = BALANCE_SCREEN_MESSAGE,
-                logo = BALANCE_SCREEN_LOGO
+                beforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE
             )
         )
 
@@ -146,9 +142,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
             signedMessage = null,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = ScreenConfig(
-                title = BALANCE_SCREEN_TITLE,
-                message = BALANCE_SCREEN_MESSAGE,
-                logo = BALANCE_SCREEN_LOGO
+                beforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE
             )
         )
 
@@ -177,9 +172,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
             requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = ScreenConfig(
-                title = BALANCE_SCREEN_TITLE,
-                message = BALANCE_SCREEN_MESSAGE,
-                logo = BALANCE_SCREEN_LOGO
+                beforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE
             )
         )
 
@@ -208,9 +202,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
                         signedMessage = SIGNED_MESSAGE,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
                         screenConfig = ScreenConfig(
-                            title = BALANCE_SCREEN_TITLE,
-                            message = BALANCE_SCREEN_MESSAGE,
-                            logo = BALANCE_SCREEN_LOGO
+                            beforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE
                         )
                     )
                 )
@@ -229,9 +222,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
             requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
             arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
             screenConfig = ScreenConfig(
-                title = BALANCE_SCREEN_TITLE,
-                message = BALANCE_SCREEN_MESSAGE,
-                logo = BALANCE_SCREEN_LOGO
+                beforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE
             )
         )
 
@@ -266,9 +258,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
                         signedMessage = SIGNED_MESSAGE,
                         arbitraryData = objectMapper.readTree(ARBITRARY_DATA),
                         screenConfig = ScreenConfig(
-                            title = BALANCE_SCREEN_TITLE,
-                            message = BALANCE_SCREEN_MESSAGE,
-                            logo = BALANCE_SCREEN_LOGO
+                            beforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE
                         )
                     )
                 )

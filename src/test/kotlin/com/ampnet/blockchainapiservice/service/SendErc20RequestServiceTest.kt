@@ -53,9 +53,8 @@ class SendErc20RequestServiceTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         private val TX_HASH = TransactionHash("tx-hash")
@@ -401,9 +400,8 @@ class SendErc20RequestServiceTest : TestBase() {
             txHash = null,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -466,9 +464,8 @@ class SendErc20RequestServiceTest : TestBase() {
             txHash = TX_HASH,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -539,9 +536,8 @@ class SendErc20RequestServiceTest : TestBase() {
             txHash = TX_HASH,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -619,9 +615,8 @@ class SendErc20RequestServiceTest : TestBase() {
             txHash = TX_HASH,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -699,9 +694,8 @@ class SendErc20RequestServiceTest : TestBase() {
             txHash = TX_HASH,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -779,9 +773,8 @@ class SendErc20RequestServiceTest : TestBase() {
             txHash = TX_HASH,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -859,9 +852,8 @@ class SendErc20RequestServiceTest : TestBase() {
             txHash = TX_HASH,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()
@@ -939,9 +931,8 @@ class SendErc20RequestServiceTest : TestBase() {
             txHash = TX_HASH,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val sendErc20RequestRepository = mock<SendErc20RequestRepository>()

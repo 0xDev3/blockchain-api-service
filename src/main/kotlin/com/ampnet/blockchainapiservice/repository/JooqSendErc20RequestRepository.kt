@@ -37,9 +37,8 @@ class JooqSendErc20RequestRepository(
             tokenSenderAddress = params.tokenSenderAddress?.rawValue,
             tokenRecipientAddress = params.tokenRecipientAddress.rawValue,
             arbitraryData = params.arbitraryData?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) },
-            sendScreenTitle = params.screenConfig.title,
-            sendScreenMessage = params.screenConfig.message,
-            sendScreenLogo = params.screenConfig.logo,
+            sendScreenBeforeActionMessage = params.screenConfig.beforeActionMessage,
+            sendScreenAfterActionMessage = params.screenConfig.afterActionMessage,
             txHash = null
         )
         dslContext.executeInsert(record)
@@ -78,9 +77,8 @@ class JooqSendErc20RequestRepository(
             txHash = txHash?.let { TransactionHash(it) },
             arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
             screenConfig = ScreenConfig(
-                title = sendScreenTitle,
-                message = sendScreenMessage,
-                logo = sendScreenLogo
+                beforeActionMessage = sendScreenBeforeActionMessage,
+                afterActionMessage = sendScreenAfterActionMessage
             )
         )
 }

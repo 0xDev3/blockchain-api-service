@@ -75,9 +75,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                message = "message",
-                title = "title",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val fullRedirectUrl = redirectUrl.replace("\${id}", uuid.toString())
@@ -150,9 +149,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                message = "message",
-                title = "title",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val fullRedirectUrl = redirectUrl.replace("\${id}", uuid.toString())
@@ -222,9 +220,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                message = "message",
-                title = "title",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
 
@@ -265,9 +262,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                message = "message",
-                title = "title",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
 
@@ -308,9 +304,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                message = "message",
-                title = "title",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
 
@@ -351,9 +346,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                message = "message",
-                title = "title",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
 
@@ -414,9 +408,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             signedMessage = null,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
@@ -471,9 +464,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             signedMessage = null,
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
@@ -551,9 +543,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             signedMessage = SignedMessage("signed-message"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
@@ -631,9 +622,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             signedMessage = SignedMessage("signed-message"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
@@ -723,9 +713,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             signedMessage = SignedMessage("signed-message"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
@@ -815,9 +804,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             signedMessage = SignedMessage("signed-message"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()

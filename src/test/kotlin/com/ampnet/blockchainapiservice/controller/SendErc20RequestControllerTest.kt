@@ -44,9 +44,8 @@ class SendErc20RequestControllerTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             )
         )
         val result = SendErc20Request(
@@ -129,9 +128,8 @@ class SendErc20RequestControllerTest : TestBase() {
             tokenRecipientAddress = WalletAddress("c"),
             arbitraryData = null,
             screenConfig = ScreenConfig(
-                title = "title",
-                message = "message",
-                logo = "logo"
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
             ),
             transactionData = FullTransactionData(
                 txHash = TransactionHash("tx-hash"),
