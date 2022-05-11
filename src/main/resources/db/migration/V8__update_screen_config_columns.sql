@@ -1,0 +1,13 @@
+ALTER TABLE blockchain_api_service.send_erc20_request DROP COLUMN send_screen_title;
+ALTER TABLE blockchain_api_service.send_erc20_request DROP COLUMN send_screen_message;
+ALTER TABLE blockchain_api_service.send_erc20_request DROP COLUMN send_screen_logo;
+ALTER TABLE blockchain_api_service.send_erc20_request ADD COLUMN send_screen_before_action_message VARCHAR DEFAULT NULL;
+ALTER TABLE blockchain_api_service.send_erc20_request ADD COLUMN send_screen_after_action_message VARCHAR DEFAULT NULL;
+
+ALTER TABLE blockchain_api_service.erc20_balance_request DROP COLUMN balance_screen_title;
+ALTER TABLE blockchain_api_service.erc20_balance_request DROP COLUMN balance_screen_message;
+ALTER TABLE blockchain_api_service.erc20_balance_request DROP COLUMN balance_screen_logo;
+ALTER TABLE blockchain_api_service.erc20_balance_request
+    ADD COLUMN balance_screen_before_action_message VARCHAR DEFAULT NULL;
+ALTER TABLE blockchain_api_service.erc20_balance_request
+    ADD COLUMN balance_screen_after_action_message VARCHAR DEFAULT NULL;

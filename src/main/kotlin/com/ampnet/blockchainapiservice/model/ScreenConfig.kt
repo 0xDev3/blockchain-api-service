@@ -1,12 +1,11 @@
 package com.ampnet.blockchainapiservice.model
 
 data class ScreenConfig(
-    val title: String?,
-    val message: String?,
-    val logo: String?
+    val beforeActionMessage: String?,
+    val afterActionMessage: String?
 ) {
     companion object {
-        val EMPTY = ScreenConfig(null, null, null)
+        val EMPTY = ScreenConfig(null, null)
     }
 
     fun orEmpty(): ScreenConfig? =

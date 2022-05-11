@@ -36,9 +36,8 @@ class JooqErc20BalanceRequestRepository(
             blockNumber = params.blockNumber?.value,
             requestedWalletAddress = params.requestedWalletAddress?.rawValue,
             arbitraryData = params.arbitraryData?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) },
-            balanceScreenTitle = params.screenConfig.title,
-            balanceScreenMessage = params.screenConfig.message,
-            balanceScreenLogo = params.screenConfig.logo,
+            balanceScreenBeforeActionMessage = params.screenConfig.beforeActionMessage,
+            balanceScreenAfterActionMessage = params.screenConfig.afterActionMessage,
             actualWalletAddress = null,
             signedMessage = null
         )
@@ -83,9 +82,8 @@ class JooqErc20BalanceRequestRepository(
             signedMessage = signedMessage?.let { SignedMessage(it) },
             arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
             screenConfig = ScreenConfig(
-                title = balanceScreenTitle,
-                message = balanceScreenMessage,
-                logo = balanceScreenLogo
+                beforeActionMessage = balanceScreenBeforeActionMessage,
+                afterActionMessage = balanceScreenAfterActionMessage
             )
         )
 }
