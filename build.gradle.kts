@@ -154,13 +154,18 @@ jooq {
                     name = "org.jooq.codegen.KotlinGenerator"
                     database.apply {
                         inputSchema = Configurations.Database.schema
+                        excludes = "flyway_schema_history"
                     }
                     generate.apply {
                         isDeprecated = false
                         isRecords = true
-                        isImmutablePojos = true
+                        isImmutablePojos = false
                         isImmutableInterfaces = true
                         isFluentSetters = false
+                        isIndexes = false
+                        isGlobalObjectReferences = false
+                        isRecordsImplementingRecordN = false
+                        isKeys = false
                     }
                     target.apply {
                         packageName = "com.ampnet.blockchainapiservice.generated.jooq"
@@ -171,9 +176,24 @@ jooq {
                         matchers = Matchers().apply {
                             tables = listOf(
                                 MatchersTableType().apply {
+                                    expression = "erc20_.*"
                                     tableClass = MatcherRule().apply {
                                         transform = MatcherTransformType.PASCAL
                                         expression = "$0_table"
+                                        recordImplements =
+                                            "com.ampnet.blockchainapiservice.model.database.record.Erc20Record"
+                                        tableImplements =
+                                            "com.ampnet.blockchainapiservice.model.database.table.Erc20Table"
+                                    }
+                                },
+                                MatchersTableType().apply {
+                                    tableClass = MatcherRule().apply {
+                                        transform = MatcherTransformType.PASCAL
+                                        expression = "$0_table"
+                                    }
+                                    interfaceClass = MatcherRule().apply {
+                                        transform = MatcherTransformType.PASCAL
+                                        expression = "i_$0_record"
                                     }
                                 }
                             )

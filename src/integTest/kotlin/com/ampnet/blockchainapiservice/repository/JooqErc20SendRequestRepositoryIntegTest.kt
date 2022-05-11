@@ -69,8 +69,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                     tokenSenderAddress = TOKEN_SENDER_ADDRESS.rawValue,
                     tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS.rawValue,
                     arbitraryData = JSON.valueOf(ARBITRARY_DATA),
-                    sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                    sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                    screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                    screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
                     txHash = TX_HASH.value
                 )
             )

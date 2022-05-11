@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20BalanceRequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IErc20BalanceRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20BalanceRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20BalanceRequestParams
@@ -36,8 +37,8 @@ class JooqErc20BalanceRequestRepository(
             blockNumber = params.blockNumber?.value,
             requestedWalletAddress = params.requestedWalletAddress?.rawValue,
             arbitraryData = params.arbitraryData?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) },
-            balanceScreenBeforeActionMessage = params.screenConfig.beforeActionMessage,
-            balanceScreenAfterActionMessage = params.screenConfig.afterActionMessage,
+            screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
+            screenAfterActionMessage = params.screenConfig.afterActionMessage,
             actualWalletAddress = null,
             signedMessage = null
         )
@@ -70,7 +71,7 @@ class JooqErc20BalanceRequestRepository(
             .execute() > 0
     }
 
-    private fun Erc20BalanceRequestRecord.toModel(): Erc20BalanceRequest =
+    private fun IErc20BalanceRequestRecord.toModel(): Erc20BalanceRequest =
         Erc20BalanceRequest(
             id = id!!,
             chainId = ChainId(chainId!!),
@@ -82,8 +83,8 @@ class JooqErc20BalanceRequestRepository(
             signedMessage = signedMessage?.let { SignedMessage(it) },
             arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
             screenConfig = ScreenConfig(
-                beforeActionMessage = balanceScreenBeforeActionMessage,
-                afterActionMessage = balanceScreenAfterActionMessage
+                beforeActionMessage = screenBeforeActionMessage,
+                afterActionMessage = screenAfterActionMessage
             )
         )
 }

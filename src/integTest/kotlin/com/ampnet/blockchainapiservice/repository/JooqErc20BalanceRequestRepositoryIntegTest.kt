@@ -68,8 +68,8 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
                     blockNumber = BLOCK_NUMBER.value,
                     requestedWalletAddress = REQUESTED_WALLET_ADDRESS.rawValue,
                     arbitraryData = JSON.valueOf(ARBITRARY_DATA),
-                    balanceScreenBeforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
-                    balanceScreenAfterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE,
+                    screenBeforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                    screenAfterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE,
                     actualWalletAddress = ACTUAL_WALLET_ADDRESS.rawValue,
                     signedMessage = SIGNED_MESSAGE.value
                 )

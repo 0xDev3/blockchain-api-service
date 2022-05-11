@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20SendRequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IErc20SendRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20SendRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
@@ -37,8 +38,8 @@ class JooqErc20SendRequestRepository(
             tokenSenderAddress = params.tokenSenderAddress?.rawValue,
             tokenRecipientAddress = params.tokenRecipientAddress.rawValue,
             arbitraryData = params.arbitraryData?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) },
-            sendScreenBeforeActionMessage = params.screenConfig.beforeActionMessage,
-            sendScreenAfterActionMessage = params.screenConfig.afterActionMessage,
+            screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
+            screenAfterActionMessage = params.screenConfig.afterActionMessage,
             txHash = null
         )
         dslContext.executeInsert(record)
@@ -65,7 +66,7 @@ class JooqErc20SendRequestRepository(
             .execute() > 0
     }
 
-    private fun Erc20SendRequestRecord.toModel(): Erc20SendRequest =
+    private fun IErc20SendRequestRecord.toModel(): Erc20SendRequest =
         Erc20SendRequest(
             id = id!!,
             chainId = ChainId(chainId!!),
@@ -77,8 +78,8 @@ class JooqErc20SendRequestRepository(
             txHash = txHash?.let { TransactionHash(it) },
             arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
             screenConfig = ScreenConfig(
-                beforeActionMessage = sendScreenBeforeActionMessage,
-                afterActionMessage = sendScreenAfterActionMessage
+                beforeActionMessage = screenBeforeActionMessage,
+                afterActionMessage = screenAfterActionMessage
             )
         )
 }
