@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.ControllerTestBase
+import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
@@ -60,10 +61,10 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                 .set(
                     ClientInfoRecord(
                         clientId = "client-id",
-                        chainId = chainId.value,
+                        chainId = chainId,
                         sendRedirectUrl = redirectUrl,
                         balanceRedirectUrl = null,
-                        tokenAddress = tokenAddress.rawValue
+                        tokenAddress = tokenAddress
                     )
                 )
                 .execute()
@@ -638,7 +639,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                     tokenAmount = Balance(BigInteger.TEN),
                     tokenSenderAddress = WalletAddress("b"),
                     tokenRecipientAddress = WalletAddress("c"),
-                    arbitraryData = null,
+                    arbitraryData = TestData.EMPTY_JSON_OBJECT,
                     screenConfig = ScreenConfig(
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"
@@ -688,7 +689,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                     tokenAmount = Balance(BigInteger.TEN),
                     tokenSenderAddress = WalletAddress("b"),
                     tokenRecipientAddress = WalletAddress("c"),
-                    arbitraryData = null,
+                    arbitraryData = TestData.EMPTY_JSON_OBJECT,
                     screenConfig = ScreenConfig(
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"

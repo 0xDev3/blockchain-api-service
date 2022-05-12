@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.ScreenConfig
@@ -41,7 +42,7 @@ class Erc20BalanceRequestControllerTest : TestBase() {
             tokenAddress = ContractAddress("a"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("b"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -56,7 +57,7 @@ class Erc20BalanceRequestControllerTest : TestBase() {
             requestedWalletAddress = params.requestedWalletAddress,
             actualWalletAddress = null,
             signedMessage = null,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = params.screenConfig
         )
         val service = mock<Erc20BalanceRequestService>()
@@ -117,7 +118,7 @@ class Erc20BalanceRequestControllerTest : TestBase() {
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"

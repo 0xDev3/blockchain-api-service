@@ -42,10 +42,10 @@ class JooqClientInfoRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(
                 ClientInfoRecord(
                     clientId = clientInfo.clientId,
-                    chainId = clientInfo.chainId.alternative?.value,
+                    chainId = clientInfo.chainId.alternative,
                     sendRedirectUrl = clientInfo.sendRedirectUrl.alternative,
                     balanceRedirectUrl = clientInfo.balanceRedirectUrl.alternative,
-                    tokenAddress = clientInfo.tokenAddress.alternative?.rawValue
+                    tokenAddress = clientInfo.tokenAddress.alternative
                 )
             )
         }

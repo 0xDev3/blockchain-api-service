@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
@@ -51,7 +52,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             tokenAmount = Balance(BigInteger.valueOf(123456L)),
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -398,7 +399,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             txHash = null,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -462,7 +463,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -534,7 +535,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -613,7 +614,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -692,7 +693,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -771,7 +772,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -850,7 +851,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             tokenSenderAddress = null,
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -929,7 +930,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
             txHash = TX_HASH,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
