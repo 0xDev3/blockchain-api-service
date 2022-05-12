@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
@@ -73,7 +74,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             tokenAddress = null,
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -147,7 +148,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             tokenAddress = tokenAddress,
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -218,7 +219,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             tokenAddress = null,
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -260,7 +261,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -302,7 +303,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -344,7 +345,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             tokenAddress = null,
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -406,7 +407,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = null,
             signedMessage = null,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -462,7 +463,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = WalletAddress("fff"),
             signedMessage = null,
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -541,7 +542,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = WalletAddress("fff"),
             signedMessage = SignedMessage("signed-message"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -620,7 +621,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = WalletAddress("def"),
             signedMessage = SignedMessage("signed-message"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -711,7 +712,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = null,
             actualWalletAddress = WalletAddress("def"),
             signedMessage = SignedMessage("signed-message"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -802,7 +803,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = WalletAddress("def"),
             signedMessage = SignedMessage("signed-message"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"

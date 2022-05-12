@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
@@ -42,7 +43,7 @@ class Erc20SendRequestControllerTest : TestBase() {
             tokenAmount = Balance(BigInteger.TEN),
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -126,7 +127,7 @@ class Erc20SendRequestControllerTest : TestBase() {
             tokenAmount = Balance(BigInteger.TEN),
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"

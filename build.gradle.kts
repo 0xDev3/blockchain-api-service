@@ -2,6 +2,8 @@ import io.gitlab.arturbosch.detekt.Detekt
 import nu.studer.gradle.jooq.JooqGenerate
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
+import org.jooq.meta.jaxb.ForcedType
+import org.jooq.meta.jaxb.GeneratedSerialVersionUID
 import org.jooq.meta.jaxb.MatcherRule
 import org.jooq.meta.jaxb.MatcherTransformType
 import org.jooq.meta.jaxb.Matchers
@@ -155,6 +157,56 @@ jooq {
                     database.apply {
                         inputSchema = Configurations.Database.schema
                         excludes = "flyway_schema_history"
+                        forcedTypes = listOf(
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.ChainId"
+                                converter = "com.ampnet.blockchainapiservice.util.ChainIdConverter"
+                                includeExpression = "chain_id"
+                                includeTypes = "BIGINT"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.ContractAddress"
+                                converter = "com.ampnet.blockchainapiservice.util.ContractAddressConverter"
+                                includeExpression = "token_address"
+                                includeTypes = "VARCHAR"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.WalletAddress"
+                                converter = "com.ampnet.blockchainapiservice.util.WalletAddressConverter"
+                                includeExpression = ".*_address"
+                                includeTypes = "VARCHAR"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.Balance"
+                                converter = "com.ampnet.blockchainapiservice.util.BalanceConverter"
+                                includeExpression = "token_amount"
+                                includeTypes = "NUMERIC"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.BlockNumber"
+                                converter = "com.ampnet.blockchainapiservice.util.BlockNumberConverter"
+                                includeExpression = "block_number"
+                                includeTypes = "NUMERIC"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.TransactionHash"
+                                converter = "com.ampnet.blockchainapiservice.util.TransactionHashConverter"
+                                includeExpression = "tx_hash"
+                                includeTypes = "VARCHAR"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.SignedMessage"
+                                converter = "com.ampnet.blockchainapiservice.util.SignedMessageConverter"
+                                includeExpression = "signed_message"
+                                includeTypes = "VARCHAR"
+                            },
+                            ForcedType().apply {
+                                userType = "com.fasterxml.jackson.databind.JsonNode"
+                                converter = "com.ampnet.blockchainapiservice.util.JsonNodeConverter"
+                                includeExpression = ".*"
+                                includeTypes = "JSON"
+                            }
+                        )
                     }
                     generate.apply {
                         isDeprecated = false
@@ -166,6 +218,7 @@ jooq {
                         isGlobalObjectReferences = false
                         isRecordsImplementingRecordN = false
                         isKeys = false
+                        generatedSerialVersionUID = GeneratedSerialVersionUID.HASH
                     }
                     target.apply {
                         packageName = "com.ampnet.blockchainapiservice.generated.jooq"

@@ -6,24 +6,16 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20Balanc
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
-import com.ampnet.blockchainapiservice.util.BlockNumber
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.SignedMessage
 import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
 import org.jooq.DSLContext
-import org.jooq.JSON
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-class JooqErc20BalanceRequestRepository(
-    private val dslContext: DSLContext,
-    private val objectMapper: ObjectMapper
-) : Erc20BalanceRequestRepository {
+class JooqErc20BalanceRequestRepository(private val dslContext: DSLContext) : Erc20BalanceRequestRepository {
 
     companion object : KLogging()
 
@@ -31,12 +23,12 @@ class JooqErc20BalanceRequestRepository(
         logger.info { "Store ERC20 balance request, params: $params" }
         val record = Erc20BalanceRequestRecord(
             id = params.id,
-            chainId = params.chainId.value,
+            chainId = params.chainId,
             redirectUrl = params.redirectUrl,
-            tokenAddress = params.tokenAddress.rawValue,
-            blockNumber = params.blockNumber?.value,
-            requestedWalletAddress = params.requestedWalletAddress?.rawValue,
-            arbitraryData = params.arbitraryData?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) },
+            tokenAddress = params.tokenAddress,
+            blockNumber = params.blockNumber,
+            requestedWalletAddress = params.requestedWalletAddress,
+            arbitraryData = params.arbitraryData,
             screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
             screenAfterActionMessage = params.screenConfig.afterActionMessage,
             actualWalletAddress = null,
@@ -59,8 +51,8 @@ class JooqErc20BalanceRequestRepository(
                 " signedMessage: $signedMessage"
         }
         return dslContext.update(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST)
-            .set(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.ACTUAL_WALLET_ADDRESS, walletAddress.rawValue)
-            .set(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.SIGNED_MESSAGE, signedMessage.value)
+            .set(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.ACTUAL_WALLET_ADDRESS, walletAddress)
+            .set(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.SIGNED_MESSAGE, signedMessage)
             .where(
                 DSL.and(
                     Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.ID.eq(id),
@@ -74,14 +66,14 @@ class JooqErc20BalanceRequestRepository(
     private fun IErc20BalanceRequestRecord.toModel(): Erc20BalanceRequest =
         Erc20BalanceRequest(
             id = id!!,
-            chainId = ChainId(chainId!!),
+            chainId = chainId!!,
             redirectUrl = redirectUrl!!,
-            tokenAddress = ContractAddress(tokenAddress!!),
-            blockNumber = blockNumber?.let { BlockNumber(it) },
-            requestedWalletAddress = requestedWalletAddress?.let { WalletAddress(it) },
-            actualWalletAddress = actualWalletAddress?.let { WalletAddress(it) },
-            signedMessage = signedMessage?.let { SignedMessage(it) },
-            arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
+            tokenAddress = tokenAddress!!,
+            blockNumber = blockNumber,
+            requestedWalletAddress = requestedWalletAddress,
+            actualWalletAddress = actualWalletAddress,
+            signedMessage = signedMessage,
+            arbitraryData = arbitraryData,
             screenConfig = ScreenConfig(
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage

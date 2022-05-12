@@ -6,24 +6,15 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20SendRe
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
 import org.jooq.DSLContext
-import org.jooq.JSON
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-class JooqErc20SendRequestRepository(
-    private val dslContext: DSLContext,
-    private val objectMapper: ObjectMapper
-) : Erc20SendRequestRepository {
+class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20SendRequestRepository {
 
     companion object : KLogging()
 
@@ -31,13 +22,13 @@ class JooqErc20SendRequestRepository(
         logger.info { "Store ERC20 send request, params: $params" }
         val record = Erc20SendRequestRecord(
             id = params.id,
-            chainId = params.chainId.value,
+            chainId = params.chainId,
             redirectUrl = params.redirectUrl,
-            tokenAddress = params.tokenAddress.rawValue,
-            tokenAmount = params.tokenAmount.rawValue,
-            tokenSenderAddress = params.tokenSenderAddress?.rawValue,
-            tokenRecipientAddress = params.tokenRecipientAddress.rawValue,
-            arbitraryData = params.arbitraryData?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) },
+            tokenAddress = params.tokenAddress,
+            tokenAmount = params.tokenAmount,
+            tokenSenderAddress = params.tokenSenderAddress,
+            tokenRecipientAddress = params.tokenRecipientAddress,
+            arbitraryData = params.arbitraryData,
             screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
             screenAfterActionMessage = params.screenConfig.afterActionMessage,
             txHash = null
@@ -56,7 +47,7 @@ class JooqErc20SendRequestRepository(
     override fun setTxHash(id: UUID, txHash: TransactionHash): Boolean {
         logger.info { "Set txHash for ERC20 send request, id: $id, txHash: $txHash" }
         return dslContext.update(Erc20SendRequestTable.ERC20_SEND_REQUEST)
-            .set(Erc20SendRequestTable.ERC20_SEND_REQUEST.TX_HASH, txHash.value)
+            .set(Erc20SendRequestTable.ERC20_SEND_REQUEST.TX_HASH, txHash)
             .where(
                 DSL.and(
                     Erc20SendRequestTable.ERC20_SEND_REQUEST.ID.eq(id),
@@ -69,14 +60,14 @@ class JooqErc20SendRequestRepository(
     private fun IErc20SendRequestRecord.toModel(): Erc20SendRequest =
         Erc20SendRequest(
             id = id!!,
-            chainId = ChainId(chainId!!),
+            chainId = chainId!!,
             redirectUrl = redirectUrl!!,
-            tokenAddress = ContractAddress(tokenAddress!!),
-            tokenAmount = Balance(tokenAmount!!),
-            tokenSenderAddress = tokenSenderAddress?.let { WalletAddress(it) },
-            tokenRecipientAddress = WalletAddress(tokenRecipientAddress!!),
-            txHash = txHash?.let { TransactionHash(it) },
-            arbitraryData = arbitraryData?.let { objectMapper.readTree(it.data()) },
+            tokenAddress = tokenAddress!!,
+            tokenAmount = tokenAmount!!,
+            tokenSenderAddress = tokenSenderAddress,
+            tokenRecipientAddress = tokenRecipientAddress!!,
+            txHash = txHash,
+            arbitraryData = arbitraryData,
             screenConfig = ScreenConfig(
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage
