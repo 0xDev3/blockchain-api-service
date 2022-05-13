@@ -4,7 +4,6 @@ import com.ampnet.blockchainapiservice.config.JsonConfig
 import com.fasterxml.jackson.databind.JsonNode
 import org.jooq.Converter
 import org.jooq.JSON
-import org.springframework.stereotype.Component
 import java.math.BigInteger
 
 class ChainIdConverter : Converter<Long, ChainId> {
@@ -84,7 +83,6 @@ class SignedMessageConverter : Converter<String, SignedMessage> {
     }
 }
 
-@Component
 class JsonNodeConverter : Converter<JSON, JsonNode> {
 
     private val objectMapper = JsonConfig().objectMapper()
