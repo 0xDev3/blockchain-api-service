@@ -9,7 +9,7 @@ import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
 import java.util.UUID
 
-data class SendErc20Request(
+data class Erc20SendRequest(
     val id: UUID,
     val chainId: ChainId,
     val redirectUrl: String,

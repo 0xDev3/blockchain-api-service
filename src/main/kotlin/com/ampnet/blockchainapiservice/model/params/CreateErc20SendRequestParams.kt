@@ -7,7 +7,7 @@ import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
 
-data class CreateSendErc20RequestParams(
+data class CreateErc20SendRequestParams(
     val clientId: String?,
     val chainId: ChainId?,
     val redirectUrl: String?,

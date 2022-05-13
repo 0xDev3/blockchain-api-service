@@ -2,8 +2,6 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ClientInfoTable
 import com.ampnet.blockchainapiservice.model.result.ClientInfo
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
@@ -20,10 +18,10 @@ class JooqClientInfoRepository(private val dslContext: DSLContext) : ClientInfoR
             .fetchOne {
                 ClientInfo(
                     clientId = it.clientId!!,
-                    chainId = it.chainId?.let(::ChainId),
+                    chainId = it.chainId,
                     sendRedirectUrl = it.sendRedirectUrl,
                     balanceRedirectUrl = it.balanceRedirectUrl,
-                    tokenAddress = it.tokenAddress?.let(::ContractAddress)
+                    tokenAddress = it.tokenAddress
                 )
             }
     }
