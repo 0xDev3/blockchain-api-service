@@ -6,14 +6,14 @@ import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
 import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
-import com.ampnet.blockchainapiservice.model.params.StoreSendErc20RequestParams
+import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
+import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ClientInfo
-import com.ampnet.blockchainapiservice.model.result.FullSendErc20Request
-import com.ampnet.blockchainapiservice.model.result.SendErc20Request
+import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
+import com.ampnet.blockchainapiservice.model.result.FullErc20SendRequest
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
-import com.ampnet.blockchainapiservice.repository.SendErc20RequestRepository
+import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
@@ -27,49 +27,49 @@ import org.web3j.abi.datatypes.Utf8String
 import java.util.UUID
 
 @Service
-class SendErc20RequestServiceImpl(
+class Erc20SendRequestServiceImpl(
     private val uuidProvider: UuidProvider,
     private val functionEncoderService: FunctionEncoderService,
     private val blockchainService: BlockchainService,
     private val clientInfoRepository: ClientInfoRepository,
-    private val sendErc20RequestRepository: SendErc20RequestRepository
-) : SendErc20RequestService {
+    private val erc20SendRequestRepository: Erc20SendRequestRepository
+) : Erc20SendRequestService {
 
     companion object : KLogging()
 
-    override fun createSendErc20Request(params: CreateSendErc20RequestParams): WithFunctionData<SendErc20Request> {
-        logger.info { "Creating send ERC20 request, params: $params" }
+    override fun createErc20SendRequest(params: CreateErc20SendRequestParams): WithFunctionData<Erc20SendRequest> {
+        logger.info { "Creating ERC20 send request, params: $params" }
 
         val clientInfo = params.getClientInfo()
         val id = uuidProvider.getUuid()
-        val databaseParams = StoreSendErc20RequestParams.fromCreateParams(id, params, clientInfo)
+        val databaseParams = StoreErc20SendRequestParams.fromCreateParams(id, params, clientInfo)
 
         val data = encodeFunctionData(params.tokenRecipientAddress, params.tokenAmount, id)
-        val sendErc20Request = sendErc20RequestRepository.store(databaseParams)
+        val erc20SendRequest = erc20SendRequestRepository.store(databaseParams)
 
-        return WithFunctionData(sendErc20Request, data)
+        return WithFunctionData(erc20SendRequest, data)
     }
 
-    override fun getSendErc20Request(id: UUID, rpcSpec: RpcUrlSpec): FullSendErc20Request {
-        logger.debug { "Fetching send ERC20 request, id: $id, rpcSpec: $rpcSpec" }
+    override fun getErc20SendRequest(id: UUID, rpcSpec: RpcUrlSpec): FullErc20SendRequest {
+        logger.debug { "Fetching ERC20 send request, id: $id, rpcSpec: $rpcSpec" }
 
-        val sendErc20Request = sendErc20RequestRepository.getById(id)
-            ?: throw ResourceNotFoundException("Send request not found for ID: $id")
+        val erc20SendRequest = erc20SendRequestRepository.getById(id)
+            ?: throw ResourceNotFoundException("ERC20 send request not found for ID: $id")
 
-        val transactionInfo = sendErc20Request.txHash?.let {
+        val transactionInfo = erc20SendRequest.txHash?.let {
             blockchainService.fetchTransactionInfo(
                 chainSpec = ChainSpec(
-                    chainId = sendErc20Request.chainId,
+                    chainId = erc20SendRequest.chainId,
                     rpcSpec = rpcSpec
                 ),
-                txHash = sendErc20Request.txHash
+                txHash = erc20SendRequest.txHash
             )
         }
-        val data = encodeFunctionData(sendErc20Request.tokenRecipientAddress, sendErc20Request.tokenAmount, id)
-        val status = sendErc20Request.determineStatus(transactionInfo, data)
+        val data = encodeFunctionData(erc20SendRequest.tokenRecipientAddress, erc20SendRequest.tokenAmount, id)
+        val status = erc20SendRequest.determineStatus(transactionInfo, data)
 
-        return FullSendErc20Request.fromSendErc20Request(
-            request = sendErc20Request,
+        return FullErc20SendRequest.fromErc20SendRequest(
+            request = erc20SendRequest,
             status = status,
             data = data,
             transactionInfo = transactionInfo
@@ -77,16 +77,16 @@ class SendErc20RequestServiceImpl(
     }
 
     override fun attachTxHash(id: UUID, txHash: TransactionHash) {
-        logger.info { "Attach txHash to send ERC20 request, id: $id, txHash: $txHash" }
+        logger.info { "Attach txHash to ERC20 send request, id: $id, txHash: $txHash" }
 
-        val txHashAttached = sendErc20RequestRepository.setTxHash(id, txHash)
+        val txHashAttached = erc20SendRequestRepository.setTxHash(id, txHash)
 
         if (txHashAttached.not()) {
-            throw CannotAttachTxHashException("Unable to attach transaction hash to send request with ID: $id")
+            throw CannotAttachTxHashException("Unable to attach transaction hash to ERC20 send request with ID: $id")
         }
     }
 
-    private fun CreateSendErc20RequestParams.getClientInfo(): ClientInfo =
+    private fun CreateErc20SendRequestParams.getClientInfo(): ClientInfo =
         if (this.clientId != null) {
             logger.debug { "Fetching info for clientId: $clientId" }
             clientInfoRepository.getById(this.clientId) ?: throw NonExistentClientIdException(this.clientId)
@@ -105,7 +105,7 @@ class SendErc20RequestServiceImpl(
             additionalData = listOf(Utf8String(id.toString()))
         )
 
-    private fun SendErc20Request.determineStatus(
+    private fun Erc20SendRequest.determineStatus(
         transactionInfo: BlockchainTransactionInfo?,
         expectedData: FunctionData
     ): Status =
@@ -117,7 +117,7 @@ class SendErc20RequestServiceImpl(
             Status.FAILED
         }
 
-    private fun SendErc20Request.isSuccess(
+    private fun Erc20SendRequest.isSuccess(
         transactionInfo: BlockchainTransactionInfo,
         expectedData: FunctionData
     ): Boolean =

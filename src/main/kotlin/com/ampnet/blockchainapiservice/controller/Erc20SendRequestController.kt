@@ -3,12 +3,12 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.config.binding.annotation.RpcUrlBinding
 import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
+import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
-import com.ampnet.blockchainapiservice.model.request.CreateSendErc20Request
-import com.ampnet.blockchainapiservice.model.response.SendErc20RequestResponse
+import com.ampnet.blockchainapiservice.model.request.CreateErc20SendRequest
+import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
-import com.ampnet.blockchainapiservice.service.SendErc20RequestService
+import com.ampnet.blockchainapiservice.service.Erc20SendRequestService
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -25,13 +25,13 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-class SendErc20RequestController(private val sendErc20RequestService: SendErc20RequestService) {
+class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendRequestService) {
 
     @PostMapping("/send")
-    fun createSendErc20Request(
-        @RequestBody requestBody: CreateSendErc20Request
-    ): ResponseEntity<SendErc20RequestResponse> {
-        val params = CreateSendErc20RequestParams(
+    fun createErc20SendRequest(
+        @RequestBody requestBody: CreateErc20SendRequest
+    ): ResponseEntity<Erc20SendRequestResponse> {
+        val params = CreateErc20SendRequestParams(
             clientId = requestBody.clientId,
             chainId = requestBody.chainId?.let { ChainId(it) },
             redirectUrl = requestBody.redirectUrl,
@@ -43,10 +43,10 @@ class SendErc20RequestController(private val sendErc20RequestService: SendErc20R
             screenConfig = requestBody.screenConfig ?: ScreenConfig.EMPTY
         )
 
-        val createdRequest = sendErc20RequestService.createSendErc20Request(params)
+        val createdRequest = erc20SendRequestService.createErc20SendRequest(params)
 
         return ResponseEntity.ok(
-            SendErc20RequestResponse(
+            Erc20SendRequestResponse(
                 id = createdRequest.value.id,
                 status = Status.PENDING,
                 chainId = createdRequest.value.chainId.value,
@@ -69,14 +69,14 @@ class SendErc20RequestController(private val sendErc20RequestService: SendErc20R
     }
 
     @GetMapping("/send/{id}")
-    fun getSendErc20Request(
+    fun getErc20SendRequest(
         @PathVariable("id") id: UUID,
         @RpcUrlBinding rpcSpec: RpcUrlSpec
-    ): ResponseEntity<SendErc20RequestResponse> {
-        val sendRequest = sendErc20RequestService.getSendErc20Request(id, rpcSpec)
+    ): ResponseEntity<Erc20SendRequestResponse> {
+        val sendRequest = erc20SendRequestService.getErc20SendRequest(id, rpcSpec)
 
         return ResponseEntity.ok(
-            SendErc20RequestResponse(
+            Erc20SendRequestResponse(
                 id = sendRequest.id,
                 status = sendRequest.status,
                 chainId = sendRequest.chainId.value,
@@ -103,6 +103,6 @@ class SendErc20RequestController(private val sendErc20RequestService: SendErc20R
         @PathVariable("id") id: UUID,
         @RequestBody requestBody: AttachTransactionHashRequest
     ) {
-        sendErc20RequestService.attachTxHash(id, TransactionHash(requestBody.txHash))
+        erc20SendRequestService.attachTxHash(id, TransactionHash(requestBody.txHash))
     }
 }

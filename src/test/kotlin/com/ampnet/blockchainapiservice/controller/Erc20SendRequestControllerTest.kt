@@ -1,17 +1,18 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.params.CreateSendErc20RequestParams
+import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
-import com.ampnet.blockchainapiservice.model.request.CreateSendErc20Request
-import com.ampnet.blockchainapiservice.model.response.SendErc20RequestResponse
+import com.ampnet.blockchainapiservice.model.request.CreateErc20SendRequest
+import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
-import com.ampnet.blockchainapiservice.model.result.FullSendErc20Request
+import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
+import com.ampnet.blockchainapiservice.model.result.FullErc20SendRequest
 import com.ampnet.blockchainapiservice.model.result.FullTransactionData
-import com.ampnet.blockchainapiservice.model.result.SendErc20Request
-import com.ampnet.blockchainapiservice.service.SendErc20RequestService
+import com.ampnet.blockchainapiservice.service.Erc20SendRequestService
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -30,11 +31,11 @@ import java.math.BigInteger
 import java.util.UUID
 import org.mockito.kotlin.verify as verifyMock
 
-class SendErc20RequestControllerTest : TestBase() {
+class Erc20SendRequestControllerTest : TestBase() {
 
     @Test
-    fun mustCorrectlyCreateSendErc20Request() {
-        val params = CreateSendErc20RequestParams(
+    fun mustCorrectlyCreateErc20SendRequest() {
+        val params = CreateErc20SendRequestParams(
             clientId = "client-id",
             chainId = ChainId(123L),
             redirectUrl = "redirect-url",
@@ -42,13 +43,13 @@ class SendErc20RequestControllerTest : TestBase() {
             tokenAmount = Balance(BigInteger.TEN),
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
             )
         )
-        val result = SendErc20Request(
+        val result = Erc20SendRequest(
             id = UUID.randomUUID(),
             chainId = params.chainId!!,
             redirectUrl = params.redirectUrl!!,
@@ -61,18 +62,18 @@ class SendErc20RequestControllerTest : TestBase() {
             screenConfig = params.screenConfig
         )
         val data = FunctionData("data")
-        val service = mock<SendErc20RequestService>()
+        val service = mock<Erc20SendRequestService>()
 
-        suppose("send ERC20 request will be created") {
-            given(service.createSendErc20Request(params))
+        suppose("ERC20 send request will be created") {
+            given(service.createErc20SendRequest(params))
                 .willReturn(WithFunctionData(result, data))
         }
 
-        val controller = SendErc20RequestController(service)
+        val controller = Erc20SendRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.createSendErc20Request(
-                CreateSendErc20Request(
+            val response = controller.createErc20SendRequest(
+                CreateErc20SendRequest(
                     clientId = params.clientId,
                     chainId = params.chainId?.value,
                     redirectUrl = params.redirectUrl,
@@ -88,7 +89,7 @@ class SendErc20RequestControllerTest : TestBase() {
             assertThat(response).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(
-                        SendErc20RequestResponse(
+                        Erc20SendRequestResponse(
                             id = result.id,
                             status = Status.PENDING,
                             chainId = result.chainId.value,
@@ -113,11 +114,11 @@ class SendErc20RequestControllerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchSendErc20Request() {
+    fun mustCorrectlyFetchErc20SendRequest() {
         val id = UUID.randomUUID()
         val rpcSpec = RpcUrlSpec("url", "url-override")
-        val service = mock<SendErc20RequestService>()
-        val result = FullSendErc20Request(
+        val service = mock<Erc20SendRequestService>()
+        val result = FullErc20SendRequest(
             id = id,
             status = Status.SUCCESS,
             chainId = ChainId(123L),
@@ -126,7 +127,7 @@ class SendErc20RequestControllerTest : TestBase() {
             tokenAmount = Balance(BigInteger.TEN),
             tokenSenderAddress = WalletAddress("b"),
             tokenRecipientAddress = WalletAddress("c"),
-            arbitraryData = null,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
@@ -140,18 +141,18 @@ class SendErc20RequestControllerTest : TestBase() {
             )
         )
 
-        suppose("some send ERC20 request will be fetched") {
-            given(service.getSendErc20Request(id, rpcSpec))
+        suppose("some ERC20 send request will be fetched") {
+            given(service.getErc20SendRequest(id, rpcSpec))
                 .willReturn(result)
         }
 
-        val controller = SendErc20RequestController(service)
+        val controller = Erc20SendRequestController(service)
 
         verify("controller returns correct response") {
-            assertThat(controller.getSendErc20Request(id, rpcSpec)).withMessage()
+            assertThat(controller.getErc20SendRequest(id, rpcSpec)).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(
-                        SendErc20RequestResponse(
+                        Erc20SendRequestResponse(
                             id = result.id,
                             status = result.status,
                             chainId = result.chainId.value,
@@ -177,8 +178,8 @@ class SendErc20RequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyAttachTransactionHash() {
-        val service = mock<SendErc20RequestService>()
-        val controller = SendErc20RequestController(service)
+        val service = mock<Erc20SendRequestService>()
+        val controller = Erc20SendRequestController(service)
 
         val id = UUID.randomUUID()
         val txHash = "tx-hash"

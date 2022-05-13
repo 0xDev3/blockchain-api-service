@@ -66,11 +66,11 @@ include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyAttachSign
 .Response
 include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyAttachSignedMessage/http-response.adoc[]
 
-== Send ERC20 Request API
+== ERC20 Send Request API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
-=== Create Send ERC20 Request
-Creates send ERC20 request with specified parameters. Either `client_id` or `chain_id`, `redirect_url` and
+=== Create ERC20 Send Request
+Creates ERC20 send request with specified parameters. Either `client_id` or `chain_id`, `redirect_url` and
 `token_address` must be provided as request body parameters. `sender_address`, `arbitrary_data`, `screen_config` and all
 its child fields are optional. `arbitrary_data` field can contain any desired JSON value. Send request ID can be
 interpolated into the `redirect_url` by placing `${id}` placeholder in the place where request ID is desired in the URL.
@@ -79,19 +79,19 @@ The placeholder must strictly have dollar sign and brackets to be interpolated, 
 Example request using `client_id` field:
 
 .Request
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc20RequestViaClientId/http-request.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestViaClientId/http-request.adoc[]
 .Response
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc20RequestViaClientId/http-response.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestViaClientId/http-response.adoc[]
 
 Example request using `chain_id`, `redirect_url` and `token_address` fields:
 
 .Request
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc20RequestViaChainIdRedirectUrlAndTokenAddress/http-request.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestViaChainIdRedirectUrlAndTokenAddress/http-request.adoc[]
 .Response
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyCreateSendErc20RequestViaChainIdRedirectUrlAndTokenAddress/http-response.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestViaChainIdRedirectUrlAndTokenAddress/http-response.adoc[]
 
-=== Fetch Send ERC20 Request by ID
-Fetches stored send ERC20 request with its current status. Possible statuses are `PENDING`, `SUCCESS` and `FAILED`. The
+=== Fetch ERC20 Send Request by ID
+Fetches stored ERC20 send request with its current status. Possible statuses are `PENDING`, `SUCCESS` and `FAILED`. The
 request is considered successful if the attached transaction is confirmed on blockchain and all its data matches
 specified request parameters (correct `to` and `from` addresses, `amount`, matching `data` and `txHash`). If there are
 any mismatches between specified request data and state on blockchain, the request will be marked as failed. If there is
@@ -103,15 +103,15 @@ specified chain ID, it only allows you to specify RPC URL for non-natively suppo
 URL, use `X-RPC-URL-OVERRIDE` header.
 
 .Request
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyFetchSendErc20Request/http-request.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequest/http-request.adoc[]
 .Response
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyFetchSendErc20Request/http-response.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequest/http-response.adoc[]
 
-=== Attach Transaction Hash to Send ERC20 Request
-Attaches transaction hash to existing send ERC20 request. Once the transaction hash is attached to the request, any
+=== Attach Transaction Hash to ERC20 Send Request
+Attaches transaction hash to existing ERC20 send request. Once the transaction hash is attached to the request, any
 subsequent attempts to attach a new transaction hash will fail.
 
 .Request
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-request.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-request.adoc[]
 .Response
-include::{snippets}/SendErc20RequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-response.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-response.adoc[]
