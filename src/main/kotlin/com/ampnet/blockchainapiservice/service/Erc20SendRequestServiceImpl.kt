@@ -14,6 +14,7 @@ import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20SendRequest
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
+import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
@@ -98,10 +99,10 @@ class Erc20SendRequestServiceImpl(
         functionEncoderService.encode(
             functionName = "transfer",
             arguments = listOf(
-                FunctionArgument(abiType = "address", value = tokenRecipientAddress.rawValue),
-                FunctionArgument(abiType = "uint256", value = tokenAmount.rawValue)
+                FunctionArgument(abiType = AbiType.Address, value = tokenRecipientAddress),
+                FunctionArgument(abiType = AbiType.Uint256, value = tokenAmount)
             ),
-            abiOutputTypes = listOf("bool"),
+            abiOutputTypes = listOf(AbiType.Bool),
             additionalData = listOf(Utf8String(id.toString()))
         )
 
