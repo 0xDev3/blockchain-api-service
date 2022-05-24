@@ -19,6 +19,7 @@ import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20SendRequest
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
+import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -79,10 +80,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(uuid.toString()))
                 )
             )
@@ -186,10 +187,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(uuid.toString()))
                 )
             )
@@ -420,10 +421,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -492,10 +493,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -571,10 +572,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -650,10 +651,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -729,10 +730,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -808,10 +809,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -887,10 +888,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -966,10 +967,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )

@@ -9,6 +9,7 @@ import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.service.EthereumFunctionEncoderService
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
+import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -223,10 +224,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val expectedData = EthereumFunctionEncoderService().encode(
                 functionName = "transfer",
                 arguments = listOf(
-                    FunctionArgument(abiType = "address", value = accounts[1].address),
-                    FunctionArgument(abiType = "uint256", value = accountBalance.amount.rawValue)
+                    FunctionArgument(abiType = AbiType.Address, value = WalletAddress(accounts[1].address)),
+                    FunctionArgument(abiType = AbiType.Uint256, value = accountBalance.amount)
                 ),
-                abiOutputTypes = listOf("bool"),
+                abiOutputTypes = listOf(AbiType.Bool),
                 additionalData = listOf()
             )
 
