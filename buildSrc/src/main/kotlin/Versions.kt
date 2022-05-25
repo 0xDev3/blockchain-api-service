@@ -15,7 +15,6 @@ object Versions {
         const val ktlint = "10.2.1"
         const val detekt = "1.19.0"
         const val testSets = "4.0.0"
-        const val testLogger = "3.1.0"
         const val springBoot = "2.6.2"
         const val springDependencyManagement = "1.0.11.RELEASE"
         const val flyway = "8.4.1"
