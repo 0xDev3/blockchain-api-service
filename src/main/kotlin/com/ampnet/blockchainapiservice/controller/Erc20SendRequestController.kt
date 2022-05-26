@@ -90,7 +90,7 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
                 sendTx = TransactionResponse(
                     txHash = sendRequest.transactionData.txHash?.value,
                     from = sendRequest.transactionData.fromAddress?.rawValue,
-                    to = sendRequest.value.tokenAddress.rawValue,
+                    to = sendRequest.transactionData.toAddress.rawValue,
                     data = sendRequest.transactionData.data.value,
                     blockConfirmations = sendRequest.transactionData.blockConfirmations
                 )

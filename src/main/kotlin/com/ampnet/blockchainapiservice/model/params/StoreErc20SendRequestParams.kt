@@ -20,8 +20,8 @@ data class StoreErc20SendRequestParams(
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig
 ) {
-    companion object {
-        fun fromCreateParams(id: UUID, params: CreateErc20SendRequestParams, clientInfo: ClientInfo) =
+    companion object : ParamsFactory<CreateErc20SendRequestParams, StoreErc20SendRequestParams> {
+        override fun fromCreateParams(id: UUID, params: CreateErc20SendRequestParams, clientInfo: ClientInfo) =
             StoreErc20SendRequestParams(
                 id = id,
                 chainId = clientInfo.chainId.resolve(params.chainId),
