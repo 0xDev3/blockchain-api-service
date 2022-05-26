@@ -50,6 +50,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             chainId = chainId,
             sendRedirectUrl = null,
             balanceRedirectUrl = redirectUrl,
+            lockRedirectUrl = null,
             tokenAddress = tokenAddress
         )
         val clientInfoRepository = mock<ClientInfoRepository>()

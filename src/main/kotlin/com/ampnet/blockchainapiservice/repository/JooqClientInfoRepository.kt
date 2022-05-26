@@ -21,6 +21,7 @@ class JooqClientInfoRepository(private val dslContext: DSLContext) : ClientInfoR
                     chainId = it.chainId,
                     sendRedirectUrl = it.sendRedirectUrl,
                     balanceRedirectUrl = it.balanceRedirectUrl,
+                    lockRedirectUrl = it.lockRedirectUrl,
                     tokenAddress = it.tokenAddress
                 )
             }
