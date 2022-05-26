@@ -11,7 +11,6 @@ import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
-import com.ampnet.blockchainapiservice.model.result.FullErc20SendRequest
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
@@ -22,6 +21,7 @@ import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithFunctionData
+import com.ampnet.blockchainapiservice.util.WithTransactionData
 import mu.KLogging
 import org.springframework.stereotype.Service
 import org.web3j.abi.datatypes.Utf8String
@@ -51,7 +51,7 @@ class Erc20SendRequestServiceImpl(
         return WithFunctionData(erc20SendRequest, data)
     }
 
-    override fun getErc20SendRequest(id: UUID, rpcSpec: RpcUrlSpec): FullErc20SendRequest {
+    override fun getErc20SendRequest(id: UUID, rpcSpec: RpcUrlSpec): WithTransactionData<Erc20SendRequest> {
         logger.debug { "Fetching ERC20 send request, id: $id, rpcSpec: $rpcSpec" }
 
         val erc20SendRequest = erc20SendRequestRepository.getById(id)
@@ -69,8 +69,7 @@ class Erc20SendRequestServiceImpl(
         val data = encodeFunctionData(erc20SendRequest.tokenRecipientAddress, erc20SendRequest.tokenAmount, id)
         val status = erc20SendRequest.determineStatus(transactionInfo, data)
 
-        return FullErc20SendRequest.fromErc20SendRequest(
-            request = erc20SendRequest,
+        return erc20SendRequest.withTransactionData(
             status = status,
             data = data,
             transactionInfo = transactionInfo

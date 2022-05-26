@@ -16,7 +16,6 @@ import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
-import com.ampnet.blockchainapiservice.model.result.FullErc20SendRequest
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
@@ -442,8 +441,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         verify("ERC20 send request with pending status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = RpcUrlSpec(null, null))).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.PENDING,
                         data = encodedData,
                         transactionInfo = null
@@ -514,8 +512,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         verify("ERC20 send request with pending status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.PENDING,
                         data = encodedData,
                         transactionInfo = null
@@ -593,8 +590,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         verify("ERC20 send request with failed status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.FAILED,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -672,8 +668,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         verify("ERC20 send request with failed status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.FAILED,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -751,8 +746,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         verify("ERC20 send request with failed status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.FAILED,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -830,8 +824,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         verify("ERC20 send request with failed status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.FAILED,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -909,8 +902,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         verify("ERC20 send request with successful status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.SUCCESS,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -988,8 +980,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         verify("ERC20 send request with successful status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.SUCCESS,
                         data = encodedData,
                         transactionInfo = transactionInfo
