@@ -170,7 +170,7 @@ class Erc20SendRequestControllerTest : TestBase() {
                             sendTx = TransactionResponse(
                                 txHash = result.transactionData.txHash?.value,
                                 from = result.transactionData.fromAddress?.rawValue,
-                                to = result.value.tokenAddress.rawValue,
+                                to = result.transactionData.toAddress.rawValue,
                                 data = result.transactionData.data.value,
                                 blockConfirmations = result.transactionData.blockConfirmations
                             )

@@ -4,14 +4,10 @@ import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachSignedMessageException
-import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.params.CreateErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20BalanceRequestParams
-import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
-import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.Erc20BalanceRequestRepository
 import com.ampnet.blockchainapiservice.util.BlockName
 import com.ampnet.blockchainapiservice.util.Erc20Balance
@@ -24,30 +20,29 @@ import java.util.UUID
 
 @Service
 class Erc20BalanceRequestServiceImpl(
-    private val uuidProvider: UuidProvider,
     private val signatureCheckerService: SignatureCheckerService,
     private val blockchainService: BlockchainService,
-    private val clientInfoRepository: ClientInfoRepository,
-    private val erc20BalanceRequestRepository: Erc20BalanceRequestRepository
+    private val erc20BalanceRequestRepository: Erc20BalanceRequestRepository,
+    private val erc20CommonService: Erc20CommonService
 ) : Erc20BalanceRequestService {
 
     companion object : KLogging()
 
     override fun createErc20BalanceRequest(params: CreateErc20BalanceRequestParams): Erc20BalanceRequest {
         logger.info { "Creating ERC20 balance request, params: $params" }
-
-        val clientInfo = params.getClientInfo()
-        val id = uuidProvider.getUuid()
-        val databaseParams = StoreErc20BalanceRequestParams.fromCreateParams(id, params, clientInfo)
-
-        return erc20BalanceRequestRepository.store(databaseParams)
+        return erc20BalanceRequestRepository.store(
+            erc20CommonService.createDatabaseParams(StoreErc20BalanceRequestParams, params)
+        )
     }
 
     override fun getErc20BalanceRequest(id: UUID, rpcSpec: RpcUrlSpec): FullErc20BalanceRequest {
         logger.debug { "Fetching ERC20 balance request, id: $id, rpcSpec: $rpcSpec" }
 
-        val erc20BalanceRequest = erc20BalanceRequestRepository.getById(id)
-            ?: throw ResourceNotFoundException("Balance check request not found for ID: $id")
+        val erc20BalanceRequest = erc20CommonService.fetchResource(
+            erc20BalanceRequestRepository.getById(id),
+            "ERC20 balance check request not found for ID: $id"
+        )
+
         val balance = erc20BalanceRequest.actualWalletAddress?.let {
             blockchainService.fetchErc20AccountBalance(
                 chainSpec = ChainSpec(
@@ -86,14 +81,6 @@ class Erc20BalanceRequestServiceImpl(
             )
         }
     }
-
-    private fun CreateErc20BalanceRequestParams.getClientInfo(): ClientInfo =
-        if (this.clientId != null) {
-            logger.debug { "Fetching info for clientId: $clientId" }
-            clientInfoRepository.getById(this.clientId) ?: throw NonExistentClientIdException(this.clientId)
-        } else {
-            ClientInfo.EMPTY
-        }
 
     private fun Erc20BalanceRequest.determineStatus(balance: Erc20Balance?): Status =
         if (balance == null || this.signedMessage == null) {

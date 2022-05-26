@@ -19,8 +19,8 @@ data class StoreErc20BalanceRequestParams(
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig
 ) {
-    companion object {
-        fun fromCreateParams(id: UUID, params: CreateErc20BalanceRequestParams, clientInfo: ClientInfo) =
+    companion object : ParamsFactory<CreateErc20BalanceRequestParams, StoreErc20BalanceRequestParams> {
+        override fun fromCreateParams(id: UUID, params: CreateErc20BalanceRequestParams, clientInfo: ClientInfo) =
             StoreErc20BalanceRequestParams(
                 id = id,
                 chainId = clientInfo.chainId.resolve(params.chainId),

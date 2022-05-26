@@ -140,11 +140,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = functionEncoderService,
-            blockchainService = mock(),
-            clientInfoRepository = clientInfoRepository,
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = clientInfoRepository,
+                blockchainService = mock()
+            )
         )
 
         val createParams = CREATE_PARAMS.copy(
@@ -235,11 +237,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = functionEncoderService,
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ERC20 send request is correctly created") {
@@ -262,11 +266,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = clientInfoRepository,
-            erc20SendRequestRepository = mock()
+            erc20SendRequestRepository = mock(),
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = clientInfoRepository,
+                blockchainService = mock()
+            )
         )
 
         verify("NonExistentClientIdException is thrown") {
@@ -291,11 +297,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = mock()
+            erc20SendRequestRepository = mock(),
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("IncompleteRequestException is thrown") {
@@ -320,11 +328,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = mock()
+            erc20SendRequestRepository = mock(),
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("IncompleteRequestException is thrown") {
@@ -349,11 +359,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = mock()
+            erc20SendRequestRepository = mock(),
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("IncompleteRequestException is thrown") {
@@ -373,11 +385,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -431,11 +445,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ERC20 send request with pending status is returned") {
@@ -502,11 +518,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ERC20 send request with pending status is returned") {
@@ -580,11 +598,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with failed status is returned") {
@@ -658,11 +678,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with failed status is returned") {
@@ -736,11 +758,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with failed status is returned") {
@@ -814,11 +838,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with failed status is returned") {
@@ -892,11 +918,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with successful status is returned") {
@@ -970,11 +998,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with successful status is returned") {
@@ -1000,11 +1030,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("txHash was successfully attached") {
@@ -1027,11 +1059,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("CannotAttachTxHashException is thrown") {

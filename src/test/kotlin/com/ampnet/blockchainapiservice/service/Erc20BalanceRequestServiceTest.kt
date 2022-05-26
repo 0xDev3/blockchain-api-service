@@ -111,11 +111,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = uuidProvider,
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = clientInfoRepository,
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = clientInfoRepository,
+                blockchainService = mock()
+            )
         )
 
         verify("ERC20 balance request is correctly created") {
@@ -185,11 +188,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = uuidProvider,
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ERC20 balance request is correctly created") {
@@ -228,11 +234,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
 
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = clientInfoRepository,
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = clientInfoRepository,
+                blockchainService = mock()
+            )
         )
 
         verify("NonExistentClientIdException is thrown") {
@@ -270,11 +279,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
 
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = uuidProvider,
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("IncompleteRequestException is thrown") {
@@ -312,11 +324,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
 
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = uuidProvider,
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("IncompleteRequestException is thrown") {
@@ -354,11 +369,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
 
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = uuidProvider,
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("IncompleteRequestException is thrown") {
@@ -381,11 +399,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -421,11 +442,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ERC20 balance request with pending status is returned") {
@@ -500,11 +524,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = mock(),
             blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 balance request with pending status is returned") {
@@ -579,11 +606,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = mock(),
             blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 balance request with failed status is returned") {
@@ -670,11 +700,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = signatureCheckerService,
             blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 balance request with failed status is returned") {
@@ -761,11 +794,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = signatureCheckerService,
             blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 balance request with successful status is returned") {
@@ -852,11 +888,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = signatureCheckerService,
             blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 balance request with successful status is returned") {
@@ -895,11 +934,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("wallet address and signed message are successfully attached") {
@@ -924,11 +966,14 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val service = Erc20BalanceRequestServiceImpl(
-            uuidProvider = mock(),
             signatureCheckerService = mock(),
             blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("CannotAttachSignedMessageException is thrown") {
