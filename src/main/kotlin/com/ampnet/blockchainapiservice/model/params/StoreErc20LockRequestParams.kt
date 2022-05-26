@@ -25,7 +25,7 @@ data class StoreErc20LockRequestParams(
             StoreErc20LockRequestParams(
                 id = id,
                 chainId = clientInfo.chainId.resolve(params.chainId),
-                redirectUrl = clientInfo.sendRedirectUrl.resolve(params.redirectUrl).replace("\${id}", id.toString()),
+                redirectUrl = clientInfo.lockRedirectUrl.resolve(params.redirectUrl).replace("\${id}", id.toString()),
                 tokenAddress = clientInfo.tokenAddress.resolve(params.tokenAddress),
                 tokenAmount = params.tokenAmount,
                 tokenSenderAddress = params.tokenSenderAddress,
