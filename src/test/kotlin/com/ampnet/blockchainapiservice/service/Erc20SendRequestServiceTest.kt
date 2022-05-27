@@ -16,9 +16,9 @@ import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
-import com.ampnet.blockchainapiservice.model.result.FullErc20SendRequest
 import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
+import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -79,10 +79,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(uuid.toString()))
                 )
             )
@@ -140,11 +140,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = functionEncoderService,
-            blockchainService = mock(),
-            clientInfoRepository = clientInfoRepository,
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = clientInfoRepository,
+                blockchainService = mock()
+            )
         )
 
         val createParams = CREATE_PARAMS.copy(
@@ -186,10 +188,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = CREATE_PARAMS.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = CREATE_PARAMS.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(uuid.toString()))
                 )
             )
@@ -235,11 +237,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = functionEncoderService,
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ERC20 send request is correctly created") {
@@ -262,11 +266,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = clientInfoRepository,
-            erc20SendRequestRepository = mock()
+            erc20SendRequestRepository = mock(),
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = clientInfoRepository,
+                blockchainService = mock()
+            )
         )
 
         verify("NonExistentClientIdException is thrown") {
@@ -291,11 +297,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = mock()
+            erc20SendRequestRepository = mock(),
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("IncompleteRequestException is thrown") {
@@ -320,11 +328,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = mock()
+            erc20SendRequestRepository = mock(),
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("IncompleteRequestException is thrown") {
@@ -349,11 +359,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = uuidProvider,
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = mock()
+            erc20SendRequestRepository = mock(),
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = uuidProvider,
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("IncompleteRequestException is thrown") {
@@ -373,11 +385,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -420,10 +434,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -431,18 +445,19 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ERC20 send request with pending status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = RpcUrlSpec(null, null))).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.PENDING,
                         data = encodedData,
                         transactionInfo = null
@@ -492,10 +507,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -503,18 +518,19 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("ERC20 send request with pending status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.PENDING,
                         data = encodedData,
                         transactionInfo = null
@@ -571,10 +587,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -582,18 +598,19 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with failed status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.FAILED,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -650,10 +667,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -661,18 +678,19 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with failed status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.FAILED,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -729,10 +747,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -740,18 +758,19 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with failed status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.FAILED,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -808,10 +827,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -819,18 +838,19 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with failed status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.FAILED,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -887,10 +907,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -898,18 +918,19 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with successful status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.SUCCESS,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -966,10 +987,10 @@ class Erc20SendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = "address", value = sendRequest.tokenRecipientAddress.rawValue),
-                        FunctionArgument(abiType = "uint256", value = sendRequest.tokenAmount.rawValue)
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf("bool"),
+                    abiOutputTypes = listOf(AbiType.Bool),
                     additionalData = listOf(Utf8String(id.toString()))
                 )
             )
@@ -977,18 +998,19 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = functionEncoderService,
-            blockchainService = blockchainService,
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
         )
 
         verify("ERC20 send request with successful status is returned") {
             assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
                 .isEqualTo(
-                    FullErc20SendRequest.fromErc20SendRequest(
-                        request = sendRequest,
+                    sendRequest.withTransactionData(
                         status = Status.SUCCESS,
                         data = encodedData,
                         transactionInfo = transactionInfo
@@ -1008,11 +1030,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("txHash was successfully attached") {
@@ -1035,11 +1059,13 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val service = Erc20SendRequestServiceImpl(
-            uuidProvider = mock(),
             functionEncoderService = mock(),
-            blockchainService = mock(),
-            clientInfoRepository = mock(),
-            erc20SendRequestRepository = erc20SendRequestRepository
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = mock()
+            )
         )
 
         verify("CannotAttachTxHashException is thrown") {

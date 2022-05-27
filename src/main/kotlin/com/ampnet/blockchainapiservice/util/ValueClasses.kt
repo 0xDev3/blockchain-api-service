@@ -26,40 +26,47 @@ value class UtcDateTime private constructor(val value: OffsetDateTime) {
     fun isAfter(other: UtcDateTime): Boolean = value.isAfter(other.value)
 }
 
+sealed interface EthereumValue<T> {
+    val rawValue: T
+}
+
+sealed interface EthereumAddress : EthereumValue<String> {
+    val value: Address
+    override val rawValue: String
+        get() = value.value
+}
+
 @JvmInline
-value class WalletAddress private constructor(val value: Address) {
+value class WalletAddress private constructor(override val value: Address) : EthereumAddress {
     companion object {
         operator fun invoke(value: Address) = WalletAddress(value.toString())
     }
 
     constructor(value: String) : this(Address(value.lowercase()))
 
-    val rawValue: String
-        get() = value.value
-
     fun toContractAddress(): ContractAddress = ContractAddress(value)
 }
 
 @JvmInline
-value class ContractAddress private constructor(val value: Address) {
+value class ContractAddress private constructor(override val value: Address) : EthereumAddress {
     companion object {
         operator fun invoke(value: Address) = ContractAddress(value.toString())
     }
 
     constructor(value: String) : this(Address(value.lowercase()))
 
-    val rawValue: String
-        get() = value.value
-
     fun toWalletAddress(): WalletAddress = WalletAddress(value)
 }
 
-@JvmInline
-value class Balance(val value: Uint) {
-    constructor(value: BigInteger) : this(Uint(value))
-
-    val rawValue: BigInteger
+sealed interface EthereumUint : EthereumValue<BigInteger> {
+    val value: Uint
+    override val rawValue: BigInteger
         get() = value.value
+}
+
+@JvmInline
+value class Balance(override val value: Uint) : EthereumUint {
+    constructor(value: BigInteger) : this(Uint(value))
 }
 
 @JvmInline
