@@ -77,20 +77,20 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
 
         return ResponseEntity.ok(
             Erc20SendRequestResponse(
-                id = sendRequest.id,
+                id = sendRequest.value.id,
                 status = sendRequest.status,
-                chainId = sendRequest.chainId.value,
-                tokenAddress = sendRequest.tokenAddress.rawValue,
-                amount = sendRequest.tokenAmount.rawValue,
-                senderAddress = sendRequest.tokenSenderAddress?.rawValue,
-                recipientAddress = sendRequest.tokenRecipientAddress.rawValue,
-                arbitraryData = sendRequest.arbitraryData,
-                screenConfig = sendRequest.screenConfig.orEmpty(),
-                redirectUrl = sendRequest.redirectUrl,
+                chainId = sendRequest.value.chainId.value,
+                tokenAddress = sendRequest.value.tokenAddress.rawValue,
+                amount = sendRequest.value.tokenAmount.rawValue,
+                senderAddress = sendRequest.value.tokenSenderAddress?.rawValue,
+                recipientAddress = sendRequest.value.tokenRecipientAddress.rawValue,
+                arbitraryData = sendRequest.value.arbitraryData,
+                screenConfig = sendRequest.value.screenConfig.orEmpty(),
+                redirectUrl = sendRequest.value.redirectUrl,
                 sendTx = TransactionResponse(
                     txHash = sendRequest.transactionData.txHash?.value,
                     from = sendRequest.transactionData.fromAddress?.rawValue,
-                    to = sendRequest.tokenAddress.rawValue,
+                    to = sendRequest.transactionData.toAddress.rawValue,
                     data = sendRequest.transactionData.data.value,
                     blockConfirmations = sendRequest.transactionData.blockConfirmations
                 )

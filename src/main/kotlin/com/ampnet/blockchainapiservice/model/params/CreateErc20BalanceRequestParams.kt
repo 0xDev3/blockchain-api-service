@@ -8,7 +8,7 @@ import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
 
 data class CreateErc20BalanceRequestParams(
-    val clientId: String?,
+    override val clientId: String?,
     val chainId: ChainId?,
     val redirectUrl: String?,
     val tokenAddress: ContractAddress?,
@@ -16,4 +16,4 @@ data class CreateErc20BalanceRequestParams(
     val requestedWalletAddress: WalletAddress?,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig
-)
+) : ClientIdParam
