@@ -9,10 +9,11 @@ data class ClientInfo(
     val chainId: Resolvable<ChainId>,
     val sendRedirectUrl: Resolvable<String>,
     val balanceRedirectUrl: Resolvable<String>,
+    val lockRedirectUrl: Resolvable<String>,
     val tokenAddress: Resolvable<ContractAddress>
 ) {
     companion object {
-        val EMPTY = ClientInfo("", null, null, null, null)
+        val EMPTY = ClientInfo("", null, null, null, null, null)
     }
 
     constructor(
@@ -20,12 +21,14 @@ data class ClientInfo(
         chainId: ChainId?,
         sendRedirectUrl: String?,
         balanceRedirectUrl: String?,
+        lockRedirectUrl: String?,
         tokenAddress: ContractAddress?
     ) : this(
         clientId = clientId,
         chainId = Resolvable(chainId, "Missing chainId"),
         sendRedirectUrl = Resolvable(sendRedirectUrl, "Missing redirectUrl"),
         balanceRedirectUrl = Resolvable(balanceRedirectUrl, "Missing redirectUrl"),
+        lockRedirectUrl = Resolvable(lockRedirectUrl, "Missing redirectUrl"),
         tokenAddress = Resolvable(tokenAddress, "Missing tokenAddress")
     )
 }

@@ -35,6 +35,7 @@ class JooqClientInfoRepositoryIntegTest : TestBase() {
             chainId = ChainId(1337L),
             sendRedirectUrl = "example-send-url",
             balanceRedirectUrl = "example-balance-url",
+            lockRedirectUrl = "example-lock-url",
             tokenAddress = ContractAddress("abc")
         )
 
@@ -45,6 +46,7 @@ class JooqClientInfoRepositoryIntegTest : TestBase() {
                     chainId = clientInfo.chainId.alternative,
                     sendRedirectUrl = clientInfo.sendRedirectUrl.alternative,
                     balanceRedirectUrl = clientInfo.balanceRedirectUrl.alternative,
+                    lockRedirectUrl = clientInfo.lockRedirectUrl.alternative,
                     tokenAddress = clientInfo.tokenAddress.alternative
                 )
             )

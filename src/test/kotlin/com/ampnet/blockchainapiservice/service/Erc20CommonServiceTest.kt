@@ -51,6 +51,7 @@ class Erc20CommonServiceTest : TestBase() {
             chainId = Chain.HARDHAT_TESTNET.id,
             sendRedirectUrl = "send-redirect-url",
             balanceRedirectUrl = "balance-redirect-url",
+            lockRedirectUrl = "lock-redirect-url",
             tokenAddress = ContractAddress("a")
         )
         val clientInfoRepository = mock<ClientInfoRepository>()
