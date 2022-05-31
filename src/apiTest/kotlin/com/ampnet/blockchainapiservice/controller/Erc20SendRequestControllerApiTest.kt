@@ -64,6 +64,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         chainId = chainId,
                         sendRedirectUrl = redirectUrl,
                         balanceRedirectUrl = null,
+                        lockRedirectUrl = null,
                         tokenAddress = tokenAddress
                     )
                 )
