@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
 @RestController
-class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockRequestService) { // TODO test
+class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockRequestService) {
 
     @PostMapping("/lock")
     fun createErc20LockRequest(
