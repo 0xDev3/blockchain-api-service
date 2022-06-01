@@ -8,17 +8,17 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
 import java.util.UUID
 
-data class Erc20SendRequestResponse(
+data class Erc20LockRequestResponse(
     val id: UUID,
     val status: Status,
     val chainId: Long,
     val tokenAddress: String,
     @JsonSerialize(using = ToStringSerializer::class)
     val amount: BigInteger,
+    val lockContractAddress: String,
     val senderAddress: String?,
-    val recipientAddress: String,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig?,
     val redirectUrl: String,
-    val sendTx: TransactionResponse
+    val lockTx: TransactionResponse
 )
