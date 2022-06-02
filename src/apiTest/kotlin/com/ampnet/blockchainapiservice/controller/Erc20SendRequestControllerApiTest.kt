@@ -451,8 +451,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
-            contract.transferAndMine(recipientAddress.rawValue, amount.rawValue)
+        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+            contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
@@ -561,8 +561,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
-            contract.transferAndMine(recipientAddress.rawValue, amount.rawValue)
+        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+            contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 

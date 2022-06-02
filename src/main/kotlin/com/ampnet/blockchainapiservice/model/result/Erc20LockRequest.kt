@@ -38,7 +38,7 @@ data class Erc20LockRequest(
             transactionData = TransactionData(
                 txHash = this.txHash,
                 fromAddress = transactionInfo?.from,
-                toAddress = transactionInfo?.to?.toContractAddress() ?: this.lockContractAddress,
+                toAddress = transactionInfo?.to ?: this.lockContractAddress,
                 data = data,
                 blockConfirmations = transactionInfo?.blockConfirmations,
                 timestamp = transactionInfo?.timestamp

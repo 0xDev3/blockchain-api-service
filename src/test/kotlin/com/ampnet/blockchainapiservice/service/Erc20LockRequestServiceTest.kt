@@ -30,6 +30,7 @@ import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithFunctionData
+import com.ampnet.blockchainapiservice.util.ZeroAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -85,7 +86,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()
@@ -198,7 +200,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenAddress!!),
                         FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()
@@ -449,7 +452,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()
@@ -525,7 +529,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()
@@ -609,7 +614,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()
@@ -672,7 +678,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TransactionHash("wrong-hash"),
             from = lockRequest.tokenSenderAddress!!,
-            to = lockRequest.lockContractAddress.toWalletAddress(),
+            to = lockRequest.lockContractAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
@@ -693,7 +699,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()
@@ -756,7 +763,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = WalletAddress("dead"),
-            to = lockRequest.lockContractAddress.toWalletAddress(),
+            to = lockRequest.lockContractAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
@@ -777,7 +784,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()
@@ -840,7 +848,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = lockRequest.tokenSenderAddress!!,
-            to = lockRequest.lockContractAddress.toWalletAddress(),
+            to = lockRequest.lockContractAddress,
             data = FunctionData("wrong-data"),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
@@ -861,7 +869,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()
@@ -924,7 +933,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = WalletAddress("0cafe0babe"),
-            to = lockRequest.lockContractAddress.toWalletAddress(),
+            to = lockRequest.lockContractAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
@@ -945,7 +954,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()
@@ -1008,7 +1018,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = lockRequest.tokenSenderAddress!!,
-            to = lockRequest.lockContractAddress.toWalletAddress(),
+            to = lockRequest.lockContractAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
@@ -1029,7 +1039,8 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
                     abiOutputTypes = emptyList(),
                     additionalData = emptyList()

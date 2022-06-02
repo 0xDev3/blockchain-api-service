@@ -652,7 +652,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TransactionHash("wrong-hash"),
             from = sendRequest.tokenSenderAddress!!,
-            to = sendRequest.tokenAddress.toWalletAddress(),
+            to = sendRequest.tokenAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
@@ -733,7 +733,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = WalletAddress("dead"),
-            to = sendRequest.tokenAddress.toWalletAddress(),
+            to = sendRequest.tokenAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
@@ -814,7 +814,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = sendRequest.tokenSenderAddress!!,
-            to = sendRequest.tokenAddress.toWalletAddress(),
+            to = sendRequest.tokenAddress,
             data = FunctionData("wrong-data"),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
@@ -895,7 +895,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = WalletAddress("0cafe0babe"),
-            to = sendRequest.tokenAddress.toWalletAddress(),
+            to = sendRequest.tokenAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
@@ -976,7 +976,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = sendRequest.tokenSenderAddress!!,
-            to = sendRequest.tokenAddress.toWalletAddress(),
+            to = sendRequest.tokenAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP
