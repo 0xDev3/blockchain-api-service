@@ -10,6 +10,7 @@ data class CreateErc20LockRequest(
     val redirectUrl: String?,
     val tokenAddress: String?,
     val amount: BigInteger,
+    val lockDurationInSeconds: BigInteger,
     val lockContractAddress: String,
     val senderAddress: String?,
     val arbitraryData: JsonNode?,

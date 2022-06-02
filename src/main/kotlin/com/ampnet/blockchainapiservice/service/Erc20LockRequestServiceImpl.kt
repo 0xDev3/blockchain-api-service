@@ -10,6 +10,8 @@ import com.ampnet.blockchainapiservice.repository.Erc20LockRequestRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.DurationSeconds
+import com.ampnet.blockchainapiservice.util.EthereumString
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -17,9 +19,9 @@ import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithFunctionData
 import com.ampnet.blockchainapiservice.util.WithTransactionData
+import com.ampnet.blockchainapiservice.util.ZeroAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
-import org.web3j.abi.datatypes.Utf8String
 import java.util.UUID
 
 @Service
@@ -35,7 +37,13 @@ class Erc20LockRequestServiceImpl(
         logger.info { "Creating ERC20 lock request, params: $params" }
 
         val databaseParams = erc20CommonService.createDatabaseParams(StoreErc20LockRequestParams, params)
-        val data = encodeFunctionData(databaseParams.tokenAddress, databaseParams.tokenAmount, databaseParams.id)
+        val data = encodeFunctionData(
+            tokenAddress = databaseParams.tokenAddress,
+            tokenAmount = databaseParams.tokenAmount,
+            lockDuration = databaseParams.lockDuration,
+            id = databaseParams.id
+        )
+
         val erc20LockRequest = erc20LockRequestRepository.store(databaseParams)
 
         return WithFunctionData(erc20LockRequest, data)
@@ -54,7 +62,12 @@ class Erc20LockRequestServiceImpl(
             chainId = erc20LockRequest.chainId,
             rpcSpec = rpcSpec
         )
-        val data = encodeFunctionData(erc20LockRequest.tokenAddress, erc20LockRequest.tokenAmount, id)
+        val data = encodeFunctionData(
+            tokenAddress = erc20LockRequest.tokenAddress,
+            tokenAmount = erc20LockRequest.tokenAmount,
+            lockDuration = erc20LockRequest.lockDuration,
+            id = id
+        )
         val status = erc20LockRequest.determineStatus(transactionInfo, data)
 
         return erc20LockRequest.withTransactionData(
@@ -74,15 +87,23 @@ class Erc20LockRequestServiceImpl(
         }
     }
 
-    private fun encodeFunctionData(tokenAddress: ContractAddress, tokenAmount: Balance, id: UUID): FunctionData =
+    private fun encodeFunctionData(
+        tokenAddress: ContractAddress,
+        tokenAmount: Balance,
+        lockDuration: DurationSeconds,
+        id: UUID
+    ): FunctionData =
         functionEncoderService.encode(
-            functionName = "lock", // TODO what will be the actual lock function we will use?
+            functionName = "lock",
             arguments = listOf(
                 FunctionArgument(abiType = AbiType.Address, value = tokenAddress),
-                FunctionArgument(abiType = AbiType.Uint256, value = tokenAmount)
+                FunctionArgument(abiType = AbiType.Uint256, value = tokenAmount),
+                FunctionArgument(abiType = AbiType.Uint256, value = lockDuration),
+                FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
             ),
-            abiOutputTypes = listOf(AbiType.Bool),
-            additionalData = listOf(Utf8String(id.toString()))
+            abiOutputTypes = emptyList(),
+            additionalData = emptyList()
         )
 
     private fun Erc20LockRequest.determineStatus(

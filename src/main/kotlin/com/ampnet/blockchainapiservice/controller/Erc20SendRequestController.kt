@@ -62,7 +62,8 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
                     from = createdRequest.value.tokenSenderAddress?.rawValue,
                     to = createdRequest.value.tokenAddress.rawValue,
                     data = createdRequest.data.value,
-                    blockConfirmations = null
+                    blockConfirmations = null,
+                    timestamp = null
                 )
             )
         )
@@ -92,7 +93,8 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
                     from = sendRequest.transactionData.fromAddress?.rawValue,
                     to = sendRequest.transactionData.toAddress.rawValue,
                     data = sendRequest.transactionData.data.value,
-                    blockConfirmations = sendRequest.transactionData.blockConfirmations
+                    blockConfirmations = sendRequest.transactionData.blockConfirmations,
+                    timestamp = sendRequest.transactionData.timestamp?.value
                 )
             )
         )

@@ -22,6 +22,7 @@ import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,6 +32,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class Erc20SendRequestControllerApiTest : ControllerTestBase() {
@@ -125,7 +127,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.sendTx.data,
-                            blockConfirmations = null
+                            blockConfirmations = null,
+                            timestamp = null
                         )
                     )
                 )
@@ -216,7 +219,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.sendTx.data,
-                            blockConfirmations = null
+                            blockConfirmations = null,
+                            timestamp = null
                         )
                     )
                 )
@@ -447,8 +451,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
-            contract.transferAndMine(recipientAddress.rawValue, amount.rawValue)
+        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+            contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
@@ -492,13 +496,16 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = createResponse.sendTx.data,
-                            blockConfirmations = fetchResponse.sendTx.blockConfirmations
+                            blockConfirmations = fetchResponse.sendTx.blockConfirmations,
+                            timestamp = fetchResponse.sendTx.timestamp
                         )
                     )
                 )
 
             assertThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
+            assertThat(fetchResponse.sendTx.timestamp)
+                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
         }
     }
 
@@ -554,8 +561,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
-            contract.transferAndMine(recipientAddress.rawValue, amount.rawValue)
+        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+            contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
@@ -603,13 +610,16 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = createResponse.sendTx.data,
-                            blockConfirmations = fetchResponse.sendTx.blockConfirmations
+                            blockConfirmations = fetchResponse.sendTx.blockConfirmations,
+                            timestamp = fetchResponse.sendTx.timestamp
                         )
                     )
                 )
 
             assertThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
+            assertThat(fetchResponse.sendTx.timestamp)
+                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
         }
     }
 
