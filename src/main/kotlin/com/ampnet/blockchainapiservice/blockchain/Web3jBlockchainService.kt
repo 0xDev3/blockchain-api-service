@@ -16,6 +16,7 @@ import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
+import org.web3j.protocol.core.DefaultBlockParameter
 import org.web3j.protocol.core.RemoteFunctionCall
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
@@ -67,16 +68,24 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
         logger.debug { "Fetching transaction, chainSpec: $chainSpec, txHash: $txHash" }
         val web3j = chainHandler.getBlockchainProperties(chainSpec).web3j
         val transaction = web3j.ethGetTransactionByHash(txHash.value).sendSafely()?.transaction?.orElse(null)
-        val blockNumber = web3j.ethBlockNumber()?.sendSafely()?.blockNumber
+
         return transaction?.let {
+            val blockNumber = web3j.ethBlockNumber()?.sendSafely()?.blockNumber
+
             blockNumber?.let {
-                BlockchainTransactionInfo(
-                    hash = TransactionHash(transaction.hash),
-                    from = WalletAddress(transaction.from),
-                    to = WalletAddress(transaction.to),
-                    data = FunctionData(transaction.input),
-                    blockConfirmations = blockNumber - transaction.blockNumber
-                )
+                val timestamp = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(transaction.blockNumber), false)
+                    .sendSafely()?.block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }
+
+                timestamp?.let {
+                    BlockchainTransactionInfo(
+                        hash = TransactionHash(transaction.hash),
+                        from = WalletAddress(transaction.from),
+                        to = WalletAddress(transaction.to),
+                        data = FunctionData(transaction.input),
+                        blockConfirmations = blockNumber - transaction.blockNumber,
+                        timestamp = timestamp
+                    )
+                }
             }
         }
     }

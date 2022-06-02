@@ -2,7 +2,7 @@ package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.ControllerTestBase
 import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
+import com.ampnet.blockchainapiservice.blockchain.SimpleLockManager
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
@@ -18,10 +18,13 @@ import com.ampnet.blockchainapiservice.repository.Erc20LockRequestRepository
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.DurationSeconds
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
+import com.ampnet.blockchainapiservice.util.ZeroAddress
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -31,6 +34,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write docs
@@ -72,6 +76,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
         }
 
         val amount = Balance(BigInteger.TEN)
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
         val lockContractAddress = ContractAddress("b")
         val senderAddress = WalletAddress("c")
 
@@ -84,6 +89,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                             {
                                 "client_id": "$clientId",
                                 "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
                                 "lock_contract_address": "${lockContractAddress.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
                                 "arbitrary_data": {
@@ -112,6 +118,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                         chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
+                        lockDurationInSeconds = lockDuration.rawValue,
+                        unlocksAt = null,
                         lockContractAddress = lockContractAddress.rawValue,
                         senderAddress = senderAddress.rawValue,
                         arbitraryData = response.arbitraryData,
@@ -125,7 +133,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.lockTx.data,
-                            blockConfirmations = null
+                            blockConfirmations = null,
+                            timestamp = null
                         )
                     )
                 )
@@ -142,6 +151,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                         redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
                         tokenAddress = tokenAddress,
                         tokenAmount = amount,
+                        lockDuration = lockDuration,
                         lockContractAddress = lockContractAddress,
                         tokenSenderAddress = senderAddress,
                         txHash = null,
@@ -161,6 +171,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
         val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
         val lockContractAddress = ContractAddress("b")
         val senderAddress = WalletAddress("c")
 
@@ -175,6 +186,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
                                 "lock_contract_address": "${lockContractAddress.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
                                 "arbitrary_data": {
@@ -203,6 +215,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                         chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
+                        lockDurationInSeconds = lockDuration.rawValue,
+                        unlocksAt = null,
                         lockContractAddress = lockContractAddress.rawValue,
                         senderAddress = senderAddress.rawValue,
                         arbitraryData = response.arbitraryData,
@@ -216,7 +230,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.lockTx.data,
-                            blockConfirmations = null
+                            blockConfirmations = null,
+                            timestamp = null
                         )
                     )
                 )
@@ -233,6 +248,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                         redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
                         tokenAddress = tokenAddress,
                         tokenAmount = amount,
+                        lockDuration = lockDuration,
                         lockContractAddress = lockContractAddress,
                         tokenSenderAddress = senderAddress,
                         txHash = null,
@@ -249,6 +265,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
     @Test
     fun mustReturn400BadRequestForNonExistentClientId() {
         val amount = Balance(BigInteger.TEN)
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
         val lockContractAddress = ContractAddress("b")
         val senderAddress = WalletAddress("c")
 
@@ -261,6 +278,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                             {
                                 "client_id": "non-existent-client-id",
                                 "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
                                 "lock_contract_address": "${lockContractAddress.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
                                 "arbitrary_data": {
@@ -286,6 +304,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
         val redirectUrl = "https://example.com"
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
         val lockContractAddress = ContractAddress("b")
         val senderAddress = WalletAddress("c")
 
@@ -299,6 +318,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
                                 "lock_contract_address": "${lockContractAddress.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
                                 "arbitrary_data": {
@@ -324,6 +344,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
         val chainId = Chain.HARDHAT_TESTNET.id
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
         val lockContractAddress = ContractAddress("b")
         val senderAddress = WalletAddress("c")
 
@@ -337,6 +358,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                                 "chain_id": ${chainId.value},
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
                                 "lock_contract_address": "${lockContractAddress.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
                                 "arbitrary_data": {
@@ -362,6 +384,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
         val redirectUrl = "https://example.com"
         val chainId = Chain.HARDHAT_TESTNET.id
         val amount = Balance(BigInteger.TEN)
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
         val lockContractAddress = ContractAddress("b")
         val senderAddress = WalletAddress("c")
 
@@ -375,6 +398,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                                 "chain_id": ${chainId.value},
                                 "redirect_url": "$redirectUrl",
                                 "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
                                 "lock_contract_address": "${lockContractAddress.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
                                 "arbitrary_data": {
@@ -395,27 +419,24 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
         }
     }
 
-    // TODO implement after actual lock contract is known
-    // @Test
+    @Test
     fun mustCorrectlyFetchErc20LockRequest() {
         val mainAccount = accounts[0]
 
-        val contract = suppose("simple ERC20 contract is deployed") {
-            SimpleERC20.deploy(
+        val lockContract = suppose("simple lock manager contract is deployed") {
+            SimpleLockManager.deploy(
                 hardhatContainer.web3j,
                 mainAccount,
-                DefaultGasProvider(),
-                listOf(mainAccount.address),
-                listOf(BigInteger("10000")),
-                mainAccount.address
+                DefaultGasProvider()
             ).sendAndMine()
         }
 
         val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
-        val tokenAddress = ContractAddress(contract.contractAddress)
+        val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
-        val lockContractAddress = ContractAddress("dead") // TODO deploy lock contract
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
+        val lockContractAddress = ContractAddress(lockContract.contractAddress)
         val senderAddress = WalletAddress(mainAccount.address)
 
         val createResponse = suppose("request to create ERC20 lock request is made") {
@@ -429,6 +450,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
                                 "lock_contract_address": "${lockContractAddress.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
                                 "arbitrary_data": {
@@ -448,8 +470,14 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
             objectMapper.readValue(createResponse.response.contentAsString, Erc20LockRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
-            contract.transferAndMine(lockContractAddress.rawValue, amount.rawValue)
+        val txHash = suppose("some token lock transaction is made") {
+            lockContract.lockAndMine(
+                tokenAddress = tokenAddress,
+                amount = amount,
+                lockDuration = lockDuration,
+                info = createResponse.id.toString(),
+                unlockPrivilegeWallet = ZeroAddress
+            )
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
@@ -476,10 +504,12 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = createResponse.id,
-                        status = Status.FAILED,
+                        status = Status.SUCCESS,
                         chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
+                        lockDurationInSeconds = lockDuration.rawValue,
+                        unlocksAt = (fetchResponse.lockTx.timestamp!! + lockDuration.toDuration()),
                         lockContractAddress = lockContractAddress.rawValue,
                         senderAddress = senderAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
@@ -491,39 +521,39 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                         lockTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
-                            to = tokenAddress.rawValue,
+                            to = lockContractAddress.rawValue,
                             data = createResponse.lockTx.data,
-                            blockConfirmations = fetchResponse.lockTx.blockConfirmations
+                            blockConfirmations = fetchResponse.lockTx.blockConfirmations,
+                            timestamp = fetchResponse.lockTx.timestamp
                         )
                     )
                 )
 
             assertThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
+            assertThat(fetchResponse.lockTx.timestamp)
+                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
         }
     }
 
-    // TODO implement after actual lock contract is known
-    // @Test
+    @Test
     fun mustCorrectlyFetchErc20LockRequestWhenCustomRpcUrlIsSpecified() {
         val mainAccount = accounts[0]
 
-        val contract = suppose("simple ERC20 contract is deployed") {
-            SimpleERC20.deploy(
+        val lockContract = suppose("simple lock manager contract is deployed") {
+            SimpleLockManager.deploy(
                 hardhatContainer.web3j,
                 mainAccount,
-                DefaultGasProvider(),
-                listOf(mainAccount.address),
-                listOf(BigInteger("10000")),
-                mainAccount.address
+                DefaultGasProvider()
             ).sendAndMine()
         }
 
         val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
-        val tokenAddress = ContractAddress(contract.contractAddress)
+        val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
-        val lockContractAddress = ContractAddress("dead") // TODO deploy lock contract
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
+        val lockContractAddress = ContractAddress(lockContract.contractAddress)
         val senderAddress = WalletAddress(mainAccount.address)
 
         val createResponse = suppose("request to create ERC20 lock request is made") {
@@ -537,6 +567,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
                                 "lock_contract_address": "${lockContractAddress.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
                                 "arbitrary_data": {
@@ -556,8 +587,14 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
             objectMapper.readValue(createResponse.response.contentAsString, Erc20LockRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made with missing transaction data") {
-            contract.transferAndMine(lockContractAddress.rawValue, amount.rawValue)
+        val txHash = suppose("some token lock transaction is made") {
+            lockContract.lockAndMine(
+                tokenAddress = tokenAddress,
+                amount = amount,
+                lockDuration = lockDuration,
+                info = createResponse.id.toString(),
+                unlockPrivilegeWallet = ZeroAddress
+            )
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
@@ -588,10 +625,12 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = createResponse.id,
-                        status = Status.FAILED,
+                        status = Status.SUCCESS,
                         chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
+                        lockDurationInSeconds = lockDuration.rawValue,
+                        unlocksAt = (fetchResponse.lockTx.timestamp!! + lockDuration.toDuration()),
                         lockContractAddress = lockContractAddress.rawValue,
                         senderAddress = senderAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
@@ -603,15 +642,18 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                         lockTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
-                            to = tokenAddress.rawValue,
+                            to = lockContractAddress.rawValue,
                             data = createResponse.lockTx.data,
-                            blockConfirmations = fetchResponse.lockTx.blockConfirmations
+                            blockConfirmations = fetchResponse.lockTx.blockConfirmations,
+                            timestamp = fetchResponse.lockTx.timestamp
                         )
                     )
                 )
 
             assertThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
+            assertThat(fetchResponse.lockTx.timestamp)
+                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
         }
     }
 
@@ -640,6 +682,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     tokenAmount = Balance(BigInteger.TEN),
+                    lockDuration = DurationSeconds(BigInteger.valueOf(100L)),
                     lockContractAddress = ContractAddress("b"),
                     tokenSenderAddress = WalletAddress("c"),
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,
@@ -690,6 +733,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write d
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     tokenAmount = Balance(BigInteger.TEN),
+                    lockDuration = DurationSeconds(BigInteger.valueOf(100L)),
                     lockContractAddress = ContractAddress("b"),
                     tokenSenderAddress = WalletAddress("c"),
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,

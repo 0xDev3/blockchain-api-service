@@ -4,6 +4,7 @@ import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.DurationSeconds
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionData
@@ -19,6 +20,7 @@ data class Erc20LockRequest(
     val redirectUrl: String,
     val tokenAddress: ContractAddress,
     val tokenAmount: Balance,
+    val lockDuration: DurationSeconds,
     val lockContractAddress: ContractAddress,
     val tokenSenderAddress: WalletAddress?,
     val txHash: TransactionHash?,
@@ -36,9 +38,10 @@ data class Erc20LockRequest(
             transactionData = TransactionData(
                 txHash = this.txHash,
                 fromAddress = transactionInfo?.from,
-                toAddress = transactionInfo?.to?.toContractAddress() ?: this.lockContractAddress,
+                toAddress = transactionInfo?.to ?: this.lockContractAddress,
                 data = data,
-                blockConfirmations = transactionInfo?.blockConfirmations
+                blockConfirmations = transactionInfo?.blockConfirmations,
+                timestamp = transactionInfo?.timestamp
             )
         )
 }

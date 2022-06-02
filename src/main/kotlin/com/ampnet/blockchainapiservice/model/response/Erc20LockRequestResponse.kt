@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
+import java.time.OffsetDateTime
 import java.util.UUID
 
 data class Erc20LockRequestResponse(
@@ -15,6 +16,9 @@ data class Erc20LockRequestResponse(
     val tokenAddress: String,
     @JsonSerialize(using = ToStringSerializer::class)
     val amount: BigInteger,
+    @JsonSerialize(using = ToStringSerializer::class)
+    val lockDurationInSeconds: BigInteger,
+    val unlocksAt: OffsetDateTime?,
     val lockContractAddress: String,
     val senderAddress: String?,
     val arbitraryData: JsonNode?,
