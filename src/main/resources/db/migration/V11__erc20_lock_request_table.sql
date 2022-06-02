@@ -4,6 +4,7 @@ CREATE TABLE blockchain_api_service.erc20_lock_request (
     redirect_url                 VARCHAR     NOT NULL,
     token_address                VARCHAR     NOT NULL,
     token_amount                 NUMERIC(78) NOT NULL,
+    lock_duration_seconds        NUMERIC(78) NOT NULL,
     lock_contract_address        VARCHAR     NOT NULL,
     token_sender_address         VARCHAR,
     arbitrary_data               JSON,

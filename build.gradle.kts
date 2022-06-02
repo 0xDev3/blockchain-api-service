@@ -201,6 +201,12 @@ jooq {
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.DurationSeconds"
+                                converter = "com.ampnet.blockchainapiservice.util.DurationSecondsConverter"
+                                includeExpression = ".*_duration_seconds"
+                                includeTypes = "NUMERIC"
+                            },
+                            ForcedType().apply {
                                 userType = "com.fasterxml.jackson.databind.JsonNode"
                                 converter = "com.ampnet.blockchainapiservice.util.JsonNodeConverter"
                                 includeExpression = ".*"

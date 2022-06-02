@@ -11,6 +11,7 @@ import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.DurationSeconds
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
@@ -33,6 +34,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         private const val REDIRECT_URL = "redirect-url"
         private val TOKEN_ADDRESS = ContractAddress("a")
         private val TOKEN_AMOUNT = Balance(BigInteger.valueOf(123456L))
+        private val LOCK_DURATION = DurationSeconds(BigInteger.valueOf(123L))
         private val LOCK_CONTRACT_ADDRESS = ContractAddress("b")
         private val TOKEN_SENDER_ADDRESS = WalletAddress("c")
         private val ARBITRARY_DATA = TestData.EMPTY_JSON_OBJECT
@@ -62,6 +64,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                     redirectUrl = REDIRECT_URL,
                     tokenAddress = TOKEN_ADDRESS,
                     tokenAmount = TOKEN_AMOUNT,
+                    lockDurationSeconds = LOCK_DURATION,
                     lockContractAddress = LOCK_CONTRACT_ADDRESS,
                     tokenSenderAddress = TOKEN_SENDER_ADDRESS,
                     arbitraryData = ARBITRARY_DATA,
@@ -83,6 +86,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
                         tokenAmount = TOKEN_AMOUNT,
+                        lockDuration = LOCK_DURATION,
                         lockContractAddress = LOCK_CONTRACT_ADDRESS,
                         tokenSenderAddress = TOKEN_SENDER_ADDRESS,
                         txHash = TX_HASH,
@@ -115,6 +119,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
             tokenAmount = TOKEN_AMOUNT,
+            lockDuration = LOCK_DURATION,
             lockContractAddress = LOCK_CONTRACT_ADDRESS,
             tokenSenderAddress = TOKEN_SENDER_ADDRESS,
             arbitraryData = ARBITRARY_DATA,
@@ -134,6 +139,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
             tokenAmount = TOKEN_AMOUNT,
+            lockDuration = LOCK_DURATION,
             lockContractAddress = LOCK_CONTRACT_ADDRESS,
             tokenSenderAddress = TOKEN_SENDER_ADDRESS,
             txHash = null,
@@ -166,6 +172,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
             tokenAmount = TOKEN_AMOUNT,
+            lockDuration = LOCK_DURATION,
             lockContractAddress = LOCK_CONTRACT_ADDRESS,
             tokenSenderAddress = TOKEN_SENDER_ADDRESS,
             arbitraryData = ARBITRARY_DATA,
@@ -195,6 +202,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
                         tokenAmount = TOKEN_AMOUNT,
+                        lockDuration = LOCK_DURATION,
                         lockContractAddress = LOCK_CONTRACT_ADDRESS,
                         tokenSenderAddress = TOKEN_SENDER_ADDRESS,
                         txHash = TX_HASH,
@@ -217,6 +225,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
             tokenAmount = TOKEN_AMOUNT,
+            lockDuration = LOCK_DURATION,
             lockContractAddress = LOCK_CONTRACT_ADDRESS,
             tokenSenderAddress = TOKEN_SENDER_ADDRESS,
             arbitraryData = ARBITRARY_DATA,
@@ -251,6 +260,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
                         tokenAmount = TOKEN_AMOUNT,
+                        lockDuration = LOCK_DURATION,
                         lockContractAddress = LOCK_CONTRACT_ADDRESS,
                         tokenSenderAddress = TOKEN_SENDER_ADDRESS,
                         txHash = TX_HASH,

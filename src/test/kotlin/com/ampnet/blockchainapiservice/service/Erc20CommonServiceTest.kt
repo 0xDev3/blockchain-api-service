@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
@@ -168,7 +169,8 @@ class Erc20CommonServiceTest : TestBase() {
             from = WalletAddress("a"),
             to = WalletAddress("b"),
             data = FunctionData("data"),
-            blockConfirmations = BigInteger.ZERO
+            blockConfirmations = BigInteger.ZERO,
+            timestamp = TestData.TIMESTAMP
         )
 
         val blockchainService = mock<BlockchainService>()

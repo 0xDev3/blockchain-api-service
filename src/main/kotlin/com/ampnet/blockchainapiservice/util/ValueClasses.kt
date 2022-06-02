@@ -23,11 +23,25 @@ value class UtcDateTime private constructor(val value: OffsetDateTime) {
     operator fun plus(duration: Duration): UtcDateTime = UtcDateTime(value + duration)
     operator fun minus(duration: Duration): UtcDateTime = UtcDateTime(value - duration)
 
+    operator fun plus(duration: DurationSeconds): UtcDateTime = UtcDateTime(
+        value + Duration.ofSeconds(duration.rawValue.longValueExact())
+    )
+
+    operator fun minus(duration: DurationSeconds): UtcDateTime = UtcDateTime(
+        value - Duration.ofSeconds(duration.rawValue.longValueExact())
+    )
+
     fun isAfter(other: UtcDateTime): Boolean = value.isAfter(other.value)
 }
 
 sealed interface EthereumValue<T> {
     val rawValue: T
+}
+
+@JvmInline
+value class EthereumString(val value: String) : EthereumValue<String> {
+    override val rawValue: String
+        get() = value
 }
 
 sealed interface EthereumAddress : EthereumValue<String> {
@@ -66,6 +80,11 @@ sealed interface EthereumUint : EthereumValue<BigInteger> {
 
 @JvmInline
 value class Balance(override val value: Uint) : EthereumUint {
+    constructor(value: BigInteger) : this(Uint(value))
+}
+
+@JvmInline
+value class DurationSeconds(override val value: Uint) : EthereumUint {
     constructor(value: BigInteger) : this(Uint(value))
 }
 

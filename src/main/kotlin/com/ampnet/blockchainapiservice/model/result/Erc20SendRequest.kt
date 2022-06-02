@@ -38,7 +38,8 @@ data class Erc20SendRequest(
                 fromAddress = transactionInfo?.from,
                 toAddress = transactionInfo?.to?.toContractAddress() ?: this.tokenAddress,
                 data = data,
-                blockConfirmations = transactionInfo?.blockConfirmations
+                blockConfirmations = transactionInfo?.blockConfirmations,
+                timestamp = transactionInfo?.timestamp
             )
         )
 }

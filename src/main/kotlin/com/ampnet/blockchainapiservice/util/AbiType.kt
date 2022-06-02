@@ -8,5 +8,6 @@ sealed class AbiType<T : EthereumValue<*>>(val name: String) {
         object Address : Abi<EthereumAddress>("address")
         object Uint256 : Abi<EthereumUint>("uint256")
         object Bool : Abi<EthereumValue<Boolean>>("bool")
+        object Utf8String : Abi<EthereumString>("string")
     }
 }

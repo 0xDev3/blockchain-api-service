@@ -83,6 +83,17 @@ class SignedMessageConverter : Converter<String, SignedMessage> {
     }
 }
 
+class DurationSecondsConverter : Converter<BigInteger, DurationSeconds> {
+    override fun from(value: BigInteger?): DurationSeconds? = value?.let { DurationSeconds(it) }
+    override fun to(value: DurationSeconds?): BigInteger? = value?.rawValue
+    override fun fromType(): Class<BigInteger> = BigInteger::class.java
+    override fun toType(): Class<DurationSeconds> = DurationSeconds::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = 442010490221114533L
+    }
+}
+
 class JsonNodeConverter : Converter<JSON, JsonNode> {
 
     private val objectMapper = JsonConfig().objectMapper()

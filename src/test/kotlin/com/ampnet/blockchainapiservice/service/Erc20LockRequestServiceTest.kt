@@ -22,6 +22,8 @@ import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.DurationSeconds
+import com.ampnet.blockchainapiservice.util.EthereumString
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -35,7 +37,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.web3j.abi.datatypes.Utf8String
 import java.math.BigInteger
 import java.util.UUID
 import org.mockito.kotlin.verify as verifyMock
@@ -50,6 +51,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             redirectUrl = "redirect-url/\${id}",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.valueOf(123456L)),
+            lockDuration = DurationSeconds(BigInteger.valueOf(123L)),
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = WalletAddress("c"),
             arbitraryData = TestData.EMPTY_JSON_OBJECT,
@@ -64,11 +66,11 @@ class Erc20LockRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyCreateErc20LockRequestWhenClientIdIsProvided() {
         val uuidProvider = mock<UuidProvider>()
-        val uuid = UUID.randomUUID()
+        val id = UUID.randomUUID()
 
         suppose("some UUID will be generated") {
             given(uuidProvider.getUuid())
-                .willReturn(uuid)
+                .willReturn(id)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
@@ -81,10 +83,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(uuid.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -111,11 +115,12 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         val storeParams = StoreErc20LockRequestParams(
-            id = uuid,
+            id = id,
             chainId = chainId,
-            redirectUrl = redirectUrl.replace("\${id}", uuid.toString()),
+            redirectUrl = redirectUrl.replace("\${id}", id.toString()),
             tokenAddress = tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = CREATE_PARAMS.lockContractAddress,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             arbitraryData = CREATE_PARAMS.arbitraryData,
@@ -123,11 +128,12 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         val storedRequest = Erc20LockRequest(
-            id = uuid,
+            id = id,
             chainId = chainId,
             redirectUrl = storeParams.redirectUrl,
             tokenAddress = tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = CREATE_PARAMS.lockContractAddress,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             txHash = null,
@@ -160,7 +166,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             assertThat(service.createErc20LockRequest(createParams)).withMessage()
                 .isEqualTo(
                     WithFunctionData(
-                        storedRequest.copy(redirectUrl = storedRequest.redirectUrl.replace("\${id}", uuid.toString())),
+                        storedRequest.copy(redirectUrl = storedRequest.redirectUrl.replace("\${id}", id.toString())),
                         encodedData
                     )
                 )
@@ -174,11 +180,11 @@ class Erc20LockRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyCreateErc20LockRequestWhenClientIdIsNotProvided() {
         val uuidProvider = mock<UuidProvider>()
-        val uuid = UUID.randomUUID()
+        val id = UUID.randomUUID()
 
         suppose("some UUID will be generated") {
             given(uuidProvider.getUuid())
-                .willReturn(uuid)
+                .willReturn(id)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
@@ -190,10 +196,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenAddress!!),
-                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(uuid.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -204,11 +212,12 @@ class Erc20LockRequestServiceTest : TestBase() {
         val redirectUrl = CREATE_PARAMS.redirectUrl!!
 
         val storeParams = StoreErc20LockRequestParams(
-            id = uuid,
+            id = id,
             chainId = chainId,
-            redirectUrl = redirectUrl.replace("\${id}", uuid.toString()),
+            redirectUrl = redirectUrl.replace("\${id}", id.toString()),
             tokenAddress = CREATE_PARAMS.tokenAddress!!,
             tokenAmount = CREATE_PARAMS.tokenAmount,
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = CREATE_PARAMS.lockContractAddress,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             arbitraryData = CREATE_PARAMS.arbitraryData,
@@ -216,11 +225,12 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         val storedRequest = Erc20LockRequest(
-            id = uuid,
+            id = id,
             chainId = chainId,
             redirectUrl = storeParams.redirectUrl,
             tokenAddress = CREATE_PARAMS.tokenAddress!!,
             tokenAmount = CREATE_PARAMS.tokenAmount,
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = CREATE_PARAMS.lockContractAddress,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             txHash = null,
@@ -411,6 +421,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = WalletAddress("c"),
             txHash = null,
@@ -436,10 +447,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -476,6 +489,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = WalletAddress("c"),
             txHash = TX_HASH,
@@ -509,10 +523,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -549,6 +565,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = WalletAddress("c"),
             txHash = TX_HASH,
@@ -573,7 +590,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = WalletAddress("dead"),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -589,10 +607,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -629,6 +649,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = WalletAddress("c"),
             txHash = TX_HASH,
@@ -653,7 +674,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress.toWalletAddress(),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -669,10 +691,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -709,6 +733,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = WalletAddress("c"),
             txHash = TX_HASH,
@@ -733,7 +758,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = WalletAddress("dead"),
             to = lockRequest.lockContractAddress.toWalletAddress(),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -749,10 +775,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -789,6 +817,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = WalletAddress("c"),
             txHash = TX_HASH,
@@ -813,7 +842,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress.toWalletAddress(),
             data = FunctionData("wrong-data"),
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -829,10 +859,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -869,6 +901,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = null,
             txHash = TX_HASH,
@@ -893,7 +926,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = WalletAddress("0cafe0babe"),
             to = lockRequest.lockContractAddress.toWalletAddress(),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -909,10 +943,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -949,6 +985,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = WalletAddress("c"),
             txHash = TX_HASH,
@@ -973,7 +1010,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress.toWalletAddress(),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -989,10 +1027,12 @@ class Erc20LockRequestServiceTest : TestBase() {
                     functionName = "lock",
                     arguments = listOf(
                         FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount)
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
                 )
             )
                 .willReturn(encodedData)

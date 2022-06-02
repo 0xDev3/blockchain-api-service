@@ -9,5 +9,6 @@ data class TransactionData(
     val fromAddress: WalletAddress?,
     val toAddress: ContractAddress,
     val data: FunctionData,
-    val blockConfirmations: BigInteger?
+    val blockConfirmations: BigInteger?,
+    val timestamp: UtcDateTime?
 )
