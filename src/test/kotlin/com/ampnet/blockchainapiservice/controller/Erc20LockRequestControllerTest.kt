@@ -14,6 +14,7 @@ import com.ampnet.blockchainapiservice.service.Erc20LockRequestService
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.DurationSeconds
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionData
@@ -41,6 +42,7 @@ class Erc20LockRequestControllerTest : TestBase() {
             redirectUrl = "redirect-url",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = DurationSeconds(BigInteger.valueOf(123L)),
             lockContractAddress = ContractAddress("b"),
             tokenSenderAddress = WalletAddress("c"),
             arbitraryData = TestData.EMPTY_JSON_OBJECT,
@@ -55,6 +57,7 @@ class Erc20LockRequestControllerTest : TestBase() {
             redirectUrl = params.redirectUrl!!,
             tokenAddress = params.tokenAddress!!,
             tokenAmount = params.tokenAmount,
+            lockDuration = params.lockDuration,
             lockContractAddress = params.lockContractAddress,
             tokenSenderAddress = params.tokenSenderAddress,
             txHash = null,
@@ -79,6 +82,7 @@ class Erc20LockRequestControllerTest : TestBase() {
                     redirectUrl = params.redirectUrl,
                     tokenAddress = params.tokenAddress?.rawValue,
                     amount = params.tokenAmount.rawValue,
+                    lockDurationInSeconds = params.lockDuration.rawValue,
                     lockContractAddress = params.lockContractAddress.rawValue,
                     senderAddress = params.tokenSenderAddress?.rawValue,
                     arbitraryData = params.arbitraryData,
@@ -95,6 +99,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                             chainId = result.chainId.value,
                             tokenAddress = result.tokenAddress.rawValue,
                             amount = result.tokenAmount.rawValue,
+                            lockDurationInSeconds = params.lockDuration.rawValue,
+                            unlocksAt = null,
                             lockContractAddress = result.lockContractAddress.rawValue,
                             senderAddress = result.tokenSenderAddress?.rawValue,
                             arbitraryData = result.arbitraryData,
@@ -105,7 +111,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                                 from = result.tokenSenderAddress?.rawValue,
                                 to = result.tokenAddress.rawValue,
                                 data = data.value,
-                                blockConfirmations = null
+                                blockConfirmations = null,
+                                timestamp = null
                             )
                         )
                     )
@@ -126,6 +133,7 @@ class Erc20LockRequestControllerTest : TestBase() {
                 redirectUrl = "redirect-url",
                 tokenAddress = ContractAddress("a"),
                 tokenAmount = Balance(BigInteger.TEN),
+                lockDuration = DurationSeconds(BigInteger.valueOf(123L)),
                 lockContractAddress = ContractAddress("b"),
                 tokenSenderAddress = WalletAddress("c"),
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
@@ -141,7 +149,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
-                blockConfirmations = BigInteger.ONE
+                blockConfirmations = BigInteger.ONE,
+                timestamp = TestData.TIMESTAMP
             )
         )
 
@@ -162,6 +171,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                             chainId = result.value.chainId.value,
                             tokenAddress = result.value.tokenAddress.rawValue,
                             amount = result.value.tokenAmount.rawValue,
+                            lockDurationInSeconds = result.value.lockDuration.rawValue,
+                            unlocksAt = (TestData.TIMESTAMP + result.value.lockDuration).value,
                             lockContractAddress = result.value.lockContractAddress.rawValue,
                             senderAddress = result.value.tokenSenderAddress?.rawValue,
                             arbitraryData = result.value.arbitraryData,
@@ -172,7 +183,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                                 from = result.transactionData.fromAddress?.rawValue,
                                 to = result.transactionData.toAddress.rawValue,
                                 data = result.transactionData.data.value,
-                                blockConfirmations = result.transactionData.blockConfirmations
+                                blockConfirmations = result.transactionData.blockConfirmations,
+                                timestamp = TestData.TIMESTAMP.value
                             )
                         )
                     )

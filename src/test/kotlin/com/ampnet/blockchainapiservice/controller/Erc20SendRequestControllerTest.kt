@@ -105,7 +105,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                                 from = result.tokenSenderAddress?.rawValue,
                                 to = result.tokenAddress.rawValue,
                                 data = data.value,
-                                blockConfirmations = null
+                                blockConfirmations = null,
+                                timestamp = null
                             )
                         )
                     )
@@ -141,7 +142,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
-                blockConfirmations = BigInteger.ONE
+                blockConfirmations = BigInteger.ONE,
+                timestamp = TestData.TIMESTAMP
             )
         )
 
@@ -172,7 +174,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                                 from = result.transactionData.fromAddress?.rawValue,
                                 to = result.transactionData.toAddress.rawValue,
                                 data = result.transactionData.data.value,
-                                blockConfirmations = result.transactionData.blockConfirmations
+                                blockConfirmations = result.transactionData.blockConfirmations,
+                                timestamp = TestData.TIMESTAMP.value
                             )
                         )
                     )

@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.model.response
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
+import java.time.OffsetDateTime
 
 data class TransactionResponse(
     val txHash: String?,
@@ -10,5 +11,6 @@ data class TransactionResponse(
     val to: String,
     val data: String,
     @JsonSerialize(using = ToStringSerializer::class)
-    val blockConfirmations: BigInteger?
+    val blockConfirmations: BigInteger?,
+    val timestamp: OffsetDateTime?
 )

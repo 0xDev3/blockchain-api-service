@@ -217,7 +217,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         from = WalletAddress(mainAccount.address),
                         to = WalletAddress(contract.contractAddress),
                         data = transactionInfo.data,
-                        blockConfirmations = transactionInfo.blockConfirmations
+                        blockConfirmations = transactionInfo.blockConfirmations,
+                        timestamp = transactionInfo.timestamp
                     )
                 )
 
@@ -273,7 +274,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         from = WalletAddress(mainAccount.address),
                         to = WalletAddress(accounts[1].address),
                         data = FunctionData("0x"),
-                        blockConfirmations = transactionInfo.blockConfirmations
+                        blockConfirmations = transactionInfo.blockConfirmations,
+                        timestamp = transactionInfo.timestamp
                     )
                 )
 

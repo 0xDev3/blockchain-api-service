@@ -573,7 +573,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             from = sendRequest.tokenSenderAddress!!,
             to = WalletAddress("dead"),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -653,7 +654,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             from = sendRequest.tokenSenderAddress!!,
             to = sendRequest.tokenAddress.toWalletAddress(),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -733,7 +735,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             from = WalletAddress("dead"),
             to = sendRequest.tokenAddress.toWalletAddress(),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -813,7 +816,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             from = sendRequest.tokenSenderAddress!!,
             to = sendRequest.tokenAddress.toWalletAddress(),
             data = FunctionData("wrong-data"),
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -893,7 +897,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             from = WalletAddress("0cafe0babe"),
             to = sendRequest.tokenAddress.toWalletAddress(),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
@@ -973,7 +978,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             from = sendRequest.tokenSenderAddress!!,
             to = sendRequest.tokenAddress.toWalletAddress(),
             data = encodedData,
-            blockConfirmations = BigInteger.ONE
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP
         )
 
         suppose("transaction is mined") {
