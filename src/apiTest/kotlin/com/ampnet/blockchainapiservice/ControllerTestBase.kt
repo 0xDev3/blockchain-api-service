@@ -2,11 +2,16 @@ package com.ampnet.blockchainapiservice
 
 import com.ampnet.blockchainapiservice.TestBase.Companion.VerifyMessage
 import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
+import com.ampnet.blockchainapiservice.blockchain.SimpleLockManager
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.exception.ErrorResponse
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
+import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.DurationSeconds
+import com.ampnet.blockchainapiservice.util.EthereumAddress
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -30,7 +35,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import org.web3j.protocol.core.RemoteCall
 import org.web3j.protocol.core.methods.response.TransactionReceipt
-import java.math.BigInteger
 import java.util.concurrent.CompletableFuture
 
 @ExtendWith(value = [SpringExtension::class, RestDocumentationExtension::class])
@@ -82,13 +86,33 @@ class ControllerTestBase : TestBase() {
     }
 
     protected fun SimpleERC20.transferAndMine(
-        address: String,
-        amount: BigInteger
+        address: EthereumAddress,
+        amount: Balance
     ): CompletableFuture<TransactionReceipt?>? {
-        val txReceiptFuture = transfer(address, amount).sendAsync()
+        val txReceiptFuture = transfer(address.rawValue, amount.rawValue).sendAsync()
         hardhatContainer.mineUntil {
-            balanceOf(address).send() == amount
+            balanceOf(address.rawValue).send() == amount.rawValue
         }
+        return txReceiptFuture
+    }
+
+    protected fun SimpleLockManager.lockAndMine(
+        tokenAddress: ContractAddress,
+        amount: Balance,
+        lockDuration: DurationSeconds,
+        info: String,
+        unlockPrivilegeWallet: EthereumAddress
+    ): CompletableFuture<TransactionReceipt?>? {
+        val txReceiptFuture = lock(
+            tokenAddress.rawValue,
+            amount.rawValue,
+            lockDuration.rawValue,
+            info,
+            unlockPrivilegeWallet.rawValue
+        ).sendAsync()
+
+        hardhatContainer.mineUntil { isLocked().send() }
+
         return txReceiptFuture
     }
 }

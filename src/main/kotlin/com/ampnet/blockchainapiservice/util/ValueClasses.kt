@@ -23,13 +23,8 @@ value class UtcDateTime private constructor(val value: OffsetDateTime) {
     operator fun plus(duration: Duration): UtcDateTime = UtcDateTime(value + duration)
     operator fun minus(duration: Duration): UtcDateTime = UtcDateTime(value - duration)
 
-    operator fun plus(duration: DurationSeconds): UtcDateTime = UtcDateTime(
-        value + Duration.ofSeconds(duration.rawValue.longValueExact())
-    )
-
-    operator fun minus(duration: DurationSeconds): UtcDateTime = UtcDateTime(
-        value - Duration.ofSeconds(duration.rawValue.longValueExact())
-    )
+    operator fun plus(duration: DurationSeconds): UtcDateTime = UtcDateTime(value + duration.toDuration())
+    operator fun minus(duration: DurationSeconds): UtcDateTime = UtcDateTime(value - duration.toDuration())
 
     fun isAfter(other: UtcDateTime): Boolean = value.isAfter(other.value)
 }
@@ -48,6 +43,13 @@ sealed interface EthereumAddress : EthereumValue<String> {
     val value: Address
     override val rawValue: String
         get() = value.value
+
+    fun toWalletAddress() = WalletAddress(value)
+    fun toContractAddress() = ContractAddress(value)
+}
+
+object ZeroAddress : EthereumAddress {
+    override val value: Address = Address("0")
 }
 
 @JvmInline
@@ -57,8 +59,6 @@ value class WalletAddress private constructor(override val value: Address) : Eth
     }
 
     constructor(value: String) : this(Address(value.lowercase()))
-
-    fun toContractAddress(): ContractAddress = ContractAddress(value)
 }
 
 @JvmInline
@@ -68,8 +68,6 @@ value class ContractAddress private constructor(override val value: Address) : E
     }
 
     constructor(value: String) : this(Address(value.lowercase()))
-
-    fun toWalletAddress(): WalletAddress = WalletAddress(value)
 }
 
 sealed interface EthereumUint : EthereumValue<BigInteger> {
@@ -86,6 +84,8 @@ value class Balance(override val value: Uint) : EthereumUint {
 @JvmInline
 value class DurationSeconds(override val value: Uint) : EthereumUint {
     constructor(value: BigInteger) : this(Uint(value))
+
+    fun toDuration(): Duration = Duration.ofSeconds(rawValue.longValueExact())
 }
 
 @JvmInline

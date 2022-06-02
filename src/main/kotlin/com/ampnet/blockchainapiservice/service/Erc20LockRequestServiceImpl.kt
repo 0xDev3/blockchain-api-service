@@ -19,6 +19,7 @@ import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithFunctionData
 import com.ampnet.blockchainapiservice.util.WithTransactionData
+import com.ampnet.blockchainapiservice.util.ZeroAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -98,7 +99,8 @@ class Erc20LockRequestServiceImpl(
                 FunctionArgument(abiType = AbiType.Address, value = tokenAddress),
                 FunctionArgument(abiType = AbiType.Uint256, value = tokenAmount),
                 FunctionArgument(abiType = AbiType.Uint256, value = lockDuration),
-                FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString()))
+                FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
             ),
             abiOutputTypes = emptyList(),
             additionalData = emptyList()

@@ -7,7 +7,7 @@ data class WithTransactionData<T>(val value: T, val status: Status, val transact
 data class TransactionData(
     val txHash: TransactionHash?,
     val fromAddress: WalletAddress?,
-    val toAddress: ContractAddress,
+    val toAddress: EthereumAddress,
     val data: FunctionData,
     val blockConfirmations: BigInteger?,
     val timestamp: UtcDateTime?
