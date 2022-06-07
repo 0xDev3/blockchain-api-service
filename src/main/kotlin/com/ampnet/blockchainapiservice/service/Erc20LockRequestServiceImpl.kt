@@ -122,7 +122,7 @@ class Erc20LockRequestServiceImpl(
         transactionInfo: BlockchainTransactionInfo,
         expectedData: FunctionData
     ): Boolean =
-        lockContractAddress == transactionInfo.to.toContractAddress() &&
+        transactionInfo.success && lockContractAddress == transactionInfo.to.toContractAddress() &&
             txHash == transactionInfo.hash &&
             senderAddressMatches(tokenSenderAddress, transactionInfo.from) &&
             transactionInfo.data == expectedData
