@@ -25,7 +25,7 @@ import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.RepeatedTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -50,7 +50,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         dslContext.deleteFrom(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST).execute()
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustCorrectlyCreateErc20BalanceRequestViaClientId() {
         val clientId = "client-id"
         val chainId = Chain.HARDHAT_TESTNET.id
@@ -149,7 +149,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustCorrectlyCreateErc20BalanceRequestViaChainIdRedirectUrlAndTokenAddress() {
         val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
@@ -233,7 +233,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustReturn400BadRequestForNonExistentClientId() {
         val blockNumber = BlockNumber(BigInteger.TEN)
         val walletAddress = WalletAddress("a")
@@ -266,7 +266,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustReturn400BadRequestForMissingChainId() {
         val redirectUrl = "https://example.com"
         val tokenAddress = ContractAddress("a")
@@ -302,7 +302,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustReturn400BadRequestForMissingRedirectUrl() {
         val chainId = Chain.HARDHAT_TESTNET.id
         val tokenAddress = ContractAddress("a")
@@ -338,7 +338,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustReturn400BadRequestForMissingTokenAddress() {
         val redirectUrl = "https://example.com"
         val chainId = Chain.HARDHAT_TESTNET.id
@@ -374,7 +374,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustCorrectlyFetchErc20BalanceRequest() {
         val mainAccount = accounts[0]
         val walletAddress = WalletAddress("0x865f603F42ca1231e5B5F90e15663b0FE19F0b21")
@@ -483,7 +483,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustCorrectlyFetchErc20BalanceRequestWhenCustomRpcUrlIsSpecified() {
         val mainAccount = accounts[0]
         val walletAddress = WalletAddress("0x865f603F42ca1231e5B5F90e15663b0FE19F0b21")
@@ -596,7 +596,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustReturn404NotFoundForNonExistentErc20BalanceRequest() {
         verify("404 is returned for non-existent ERC20 balance request") {
             val response = mockMvc.perform(
@@ -609,7 +609,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustCorrectlyAttachSignedMessage() {
         val id = UUID.randomUUID()
 
@@ -661,7 +661,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @Test
+    @RepeatedTest(10)
     fun mustReturn400BadRequestWhenSignedMessageIsNotAttached() {
         val id = UUID.randomUUID()
         val walletAddress = WalletAddress("c")
