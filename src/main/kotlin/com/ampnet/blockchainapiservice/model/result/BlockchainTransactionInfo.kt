@@ -13,5 +13,6 @@ data class BlockchainTransactionInfo(
     val to: EthereumAddress,
     val data: FunctionData,
     val blockConfirmations: BigInteger,
-    val timestamp: UtcDateTime
+    val timestamp: UtcDateTime,
+    val success: Boolean
 )

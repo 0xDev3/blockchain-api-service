@@ -14,6 +14,8 @@ import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
+import com.ampnet.blockchainapiservice.util.bind
+import com.ampnet.blockchainapiservice.util.shortCircuiting
 import mu.KLogging
 import org.springframework.stereotype.Service
 import org.web3j.protocol.core.DefaultBlockParameter
@@ -67,26 +69,27 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
     override fun fetchTransactionInfo(chainSpec: ChainSpec, txHash: TransactionHash): BlockchainTransactionInfo? {
         logger.debug { "Fetching transaction, chainSpec: $chainSpec, txHash: $txHash" }
         val web3j = chainHandler.getBlockchainProperties(chainSpec).web3j
-        val transaction = web3j.ethGetTransactionByHash(txHash.value).sendSafely()?.transaction?.orElse(null)
 
-        return transaction?.let {
-            val blockNumber = web3j.ethBlockNumber()?.sendSafely()?.blockNumber
+        return shortCircuiting {
+            val transaction = web3j.ethGetTransactionByHash(txHash.value).sendSafely()
+                ?.transaction?.orElse(null).bind()
+            val receipt = web3j.ethGetTransactionReceipt(txHash.value).sendSafely()
+                ?.transactionReceipt?.orElse(null).bind()
+            val currentBlockNumber = web3j.ethBlockNumber()?.sendSafely()
+                ?.blockNumber.bind()
+            val blockConfirmations = currentBlockNumber - transaction.blockNumber.bind()
+            val timestamp = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(transaction.blockNumber), false)
+                .sendSafely()?.block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }.bind()
 
-            blockNumber?.let {
-                val timestamp = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(transaction.blockNumber), false)
-                    .sendSafely()?.block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }
-
-                timestamp?.let {
-                    BlockchainTransactionInfo(
-                        hash = TransactionHash(transaction.hash),
-                        from = WalletAddress(transaction.from),
-                        to = WalletAddress(transaction.to),
-                        data = FunctionData(transaction.input),
-                        blockConfirmations = blockNumber - transaction.blockNumber,
-                        timestamp = timestamp
-                    )
-                }
-            }
+            BlockchainTransactionInfo(
+                hash = TransactionHash(transaction.hash),
+                from = WalletAddress(transaction.from),
+                to = WalletAddress(transaction.to),
+                data = FunctionData(transaction.input),
+                blockConfirmations = blockConfirmations,
+                timestamp = timestamp,
+                success = receipt.isStatusOK
+            )
         }
     }
 
