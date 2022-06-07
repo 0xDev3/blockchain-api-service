@@ -68,6 +68,10 @@ class HardhatTestContainer : GenericContainer<HardhatTestContainer>("gluwa/hardh
         Request("evm_mine", emptyList<String>(), web3jService, VoidResponse::class.java).send()
     }
 
+    fun reset() {
+        Request("hardhat_reset", emptyList<String>(), web3jService, VoidResponse::class.java).send()
+    }
+
     fun waitAndMine() {
         Thread.sleep(2500L)
         mine()

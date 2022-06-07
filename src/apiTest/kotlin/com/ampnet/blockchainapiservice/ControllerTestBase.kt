@@ -54,6 +54,7 @@ class ControllerTestBase : TestBase() {
 
     @BeforeEach
     fun beforeEach(wac: WebApplicationContext, restDocumentation: RestDocumentationContextProvider) {
+        hardhatContainer.reset()
         mockMvc = MockMvcBuilders.webAppContextSetup(wac)
             .apply<DefaultMockMvcBuilder>(SecurityMockMvcConfigurers.springSecurity())
             .apply<DefaultMockMvcBuilder>(MockMvcRestDocumentation.documentationConfiguration(restDocumentation))
