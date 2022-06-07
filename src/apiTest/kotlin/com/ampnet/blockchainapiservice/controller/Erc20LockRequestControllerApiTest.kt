@@ -27,7 +27,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.RepeatedTest
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
@@ -53,7 +53,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         dslContext.deleteFrom(Erc20LockRequestTable.ERC20_LOCK_REQUEST).execute()
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustCorrectlyCreateErc20LockRequestViaClientId() {
         val clientId = "client-id"
         val chainId = Chain.HARDHAT_TESTNET.id
@@ -165,7 +165,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustCorrectlyCreateErc20LockRequestViaChainIdRedirectUrlAndTokenAddress() {
         val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
@@ -262,7 +262,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustReturn400BadRequestForNonExistentClientId() {
         val amount = Balance(BigInteger.TEN)
         val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
@@ -299,7 +299,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustReturn400BadRequestForMissingChainId() {
         val redirectUrl = "https://example.com"
         val tokenAddress = ContractAddress("a")
@@ -339,7 +339,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustReturn400BadRequestForMissingRedirectUrl() {
         val chainId = Chain.HARDHAT_TESTNET.id
         val tokenAddress = ContractAddress("a")
@@ -379,7 +379,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustReturn400BadRequestForMissingTokenAddress() {
         val redirectUrl = "https://example.com"
         val chainId = Chain.HARDHAT_TESTNET.id
@@ -419,7 +419,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustCorrectlyFetchErc20LockRequest() {
         val mainAccount = accounts[0]
 
@@ -536,7 +536,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustCorrectlyFetchErc20LockRequestWhenCustomRpcUrlIsSpecified() {
         val mainAccount = accounts[0]
 
@@ -657,7 +657,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustReturn404NotFoundForNonExistentErc20LockRequest() {
         verify("404 is returned for non-existent ERC20 lock request") {
             val response = mockMvc.perform(
@@ -670,7 +670,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustCorrectlyAttachTransactionHash() {
         val id = UUID.randomUUID()
 
@@ -720,7 +720,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustReturn400BadRequestWhenTransactionHashIsNotAttached() {
         val id = UUID.randomUUID()
         val txHash = TransactionHash("tx-hash")

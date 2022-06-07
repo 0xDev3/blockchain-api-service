@@ -22,7 +22,8 @@ import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
-import org.junit.jupiter.api.RepeatedTest
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.web3j.protocol.core.RemoteCall
@@ -43,7 +44,12 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     private val hardhatContainer = HardhatTestContainer()
     private val accounts = HardhatTestContainer.accounts
 
-    @RepeatedTest(10)
+    @BeforeEach
+    fun beforeEach() {
+        hardhatContainer.reset()
+    }
+
+    @Test
     fun mustCorrectlyFetchErc20BalanceForLatestBlock() {
         val mainAccount = accounts[0]
         val accountBalance = Erc20Balance(
@@ -86,7 +92,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustCorrectlyFetchErc20BalanceForSpecifiedBlockNumber() {
         val mainAccount = accounts[0]
         val accountBalance = Erc20Balance(
@@ -157,7 +163,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustThrowBlockchainReadExceptionWhenReadingErc20BalanceFromInvalidErc20ContractAddress() {
         verify("BlockchainReadException is thrown when reading ERC20 balance from invalid contract address") {
             val service = Web3jBlockchainService(hardhatProperties())
@@ -172,7 +178,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustCorrectlyFetchContractTransactionInfoForSuccessfulTransaction() {
         val mainAccount = accounts[0]
         val accountBalance = Erc20Balance(
@@ -243,7 +249,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustCorrectlyFetchContractTransactionInfoForFailedTransaction() {
         val mainAccount = accounts[0]
         val accountBalance = Erc20Balance(
@@ -320,7 +326,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustCorrectlyFetchNonContractTransactionInfo() {
         val mainAccount = accounts[0]
         val txHash = suppose("some ERC20 transfer transaction is made") {
@@ -365,7 +371,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
     }
 
-    @RepeatedTest(10)
+    @Test
     fun mustReturnNullWhenFetchingNonExistentTransactionInfo() {
         verify("null is returned for non existent transaction") {
             val service = Web3jBlockchainService(hardhatProperties())
