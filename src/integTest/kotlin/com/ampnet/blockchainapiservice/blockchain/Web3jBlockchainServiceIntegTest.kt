@@ -27,6 +27,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.web3j.protocol.core.RemoteCall
 import org.web3j.protocol.core.methods.response.TransactionReceipt
+import org.web3j.protocol.exceptions.TransactionException
 import org.web3j.tx.Transfer
 import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.utils.Convert
@@ -34,6 +35,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutionException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Web3jBlockchainServiceIntegTest : TestBase() {
@@ -171,7 +173,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchContractTransactionInfo() {
+    fun mustCorrectlyFetchContractTransactionInfoForSuccessfulTransaction() {
         val mainAccount = accounts[0]
         val accountBalance = Erc20Balance(
             wallet = WalletAddress(mainAccount.address),
@@ -218,7 +220,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         to = WalletAddress(contract.contractAddress),
                         data = transactionInfo.data,
                         blockConfirmations = transactionInfo.blockConfirmations,
-                        timestamp = transactionInfo.timestamp
+                        timestamp = transactionInfo.timestamp,
+                        success = true
                     )
                 )
 
@@ -227,6 +230,83 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 arguments = listOf(
                     FunctionArgument(abiType = AbiType.Address, value = WalletAddress(accounts[1].address)),
                     FunctionArgument(abiType = AbiType.Uint256, value = accountBalance.amount)
+                ),
+                abiOutputTypes = listOf(AbiType.Bool),
+                additionalData = listOf()
+            )
+
+            assertThat(transactionInfo.data).withMessage()
+                .isEqualTo(expectedData)
+
+            assertThat(transactionInfo.blockConfirmations).withMessage()
+                .isNotZero()
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractTransactionInfoForFailedTransaction() {
+        val mainAccount = accounts[0]
+        val accountBalance = Erc20Balance(
+            wallet = WalletAddress(mainAccount.address),
+            blockNumber = BlockNumber(BigInteger.ZERO),
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(BigInteger("10000"))
+        )
+        val sendAmount = Balance(accountBalance.amount.rawValue * BigInteger.TEN)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(accountBalance.wallet.rawValue),
+                listOf(accountBalance.amount.rawValue),
+                mainAccount.address
+            ).sendAndMine()
+        }
+
+        val txHash = suppose("some ERC20 transfer transaction is made") {
+            try {
+                contract.transferAndMine(accounts[1].address, sendAmount.rawValue)
+                    ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            } catch (e: ExecutionException) {
+                (e.cause as? TransactionException)?.transactionReceipt
+                    ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            }
+        }
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.waitAndMine()
+        }
+
+        verify("correct transaction info is fetched") {
+            val service = Web3jBlockchainService(hardhatProperties())
+            val transactionInfo = service.fetchTransactionInfo(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                txHash = txHash
+            )
+
+            assertThat(transactionInfo).withMessage()
+                .isNotNull()
+
+            assertThat(transactionInfo!!).withMessage()
+                .isEqualTo(
+                    BlockchainTransactionInfo(
+                        hash = txHash,
+                        from = WalletAddress(mainAccount.address),
+                        to = WalletAddress(contract.contractAddress),
+                        data = transactionInfo.data,
+                        blockConfirmations = transactionInfo.blockConfirmations,
+                        timestamp = transactionInfo.timestamp,
+                        success = false
+                    )
+                )
+
+            val expectedData = EthereumFunctionEncoderService().encode(
+                functionName = "transfer",
+                arguments = listOf(
+                    FunctionArgument(abiType = AbiType.Address, value = WalletAddress(accounts[1].address)),
+                    FunctionArgument(abiType = AbiType.Uint256, value = sendAmount)
                 ),
                 abiOutputTypes = listOf(AbiType.Bool),
                 additionalData = listOf()
@@ -275,7 +355,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         to = WalletAddress(accounts[1].address),
                         data = FunctionData("0x"),
                         blockConfirmations = transactionInfo.blockConfirmations,
-                        timestamp = transactionInfo.timestamp
+                        timestamp = transactionInfo.timestamp,
+                        success = true
                     )
                 )
 
