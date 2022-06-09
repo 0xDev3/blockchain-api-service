@@ -37,7 +37,7 @@ import java.math.BigInteger
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
-class Erc20LockRequestControllerApiTest : ControllerTestBase() { // TODO write docs
+class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
     private val accounts = HardhatTestContainer.accounts
 

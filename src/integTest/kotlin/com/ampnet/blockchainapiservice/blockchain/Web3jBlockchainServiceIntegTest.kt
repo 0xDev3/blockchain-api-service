@@ -22,6 +22,7 @@ import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
@@ -42,6 +43,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
     private val hardhatContainer = HardhatTestContainer()
     private val accounts = HardhatTestContainer.accounts
+
+    @BeforeEach
+    fun beforeEach() {
+        hardhatContainer.reset()
+    }
 
     @Test
     fun mustCorrectlyFetchErc20BalanceForLatestBlock() {
