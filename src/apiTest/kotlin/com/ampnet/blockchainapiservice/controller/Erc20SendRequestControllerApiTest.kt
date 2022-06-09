@@ -79,7 +79,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create ERC20 send request is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/send")
+                MockMvcRequestBuilders.post("/v1/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -169,7 +169,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create ERC20 send request is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/send")
+                MockMvcRequestBuilders.post("/v1/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -258,7 +258,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for non-existent clientId") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/send")
+                MockMvcRequestBuilders.post("/v1/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -295,7 +295,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for missing chainId") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/send")
+                MockMvcRequestBuilders.post("/v1/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -333,7 +333,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for missing redirectUrl") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/send")
+                MockMvcRequestBuilders.post("/v1/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -371,7 +371,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for missing redirectUrl") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/send")
+                MockMvcRequestBuilders.post("/v1/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -423,7 +423,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
-                MockMvcRequestBuilders.post("/send")
+                MockMvcRequestBuilders.post("/v1/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -466,7 +466,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch ERC20 send request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/send/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/send/${createResponse.id}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -533,7 +533,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
-                MockMvcRequestBuilders.post("/send")
+                MockMvcRequestBuilders.post("/v1/send")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -576,7 +576,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch ERC20 send request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/send/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/send/${createResponse.id}")
                     .header(
                         RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
                         "http://localhost:${hardhatContainer.mappedPort}"
@@ -627,7 +627,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonExistentErc20SendRequest() {
         verify("404 is returned for non-existent ERC20 send request") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/send/${UUID.randomUUID()}")
+                MockMvcRequestBuilders.get("/v1/send/${UUID.randomUUID()}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -663,7 +663,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach transaction hash to ERC20 send request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/send/$id")
+                MockMvcRequestBuilders.put("/v1/send/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -712,7 +712,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned when attaching transaction hash") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/send/$id")
+                MockMvcRequestBuilders.put("/v1/send/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """

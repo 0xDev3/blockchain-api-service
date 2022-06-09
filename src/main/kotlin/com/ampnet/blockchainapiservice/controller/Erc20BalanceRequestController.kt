@@ -27,7 +27,12 @@ import java.util.UUID
 @RestController
 class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc20BalanceRequestService) {
 
-    @PostMapping("/balance")
+    @PostMapping(
+        value = [
+            "/balance", // TODO deprecated
+            "/v1/balance"
+        ]
+    )
     fun createErc20BalanceRequest(
         @RequestBody requestBody: CreateErc20BalanceRequest
     ): ResponseEntity<Erc20BalanceRequestResponse> {
@@ -62,7 +67,12 @@ class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc2
         )
     }
 
-    @GetMapping("/balance/{id}")
+    @GetMapping(
+        value = [
+            "/balance/{id}", // TODO deprecated
+            "/v1/balance/{id}"
+        ]
+    )
     fun getErc20BalanceRequest(
         @PathVariable("id") id: UUID,
         @RpcUrlBinding rpcSpec: RpcUrlSpec
@@ -94,7 +104,12 @@ class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc2
         )
     }
 
-    @PutMapping("/balance/{id}")
+    @PutMapping(
+        value = [
+            "/balance/{id}", // TODO deprecated
+            "/v1/balance/{id}"
+        ]
+    )
     fun attachSignedMessage(
         @PathVariable("id") id: UUID,
         @RequestBody requestBody: AttachSignedMessageRequest

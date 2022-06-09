@@ -27,7 +27,12 @@ import java.util.UUID
 @RestController
 class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendRequestService) {
 
-    @PostMapping("/send")
+    @PostMapping(
+        value = [
+            "/send", // TODO deprecated
+            "/v1/send"
+        ]
+    )
     fun createErc20SendRequest(
         @RequestBody requestBody: CreateErc20SendRequest
     ): ResponseEntity<Erc20SendRequestResponse> {
@@ -69,7 +74,12 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
         )
     }
 
-    @GetMapping("/send/{id}")
+    @GetMapping(
+        value = [
+            "/send/{id}", // TODO deprecated
+            "/v1/send/{id}"
+        ]
+    )
     fun getErc20SendRequest(
         @PathVariable("id") id: UUID,
         @RpcUrlBinding rpcSpec: RpcUrlSpec
@@ -100,7 +110,12 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
         )
     }
 
-    @PutMapping("/send/{id}")
+    @PutMapping(
+        value = [
+            "/send/{id}", // TODO deprecated
+            "/v1/send/{id}"
+        ]
+    )
     fun attachTransactionHash(
         @PathVariable("id") id: UUID,
         @RequestBody requestBody: AttachTransactionHashRequest

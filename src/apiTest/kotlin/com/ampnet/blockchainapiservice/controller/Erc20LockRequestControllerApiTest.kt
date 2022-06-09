@@ -82,7 +82,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create ERC20 lock request is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/lock")
+                MockMvcRequestBuilders.post("/v1/lock")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -177,7 +177,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create ERC20 lock request is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/lock")
+                MockMvcRequestBuilders.post("/v1/lock")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -271,7 +271,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for non-existent clientId") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/lock")
+                MockMvcRequestBuilders.post("/v1/lock")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -310,7 +310,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for missing chainId") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/lock")
+                MockMvcRequestBuilders.post("/v1/lock")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -350,7 +350,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for missing redirectUrl") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/lock")
+                MockMvcRequestBuilders.post("/v1/lock")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -390,7 +390,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for missing redirectUrl") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/lock")
+                MockMvcRequestBuilders.post("/v1/lock")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -441,7 +441,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         val createResponse = suppose("request to create ERC20 lock request is made") {
             val createResponse = mockMvc.perform(
-                MockMvcRequestBuilders.post("/lock")
+                MockMvcRequestBuilders.post("/v1/lock")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -491,7 +491,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch ERC20 lock request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/lock/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/lock/${createResponse.id}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -558,7 +558,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         val createResponse = suppose("request to create ERC20 lock request is made") {
             val createResponse = mockMvc.perform(
-                MockMvcRequestBuilders.post("/lock")
+                MockMvcRequestBuilders.post("/v1/lock")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -608,7 +608,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch ERC20 lock request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/lock/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/lock/${createResponse.id}")
                     .header(
                         RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
                         "http://localhost:${hardhatContainer.mappedPort}"
@@ -661,7 +661,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonExistentErc20LockRequest() {
         verify("404 is returned for non-existent ERC20 lock request") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/lock/${UUID.randomUUID()}")
+                MockMvcRequestBuilders.get("/v1/lock/${UUID.randomUUID()}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -698,7 +698,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach transaction hash to ERC20 lock request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/lock/$id")
+                MockMvcRequestBuilders.put("/v1/lock/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -748,7 +748,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned when attaching transaction hash") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/lock/$id")
+                MockMvcRequestBuilders.put("/v1/lock/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
