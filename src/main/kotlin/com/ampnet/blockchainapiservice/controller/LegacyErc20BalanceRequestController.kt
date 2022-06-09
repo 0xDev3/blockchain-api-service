@@ -24,10 +24,11 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
+@Deprecated("for removal")
 @RestController
-class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc20BalanceRequestService) {
+class LegacyErc20BalanceRequestController(private val erc20BalanceRequestService: Erc20BalanceRequestService) {
 
-    @PostMapping("/v1/balance")
+    @PostMapping("/balance")
     fun createErc20BalanceRequest(
         @RequestBody requestBody: CreateErc20BalanceRequest
     ): ResponseEntity<Erc20BalanceRequestResponse> {
@@ -62,7 +63,7 @@ class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc2
         )
     }
 
-    @GetMapping("/v1/balance/{id}")
+    @GetMapping("/balance/{id}")
     fun getErc20BalanceRequest(
         @PathVariable("id") id: UUID,
         @RpcUrlBinding rpcSpec: RpcUrlSpec
@@ -94,7 +95,7 @@ class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc2
         )
     }
 
-    @PutMapping("/v1/balance/{id}")
+    @PutMapping("/balance/{id}")
     fun attachSignedMessage(
         @PathVariable("id") id: UUID,
         @RequestBody requestBody: AttachSignedMessageRequest
