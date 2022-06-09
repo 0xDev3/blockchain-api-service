@@ -541,6 +541,88 @@ class Erc20SendRequestServiceTest : TestBase() {
     }
 
     @Test
+    fun mustReturnErc20SendRequestWithFailedStatusWhenTransactionIsNotSuccessful() {
+        val id = UUID.randomUUID()
+        val sendRequest = Erc20SendRequest(
+            id = id,
+            chainId = Chain.HARDHAT_TESTNET.id,
+            redirectUrl = "test",
+            tokenAddress = ContractAddress("a"),
+            tokenAmount = Balance(BigInteger.TEN),
+            tokenSenderAddress = WalletAddress("b"),
+            tokenRecipientAddress = WalletAddress("c"),
+            txHash = TX_HASH,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
+            )
+        )
+        val erc20SendRequestRepository = mock<Erc20SendRequestRepository>()
+
+        suppose("ERC20 send request exists in database") {
+            given(erc20SendRequestRepository.getById(id))
+                .willReturn(sendRequest)
+        }
+
+        val blockchainService = mock<BlockchainService>()
+        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val encodedData = FunctionData("encoded")
+        val transactionInfo = BlockchainTransactionInfo(
+            hash = TX_HASH,
+            from = sendRequest.tokenSenderAddress!!,
+            to = sendRequest.tokenAddress,
+            data = encodedData,
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP,
+            success = false
+        )
+
+        suppose("transaction is mined") {
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+                .willReturn(transactionInfo)
+        }
+
+        val functionEncoderService = mock<FunctionEncoderService>()
+
+        suppose("function data will be encoded") {
+            given(
+                functionEncoderService.encode(
+                    functionName = "transfer",
+                    arguments = listOf(
+                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
+                    ),
+                    abiOutputTypes = listOf(AbiType.Bool),
+                    additionalData = listOf(Utf8String(id.toString()))
+                )
+            )
+                .willReturn(encodedData)
+        }
+
+        val service = Erc20SendRequestServiceImpl(
+            functionEncoderService = functionEncoderService,
+            erc20SendRequestRepository = erc20SendRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                clientInfoRepository = mock(),
+                blockchainService = blockchainService
+            )
+        )
+
+        verify("ERC20 send request with successful status is returned") {
+            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+                .isEqualTo(
+                    sendRequest.withTransactionData(
+                        status = Status.FAILED,
+                        data = encodedData,
+                        transactionInfo = transactionInfo
+                    )
+                )
+        }
+    }
+
+    @Test
     fun mustReturnErc20SendRequestWithFailedStatusWhenTransactionHasWrongToAddress() {
         val id = UUID.randomUUID()
         val sendRequest = Erc20SendRequest(
@@ -574,7 +656,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             to = WalletAddress("dead"),
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
-            timestamp = TestData.TIMESTAMP
+            timestamp = TestData.TIMESTAMP,
+            success = true
         )
 
         suppose("transaction is mined") {
@@ -655,7 +738,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
-            timestamp = TestData.TIMESTAMP
+            timestamp = TestData.TIMESTAMP,
+            success = true
         )
 
         suppose("transaction is mined") {
@@ -736,7 +820,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
-            timestamp = TestData.TIMESTAMP
+            timestamp = TestData.TIMESTAMP,
+            success = true
         )
 
         suppose("transaction is mined") {
@@ -817,7 +902,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress,
             data = FunctionData("wrong-data"),
             blockConfirmations = BigInteger.ONE,
-            timestamp = TestData.TIMESTAMP
+            timestamp = TestData.TIMESTAMP,
+            success = true
         )
 
         suppose("transaction is mined") {
@@ -898,7 +984,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
-            timestamp = TestData.TIMESTAMP
+            timestamp = TestData.TIMESTAMP,
+            success = true
         )
 
         suppose("transaction is mined") {
@@ -979,7 +1066,8 @@ class Erc20SendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress,
             data = encodedData,
             blockConfirmations = BigInteger.ONE,
-            timestamp = TestData.TIMESTAMP
+            timestamp = TestData.TIMESTAMP,
+            success = true
         )
 
         suppose("transaction is mined") {

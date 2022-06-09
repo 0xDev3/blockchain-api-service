@@ -170,7 +170,8 @@ class Erc20CommonServiceTest : TestBase() {
             to = WalletAddress("b"),
             data = FunctionData("data"),
             blockConfirmations = BigInteger.ZERO,
-            timestamp = TestData.TIMESTAMP
+            timestamp = TestData.TIMESTAMP,
+            success = true
         )
 
         val blockchainService = mock<BlockchainService>()

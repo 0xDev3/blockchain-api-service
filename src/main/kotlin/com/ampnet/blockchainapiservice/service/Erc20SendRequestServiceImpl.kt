@@ -100,7 +100,7 @@ class Erc20SendRequestServiceImpl(
         transactionInfo: BlockchainTransactionInfo,
         expectedData: FunctionData
     ): Boolean =
-        tokenAddress == transactionInfo.to.toContractAddress() &&
+        transactionInfo.success && tokenAddress == transactionInfo.to.toContractAddress() &&
             txHash == transactionInfo.hash &&
             senderAddressMatches(tokenSenderAddress, transactionInfo.from) &&
             transactionInfo.data == expectedData
