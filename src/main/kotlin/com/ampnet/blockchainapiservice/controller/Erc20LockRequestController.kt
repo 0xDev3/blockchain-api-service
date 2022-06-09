@@ -28,12 +28,7 @@ import java.util.UUID
 @RestController
 class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockRequestService) {
 
-    @PostMapping(
-        value = [
-            "/lock", // TODO deprecated
-            "/v1/lock"
-        ]
-    )
+    @PostMapping("/v1/lock")
     fun createErc20LockRequest(
         @RequestBody requestBody: CreateErc20LockRequest
     ): ResponseEntity<Erc20LockRequestResponse> {
@@ -78,12 +73,7 @@ class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockR
         )
     }
 
-    @GetMapping(
-        value = [
-            "/lock/{id}", // TODO deprecated
-            "/v1/lock/{id}"
-        ]
-    )
+    @GetMapping("/v1/lock/{id}")
     fun getErc20LockRequest(
         @PathVariable("id") id: UUID,
         @RpcUrlBinding rpcSpec: RpcUrlSpec
@@ -116,12 +106,7 @@ class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockR
         )
     }
 
-    @PutMapping(
-        value = [
-            "/lock/{id}", // TODO deprecated
-            "/v1/lock/{id}"
-        ]
-    )
+    @PutMapping("/v1/lock/{id}")
     fun attachTransactionHash(
         @PathVariable("id") id: UUID,
         @RequestBody requestBody: AttachTransactionHashRequest
