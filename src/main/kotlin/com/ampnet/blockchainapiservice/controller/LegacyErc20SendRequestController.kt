@@ -24,10 +24,11 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
+@Deprecated("for removal")
 @RestController
-class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendRequestService) {
+class LegacyErc20SendRequestController(private val erc20SendRequestService: Erc20SendRequestService) {
 
-    @PostMapping("/v1/send")
+    @PostMapping("/send")
     fun createErc20SendRequest(
         @RequestBody requestBody: CreateErc20SendRequest
     ): ResponseEntity<Erc20SendRequestResponse> {
@@ -69,7 +70,7 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
         )
     }
 
-    @GetMapping("/v1/send/{id}")
+    @GetMapping("/send/{id}")
     fun getErc20SendRequest(
         @PathVariable("id") id: UUID,
         @RpcUrlBinding rpcSpec: RpcUrlSpec
@@ -100,7 +101,7 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
         )
     }
 
-    @PutMapping("/v1/send/{id}")
+    @PutMapping("/send/{id}")
     fun attachTransactionHash(
         @PathVariable("id") id: UUID,
         @RequestBody requestBody: AttachTransactionHashRequest
