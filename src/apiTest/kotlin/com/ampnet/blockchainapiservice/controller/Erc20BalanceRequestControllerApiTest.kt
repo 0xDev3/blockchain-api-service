@@ -77,7 +77,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create ERC20 balance request is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/balance")
+                MockMvcRequestBuilders.post("/v1/balance")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -159,7 +159,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create ERC20 balance request is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/balance")
+                MockMvcRequestBuilders.post("/v1/balance")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -240,7 +240,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for non-existent clientId") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/balance")
+                MockMvcRequestBuilders.post("/v1/balance")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -275,7 +275,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for non-existent clientId") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/balance")
+                MockMvcRequestBuilders.post("/v1/balance")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -311,7 +311,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for non-existent clientId") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/balance")
+                MockMvcRequestBuilders.post("/v1/balance")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -347,7 +347,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for non-existent clientId") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/balance")
+                MockMvcRequestBuilders.post("/v1/balance")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -398,7 +398,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         val createResponse = suppose("request to create ERC20 balance request is made") {
             val createResponse = mockMvc.perform(
-                MockMvcRequestBuilders.post("/balance")
+                MockMvcRequestBuilders.post("/v1/balance")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -446,7 +446,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch ERC20 balance request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/balance/$id")
+                MockMvcRequestBuilders.get("/v1/balance/$id")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -507,7 +507,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         val createResponse = suppose("request to create ERC20 balance request is made") {
             val createResponse = mockMvc.perform(
-                MockMvcRequestBuilders.post("/balance")
+                MockMvcRequestBuilders.post("/v1/balance")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -555,7 +555,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch ERC20 balance request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/balance/$id")
+                MockMvcRequestBuilders.get("/v1/balance/$id")
                     .header(
                         RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
                         "http://localhost:${hardhatContainer.mappedPort}"
@@ -600,7 +600,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonExistentErc20BalanceRequest() {
         verify("404 is returned for non-existent ERC20 balance request") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/balance/${UUID.randomUUID()}")
+                MockMvcRequestBuilders.get("/v1/balance/${UUID.randomUUID()}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -636,7 +636,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach signed message to ERC20 balance request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/balance/$id")
+                MockMvcRequestBuilders.put("/v1/balance/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -688,7 +688,7 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned when attaching signed message") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/balance/$id")
+                MockMvcRequestBuilders.put("/v1/balance/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
