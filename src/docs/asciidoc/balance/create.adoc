@@ -8,14 +8,19 @@ and only `id` field can be interpolated.
 
 Example request using `client_id` field:
 
-.Request
+.Request Example
 include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaClientId/http-request.adoc[]
-.Response
+.Response Example
 include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaClientId/http-response.adoc[]
 
 Example request using `chain_id`, `redirect_url` and `token_address` fields:
 
-.Request
+.Request Example
 include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaChainIdRedirectUrlAndTokenAddress/http-request.adoc[]
-.Response
+.Response Example
 include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaChainIdRedirectUrlAndTokenAddress/http-response.adoc[]
+
+.Request Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateErc20BalanceRequest.adoc[]
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse.adoc[]

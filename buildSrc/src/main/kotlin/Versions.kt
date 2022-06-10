@@ -38,6 +38,7 @@ object Versions {
         const val mockitoKotlin = "4.0.0"
         const val assertk = "0.25"
         const val wireMock = "2.27.2"
+        const val jsonSchemaGenerator = "4.24.3"
         const val testContainers = "1.16.2"
         const val postgresDriver = "42.3.1"
         const val jwt = "1.0.1"
