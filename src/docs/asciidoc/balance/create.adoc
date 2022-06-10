@@ -1,0 +1,40 @@
+=== Create ERC20 Balance Check Request
+Creates ERC20 balance request with specified parameters. Either `client_id` or `chain_id`, `redirect_url` and
+`token_address` must be provided as request body parameters. `block_number`, `wallet_address`, `arbitrary_data`,
+`screen_config` and all its child fields are optional. `arbitrary_data` field can contain any desired JSON value.
+Balance check request ID can be interpolated into the `redirect_url` by placing `${id}` placeholder in the place where
+request ID is desired in the URL. The placeholder must strictly have dollar sign and brackets to be interpolated,
+and only `id` field can be interpolated.
+
+Example request using `client_id` field:
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaClientId/http-request.adoc[]
+====
+.Response Example
+[%collapsible]
+====
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaClientId/http-response.adoc[]
+====
+
+Example request using `chain_id`, `redirect_url` and `token_address` fields:
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaChainIdRedirectUrlAndTokenAddress/http-request.adoc[]
+====
+.Response Example
+[%collapsible]
+====
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestViaChainIdRedirectUrlAndTokenAddress/http-response.adoc[]
+====
+
+Schemas:
+
+.Request Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateErc20BalanceRequest.adoc[]
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse.adoc[]

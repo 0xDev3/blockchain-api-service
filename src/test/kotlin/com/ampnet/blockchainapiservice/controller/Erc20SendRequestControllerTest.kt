@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.controller
 
+import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
@@ -72,19 +73,21 @@ class Erc20SendRequestControllerTest : TestBase() {
         val controller = Erc20SendRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.createErc20SendRequest(
-                CreateErc20SendRequest(
-                    clientId = params.clientId,
-                    chainId = params.chainId?.value,
-                    redirectUrl = params.redirectUrl,
-                    tokenAddress = params.tokenAddress?.rawValue,
-                    amount = params.tokenAmount.rawValue,
-                    senderAddress = params.tokenSenderAddress?.rawValue,
-                    recipientAddress = params.tokenRecipientAddress.rawValue,
-                    arbitraryData = params.arbitraryData,
-                    screenConfig = params.screenConfig
-                )
+            val request = CreateErc20SendRequest(
+                clientId = params.clientId,
+                chainId = params.chainId?.value,
+                redirectUrl = params.redirectUrl,
+                tokenAddress = params.tokenAddress?.rawValue,
+                amount = params.tokenAmount.rawValue,
+                senderAddress = params.tokenSenderAddress?.rawValue,
+                recipientAddress = params.tokenRecipientAddress.rawValue,
+                arbitraryData = params.arbitraryData,
+                screenConfig = params.screenConfig
             )
+            val response = controller.createErc20SendRequest(request)
+
+            JsonSchemaDocumentation.createSchema(request.javaClass)
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
             assertThat(response).withMessage()
                 .isEqualTo(
@@ -155,7 +158,11 @@ class Erc20SendRequestControllerTest : TestBase() {
         val controller = Erc20SendRequestController(service)
 
         verify("controller returns correct response") {
-            assertThat(controller.getErc20SendRequest(id, rpcSpec)).withMessage()
+            val response = controller.getErc20SendRequest(id, rpcSpec)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(
                         Erc20SendRequestResponse(
@@ -192,7 +199,9 @@ class Erc20SendRequestControllerTest : TestBase() {
         val txHash = "tx-hash"
 
         suppose("transaction hash will be attached") {
-            controller.attachTransactionHash(id, AttachTransactionHashRequest(txHash))
+            val request = AttachTransactionHashRequest(txHash)
+            controller.attachTransactionHash(id, request)
+            JsonSchemaDocumentation.createSchema(request.javaClass)
         }
 
         verify("transaction hash is correctly attached") {

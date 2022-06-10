@@ -1,0 +1,27 @@
+=== Fetch ERC20 Balance Check Request by ID
+Fetches stored ERC20 balance check request with its current status. Possible statuses are `PENDING`, `SUCCESS` and
+`FAILED`. The request is considered successful if the attached signed message is valid and was signed by
+`wallet_address`. If `wallet_address` was not specified when the request was created, then any valid signature will be
+accepted. For successful requests, `balance` field will contain info about requested ERC20 balance. For pending
+requests, `balance` and `signed_message` fields will always be `null`. If the signed message is invalid or does not
+match specified `wallet_address`, request will be considered as failed. If `block_number` was specified during request
+creation, then ERC20 balance will be fetched only for that block number, and if `block_number` was not specified then
+the latest ERC20 balance will be fetched every time this resource is requested.
+
+Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
+specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC
+URL, use `X-RPC-URL-OVERRIDE` header.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequest/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequest/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse.adoc[]

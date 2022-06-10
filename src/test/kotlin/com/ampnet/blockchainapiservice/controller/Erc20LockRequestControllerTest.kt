@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.controller
 
+import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
@@ -75,20 +76,22 @@ class Erc20LockRequestControllerTest : TestBase() {
         val controller = Erc20LockRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.createErc20LockRequest(
-                CreateErc20LockRequest(
-                    clientId = params.clientId,
-                    chainId = params.chainId?.value,
-                    redirectUrl = params.redirectUrl,
-                    tokenAddress = params.tokenAddress?.rawValue,
-                    amount = params.tokenAmount.rawValue,
-                    lockDurationInSeconds = params.lockDuration.rawValue,
-                    lockContractAddress = params.lockContractAddress.rawValue,
-                    senderAddress = params.tokenSenderAddress?.rawValue,
-                    arbitraryData = params.arbitraryData,
-                    screenConfig = params.screenConfig
-                )
+            val request = CreateErc20LockRequest(
+                clientId = params.clientId,
+                chainId = params.chainId?.value,
+                redirectUrl = params.redirectUrl,
+                tokenAddress = params.tokenAddress?.rawValue,
+                amount = params.tokenAmount.rawValue,
+                lockDurationInSeconds = params.lockDuration.rawValue,
+                lockContractAddress = params.lockContractAddress.rawValue,
+                senderAddress = params.tokenSenderAddress?.rawValue,
+                arbitraryData = params.arbitraryData,
+                screenConfig = params.screenConfig
             )
+            val response = controller.createErc20LockRequest(request)
+
+            JsonSchemaDocumentation.createSchema(request.javaClass)
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
             assertThat(response).withMessage()
                 .isEqualTo(
@@ -162,7 +165,11 @@ class Erc20LockRequestControllerTest : TestBase() {
         val controller = Erc20LockRequestController(service)
 
         verify("controller returns correct response") {
-            assertThat(controller.getErc20LockRequest(id, rpcSpec)).withMessage()
+            val response = controller.getErc20LockRequest(id, rpcSpec)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(
                         Erc20LockRequestResponse(
@@ -201,7 +208,9 @@ class Erc20LockRequestControllerTest : TestBase() {
         val txHash = "tx-hash"
 
         suppose("transaction hash will be attached") {
-            controller.attachTransactionHash(id, AttachTransactionHashRequest(txHash))
+            val request = AttachTransactionHashRequest(txHash)
+            controller.attachTransactionHash(id, request)
+            JsonSchemaDocumentation.createSchema(request.javaClass)
         }
 
         verify("transaction hash is correctly attached") {

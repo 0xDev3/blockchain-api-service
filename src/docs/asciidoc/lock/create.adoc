@@ -1,0 +1,39 @@
+=== Create ERC20 Lock Request
+Creates ERC20 lock request with specified parameters. Either `client_id` or `chain_id`, `redirect_url` and
+`token_address` must be provided as request body parameters. `sender_address`, `arbitrary_data`, `screen_config` and all
+its child fields are optional. `arbitrary_data` field can contain any desired JSON value. Lock request ID can be
+interpolated into the `redirect_url` by placing `${id}` placeholder in the place where request ID is desired in the URL.
+The placeholder must strictly have dollar sign and brackets to be interpolated, and only `id` field can be interpolated.
+
+Example request using `client_id` field:
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyCreateErc20LockRequestViaClientId/http-request.adoc[]
+====
+.Response Example
+[%collapsible]
+====
+include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyCreateErc20LockRequestViaClientId/http-response.adoc[]
+====
+
+Example request using `chain_id`, `redirect_url` and `token_address` fields:
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyCreateErc20LockRequestViaChainIdRedirectUrlAndTokenAddress/http-request.adoc[]
+====
+.Response Example
+[%collapsible]
+====
+include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyCreateErc20LockRequestViaChainIdRedirectUrlAndTokenAddress/http-response.adoc[]
+====
+
+Schemas:
+
+.Request Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest.adoc[]
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20LockRequestResponse.adoc[]
