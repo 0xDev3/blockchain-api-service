@@ -8,16 +8,30 @@ The placeholder must strictly have dollar sign and brackets to be interpolated, 
 Example request using `client_id` field:
 
 .Request Example
+[%collapsible]
+====
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestViaClientId/http-request.adoc[]
+====
 .Response Example
+[%collapsible]
+====
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestViaClientId/http-response.adoc[]
+====
 
 Example request using `chain_id`, `redirect_url` and `token_address` fields:
 
 .Request Example
+[%collapsible]
+====
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestViaChainIdRedirectUrlAndTokenAddress/http-request.adoc[]
+====
 .Response Example
+[%collapsible]
+====
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestViaChainIdRedirectUrlAndTokenAddress/http-response.adoc[]
+====
+
+Schemas:
 
 .Request Schema
 include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateErc20SendRequest.adoc[]

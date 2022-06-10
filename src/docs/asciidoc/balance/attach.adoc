@@ -3,9 +3,15 @@ Attaches wallet address and signed message to existing ERC20 balance check reque
 message are attached to the request, any subsequent attempts to attach a new values will fail.
 
 .Request Example
+[%collapsible]
+====
 include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyAttachSignedMessage/http-request.adoc[]
+====
 .Request Schema
 include::{snippets}/com.ampnet.blockchainapiservice.model.request.AttachSignedMessageRequest.adoc[]
 
 .Response Example
+[%collapsible]
+====
 include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyAttachSignedMessage/http-response.adoc[]
+====

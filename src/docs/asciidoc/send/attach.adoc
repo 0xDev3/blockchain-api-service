@@ -3,9 +3,15 @@ Attaches transaction hash to existing ERC20 send request. Once the transaction h
 subsequent attempts to attach a new transaction hash will fail.
 
 .Request Example
+[%collapsible]
+====
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-request.adoc[]
+====
 .Request Schema
 include::{snippets}/com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest.adoc[]
 
 .Response Example
+[%collapsible]
+====
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-response.adoc[]
+====

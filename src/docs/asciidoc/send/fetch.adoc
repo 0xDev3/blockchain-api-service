@@ -11,9 +11,15 @@ specified chain ID, it only allows you to specify RPC URL for non-natively suppo
 URL, use `X-RPC-URL-OVERRIDE` header.
 
 .Request Example
+[%collapsible]
+====
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequest/http-request.adoc[]
+====
 
 .Response Example
+[%collapsible]
+====
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequest/http-response.adoc[]
+====
 .Response Schema
 include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse.adoc[]
