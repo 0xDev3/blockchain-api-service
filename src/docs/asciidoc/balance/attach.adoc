@@ -1,0 +1,8 @@
+=== Attach WalletAddress and Signed Message to ERC20 Balance Check Request
+Attaches wallet address and signed message to existing ERC20 balance check request. Once the wallet address and signed
+message are attached to the request, any subsequent attempts to attach a new values will fail.
+
+.Request
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyAttachSignedMessage/http-request.adoc[]
+.Response
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyAttachSignedMessage/http-response.adoc[]

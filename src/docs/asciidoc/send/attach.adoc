@@ -1,0 +1,8 @@
+=== Attach Transaction Hash to ERC20 Send Request
+Attaches transaction hash to existing ERC20 send request. Once the transaction hash is attached to the request, any
+subsequent attempts to attach a new transaction hash will fail.
+
+.Request
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-request.adoc[]
+.Response
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-response.adoc[]
