@@ -7,14 +7,19 @@ The placeholder must strictly have dollar sign and brackets to be interpolated, 
 
 Example request using `client_id` field:
 
-.Request
+.Request Example
 include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyCreateErc20LockRequestViaClientId/http-request.adoc[]
-.Response
+.Response Example
 include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyCreateErc20LockRequestViaClientId/http-response.adoc[]
 
 Example request using `chain_id`, `redirect_url` and `token_address` fields:
 
-.Request
+.Request Example
 include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyCreateErc20LockRequestViaChainIdRedirectUrlAndTokenAddress/http-request.adoc[]
-.Response
+.Response Example
 include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyCreateErc20LockRequestViaChainIdRedirectUrlAndTokenAddress/http-response.adoc[]
+
+.Request Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest.adoc[]
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20LockRequestResponse.adoc[]

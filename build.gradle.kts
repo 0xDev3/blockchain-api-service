@@ -122,6 +122,7 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:${Versions.Dependencies.testContainers}")
     testImplementation("org.testcontainers:postgresql:${Versions.Dependencies.testContainers}")
     testImplementation("com.github.tomakehurst:wiremock:${Versions.Dependencies.wireMock}")
+    testImplementation("com.github.victools:jsonschema-generator:${Versions.Dependencies.jsonSchemaGenerator}")
     testImplementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
@@ -358,7 +359,7 @@ tasks.asciidoctor {
 }
 
 tasks.register<Copy>("copyDocs") {
-    from(file("$buildDir/docs/asciidoc"))
+    from(file("$buildDir/docs/asciidoc/index.html"))
     into(file("src/main/resources/static/docs"))
     dependsOn(tasks.asciidoctor)
 }

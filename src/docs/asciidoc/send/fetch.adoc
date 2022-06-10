@@ -10,7 +10,10 @@ Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT 
 specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC
 URL, use `X-RPC-URL-OVERRIDE` header.
 
-.Request
+.Request Example
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequest/http-request.adoc[]
-.Response
+
+.Response Example
 include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequest/http-response.adoc[]
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse.adoc[]
