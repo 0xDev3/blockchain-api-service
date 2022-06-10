@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.controller
 
+import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
@@ -70,18 +71,20 @@ class Erc20BalanceRequestControllerTest : TestBase() {
         val controller = Erc20BalanceRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.createErc20BalanceRequest(
-                CreateErc20BalanceRequest(
-                    clientId = params.clientId,
-                    chainId = params.chainId?.value,
-                    redirectUrl = params.redirectUrl,
-                    tokenAddress = params.tokenAddress?.rawValue,
-                    blockNumber = params.blockNumber?.value,
-                    walletAddress = params.requestedWalletAddress?.rawValue,
-                    arbitraryData = params.arbitraryData,
-                    screenConfig = params.screenConfig
-                )
+            val request = CreateErc20BalanceRequest(
+                clientId = params.clientId,
+                chainId = params.chainId?.value,
+                redirectUrl = params.redirectUrl,
+                tokenAddress = params.tokenAddress?.rawValue,
+                blockNumber = params.blockNumber?.value,
+                walletAddress = params.requestedWalletAddress?.rawValue,
+                arbitraryData = params.arbitraryData,
+                screenConfig = params.screenConfig
             )
+            val response = controller.createErc20BalanceRequest(request)
+
+            JsonSchemaDocumentation.createSchema(request.javaClass)
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
             assertThat(response).withMessage()
                 .isEqualTo(
@@ -141,7 +144,11 @@ class Erc20BalanceRequestControllerTest : TestBase() {
         val controller = Erc20BalanceRequestController(service)
 
         verify("controller returns correct response") {
-            assertThat(controller.getErc20BalanceRequest(id, rpcSpec)).withMessage()
+            val response = controller.getErc20BalanceRequest(id, rpcSpec)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(
                         Erc20BalanceRequestResponse(
@@ -180,7 +187,9 @@ class Erc20BalanceRequestControllerTest : TestBase() {
         val signedMessage = SignedMessage("signed-message")
 
         suppose("signed message will be attached") {
-            controller.attachSignedMessage(id, AttachSignedMessageRequest(walletAddress.rawValue, signedMessage.value))
+            val request = AttachSignedMessageRequest(walletAddress.rawValue, signedMessage.value)
+            controller.attachSignedMessage(id, request)
+            JsonSchemaDocumentation.createSchema(request.javaClass)
         }
 
         verify("signed message is correctly attached") {
