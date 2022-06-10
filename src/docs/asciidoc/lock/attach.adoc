@@ -1,0 +1,8 @@
+=== Attach Transaction Hash to ERC20 Lock Request
+Attaches transaction hash to existing ERC20 lock request. Once the transaction hash is attached to the request, any
+subsequent attempts to attach a new transaction hash will fail.
+
+.Request
+include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-request.adoc[]
+.Response
+include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyAttachTransactionHash/http-response.adoc[]
