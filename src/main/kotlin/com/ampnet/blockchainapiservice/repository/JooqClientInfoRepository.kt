@@ -7,6 +7,7 @@ import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
 
 @Repository
+@Deprecated("for removal")
 class JooqClientInfoRepository(private val dslContext: DSLContext) : ClientInfoRepository {
 
     companion object : KLogging()
