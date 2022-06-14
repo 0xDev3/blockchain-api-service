@@ -2,7 +2,6 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.config.JsonConfig
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20SendRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
@@ -24,7 +23,7 @@ import java.math.BigInteger
 import java.util.UUID
 
 @JooqTest
-@Import(JooqErc20SendRequestRepository::class, JsonConfig::class)
+@Import(JooqErc20SendRequestRepository::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
 
