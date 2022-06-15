@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.jooq.Converter
 import org.jooq.JSON
 import java.math.BigInteger
+import java.time.OffsetDateTime
 
 class ChainIdConverter : Converter<Long, ChainId> {
     override fun from(value: Long?): ChainId? = value?.let { ChainId(it) }
@@ -105,5 +106,16 @@ class JsonNodeConverter : Converter<JSON, JsonNode> {
 
     companion object {
         private const val serialVersionUID: Long = 912286490023352427L
+    }
+}
+
+class UtcDateTimeConverter : Converter<OffsetDateTime, UtcDateTime> {
+    override fun from(value: OffsetDateTime?): UtcDateTime? = value?.let { UtcDateTime(it) }
+    override fun to(value: UtcDateTime?): OffsetDateTime? = value?.value
+    override fun fromType(): Class<OffsetDateTime> = OffsetDateTime::class.java
+    override fun toType(): Class<UtcDateTime> = UtcDateTime::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = -8529019904691898554L
     }
 }
