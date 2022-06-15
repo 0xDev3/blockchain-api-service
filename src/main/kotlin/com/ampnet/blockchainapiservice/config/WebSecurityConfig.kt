@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.config
 
+import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
 import com.ampnet.core.jwt.AuthenticationEntryPointExceptionHandler
 import com.ampnet.core.jwt.filter.JwtAuthenticationFilter
 import com.ampnet.core.jwt.provider.JwtAuthenticationProvider
@@ -53,7 +54,9 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) : WebSecurityCon
             HttpHeaders.AUTHORIZATION,
             HttpHeaders.CONTENT_TYPE,
             HttpHeaders.CACHE_CONTROL,
-            HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS
+            HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
+            RpcUrlSpecResolver.RPC_URL_HEADER,
+            RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER
         )
 
         val source = UrlBasedCorsConfigurationSource()
