@@ -22,10 +22,12 @@ CREATE TABLE blockchain_api_service.project (
 CREATE INDEX project_owner_id ON blockchain_api_service.project(owner_id);
 
 CREATE TABLE blockchain_api_service.api_key (
-    id         UUID    PRIMARY KEY,
-    project_id UUID    NOT NULL REFERENCES blockchain_api_service.project(id),
-    api_key    VARCHAR NOT NULL UNIQUE
+    id         UUID                     PRIMARY KEY,
+    project_id UUID                     NOT NULL REFERENCES blockchain_api_service.project(id),
+    api_key    VARCHAR                  NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE INDEX api_key_project_id ON blockchain_api_service.api_key(project_id);
 CREATE INDEX api_key_api_key ON blockchain_api_service.api_key(api_key);
+CREATE INDEX api_key_created_at ON blockchain_api_service.api_key(created_at);

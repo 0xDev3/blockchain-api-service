@@ -19,7 +19,8 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
         val record = ApiKeyRecord(
             id = apiKey.id,
             projectId = apiKey.projectId,
-            apiKey = apiKey.apiKey
+            apiKey = apiKey.apiKey,
+            createdAt = apiKey.createdAt
         )
         dslContext.executeInsert(record)
         return record.toModel()
@@ -36,6 +37,7 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
         logger.info { "Get API key by projectId: $projectId" }
         return dslContext.selectFrom(ApiKeyTable.API_KEY)
             .where(ApiKeyTable.API_KEY.PROJECT_ID.eq(projectId))
+            .orderBy(ApiKeyTable.API_KEY.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
@@ -51,6 +53,7 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
         ApiKey(
             id = id!!,
             projectId = projectId!!,
-            apiKey = apiKey!!
+            apiKey = apiKey!!,
+            createdAt = createdAt!!
         )
 }

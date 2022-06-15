@@ -212,6 +212,12 @@ jooq {
                                 converter = "com.ampnet.blockchainapiservice.util.JsonNodeConverter"
                                 includeExpression = ".*"
                                 includeTypes = "JSON"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.UtcDateTime"
+                                converter = "com.ampnet.blockchainapiservice.util.UtcDateTimeConverter"
+                                includeExpression = ".*"
+                                includeTypes = "TIMESTAMPTZ"
                             }
                         )
                     }

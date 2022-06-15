@@ -12,6 +12,7 @@ import com.ampnet.blockchainapiservice.model.result.ApiKey
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.UtcDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -20,6 +21,8 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
+import java.time.Duration
+import java.time.OffsetDateTime
 import java.util.UUID
 
 @JooqTest
@@ -30,7 +33,8 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
     companion object {
         private val PROJECT_ID = UUID.randomUUID()
         private val OWNER_ID = UUID.randomUUID()
-        private val API_KEY = "api-key"
+        private const val API_KEY = "api-key"
+        private val CREATED_AT = UtcDateTime(OffsetDateTime.parse("2022-01-01T00:00:00Z"))
     }
 
     @Suppress("unused")
@@ -77,7 +81,8 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                 ApiKeyRecord(
                     id = id,
                     projectId = PROJECT_ID,
-                    apiKey = API_KEY
+                    apiKey = API_KEY,
+                    createdAt = CREATED_AT
                 )
             )
         }
@@ -90,7 +95,8 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                     ApiKey(
                         id = id,
                         projectId = PROJECT_ID,
-                        apiKey = API_KEY
+                        apiKey = API_KEY,
+                        createdAt = CREATED_AT
                     )
                 )
         }
@@ -113,12 +119,14 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                 ApiKeyRecord(
                     id = UUID.randomUUID(),
                     projectId = PROJECT_ID,
-                    apiKey = "api-key-1"
+                    apiKey = "api-key-1",
+                    createdAt = CREATED_AT
                 ),
                 ApiKeyRecord(
                     id = UUID.randomUUID(),
                     projectId = PROJECT_ID,
-                    apiKey = "api-key-2"
+                    apiKey = "api-key-2",
+                    createdAt = CREATED_AT + Duration.ofSeconds(10L)
                 )
             ).execute()
         }
@@ -127,7 +135,9 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
             val result = repository.getAllByProjectId(PROJECT_ID)
 
             assertThat(result.map { it.apiKey }).withMessage()
-                .containsExactlyInAnyOrder("api-key-1", "api-key-2")
+                .isEqualTo(
+                    listOf("api-key-1", "api-key-2")
+                )
         }
     }
 
@@ -138,7 +148,8 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                 ApiKeyRecord(
                     id = UUID.randomUUID(),
                     projectId = PROJECT_ID,
-                    apiKey = API_KEY
+                    apiKey = API_KEY,
+                    createdAt = CREATED_AT
                 )
             )
         }
@@ -157,7 +168,8 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         val apiKey = ApiKey(
             id = id,
             projectId = PROJECT_ID,
-            apiKey = API_KEY
+            apiKey = API_KEY,
+            createdAt = CREATED_AT
         )
 
         val storedApiKey = suppose("API key is stored in database") {
