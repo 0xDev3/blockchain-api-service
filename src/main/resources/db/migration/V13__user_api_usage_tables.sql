@@ -11,15 +11,17 @@ CREATE INDEX user_identifier_user_identifier_identifier_type
     ON blockchain_api_service.user_identifier(user_identifier, identifier_type);
 
 CREATE TABLE blockchain_api_service.project (
-    id                      UUID    PRIMARY KEY,
-    owner_id                UUID    NOT NULL REFERENCES blockchain_api_service.user_identifier(id),
-    issuer_contract_address VARCHAR NOT NULL UNIQUE,
-    redirect_url            VARCHAR NOT NULL,
-    chain_id                BIGINT  NOT NULL,
-    custom_rpc_url          VARCHAR
+    id                      UUID                     PRIMARY KEY,
+    owner_id                UUID                     NOT NULL REFERENCES blockchain_api_service.user_identifier(id),
+    issuer_contract_address VARCHAR                  NOT NULL UNIQUE,
+    redirect_url            VARCHAR                  NOT NULL,
+    chain_id                BIGINT                   NOT NULL,
+    custom_rpc_url          VARCHAR,
+    created_at              TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
 CREATE INDEX project_owner_id ON blockchain_api_service.project(owner_id);
+CREATE INDEX project_created_at ON blockchain_api_service.project(created_at);
 
 CREATE TABLE blockchain_api_service.api_key (
     id         UUID                     PRIMARY KEY,
