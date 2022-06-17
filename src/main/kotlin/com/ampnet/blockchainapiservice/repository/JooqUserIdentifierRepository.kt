@@ -56,5 +56,4 @@ class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIde
                     walletAddress = WalletAddress(userIdentifier!!)
                 )
         }
-
 }

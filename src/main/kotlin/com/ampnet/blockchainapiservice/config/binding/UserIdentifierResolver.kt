@@ -30,7 +30,7 @@ class UserIdentifierResolver(
         nativeWebRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?
     ): UserIdentifier {
-        val principal = (SecurityContextHolder.getContext()?.authentication?.principal as? String)
+        val principal = (SecurityContextHolder.getContext().authentication?.principal as? String)
             ?.let { WalletAddress(it) } ?: throw BadAuthenticationException()
         return userIdentifierRepository.getByWalletAddress(principal)
             ?: userIdentifierRepository.store(
