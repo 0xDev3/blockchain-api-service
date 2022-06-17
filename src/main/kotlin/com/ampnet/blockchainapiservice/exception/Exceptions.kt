@@ -83,7 +83,7 @@ class CannotAttachSignedMessageException(message: String) : ServiceException(
     }
 }
 
-class BadAuthenticationException() : ServiceException(
+class BadAuthenticationException : ServiceException(
     errorCode = ErrorCode.BAD_AUTHENTICATION,
     httpStatus = HttpStatus.UNAUTHORIZED,
     message = "Provided authentication header has invalid format"
