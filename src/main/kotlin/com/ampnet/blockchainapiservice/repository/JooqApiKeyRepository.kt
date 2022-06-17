@@ -34,7 +34,7 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
     }
 
     override fun getAllByProjectId(projectId: UUID): List<ApiKey> {
-        logger.info { "Get API key by projectId: $projectId" }
+        logger.info { "Get API keys by projectId: $projectId" }
         return dslContext.selectFrom(ApiKeyTable.API_KEY)
             .where(ApiKeyTable.API_KEY.PROJECT_ID.eq(projectId))
             .orderBy(ApiKeyTable.API_KEY.CREATED_AT.asc())

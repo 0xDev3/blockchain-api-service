@@ -5,6 +5,8 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IUserIdentifierRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.result.UserIdentifier
+import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
@@ -47,9 +49,12 @@ class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIde
     }
 
     private fun IUserIdentifierRecord.toModel(): UserIdentifier =
-        UserIdentifier(
-            id = id!!,
-            userIdentifier = userIdentifier!!,
-            identifierType = identifierType!!
-        )
+        when (identifierType!!) {
+            UserIdentifierType.ETH_WALLET_ADDRESS ->
+                UserWalletAddressIdentifier(
+                    id = id!!,
+                    walletAddress = WalletAddress(userIdentifier!!)
+                )
+        }
+
 }
