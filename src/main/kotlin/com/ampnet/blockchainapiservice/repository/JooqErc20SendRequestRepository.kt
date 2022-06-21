@@ -7,6 +7,7 @@ import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.util.TransactionHash
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
@@ -42,6 +43,20 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
         return dslContext.selectFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST)
             .where(Erc20SendRequestTable.ERC20_SEND_REQUEST.ID.eq(id))
             .fetchOne { it.toModel() }
+    }
+
+    override fun getBySender(sender: WalletAddress): List<Erc20SendRequest> {
+        logger.debug { "Get ERC20 send requests filtered by sender address: $sender" }
+        return dslContext.selectFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST)
+            .where(Erc20SendRequestTable.ERC20_SEND_REQUEST.TOKEN_SENDER_ADDRESS.eq(sender))
+            .fetch { it.toModel() }
+    }
+
+    override fun getByRecipient(recipient: WalletAddress): List<Erc20SendRequest> {
+        logger.debug { "Get ERC20 send requests filtered by recipient address: $recipient" }
+        return dslContext.selectFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST)
+            .where(Erc20SendRequestTable.ERC20_SEND_REQUEST.TOKEN_RECIPIENT_ADDRESS.eq(recipient))
+            .fetch { it.toModel() }
     }
 
     override fun setTxHash(id: UUID, txHash: TransactionHash): Boolean {

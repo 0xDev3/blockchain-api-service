@@ -100,6 +100,72 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
         )
     }
 
+    @GetMapping("/v1/send/by-sender/{sender}")
+    fun getErc20SendRequestsBySender(
+        @PathVariable("sender") sender: WalletAddress,
+        @RpcUrlBinding rpcSpec: RpcUrlSpec
+    ): ResponseEntity<List<Erc20SendRequestResponse>> {
+        val sendRequests = erc20SendRequestService.getErc20SendRequestsBySender(sender, rpcSpec)
+
+        return ResponseEntity.ok(
+            sendRequests.map {
+                Erc20SendRequestResponse(
+                    id = it.value.id,
+                    status = it.status,
+                    chainId = it.value.chainId.value,
+                    tokenAddress = it.value.tokenAddress.rawValue,
+                    amount = it.value.tokenAmount.rawValue,
+                    senderAddress = it.value.tokenSenderAddress?.rawValue,
+                    recipientAddress = it.value.tokenRecipientAddress.rawValue,
+                    arbitraryData = it.value.arbitraryData,
+                    screenConfig = it.value.screenConfig.orEmpty(),
+                    redirectUrl = it.value.redirectUrl,
+                    sendTx = TransactionResponse(
+                        txHash = it.transactionData.txHash?.value,
+                        from = it.transactionData.fromAddress?.rawValue,
+                        to = it.transactionData.toAddress.rawValue,
+                        data = it.transactionData.data.value,
+                        blockConfirmations = it.transactionData.blockConfirmations,
+                        timestamp = it.transactionData.timestamp?.value
+                    )
+                )
+            }
+        )
+    }
+
+    @GetMapping("/v1/send/by-recipient/{recipient}")
+    fun getErc20SendRequestsByRecipient(
+        @PathVariable("recipient") recipient: WalletAddress,
+        @RpcUrlBinding rpcSpec: RpcUrlSpec
+    ): ResponseEntity<List<Erc20SendRequestResponse>> {
+        val sendRequests = erc20SendRequestService.getErc20SendRequestsByRecipient(recipient, rpcSpec)
+
+        return ResponseEntity.ok(
+            sendRequests.map {
+                Erc20SendRequestResponse(
+                    id = it.value.id,
+                    status = it.status,
+                    chainId = it.value.chainId.value,
+                    tokenAddress = it.value.tokenAddress.rawValue,
+                    amount = it.value.tokenAmount.rawValue,
+                    senderAddress = it.value.tokenSenderAddress?.rawValue,
+                    recipientAddress = it.value.tokenRecipientAddress.rawValue,
+                    arbitraryData = it.value.arbitraryData,
+                    screenConfig = it.value.screenConfig.orEmpty(),
+                    redirectUrl = it.value.redirectUrl,
+                    sendTx = TransactionResponse(
+                        txHash = it.transactionData.txHash?.value,
+                        from = it.transactionData.fromAddress?.rawValue,
+                        to = it.transactionData.toAddress.rawValue,
+                        data = it.transactionData.data.value,
+                        blockConfirmations = it.transactionData.blockConfirmations,
+                        timestamp = it.transactionData.timestamp?.value
+                    )
+                )
+            }
+        )
+    }
+
     @PutMapping("/v1/send/{id}")
     fun attachTransactionHash(
         @PathVariable("id") id: UUID,
