@@ -76,9 +76,6 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) : WebSecurityCon
             .antMatchers("/actuator/**").permitAll()
             .antMatchers("/public/**").permitAll()
             .antMatchers("/docs/index.html").permitAll()
-            .antMatchers("/send/**").permitAll() // TODO remove after api is removed
-            .antMatchers("/balance/**").permitAll() // TODO remove after api is removed
-            .antMatchers("/lock/**").permitAll() // TODO remove after api is removed
             .antMatchers("/v1/**").permitAll()
             .antMatchers("/v1/projects/**").authenticated()
             .anyRequest().authenticated()

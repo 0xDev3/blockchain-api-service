@@ -106,6 +106,171 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchErc20SendRequestsBySender() {
+        val senderRequests = listOf(
+            Erc20SendRequestRecord(
+                id = UUID.randomUUID(),
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH
+            ),
+            Erc20SendRequestRecord(
+                id = UUID.randomUUID(),
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH
+            ),
+        )
+        val otherRequests = listOf(
+            Erc20SendRequestRecord(
+                id = UUID.randomUUID(),
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                tokenSenderAddress = WalletAddress("dead"),
+                tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH
+            ),
+            Erc20SendRequestRecord(
+                id = UUID.randomUUID(),
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                tokenSenderAddress = null,
+                tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH
+            )
+        )
+
+        suppose("some ERC20 send requests exist in database") {
+            dslContext.batchInsert(senderRequests + otherRequests).execute()
+        }
+
+        verify("ERC20 send requests are correctly fetched by sender") {
+            val result = repository.getBySender(TOKEN_SENDER_ADDRESS)
+
+            assertThat(result).withMessage()
+                .containsExactlyInAnyOrderElementsOf(
+                    senderRequests.map {
+                        Erc20SendRequest(
+                            id = it.id!!,
+                            chainId = it.chainId!!,
+                            redirectUrl = it.redirectUrl!!,
+                            tokenAddress = it.tokenAddress!!,
+                            tokenAmount = it.tokenAmount!!,
+                            tokenSenderAddress = it.tokenSenderAddress,
+                            tokenRecipientAddress = it.tokenRecipientAddress!!,
+                            txHash = it.txHash,
+                            arbitraryData = it.arbitraryData,
+                            screenConfig = ScreenConfig(
+                                beforeActionMessage = it.screenBeforeActionMessage,
+                                afterActionMessage = it.screenAfterActionMessage
+                            )
+                        )
+                    }
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20SendRequestsByRecipient() {
+        val recipientRequests = listOf(
+            Erc20SendRequestRecord(
+                id = UUID.randomUUID(),
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH
+            ),
+            Erc20SendRequestRecord(
+                id = UUID.randomUUID(),
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH
+            ),
+        )
+        val otherRequests = listOf(
+            Erc20SendRequestRecord(
+                id = UUID.randomUUID(),
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                tokenRecipientAddress = WalletAddress("dead"),
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH
+            )
+        )
+
+        suppose("some ERC20 send requests exist in database") {
+            dslContext.batchInsert(recipientRequests + otherRequests).execute()
+        }
+
+        verify("ERC20 send requests are correctly fetched by recipient") {
+            val result = repository.getByRecipient(TOKEN_RECIPIENT_ADDRESS)
+
+            assertThat(result).withMessage()
+                .containsExactlyInAnyOrderElementsOf(
+                    recipientRequests.map {
+                        Erc20SendRequest(
+                            id = it.id!!,
+                            chainId = it.chainId!!,
+                            redirectUrl = it.redirectUrl!!,
+                            tokenAddress = it.tokenAddress!!,
+                            tokenAmount = it.tokenAmount!!,
+                            tokenSenderAddress = it.tokenSenderAddress,
+                            tokenRecipientAddress = it.tokenRecipientAddress!!,
+                            txHash = it.txHash,
+                            arbitraryData = it.arbitraryData,
+                            screenConfig = ScreenConfig(
+                                beforeActionMessage = it.screenBeforeActionMessage,
+                                afterActionMessage = it.screenAfterActionMessage
+                            )
+                        )
+                    }
+                )
+        }
+    }
+
+    @Test
     fun mustCorrectlyStoreErc20SendRequest() {
         val id = UUID.randomUUID()
         val params = StoreErc20SendRequestParams(

@@ -24,7 +24,6 @@ import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.ZeroAddress
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,7 +33,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class Erc20LockRequestControllerApiTest : ControllerTestBase() {
@@ -532,7 +530,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.lockTx.timestamp)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -653,7 +651,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.lockTx.timestamp)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 

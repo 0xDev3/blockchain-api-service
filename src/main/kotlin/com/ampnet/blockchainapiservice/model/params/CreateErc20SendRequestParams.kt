@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.model.params
 
 import com.ampnet.blockchainapiservice.model.ScreenConfig
+import com.ampnet.blockchainapiservice.model.request.CreateErc20SendRequest
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -17,4 +18,16 @@ data class CreateErc20SendRequestParams(
     val tokenRecipientAddress: WalletAddress,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig
-) : ClientIdParam
+) : ClientIdParam {
+    constructor(requestBody: CreateErc20SendRequest) : this(
+        clientId = requestBody.clientId,
+        chainId = requestBody.chainId?.let { ChainId(it) },
+        redirectUrl = requestBody.redirectUrl,
+        tokenAddress = requestBody.tokenAddress?.let { ContractAddress(it) },
+        tokenAmount = Balance(requestBody.amount),
+        tokenSenderAddress = requestBody.senderAddress?.let { WalletAddress(it) },
+        tokenRecipientAddress = WalletAddress(requestBody.recipientAddress),
+        arbitraryData = requestBody.arbitraryData,
+        screenConfig = requestBody.screenConfig ?: ScreenConfig.EMPTY
+    )
+}
