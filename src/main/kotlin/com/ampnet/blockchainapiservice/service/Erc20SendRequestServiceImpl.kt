@@ -48,19 +48,23 @@ class Erc20SendRequestServiceImpl(
             "ERC20 send request not found for ID: $id"
         )
 
-        val transactionInfo = erc20CommonService.fetchTransactionInfo(
-            txHash = erc20SendRequest.txHash,
-            chainId = erc20SendRequest.chainId,
-            rpcSpec = rpcSpec
-        )
-        val data = encodeFunctionData(erc20SendRequest.tokenRecipientAddress, erc20SendRequest.tokenAmount, id)
-        val status = erc20SendRequest.determineStatus(transactionInfo, data)
+        return erc20SendRequest.appendTransactionData(rpcSpec)
+    }
 
-        return erc20SendRequest.withTransactionData(
-            status = status,
-            data = data,
-            transactionInfo = transactionInfo
-        )
+    override fun getErc20SendRequestsBySender(
+        sender: WalletAddress,
+        rpcSpec: RpcUrlSpec
+    ): List<WithTransactionData<Erc20SendRequest>> {
+        logger.debug { "Fetching ERC20 send requests for sender: $sender, rpcSpec: $rpcSpec" }
+        return erc20SendRequestRepository.getBySender(sender).map { it.appendTransactionData(rpcSpec) }
+    }
+
+    override fun getErc20SendRequestsByRecipient(
+        recipient: WalletAddress,
+        rpcSpec: RpcUrlSpec
+    ): List<WithTransactionData<Erc20SendRequest>> {
+        logger.debug { "Fetching ERC20 send requests for recipient: $recipient, rpcSpec: $rpcSpec" }
+        return erc20SendRequestRepository.getByRecipient(recipient).map { it.appendTransactionData(rpcSpec) }
     }
 
     override fun attachTxHash(id: UUID, txHash: TransactionHash) {
@@ -83,6 +87,22 @@ class Erc20SendRequestServiceImpl(
             abiOutputTypes = listOf(AbiType.Bool),
             additionalData = listOf(Utf8String(id.toString()))
         )
+
+    private fun Erc20SendRequest.appendTransactionData(rpcSpec: RpcUrlSpec): WithTransactionData<Erc20SendRequest> {
+        val transactionInfo = erc20CommonService.fetchTransactionInfo(
+            txHash = txHash,
+            chainId = chainId,
+            rpcSpec = rpcSpec
+        )
+        val data = encodeFunctionData(tokenRecipientAddress, tokenAmount, id)
+        val status = determineStatus(transactionInfo, data)
+
+        return withTransactionData(
+            status = status,
+            data = data,
+            transactionInfo = transactionInfo
+        )
+    }
 
     private fun Erc20SendRequest.determineStatus(
         transactionInfo: BlockchainTransactionInfo?,
