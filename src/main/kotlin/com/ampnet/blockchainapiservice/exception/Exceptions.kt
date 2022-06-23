@@ -103,3 +103,13 @@ class ApiKeyAlreadyExistsException(projectId: UUID) : ServiceException(
         private const val serialVersionUID: Long = 6676987534485377215L
     }
 }
+
+class NonExistentApiKeyException() : ServiceException(
+    errorCode = ErrorCode.NON_EXISTENT_API_KEY,
+    httpStatus = HttpStatus.UNAUTHORIZED,
+    message = "Non existent API key provided in request"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -176593491332037627L
+    }
+}
