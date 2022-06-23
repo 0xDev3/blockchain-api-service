@@ -1,0 +1,23 @@
+= AMPnet Blockchain API Service Documentation - Project and API Key Management
+Version {version}, {date}
+:doctype: book
+:toc: left
+:sectnums:
+:toclevels: 2
+:source-highlighter: prettify
+:docinfo: shared
+:icons: font
+
+== Introduction
+This document contains generated documentation for `AMPnet blockchain-api-service` API endpoints used to manage projects
+and API keys. Source code is available on https://github.com/AMPnet/blockchain-api-service[Github].
+
+== Project Management API
+All endpoints require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/project/create.adoc[]
+include::src/docs/asciidoc/project/fetch-by-id.adoc[]
+include::src/docs/asciidoc/project/fetch-by-issuer.adoc[]
+include::src/docs/asciidoc/project/fetch-all.adoc[]
+include::src/docs/asciidoc/project/create-api-key.adoc[]
+include::src/docs/asciidoc/project/fetch-api-key.adoc[]

@@ -365,7 +365,10 @@ tasks.asciidoctor {
 }
 
 tasks.register<Copy>("copyDocs") {
-    from(file("$buildDir/docs/asciidoc/index.html"))
+    from(
+        file("$buildDir/docs/asciidoc/index.html"),
+        file("$buildDir/docs/asciidoc/internal.html")
+    )
     into(file("src/main/resources/static/docs"))
     dependsOn(tasks.asciidoctor)
 }
