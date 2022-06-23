@@ -25,7 +25,7 @@ class ProjectServiceTest : TestBase() {
 
     companion object {
         private val CREATED_AT = UtcDateTime(OffsetDateTime.parse("2022-01-01T00:00:00Z"))
-        private const val API_KEY_BYTES = 66
+        private const val API_KEY_BYTES = 33
     }
 
     @Test
@@ -481,7 +481,7 @@ class ProjectServiceTest : TestBase() {
         val apiKey = ApiKey(
             id = uuid,
             projectId = project.id,
-            apiKey = "AAAAAA.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            apiKey = "AAAAA.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
             createdAt = CREATED_AT
         )
         val apiKeyRepository = mock<ApiKeyRepository>()

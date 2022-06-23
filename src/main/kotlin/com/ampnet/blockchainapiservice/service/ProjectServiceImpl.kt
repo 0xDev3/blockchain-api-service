@@ -23,8 +23,8 @@ class ProjectServiceImpl(
 ) : ProjectService {
 
     companion object : KLogging() {
-        private const val API_KEY_BYTES = 66
-        private const val API_KEY_PREFIX_LENGTH = 6
+        private const val API_KEY_BYTES = 33
+        private const val API_KEY_PREFIX_LENGTH = 5
     }
 
     override fun createProject(userIdentifier: UserIdentifier, params: CreateProjectParams): Project {
