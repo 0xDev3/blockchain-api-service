@@ -21,7 +21,6 @@ import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -34,7 +33,6 @@ import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.utils.Convert
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.time.temporal.ChronoUnit
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 
@@ -88,7 +86,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             assertThat(fetchedAccountBalance.blockNumber.value)
                 .isPositive()
             assertThat(fetchedAccountBalance.timestamp.value)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -137,7 +135,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     )
                 )
             assertThat(fetchedAccountBalance.timestamp.value)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         val blockNumberAfterSendingBalance = hardhatContainer.blockNumber()
@@ -159,7 +157,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     )
                 )
             assertThat(fetchedAccountBalance.timestamp.value)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 

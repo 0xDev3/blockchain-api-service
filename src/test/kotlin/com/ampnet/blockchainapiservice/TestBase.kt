@@ -1,7 +1,9 @@
 package com.ampnet.blockchainapiservice
 
 import org.assertj.core.api.Assert
+import org.assertj.core.api.Assertions.within
 import org.springframework.test.context.ActiveProfiles
+import java.time.temporal.ChronoUnit
 
 @ActiveProfiles("test")
 abstract class TestBase {
@@ -13,6 +15,8 @@ abstract class TestBase {
             fun <A : Assert<A, B>, B> Assert<A, B>.withMessage(): A = this.`as`(message)
             fun <A : Assert<A, B>, B> Assert<A, B>.withIndexedMessage(index: Int): A = this.`as`("[$index] $message")
         }
+
+        val WITHIN_TIME_TOLERANCE = within(5, ChronoUnit.MINUTES)
     }
 
     protected fun <R> suppose(description: String, function: SupposeMessage.() -> R): R {

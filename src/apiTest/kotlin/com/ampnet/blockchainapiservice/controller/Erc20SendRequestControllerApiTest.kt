@@ -23,7 +23,6 @@ import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -33,7 +32,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
-import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 class Erc20SendRequestControllerApiTest : ControllerTestBase() {
@@ -506,7 +504,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.sendTx.timestamp)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -620,7 +618,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.sendTx.timestamp)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -747,7 +745,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.requests[0].sendTx.timestamp)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -865,7 +863,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.requests[0].sendTx.timestamp)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -979,7 +977,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.requests[0].sendTx.timestamp)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -1097,7 +1095,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.requests[0].sendTx.timestamp)
-                .isCloseToUtcNow(within(1, ChronoUnit.MINUTES))
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
