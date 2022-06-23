@@ -2,6 +2,7 @@ package com.ampnet.blockchainapiservice.exception
 
 import com.ampnet.blockchainapiservice.util.ChainId
 import org.springframework.http.HttpStatus
+import java.util.UUID
 
 abstract class ServiceException(
     val errorCode: ErrorCode,
@@ -90,5 +91,15 @@ class BadAuthenticationException : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = -787538305851627646L
+    }
+}
+
+class ApiKeyAlreadyExistsException(projectId: UUID) : ServiceException(
+    errorCode = ErrorCode.API_KEY_ALREADY_EXISTS,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "API key already exists for project with ID: $projectId"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 6676987534485377215L
     }
 }
