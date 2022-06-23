@@ -9,6 +9,7 @@ import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20SendRequest
 import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse
+import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestsResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.service.Erc20SendRequestService
@@ -183,6 +184,162 @@ class Erc20SendRequestControllerTest : TestBase() {
                                 data = result.transactionData.data.value,
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = TestData.TIMESTAMP.value
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20SendRequestsBySender() {
+        val id = UUID.randomUUID()
+        val sender = WalletAddress("b")
+        val rpcSpec = RpcUrlSpec("url", "url-override")
+        val service = mock<Erc20SendRequestService>()
+        val txHash = TransactionHash("tx-hash")
+        val result = WithTransactionData(
+            value = Erc20SendRequest(
+                id = id,
+                chainId = ChainId(123L),
+                redirectUrl = "redirect-url",
+                tokenAddress = ContractAddress("a"),
+                tokenAmount = Balance(BigInteger.TEN),
+                tokenSenderAddress = sender,
+                tokenRecipientAddress = WalletAddress("c"),
+                arbitraryData = TestData.EMPTY_JSON_OBJECT,
+                screenConfig = ScreenConfig(
+                    beforeActionMessage = "before-action-message",
+                    afterActionMessage = "after-action-message"
+                ),
+                txHash = txHash
+            ),
+            status = Status.SUCCESS,
+            transactionData = TransactionData(
+                txHash = txHash,
+                fromAddress = WalletAddress("b"),
+                toAddress = ContractAddress("a"),
+                data = FunctionData("data"),
+                blockConfirmations = BigInteger.ONE,
+                timestamp = TestData.TIMESTAMP
+            )
+        )
+
+        suppose("some ERC20 send request will be fetched by sender") {
+            given(service.getErc20SendRequestsBySender(sender, rpcSpec))
+                .willReturn(listOf(result))
+        }
+
+        val controller = Erc20SendRequestController(service)
+
+        verify("controller returns correct response") {
+            val response = controller.getErc20SendRequestsBySender(sender, rpcSpec)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        Erc20SendRequestsResponse(
+                            listOf(
+                                Erc20SendRequestResponse(
+                                    id = result.value.id,
+                                    status = result.status,
+                                    chainId = result.value.chainId.value,
+                                    tokenAddress = result.value.tokenAddress.rawValue,
+                                    amount = result.value.tokenAmount.rawValue,
+                                    senderAddress = result.value.tokenSenderAddress?.rawValue,
+                                    recipientAddress = result.value.tokenRecipientAddress.rawValue,
+                                    arbitraryData = result.value.arbitraryData,
+                                    screenConfig = result.value.screenConfig,
+                                    redirectUrl = result.value.redirectUrl,
+                                    sendTx = TransactionResponse(
+                                        txHash = result.transactionData.txHash?.value,
+                                        from = result.transactionData.fromAddress?.rawValue,
+                                        to = result.transactionData.toAddress.rawValue,
+                                        data = result.transactionData.data.value,
+                                        blockConfirmations = result.transactionData.blockConfirmations,
+                                        timestamp = TestData.TIMESTAMP.value
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20SendRequestsByRecipient() {
+        val id = UUID.randomUUID()
+        val recipient = WalletAddress("c")
+        val rpcSpec = RpcUrlSpec("url", "url-override")
+        val service = mock<Erc20SendRequestService>()
+        val txHash = TransactionHash("tx-hash")
+        val result = WithTransactionData(
+            value = Erc20SendRequest(
+                id = id,
+                chainId = ChainId(123L),
+                redirectUrl = "redirect-url",
+                tokenAddress = ContractAddress("a"),
+                tokenAmount = Balance(BigInteger.TEN),
+                tokenSenderAddress = WalletAddress("b"),
+                tokenRecipientAddress = recipient,
+                arbitraryData = TestData.EMPTY_JSON_OBJECT,
+                screenConfig = ScreenConfig(
+                    beforeActionMessage = "before-action-message",
+                    afterActionMessage = "after-action-message"
+                ),
+                txHash = txHash
+            ),
+            status = Status.SUCCESS,
+            transactionData = TransactionData(
+                txHash = txHash,
+                fromAddress = WalletAddress("b"),
+                toAddress = ContractAddress("a"),
+                data = FunctionData("data"),
+                blockConfirmations = BigInteger.ONE,
+                timestamp = TestData.TIMESTAMP
+            )
+        )
+
+        suppose("some ERC20 send request will be fetched by recipient") {
+            given(service.getErc20SendRequestsByRecipient(recipient, rpcSpec))
+                .willReturn(listOf(result))
+        }
+
+        val controller = Erc20SendRequestController(service)
+
+        verify("controller returns correct response") {
+            val response = controller.getErc20SendRequestsByRecipient(recipient, rpcSpec)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        Erc20SendRequestsResponse(
+                            listOf(
+                                Erc20SendRequestResponse(
+                                    id = result.value.id,
+                                    status = result.status,
+                                    chainId = result.value.chainId.value,
+                                    tokenAddress = result.value.tokenAddress.rawValue,
+                                    amount = result.value.tokenAmount.rawValue,
+                                    senderAddress = result.value.tokenSenderAddress?.rawValue,
+                                    recipientAddress = result.value.tokenRecipientAddress.rawValue,
+                                    arbitraryData = result.value.arbitraryData,
+                                    screenConfig = result.value.screenConfig,
+                                    redirectUrl = result.value.redirectUrl,
+                                    sendTx = TransactionResponse(
+                                        txHash = result.transactionData.txHash?.value,
+                                        from = result.transactionData.fromAddress?.rawValue,
+                                        to = result.transactionData.toAddress.rawValue,
+                                        data = result.transactionData.data.value,
+                                        blockConfirmations = result.transactionData.blockConfirmations,
+                                        timestamp = TestData.TIMESTAMP.value
+                                    )
+                                )
                             )
                         )
                     )
