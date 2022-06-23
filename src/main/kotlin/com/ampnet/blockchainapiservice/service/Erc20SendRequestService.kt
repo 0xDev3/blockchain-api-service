@@ -16,9 +16,11 @@ interface Erc20SendRequestService {
         sender: WalletAddress,
         rpcSpec: RpcUrlSpec
     ): List<WithTransactionData<Erc20SendRequest>>
+
     fun getErc20SendRequestsByRecipient(
         recipient: WalletAddress,
         rpcSpec: RpcUrlSpec
     ): List<WithTransactionData<Erc20SendRequest>>
+
     fun attachTxHash(id: UUID, txHash: TransactionHash)
 }

@@ -25,6 +25,8 @@ All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
 include::src/docs/asciidoc/send/create.adoc[]
 include::src/docs/asciidoc/send/fetch.adoc[]
+include::src/docs/asciidoc/send/fetch-by-sender.adoc[]
+include::src/docs/asciidoc/send/fetch-by-recipient.adoc[]
 include::src/docs/asciidoc/send/attach.adoc[]
 
 == ERC20 Lock Request API
@@ -33,5 +35,3 @@ All endpoints are public and do not require `Authorization: Bearer JWT` header.
 include::src/docs/asciidoc/lock/create.adoc[]
 include::src/docs/asciidoc/lock/fetch.adoc[]
 include::src/docs/asciidoc/lock/attach.adoc[]
-
-include::src/docs/asciidoc/legacy.adoc[]

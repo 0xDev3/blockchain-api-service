@@ -56,8 +56,6 @@ class Erc20SendRequestServiceImpl(
         rpcSpec: RpcUrlSpec
     ): List<WithTransactionData<Erc20SendRequest>> {
         logger.debug { "Fetching ERC20 send requests for sender: $sender, rpcSpec: $rpcSpec" }
-        val x = erc20SendRequestRepository.getBySender(sender)
-        logger.debug { "Fetched from repo: $x" }
         return erc20SendRequestRepository.getBySender(sender).map { it.appendTransactionData(rpcSpec) }
     }
 
