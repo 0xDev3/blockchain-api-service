@@ -4,6 +4,7 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.model.result.Project
+import com.ampnet.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
@@ -22,7 +23,8 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
             issuerContractAddress = project.issuerContractAddress,
             redirectUrl = project.redirectUrl,
             chainId = project.chainId,
-            customRpcUrl = project.customRpcUrl
+            customRpcUrl = project.customRpcUrl,
+            createdAt = project.createdAt
         )
         dslContext.executeInsert(record)
         return record.toModel()
@@ -35,6 +37,21 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
             .fetchOne { it.toModel() }
     }
 
+    override fun getByIssuerContractAddress(issuerContractAddress: ContractAddress): Project? {
+        logger.debug { "Get project by issuerContractAddress: $issuerContractAddress" }
+        return dslContext.selectFrom(ProjectTable.PROJECT)
+            .where(ProjectTable.PROJECT.ISSUER_CONTRACT_ADDRESS.eq(issuerContractAddress))
+            .fetchOne { it.toModel() }
+    }
+
+    override fun getAllByOwnerId(ownerId: UUID): List<Project> {
+        logger.info { "Get projects by ownerId: $ownerId" }
+        return dslContext.selectFrom(ProjectTable.PROJECT)
+            .where(ProjectTable.PROJECT.OWNER_ID.eq(ownerId))
+            .orderBy(ProjectTable.PROJECT.CREATED_AT.asc())
+            .fetch { it.toModel() }
+    }
+
     private fun IProjectRecord.toModel(): Project =
         Project(
             id = id!!,
@@ -42,6 +59,7 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
             issuerContractAddress = issuerContractAddress!!,
             redirectUrl = redirectUrl!!,
             chainId = chainId!!,
-            customRpcUrl = customRpcUrl
+            customRpcUrl = customRpcUrl,
+            createdAt = createdAt!!
         )
 }
