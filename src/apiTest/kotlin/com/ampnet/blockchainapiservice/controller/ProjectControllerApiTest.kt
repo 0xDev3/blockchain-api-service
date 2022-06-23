@@ -598,7 +598,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             apiKeyRepository.store(apiKey)
         }
 
-        verify("404 is returned for non-existent project") {
+        verify("400 is returned for project which already has API key") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/api/v1/projects/${project.id}/api-key")
             )
@@ -606,6 +606,43 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .andReturn()
 
             verifyResponseErrorCode(response, ErrorCode.API_KEY_ALREADY_EXISTS)
+        }
+    }
+
+    @Test
+    @WithMockUser(address = HardhatTestContainer.accountAddress2)
+    fun mustReturn404NotFoundWhenCreatingApiKeyByNonProjectOwner() {
+        val userIdentifier = UserWalletAddressIdentifier(
+            id = UUID.randomUUID(),
+            walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+        )
+
+        suppose("some user identifier exists in database") {
+            userIdentifierRepository.store(userIdentifier)
+        }
+
+        val project = Project(
+            id = UUID.randomUUID(),
+            ownerId = userIdentifier.id,
+            issuerContractAddress = ContractAddress("a"),
+            redirectUrl = "redirect-url",
+            chainId = Chain.HARDHAT_TESTNET.id,
+            customRpcUrl = "custom-rpc-url",
+            createdAt = UtcDateTime(OffsetDateTime.now())
+        )
+
+        suppose("some project exists in database") {
+            projectRepository.store(project)
+        }
+
+        verify("404 is returned for non-owned project") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/api/v1/projects/${project.id}/api-key")
+            )
+                .andExpect(MockMvcResultMatchers.status().isNotFound)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 }
