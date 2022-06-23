@@ -4,7 +4,6 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
-import com.ampnet.blockchainapiservice.model.result.UserIdentifier
 import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -24,7 +23,7 @@ import java.util.UUID
 class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
     companion object {
-        private const val USER_IDENTIFIER = "user-identifier"
+        private val USER_WALLET_ADDRESS = WalletAddress("fade")
         private val IDENTIFIER_TYPE = UserIdentifierType.ETH_WALLET_ADDRESS
     }
 
@@ -50,7 +49,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(
                 UserIdentifierRecord(
                     id = id,
-                    userIdentifier = USER_IDENTIFIER,
+                    userIdentifier = USER_WALLET_ADDRESS.rawValue,
                     identifierType = IDENTIFIER_TYPE
                 )
             )
@@ -61,10 +60,9 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
             assertThat(result).withMessage()
                 .isEqualTo(
-                    UserIdentifier(
+                    UserWalletAddressIdentifier(
                         id = id,
-                        userIdentifier = USER_IDENTIFIER,
-                        identifierType = IDENTIFIER_TYPE
+                        walletAddress = USER_WALLET_ADDRESS
                     )
                 )
         }
@@ -88,21 +86,20 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(
                 UserIdentifierRecord(
                     id = id,
-                    userIdentifier = USER_IDENTIFIER,
+                    userIdentifier = USER_WALLET_ADDRESS.rawValue,
                     identifierType = IDENTIFIER_TYPE
                 )
             )
         }
 
         verify("user identifier is correctly fetched by identifier") {
-            val result = repository.getByUserIdentifier(USER_IDENTIFIER, IDENTIFIER_TYPE)
+            val result = repository.getByUserIdentifier(USER_WALLET_ADDRESS.rawValue, IDENTIFIER_TYPE)
 
             assertThat(result).withMessage()
                 .isEqualTo(
-                    UserIdentifier(
+                    UserWalletAddressIdentifier(
                         id = id,
-                        userIdentifier = USER_IDENTIFIER,
-                        identifierType = IDENTIFIER_TYPE
+                        walletAddress = USER_WALLET_ADDRESS
                     )
                 )
         }
@@ -159,10 +156,9 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyStoreUserIdentifier() {
         val id = UUID.randomUUID()
-        val userIdentifier = UserIdentifier(
+        val userIdentifier = UserWalletAddressIdentifier(
             id = id,
-            userIdentifier = USER_IDENTIFIER,
-            identifierType = IDENTIFIER_TYPE
+            walletAddress = USER_WALLET_ADDRESS
         )
 
         val storedUserIdentifier = suppose("user identifier is stored in database") {

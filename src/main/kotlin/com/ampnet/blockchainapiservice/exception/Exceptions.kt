@@ -82,3 +82,13 @@ class CannotAttachSignedMessageException(message: String) : ServiceException(
         private const val serialVersionUID: Long = 2487635142233013917L
     }
 }
+
+class BadAuthenticationException : ServiceException(
+    errorCode = ErrorCode.BAD_AUTHENTICATION,
+    httpStatus = HttpStatus.UNAUTHORIZED,
+    message = "Provided authentication header has invalid format"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -787538305851627646L
+    }
+}

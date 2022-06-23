@@ -67,7 +67,8 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                 issuerContractAddress = ContractAddress("0"),
                 redirectUrl = "redirect-url",
                 chainId = ChainId(1337L),
-                customRpcUrl = "custom-rpc-url"
+                customRpcUrl = "custom-rpc-url",
+                createdAt = CREATED_AT
             )
         )
     }
