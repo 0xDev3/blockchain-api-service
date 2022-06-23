@@ -104,6 +104,36 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchApiKeyByValue() {
+        val id = UUID.randomUUID()
+
+        suppose("some API key is stored in database") {
+            dslContext.executeInsert(
+                ApiKeyRecord(
+                    id = id,
+                    projectId = PROJECT_ID,
+                    apiKey = API_KEY,
+                    createdAt = CREATED_AT
+                )
+            )
+        }
+
+        verify("API key is correctly fetched by ID") {
+            val result = repository.getByValue(API_KEY)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    ApiKey(
+                        id = id,
+                        projectId = PROJECT_ID,
+                        apiKey = API_KEY,
+                        createdAt = CREATED_AT
+                    )
+                )
+        }
+    }
+
+    @Test
     fun mustReturnNullWhenFetchingNonExistentApiKeyById() {
         verify("null is returned when fetching non-existent API key") {
             val result = repository.getById(UUID.randomUUID())

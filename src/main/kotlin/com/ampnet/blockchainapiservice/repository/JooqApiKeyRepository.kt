@@ -33,6 +33,13 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
             .fetchOne { it.toModel() }
     }
 
+    override fun getByValue(value: String): ApiKey? {
+        logger.info { "Get API key by value: $value" }
+        return dslContext.selectFrom(ApiKeyTable.API_KEY)
+            .where(ApiKeyTable.API_KEY.API_KEY_.eq(value))
+            .fetchOne { it.toModel() }
+    }
+
     override fun getAllByProjectId(projectId: UUID): List<ApiKey> {
         logger.info { "Get API keys by projectId: $projectId" }
         return dslContext.selectFrom(ApiKeyTable.API_KEY)
