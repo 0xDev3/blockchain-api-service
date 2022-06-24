@@ -3,11 +3,12 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.config.binding.annotation.RpcUrlBinding
 import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
-import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
+import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest
 import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestResponse
 import com.ampnet.blockchainapiservice.service.Erc20LockRequestService
 import com.ampnet.blockchainapiservice.util.TransactionHash
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -39,10 +40,10 @@ class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockR
     }
 
     @PutMapping("/v1/lock/{id}")
-    fun attachTransactionHash(
+    fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
-        @RequestBody requestBody: AttachTransactionHashRequest
+        @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
-        erc20LockRequestService.attachTxHash(id, TransactionHash(requestBody.txHash))
+        erc20LockRequestService.attachTxInfo(id, TransactionHash(requestBody.txHash), WalletAddress(requestBody.caller))
     }
 }
