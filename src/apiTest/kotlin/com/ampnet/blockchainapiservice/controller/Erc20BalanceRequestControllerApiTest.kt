@@ -19,6 +19,7 @@ import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.response.BalanceResponse
 import com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse
+import com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestsResponse
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20BalanceRequestRepository
@@ -545,6 +546,240 @@ class Erc20BalanceRequestControllerApiTest : ControllerTestBase() {
                 )
 
             assertThat(fetchResponse.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20BalanceRequestsByProjectId() {
+        val mainAccount = accounts[0]
+        val walletAddress = WalletAddress("0x865f603F42ca1231e5B5F90e15663b0FE19F0b21")
+        val erc20balance = Balance(BigInteger("10000"))
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(walletAddress.rawValue),
+                listOf(erc20balance.rawValue),
+                mainAccount.address
+            ).sendAndMine()
+        }
+
+        val tokenAddress = ContractAddress(contract.contractAddress)
+        val blockNumber = hardhatContainer.blockNumber()
+
+        val createResponse = suppose("request to create ERC20 balance request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/balance")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "token_address": "${tokenAddress.rawValue}",
+                                "block_number": "${blockNumber.value}",
+                                "wallet_address": "${walletAddress.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(createResponse.response.contentAsString, Erc20BalanceRequestResponse::class.java)
+        }
+
+        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+
+        suppose("ID from pre-signed message is used in database") {
+            dslContext.update(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST)
+                .set(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.ID, id)
+                .set(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.REDIRECT_URL, "https://example.com/$id")
+                .where(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.ID.eq(createResponse.id))
+                .execute()
+        }
+
+        val signedMessage = SignedMessage(
+            "0xfc90c8aa9f2164234b8826144d8ecfc287b5d7c168d0e9d284baf76dbef55c4c5761cf46e34b7cdb72cc97f1fb1c19f315ee7a" +
+                "430dd6111fa6c693b41c96c5501c"
+        )
+
+        suppose("signed message is attached to ERC20 balance request") {
+            erc20BalanceRequestRepository.setSignedMessage(id, walletAddress, signedMessage)
+        }
+
+        val fetchResponse = suppose("request to fetch ERC20 balance requests by project ID is made") {
+            val fetchResponse = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/balance/by-project/$PROJECT_ID")
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(fetchResponse.response.contentAsString, Erc20BalanceRequestsResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(fetchResponse).withMessage()
+                .isEqualTo(
+                    Erc20BalanceRequestsResponse(
+                        listOf(
+                            Erc20BalanceRequestResponse(
+                                id = id,
+                                projectId = PROJECT_ID,
+                                status = Status.SUCCESS,
+                                chainId = PROJECT.chainId.value,
+                                redirectUrl = "https://example.com/$id",
+                                tokenAddress = tokenAddress.rawValue,
+                                blockNumber = blockNumber.value,
+                                walletAddress = walletAddress.rawValue,
+                                arbitraryData = createResponse.arbitraryData,
+                                screenConfig = ScreenConfig(
+                                    beforeActionMessage = "before-action-message",
+                                    afterActionMessage = "after-action-message"
+                                ),
+                                balance = BalanceResponse(
+                                    wallet = walletAddress.rawValue,
+                                    blockNumber = blockNumber.value,
+                                    timestamp = fetchResponse.requests[0].balance!!.timestamp,
+                                    amount = erc20balance.rawValue
+                                ),
+                                messageToSign = "Verification message ID to sign: $id",
+                                signedMessage = signedMessage.value,
+                                createdAt = fetchResponse.requests[0].createdAt
+                            )
+                        )
+                    )
+                )
+
+            assertThat(fetchResponse.requests[0].createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20BalanceRequestsByProjectIdWhenCustomRpcUrlIsSpecified() {
+        val mainAccount = accounts[0]
+        val walletAddress = WalletAddress("0x865f603F42ca1231e5B5F90e15663b0FE19F0b21")
+        val erc20balance = Balance(BigInteger("10000"))
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(walletAddress.rawValue),
+                listOf(erc20balance.rawValue),
+                mainAccount.address
+            ).sendAndMine()
+        }
+
+        val tokenAddress = ContractAddress(contract.contractAddress)
+        val blockNumber = hardhatContainer.blockNumber()
+
+        val createResponse = suppose("request to create ERC20 balance request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/balance")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "token_address": "${tokenAddress.rawValue}",
+                                "block_number": "${blockNumber.value}",
+                                "wallet_address": "${walletAddress.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(createResponse.response.contentAsString, Erc20BalanceRequestResponse::class.java)
+        }
+
+        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+
+        suppose("ID from pre-signed message is used in database") {
+            dslContext.update(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST)
+                .set(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.ID, id)
+                .set(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.REDIRECT_URL, "https://example.com/$id")
+                .where(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.ID.eq(createResponse.id))
+                .execute()
+        }
+
+        val signedMessage = SignedMessage(
+            "0xfc90c8aa9f2164234b8826144d8ecfc287b5d7c168d0e9d284baf76dbef55c4c5761cf46e34b7cdb72cc97f1fb1c19f315ee7a" +
+                "430dd6111fa6c693b41c96c5501c"
+        )
+
+        suppose("signed message is attached to ERC20 balance request") {
+            erc20BalanceRequestRepository.setSignedMessage(id, walletAddress, signedMessage)
+        }
+
+        val fetchResponse = suppose("request to fetch ERC20 balance requests by project ID is made") {
+            val fetchResponse = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/balance/by-project/$PROJECT_ID")
+                    .header(
+                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
+                        "http://localhost:${hardhatContainer.mappedPort}"
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(fetchResponse.response.contentAsString, Erc20BalanceRequestsResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(fetchResponse).withMessage()
+                .isEqualTo(
+                    Erc20BalanceRequestsResponse(
+                        listOf(
+                            Erc20BalanceRequestResponse(
+                                id = id,
+                                projectId = PROJECT_ID,
+                                status = Status.SUCCESS,
+                                chainId = PROJECT.chainId.value,
+                                redirectUrl = "https://example.com/$id",
+                                tokenAddress = tokenAddress.rawValue,
+                                blockNumber = blockNumber.value,
+                                walletAddress = walletAddress.rawValue,
+                                arbitraryData = createResponse.arbitraryData,
+                                screenConfig = ScreenConfig(
+                                    beforeActionMessage = "before-action-message",
+                                    afterActionMessage = "after-action-message"
+                                ),
+                                balance = BalanceResponse(
+                                    wallet = walletAddress.rawValue,
+                                    blockNumber = blockNumber.value,
+                                    timestamp = fetchResponse.requests[0].balance!!.timestamp,
+                                    amount = erc20balance.rawValue
+                                ),
+                                messageToSign = "Verification message ID to sign: $id",
+                                signedMessage = signedMessage.value,
+                                createdAt = fetchResponse.requests[0].createdAt
+                            )
+                        )
+                    )
+                )
+
+            assertThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }

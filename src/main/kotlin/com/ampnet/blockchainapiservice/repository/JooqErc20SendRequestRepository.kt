@@ -47,6 +47,14 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
             .fetchOne { it.toModel() }
     }
 
+    override fun getAllByProjectId(projectId: UUID): List<Erc20SendRequest> {
+        logger.debug { "Get ERC20 send requests filtered by projectId: $projectId" }
+        return dslContext.selectFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST)
+            .where(Erc20SendRequestTable.ERC20_SEND_REQUEST.PROJECT_ID.eq(projectId))
+            .orderBy(Erc20SendRequestTable.ERC20_SEND_REQUEST.CREATED_AT.asc())
+            .fetch { it.toModel() }
+    }
+
     override fun getBySender(sender: WalletAddress): List<Erc20SendRequest> {
         logger.debug { "Get ERC20 send requests filtered by sender address: $sender" }
         return dslContext.selectFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST)

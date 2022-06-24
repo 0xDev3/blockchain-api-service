@@ -1,6 +1,5 @@
-=== Fetch ERC20 Send Requests by Sender Address
-Fetches stored ERC20 send requests with their current status filtered by sender address *which was specified at the
-moment of request creation*.
+=== Fetch ERC20 Send Requests by Project ID
+Fetches stored ERC20 send requests with their current status filtered by project ID.
 
 Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
 specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC
@@ -9,13 +8,13 @@ URL, use `X-RPC-URL-OVERRIDE` header.
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequestsBySenderAddress/http-request.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequestsByProjectId/http-request.adoc[]
 ====
 
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequestsBySenderAddress/http-response.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequestsByProjectId/http-response.adoc[]
 ====
 .Response Schema
 include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20SendRequestsResponse.adoc[]

@@ -47,6 +47,14 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
             .fetchOne { it.toModel() }
     }
 
+    override fun getAllByProjectId(projectId: UUID): List<Erc20LockRequest> {
+        logger.debug { "Get ERC20 lock requests filtered by projectId: $projectId" }
+        return dslContext.selectFrom(Erc20LockRequestTable.ERC20_LOCK_REQUEST)
+            .where(Erc20LockRequestTable.ERC20_LOCK_REQUEST.PROJECT_ID.eq(projectId))
+            .orderBy(Erc20LockRequestTable.ERC20_LOCK_REQUEST.CREATED_AT.asc())
+            .fetch { it.toModel() }
+    }
+
     override fun setTxHash(id: UUID, txHash: TransactionHash): Boolean {
         logger.info { "Set txHash for ERC20 lock request, id: $id, txHash: $txHash" }
         return dslContext.update(Erc20LockRequestTable.ERC20_LOCK_REQUEST)

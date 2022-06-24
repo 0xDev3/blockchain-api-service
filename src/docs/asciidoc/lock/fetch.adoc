@@ -1,10 +1,9 @@
 === Fetch ERC20 Lock Request by ID
-Fetches stored ERC20 lock request with its current status. Possible statuses are `PENDING`, `SUCCESS` and `FAILED`. The
-request is considered successful if the attached transaction is confirmed on blockchain and all its data matches
-specified request parameters (correct `to` and `from` addresses, `amount`, matching `data` and `txHash`). If there are
-any mismatches between specified request data and state on blockchain, the request will be marked as failed. If there is
-no attached transaction hash or if transaction for attached hash is not yet mined on blockchain, request will be in
-pending state.
+Fetches stored ERC20 lock request with its current status. The request is considered successful if the attached
+transaction is confirmed on blockchain and all its data matches specified request parameters (correct `to` and `from`
+addresses, `amount`, matching `data` and `txHash`). If there are any mismatches between specified request data and state
+on blockchain, the request will be marked as failed. If there is no attached transaction hash or if transaction for
+attached hash is not yet mined on blockchain, request will be in pending state.
 
 Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
 specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC

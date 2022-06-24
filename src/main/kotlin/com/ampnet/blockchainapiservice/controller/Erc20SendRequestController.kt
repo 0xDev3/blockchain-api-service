@@ -43,6 +43,15 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
         return ResponseEntity.ok(Erc20SendRequestResponse(sendRequest))
     }
 
+    @GetMapping("/v1/send/by-project/{projectId}")
+    fun getErc20SendRequestsByProjectId(
+        @PathVariable("projectId") projectId: UUID,
+        @RpcUrlBinding rpcSpec: RpcUrlSpec
+    ): ResponseEntity<Erc20SendRequestsResponse> {
+        val sendRequests = erc20SendRequestService.getErc20SendRequestsByProjectId(projectId, rpcSpec)
+        return ResponseEntity.ok(Erc20SendRequestsResponse(sendRequests.map { Erc20SendRequestResponse(it) }))
+    }
+
     @GetMapping("/v1/send/by-sender/{sender}")
     fun getErc20SendRequestsBySender(
         @PathVariable("sender") sender: WalletAddress,

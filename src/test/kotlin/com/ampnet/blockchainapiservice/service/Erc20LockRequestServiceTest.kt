@@ -958,6 +958,97 @@ class Erc20LockRequestServiceTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyReturnListOfErc20LockRequestsByProjectId() {
+        val id = UUID.randomUUID()
+        val lockRequest = Erc20LockRequest(
+            id = id,
+            projectId = PROJECT.id,
+            chainId = Chain.HARDHAT_TESTNET.id,
+            redirectUrl = "test",
+            tokenAddress = ContractAddress("a"),
+            tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
+            lockContractAddress = ContractAddress("b"),
+            tokenSenderAddress = WalletAddress("c"),
+            txHash = TX_HASH,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
+            ),
+            createdAt = TestData.TIMESTAMP
+        )
+        val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
+
+        suppose("ERC20 lock request exists in database") {
+            given(erc20LockRequestRepository.getAllByProjectId(PROJECT.id))
+                .willReturn(listOf(lockRequest))
+        }
+
+        val blockchainService = mock<BlockchainService>()
+        val chainSpec = ChainSpec(lockRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val encodedData = FunctionData("encoded")
+        val transactionInfo = BlockchainTransactionInfo(
+            hash = TX_HASH,
+            from = lockRequest.tokenSenderAddress!!,
+            to = lockRequest.lockContractAddress,
+            data = encodedData,
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP,
+            success = true
+        )
+
+        suppose("transaction is mined") {
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+                .willReturn(transactionInfo)
+        }
+
+        val functionEncoderService = mock<FunctionEncoderService>()
+
+        suppose("function data will be encoded") {
+            given(
+                functionEncoderService.encode(
+                    functionName = "lock",
+                    arguments = listOf(
+                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                    ),
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
+                )
+            )
+                .willReturn(encodedData)
+        }
+
+        val service = Erc20LockRequestServiceImpl(
+            functionEncoderService = functionEncoderService,
+            erc20LockRequestRepository = erc20LockRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = blockchainService
+            )
+        )
+
+        verify("ERC20 lock request with successful status is returned") {
+            assertThat(service.getErc20LockRequestsByProjectId(projectId = PROJECT.id, rpcSpec = chainSpec.rpcSpec))
+                .withMessage()
+                .isEqualTo(
+                    listOf(
+                        lockRequest.withTransactionData(
+                            status = Status.SUCCESS,
+                            data = encodedData,
+                            transactionInfo = transactionInfo
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
     fun mustSuccessfullyAttachTxHash() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
         val id = UUID.randomUUID()
