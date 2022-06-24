@@ -1,11 +1,13 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
+import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import com.ampnet.blockchainapiservice.config.binding.annotation.RpcUrlBinding
 import com.ampnet.blockchainapiservice.model.params.CreateErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachSignedMessageRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.Erc20BalanceRequestService
 import com.ampnet.blockchainapiservice.util.SignedMessage
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -23,10 +25,11 @@ class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc2
 
     @PostMapping("/v1/balance")
     fun createErc20BalanceRequest(
+        @ApiKeyBinding project: Project,
         @RequestBody requestBody: CreateErc20BalanceRequest
     ): ResponseEntity<Erc20BalanceRequestResponse> {
         val params = CreateErc20BalanceRequestParams(requestBody)
-        val createdRequest = erc20BalanceRequestService.createErc20BalanceRequest(params)
+        val createdRequest = erc20BalanceRequestService.createErc20BalanceRequest(params, project)
         return ResponseEntity.ok(Erc20BalanceRequestResponse(createdRequest))
     }
 

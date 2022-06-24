@@ -8,6 +8,7 @@ import com.ampnet.blockchainapiservice.model.params.CreateErc20BalanceRequestPar
 import com.ampnet.blockchainapiservice.model.params.StoreErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20BalanceRequestRepository
 import com.ampnet.blockchainapiservice.util.BlockName
 import com.ampnet.blockchainapiservice.util.Erc20Balance
@@ -28,10 +29,13 @@ class Erc20BalanceRequestServiceImpl(
 
     companion object : KLogging()
 
-    override fun createErc20BalanceRequest(params: CreateErc20BalanceRequestParams): Erc20BalanceRequest {
-        logger.info { "Creating ERC20 balance request, params: $params" }
+    override fun createErc20BalanceRequest(
+        params: CreateErc20BalanceRequestParams,
+        project: Project
+    ): Erc20BalanceRequest {
+        logger.info { "Creating ERC20 balance request, params: $params, project: $project" }
         return erc20BalanceRequestRepository.store(
-            erc20CommonService.createDatabaseParams(StoreErc20BalanceRequestParams, params)
+            erc20CommonService.createDatabaseParams(StoreErc20BalanceRequestParams, params, project)
         )
     }
 

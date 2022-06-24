@@ -9,10 +9,12 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
+import java.time.OffsetDateTime
 import java.util.UUID
 
 data class Erc20SendRequestResponse(
     val id: UUID,
+    val projectId: UUID,
     val status: Status,
     val chainId: Long,
     val tokenAddress: String,
@@ -23,10 +25,12 @@ data class Erc20SendRequestResponse(
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig?,
     val redirectUrl: String,
-    val sendTx: TransactionResponse
+    val sendTx: TransactionResponse,
+    val createdAt: OffsetDateTime
 ) {
     constructor(sendRequest: WithFunctionData<Erc20SendRequest>) : this(
         id = sendRequest.value.id,
+        projectId = sendRequest.value.projectId,
         status = Status.PENDING,
         chainId = sendRequest.value.chainId.value,
         tokenAddress = sendRequest.value.tokenAddress.rawValue,
@@ -43,11 +47,13 @@ data class Erc20SendRequestResponse(
             data = sendRequest.data.value,
             blockConfirmations = null,
             timestamp = null
-        )
+        ),
+        createdAt = sendRequest.value.createdAt.value
     )
 
     constructor(sendRequest: WithTransactionData<Erc20SendRequest>) : this(
         id = sendRequest.value.id,
+        projectId = sendRequest.value.projectId,
         status = sendRequest.status,
         chainId = sendRequest.value.chainId.value,
         tokenAddress = sendRequest.value.tokenAddress.rawValue,
@@ -64,6 +70,7 @@ data class Erc20SendRequestResponse(
             data = sendRequest.transactionData.data.value,
             blockConfirmations = sendRequest.transactionData.blockConfirmations,
             timestamp = sendRequest.transactionData.timestamp?.value
-        )
+        ),
+        createdAt = sendRequest.value.createdAt.value
     )
 }
