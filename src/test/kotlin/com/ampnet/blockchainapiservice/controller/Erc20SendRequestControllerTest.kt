@@ -207,6 +207,88 @@ class Erc20SendRequestControllerTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchErc20SendRequestsByProjectId() {
+        val id = UUID.randomUUID()
+        val projectId = UUID.randomUUID()
+        val rpcSpec = RpcUrlSpec("url", "url-override")
+        val service = mock<Erc20SendRequestService>()
+        val txHash = TransactionHash("tx-hash")
+        val result = WithTransactionData(
+            value = Erc20SendRequest(
+                id = id,
+                projectId = projectId,
+                chainId = ChainId(123L),
+                redirectUrl = "redirect-url",
+                tokenAddress = ContractAddress("a"),
+                tokenAmount = Balance(BigInteger.TEN),
+                tokenSenderAddress = WalletAddress("b"),
+                tokenRecipientAddress = WalletAddress("c"),
+                arbitraryData = TestData.EMPTY_JSON_OBJECT,
+                screenConfig = ScreenConfig(
+                    beforeActionMessage = "before-action-message",
+                    afterActionMessage = "after-action-message"
+                ),
+                txHash = txHash,
+                createdAt = TestData.TIMESTAMP
+            ),
+            status = Status.SUCCESS,
+            transactionData = TransactionData(
+                txHash = txHash,
+                fromAddress = WalletAddress("b"),
+                toAddress = ContractAddress("a"),
+                data = FunctionData("data"),
+                blockConfirmations = BigInteger.ONE,
+                timestamp = TestData.TIMESTAMP
+            )
+        )
+
+        suppose("some ERC20 send requests will be fetched by project ID") {
+            given(service.getErc20SendRequestsByProjectId(projectId, rpcSpec))
+                .willReturn(listOf(result))
+        }
+
+        val controller = Erc20SendRequestController(service)
+
+        verify("controller returns correct response") {
+            val response = controller.getErc20SendRequestsByProjectId(projectId, rpcSpec)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        Erc20SendRequestsResponse(
+                            listOf(
+                                Erc20SendRequestResponse(
+                                    id = result.value.id,
+                                    projectId = result.value.projectId,
+                                    status = result.status,
+                                    chainId = result.value.chainId.value,
+                                    tokenAddress = result.value.tokenAddress.rawValue,
+                                    amount = result.value.tokenAmount.rawValue,
+                                    senderAddress = result.value.tokenSenderAddress?.rawValue,
+                                    recipientAddress = result.value.tokenRecipientAddress.rawValue,
+                                    arbitraryData = result.value.arbitraryData,
+                                    screenConfig = result.value.screenConfig,
+                                    redirectUrl = result.value.redirectUrl,
+                                    sendTx = TransactionResponse(
+                                        txHash = result.transactionData.txHash?.value,
+                                        from = result.transactionData.fromAddress?.rawValue,
+                                        to = result.transactionData.toAddress.rawValue,
+                                        data = result.transactionData.data.value,
+                                        blockConfirmations = result.transactionData.blockConfirmations,
+                                        timestamp = TestData.TIMESTAMP.value
+                                    ),
+                                    createdAt = result.value.createdAt.value
+                                )
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
     fun mustCorrectlyFetchErc20SendRequestsBySender() {
         val id = UUID.randomUUID()
         val sender = WalletAddress("b")
@@ -242,7 +324,7 @@ class Erc20SendRequestControllerTest : TestBase() {
             )
         )
 
-        suppose("some ERC20 send request will be fetched by sender") {
+        suppose("some ERC20 send requests will be fetched by sender") {
             given(service.getErc20SendRequestsBySender(sender, rpcSpec))
                 .willReturn(listOf(result))
         }
@@ -324,7 +406,7 @@ class Erc20SendRequestControllerTest : TestBase() {
             )
         )
 
-        suppose("some ERC20 send request will be fetched by recipient") {
+        suppose("some ERC20 send requests will be fetched by recipient") {
             given(service.getErc20SendRequestsByRecipient(recipient, rpcSpec))
                 .willReturn(listOf(result))
         }

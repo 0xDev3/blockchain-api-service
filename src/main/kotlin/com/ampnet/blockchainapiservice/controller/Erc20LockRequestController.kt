@@ -7,6 +7,7 @@ import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest
 import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestResponse
+import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestsResponse
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.Erc20LockRequestService
 import com.ampnet.blockchainapiservice.util.TransactionHash
@@ -39,6 +40,15 @@ class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockR
     ): ResponseEntity<Erc20LockRequestResponse> {
         val lockRequest = erc20LockRequestService.getErc20LockRequest(id, rpcSpec)
         return ResponseEntity.ok(Erc20LockRequestResponse(lockRequest))
+    }
+
+    @GetMapping("/v1/lock/by-project/{projectId}")
+    fun getErc20LockRequestsByProjectId(
+        @PathVariable("projectId") projectId: UUID,
+        @RpcUrlBinding rpcSpec: RpcUrlSpec
+    ): ResponseEntity<Erc20LockRequestsResponse> {
+        val lockRequests = erc20LockRequestService.getErc20LockRequestsByProjectId(projectId, rpcSpec)
+        return ResponseEntity.ok(Erc20LockRequestsResponse(lockRequests.map { Erc20LockRequestResponse(it) }))
     }
 
     @PutMapping("/v1/lock/{id}")

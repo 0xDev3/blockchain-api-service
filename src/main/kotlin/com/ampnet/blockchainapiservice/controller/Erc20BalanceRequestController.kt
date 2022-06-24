@@ -7,6 +7,7 @@ import com.ampnet.blockchainapiservice.model.params.CreateErc20BalanceRequestPar
 import com.ampnet.blockchainapiservice.model.request.AttachSignedMessageRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse
+import com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestsResponse
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.Erc20BalanceRequestService
 import com.ampnet.blockchainapiservice.util.SignedMessage
@@ -40,6 +41,15 @@ class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc2
     ): ResponseEntity<Erc20BalanceRequestResponse> {
         val balanceRequest = erc20BalanceRequestService.getErc20BalanceRequest(id, rpcSpec)
         return ResponseEntity.ok(Erc20BalanceRequestResponse(balanceRequest))
+    }
+
+    @GetMapping("/v1/balance/by-project/{projectId}")
+    fun getErc20BalanceRequestsByProjectId(
+        @PathVariable("projectId") projectId: UUID,
+        @RpcUrlBinding rpcSpec: RpcUrlSpec
+    ): ResponseEntity<Erc20BalanceRequestsResponse> {
+        val balanceRequests = erc20BalanceRequestService.getErc20BalanceRequestsByProjectId(projectId, rpcSpec)
+        return ResponseEntity.ok(Erc20BalanceRequestsResponse(balanceRequests.map { Erc20BalanceRequestResponse(it) }))
     }
 
     @PutMapping("/v1/balance/{id}")

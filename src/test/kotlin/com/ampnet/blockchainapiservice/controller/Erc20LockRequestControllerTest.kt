@@ -9,6 +9,7 @@ import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest
 import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestResponse
+import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestsResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
 import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
 import com.ampnet.blockchainapiservice.model.result.Project
@@ -208,6 +209,91 @@ class Erc20LockRequestControllerTest : TestBase() {
                                 timestamp = TestData.TIMESTAMP.value
                             ),
                             createdAt = result.value.createdAt.value
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20LockRequestsByProjectId() {
+        val id = UUID.randomUUID()
+        val projectId = UUID.randomUUID()
+        val rpcSpec = RpcUrlSpec("url", "url-override")
+        val service = mock<Erc20LockRequestService>()
+        val txHash = TransactionHash("tx-hash")
+        val result = WithTransactionData(
+            value = Erc20LockRequest(
+                id = id,
+                projectId = projectId,
+                chainId = ChainId(123L),
+                redirectUrl = "redirect-url",
+                tokenAddress = ContractAddress("a"),
+                tokenAmount = Balance(BigInteger.TEN),
+                lockDuration = DurationSeconds(BigInteger.valueOf(123L)),
+                lockContractAddress = ContractAddress("b"),
+                tokenSenderAddress = WalletAddress("c"),
+                arbitraryData = TestData.EMPTY_JSON_OBJECT,
+                screenConfig = ScreenConfig(
+                    beforeActionMessage = "before-action-message",
+                    afterActionMessage = "after-action-message"
+                ),
+                txHash = txHash,
+                createdAt = TestData.TIMESTAMP
+            ),
+            status = Status.SUCCESS,
+            transactionData = TransactionData(
+                txHash = txHash,
+                fromAddress = WalletAddress("b"),
+                toAddress = ContractAddress("a"),
+                data = FunctionData("data"),
+                blockConfirmations = BigInteger.ONE,
+                timestamp = TestData.TIMESTAMP
+            )
+        )
+
+        suppose("some ERC20 lock requests will be fetched by project ID") {
+            given(service.getErc20LockRequestsByProjectId(projectId, rpcSpec))
+                .willReturn(listOf(result))
+        }
+
+        val controller = Erc20LockRequestController(service)
+
+        verify("controller returns correct response") {
+            val response = controller.getErc20LockRequestsByProjectId(projectId, rpcSpec)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        Erc20LockRequestsResponse(
+                            listOf(
+                                Erc20LockRequestResponse(
+                                    id = result.value.id,
+                                    projectId = result.value.projectId,
+                                    status = result.status,
+                                    chainId = result.value.chainId.value,
+                                    tokenAddress = result.value.tokenAddress.rawValue,
+                                    amount = result.value.tokenAmount.rawValue,
+                                    lockDurationInSeconds = result.value.lockDuration.rawValue,
+                                    unlocksAt = (TestData.TIMESTAMP + result.value.lockDuration).value,
+                                    lockContractAddress = result.value.lockContractAddress.rawValue,
+                                    senderAddress = result.value.tokenSenderAddress?.rawValue,
+                                    arbitraryData = result.value.arbitraryData,
+                                    screenConfig = result.value.screenConfig,
+                                    redirectUrl = result.value.redirectUrl,
+                                    lockTx = TransactionResponse(
+                                        txHash = result.transactionData.txHash?.value,
+                                        from = result.transactionData.fromAddress?.rawValue,
+                                        to = result.transactionData.toAddress.rawValue,
+                                        data = result.transactionData.data.value,
+                                        blockConfirmations = result.transactionData.blockConfirmations,
+                                        timestamp = TestData.TIMESTAMP.value
+                                    ),
+                                    createdAt = result.value.createdAt.value
+                                )
+                            )
                         )
                     )
                 )
