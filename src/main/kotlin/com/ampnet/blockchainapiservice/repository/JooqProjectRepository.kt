@@ -21,7 +21,7 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
             id = project.id,
             ownerId = project.ownerId,
             issuerContractAddress = project.issuerContractAddress,
-            redirectUrl = project.redirectUrl,
+            baseRedirectUrl = project.baseRedirectUrl,
             chainId = project.chainId,
             customRpcUrl = project.customRpcUrl,
             createdAt = project.createdAt
@@ -57,7 +57,7 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
             id = id!!,
             ownerId = ownerId!!,
             issuerContractAddress = issuerContractAddress!!,
-            redirectUrl = redirectUrl!!,
+            baseRedirectUrl = baseRedirectUrl!!,
             chainId = chainId!!,
             customRpcUrl = customRpcUrl,
             createdAt = createdAt!!

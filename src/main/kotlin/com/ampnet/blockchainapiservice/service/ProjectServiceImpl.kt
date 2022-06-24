@@ -34,7 +34,7 @@ class ProjectServiceImpl(
             id = uuidProvider.getUuid(),
             ownerId = userIdentifier.id,
             issuerContractAddress = params.issuerContractAddress,
-            redirectUrl = params.redirectUrl,
+            baseRedirectUrl = params.baseRedirectUrl,
             chainId = params.chainId,
             customRpcUrl = params.customRpcUrl,
             createdAt = utcDateTimeProvider.getUtcDateTime()
