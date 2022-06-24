@@ -151,6 +151,126 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchErc20LockRequestsByProject() {
+        val otherProjectId = UUID.randomUUID()
+
+        suppose("some other project is in database") {
+            dslContext.executeInsert(
+                ProjectRecord(
+                    id = otherProjectId,
+                    ownerId = OWNER_ID,
+                    issuerContractAddress = ContractAddress("1"),
+                    baseRedirectUrl = BaseUrl("base-redirect-url"),
+                    chainId = ChainId(1337L),
+                    customRpcUrl = "custom-rpc-url",
+                    createdAt = TestData.TIMESTAMP
+                )
+            )
+        }
+
+        val projectRequests = listOf(
+            Erc20LockRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                lockDurationSeconds = LOCK_DURATION,
+                lockContractAddress = LOCK_CONTRACT_ADDRESS,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
+            ),
+            Erc20LockRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                lockDurationSeconds = LOCK_DURATION,
+                lockContractAddress = LOCK_CONTRACT_ADDRESS,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+        val otherRequests = listOf(
+            Erc20LockRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = otherProjectId,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                lockDurationSeconds = LOCK_DURATION,
+                lockContractAddress = LOCK_CONTRACT_ADDRESS,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
+            ),
+            Erc20LockRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = otherProjectId,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                lockDurationSeconds = LOCK_DURATION,
+                lockContractAddress = LOCK_CONTRACT_ADDRESS,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+
+        suppose("some ERC20 lock requests exist in database") {
+            dslContext.batchInsert(projectRequests + otherRequests).execute()
+        }
+
+        verify("ERC20 lock requests are correctly fetched by project") {
+            val result = repository.getAllByProjectId(PROJECT_ID)
+
+            assertThat(result).withMessage()
+                .containsExactlyInAnyOrderElementsOf(
+                    projectRequests.map {
+                        Erc20LockRequest(
+                            id = it.id!!,
+                            projectId = it.projectId!!,
+                            chainId = it.chainId!!,
+                            redirectUrl = it.redirectUrl!!,
+                            tokenAddress = it.tokenAddress!!,
+                            tokenAmount = it.tokenAmount!!,
+                            lockDuration = it.lockDurationSeconds!!,
+                            lockContractAddress = it.lockContractAddress!!,
+                            tokenSenderAddress = it.tokenSenderAddress,
+                            txHash = it.txHash,
+                            arbitraryData = it.arbitraryData,
+                            screenConfig = ScreenConfig(
+                                beforeActionMessage = it.screenBeforeActionMessage,
+                                afterActionMessage = it.screenAfterActionMessage
+                            ),
+                            createdAt = it.createdAt!!
+                        )
+                    }
+                )
+        }
+    }
+
+    @Test
     fun mustCorrectlyStoreErc20LockRequest() {
         val id = UUID.randomUUID()
         val params = StoreErc20LockRequestParams(
