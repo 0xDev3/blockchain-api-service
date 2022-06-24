@@ -10,6 +10,7 @@ import com.ampnet.blockchainapiservice.model.response.ProjectResponse
 import com.ampnet.blockchainapiservice.model.response.ProjectsResponse
 import com.ampnet.blockchainapiservice.model.result.UserIdentifier
 import com.ampnet.blockchainapiservice.service.ProjectService
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import org.springframework.http.ResponseEntity
@@ -30,7 +31,7 @@ class ProjectController(private val projectService: ProjectService) {
     ): ResponseEntity<ProjectResponse> {
         val params = CreateProjectParams(
             issuerContractAddress = ContractAddress(requestBody.issuerContractAddress),
-            redirectUrl = requestBody.redirectUrl,
+            baseRedirectUrl = BaseUrl(requestBody.baseRedirectUrl),
             chainId = ChainId(requestBody.chainId),
             customRpcUrl = requestBody.customRpcUrl
         )

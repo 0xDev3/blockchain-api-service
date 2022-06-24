@@ -6,6 +6,7 @@ import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20LockRequestRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
@@ -33,10 +34,13 @@ class Erc20LockRequestServiceImpl(
 
     companion object : KLogging()
 
-    override fun createErc20LockRequest(params: CreateErc20LockRequestParams): WithFunctionData<Erc20LockRequest> {
-        logger.info { "Creating ERC20 lock request, params: $params" }
+    override fun createErc20LockRequest(
+        params: CreateErc20LockRequestParams,
+        project: Project
+    ): WithFunctionData<Erc20LockRequest> {
+        logger.info { "Creating ERC20 lock request, params: $params, project: $project" }
 
-        val databaseParams = erc20CommonService.createDatabaseParams(StoreErc20LockRequestParams, params)
+        val databaseParams = erc20CommonService.createDatabaseParams(StoreErc20LockRequestParams, params, project)
         val data = encodeFunctionData(
             tokenAddress = databaseParams.tokenAddress,
             tokenAmount = databaseParams.tokenAmount,

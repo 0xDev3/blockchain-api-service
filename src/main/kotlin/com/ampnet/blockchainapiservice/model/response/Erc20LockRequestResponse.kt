@@ -14,6 +14,7 @@ import java.util.UUID
 
 data class Erc20LockRequestResponse(
     val id: UUID,
+    val projectId: UUID,
     val status: Status,
     val chainId: Long,
     val tokenAddress: String,
@@ -27,10 +28,12 @@ data class Erc20LockRequestResponse(
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig?,
     val redirectUrl: String,
-    val lockTx: TransactionResponse
+    val lockTx: TransactionResponse,
+    val createdAt: OffsetDateTime
 ) {
     constructor(lockRequest: WithFunctionData<Erc20LockRequest>) : this(
         id = lockRequest.value.id,
+        projectId = lockRequest.value.projectId,
         status = Status.PENDING,
         chainId = lockRequest.value.chainId.value,
         tokenAddress = lockRequest.value.tokenAddress.rawValue,
@@ -49,11 +52,13 @@ data class Erc20LockRequestResponse(
             data = lockRequest.data.value,
             blockConfirmations = null,
             timestamp = null
-        )
+        ),
+        createdAt = lockRequest.value.createdAt.value
     )
 
     constructor(lockRequest: WithTransactionData<Erc20LockRequest>) : this(
         id = lockRequest.value.id,
+        projectId = lockRequest.value.projectId,
         status = lockRequest.status,
         chainId = lockRequest.value.chainId.value,
         tokenAddress = lockRequest.value.tokenAddress.rawValue,
@@ -72,6 +77,7 @@ data class Erc20LockRequestResponse(
             data = lockRequest.transactionData.data.value,
             blockConfirmations = lockRequest.transactionData.blockConfirmations,
             timestamp = lockRequest.transactionData.timestamp?.value
-        )
+        ),
+        createdAt = lockRequest.value.createdAt.value
     )
 }

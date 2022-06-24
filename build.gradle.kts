@@ -218,6 +218,12 @@ jooq {
                                 converter = "com.ampnet.blockchainapiservice.util.UtcDateTimeConverter"
                                 includeExpression = ".*"
                                 includeTypes = "TIMESTAMPTZ"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.BaseUrl"
+                                converter = "com.ampnet.blockchainapiservice.util.BaseUrlConverter"
+                                includeExpression = "base_redirect_url"
+                                includeTypes = "VARCHAR"
                             }
                         )
                     }

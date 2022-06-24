@@ -8,6 +8,7 @@ import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
+import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithTransactionData
 import com.fasterxml.jackson.databind.JsonNode
@@ -15,6 +16,7 @@ import java.util.UUID
 
 data class Erc20SendRequest(
     val id: UUID,
+    val projectId: UUID,
     val chainId: ChainId,
     val redirectUrl: String,
     val tokenAddress: ContractAddress,
@@ -23,7 +25,8 @@ data class Erc20SendRequest(
     val tokenRecipientAddress: WalletAddress,
     val txHash: TransactionHash?,
     val arbitraryData: JsonNode?,
-    val screenConfig: ScreenConfig
+    val screenConfig: ScreenConfig,
+    val createdAt: UtcDateTime
 ) {
     fun withTransactionData(
         status: Status,

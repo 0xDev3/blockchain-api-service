@@ -6,16 +6,16 @@ import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
-import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.params.ClientIdParam
 import com.ampnet.blockchainapiservice.model.params.ParamsFactory
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
-import com.ampnet.blockchainapiservice.model.result.ClientInfo
-import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
+import com.ampnet.blockchainapiservice.model.result.Project
+import com.ampnet.blockchainapiservice.util.BaseUrl
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
+import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -28,16 +28,16 @@ import java.util.UUID
 class Erc20CommonServiceTest : TestBase() {
 
     companion object {
-        data class InParams(override val clientId: String?) : ClientIdParam
-        data class OutParams(val id: UUID, val params: InParams, val clientInfo: ClientInfo)
+        data class InParams(val value: Int)
+        data class OutParams(val id: UUID, val params: InParams, val project: Project, val createdAt: UtcDateTime)
         object Factory : ParamsFactory<InParams, OutParams> {
-            override fun fromCreateParams(id: UUID, params: InParams, clientInfo: ClientInfo) =
-                OutParams(id, params, clientInfo)
+            override fun fromCreateParams(id: UUID, params: InParams, project: Project, createdAt: UtcDateTime) =
+                OutParams(id, params, project, createdAt)
         }
     }
 
     @Test
-    fun mustCorrectlyCreateDatabaseParamsWhenClientIdIsSpecified() {
+    fun mustCorrectlyCreateDatabaseParams() {
         val uuid = UUID.randomUUID()
         val uuidProvider = mock<UuidProvider>()
 
@@ -46,82 +46,34 @@ class Erc20CommonServiceTest : TestBase() {
                 .willReturn(uuid)
         }
 
-        val clientId = "test-client-id"
-        val clientInfo = ClientInfo(
-            clientId = clientId,
-            chainId = Chain.HARDHAT_TESTNET.id,
-            sendRedirectUrl = "send-redirect-url",
-            balanceRedirectUrl = "balance-redirect-url",
-            lockRedirectUrl = "lock-redirect-url",
-            tokenAddress = ContractAddress("a")
-        )
-        val clientInfoRepository = mock<ClientInfoRepository>()
+        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
-        suppose("client info exists in database") {
-            given(clientInfoRepository.getById(clientId))
-                .willReturn(clientInfo)
+        suppose("some timestamp will be returned") {
+            given(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(TestData.TIMESTAMP)
         }
 
-        val params = InParams(clientId)
+        val params = InParams(1)
+        val project = Project(
+            id = UUID.randomUUID(),
+            ownerId = UUID.randomUUID(),
+            issuerContractAddress = ContractAddress("a"),
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
+            chainId = ChainId(1337L),
+            customRpcUrl = "custom-rpc-url",
+            createdAt = TestData.TIMESTAMP
+        )
         val service = Erc20CommonServiceImpl(
             uuidProvider = uuidProvider,
-            clientInfoRepository = clientInfoRepository,
+            utcDateTimeProvider = utcDateTimeProvider,
             blockchainService = mock()
         )
 
         verify("correct result is returned") {
-            val result = service.createDatabaseParams(Factory, params)
+            val result = service.createDatabaseParams(Factory, params, project)
 
             assertThat(result).withMessage()
-                .isEqualTo(OutParams(uuid, params, clientInfo))
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCreateDatabaseParamsWhenClientIdIsNotSpecified() {
-        val uuid = UUID.randomUUID()
-        val uuidProvider = mock<UuidProvider>()
-
-        suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
-                .willReturn(uuid)
-        }
-
-        val params = InParams(null)
-        val service = Erc20CommonServiceImpl(
-            uuidProvider = uuidProvider,
-            clientInfoRepository = mock(),
-            blockchainService = mock()
-        )
-
-        verify("correct result is returned") {
-            val result = service.createDatabaseParams(Factory, params)
-
-            assertThat(result).withMessage()
-                .isEqualTo(OutParams(uuid, params, ClientInfo.EMPTY))
-        }
-    }
-
-    @Test
-    fun mustThrowNonExistentClientIdExceptionForNonExistentClientId() {
-        val clientId = "test-client-id"
-        val clientInfoRepository = mock<ClientInfoRepository>()
-
-        suppose("client info does not exist in database") {
-            given(clientInfoRepository.getById(clientId))
-                .willReturn(null)
-        }
-
-        val service = Erc20CommonServiceImpl(
-            uuidProvider = mock(),
-            clientInfoRepository = clientInfoRepository,
-            blockchainService = mock()
-        )
-
-        verify("NonExistentClientIdException is thrown") {
-            assertThrows<NonExistentClientIdException>(message) {
-                service.createDatabaseParams(Factory, InParams(clientId))
-            }
+                .isEqualTo(OutParams(uuid, params, project, TestData.TIMESTAMP))
         }
     }
 
@@ -129,7 +81,7 @@ class Erc20CommonServiceTest : TestBase() {
     fun mustCorrectlyFetchNonNullResource() {
         val service = Erc20CommonServiceImpl(
             uuidProvider = mock(),
-            clientInfoRepository = mock(),
+            utcDateTimeProvider = mock(),
             blockchainService = mock()
         )
         val input = "test"
@@ -146,7 +98,7 @@ class Erc20CommonServiceTest : TestBase() {
     fun mustThrowResourceNotFoundExceptionForNullResource() {
         val service = Erc20CommonServiceImpl(
             uuidProvider = mock(),
-            clientInfoRepository = mock(),
+            utcDateTimeProvider = mock(),
             blockchainService = mock()
         )
 
@@ -183,7 +135,7 @@ class Erc20CommonServiceTest : TestBase() {
 
         val service = Erc20CommonServiceImpl(
             uuidProvider = mock(),
-            clientInfoRepository = mock(),
+            utcDateTimeProvider = mock(),
             blockchainService = blockchainService
         )
 
@@ -203,7 +155,7 @@ class Erc20CommonServiceTest : TestBase() {
     fun mustReturnNullWhenTxHashIsNull() {
         val service = Erc20CommonServiceImpl(
             uuidProvider = mock(),
-            clientInfoRepository = mock(),
+            utcDateTimeProvider = mock(),
             blockchainService = mock()
         )
 

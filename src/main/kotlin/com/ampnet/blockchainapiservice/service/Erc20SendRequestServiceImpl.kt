@@ -6,6 +6,7 @@ import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
@@ -30,10 +31,13 @@ class Erc20SendRequestServiceImpl(
 
     companion object : KLogging()
 
-    override fun createErc20SendRequest(params: CreateErc20SendRequestParams): WithFunctionData<Erc20SendRequest> {
-        logger.info { "Creating ERC20 send request, params: $params" }
+    override fun createErc20SendRequest(
+        params: CreateErc20SendRequestParams,
+        project: Project
+    ): WithFunctionData<Erc20SendRequest> {
+        logger.info { "Creating ERC20 send request, params: $params, project: $project" }
 
-        val databaseParams = erc20CommonService.createDatabaseParams(StoreErc20SendRequestParams, params)
+        val databaseParams = erc20CommonService.createDatabaseParams(StoreErc20SendRequestParams, params, project)
         val data = encodeFunctionData(params.tokenRecipientAddress, params.tokenAmount, databaseParams.id)
         val erc20SendRequest = erc20SendRequestRepository.store(databaseParams)
 
