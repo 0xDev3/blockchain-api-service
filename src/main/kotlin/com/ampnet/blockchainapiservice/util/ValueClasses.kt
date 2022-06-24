@@ -128,3 +128,12 @@ value class SignedMessage private constructor(val value: String) {
         operator fun invoke(value: String) = SignedMessage(value.lowercase())
     }
 }
+
+@JvmInline
+value class BaseUrl private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = BaseUrl(
+            if (value.endsWith('/')) value.dropLast(1) else value
+        )
+    }
+}

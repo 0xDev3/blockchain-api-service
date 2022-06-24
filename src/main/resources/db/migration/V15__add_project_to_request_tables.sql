@@ -31,3 +31,5 @@ ALTER TABLE blockchain_api_service.erc20_balance_request
 CREATE INDEX erc20_send_request_created_at ON blockchain_api_service.erc20_send_request(created_at);
 CREATE INDEX erc20_lock_request_created_at ON blockchain_api_service.erc20_lock_request(created_at);
 CREATE INDEX erc20_balance_request_created_at ON blockchain_api_service.erc20_balance_request(created_at);
+
+ALTER TABLE blockchain_api_service.project RENAME COLUMN redirect_url TO base_redirect_url;

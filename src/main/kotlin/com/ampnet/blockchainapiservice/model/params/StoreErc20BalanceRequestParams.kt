@@ -32,7 +32,7 @@ data class StoreErc20BalanceRequestParams(
             id = id,
             projectId = project.id,
             chainId = project.chainId,
-            redirectUrl = (params.redirectUrl ?: (project.redirectUrl + "/balance/\${id}")) // TODO check path on FE
+            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/request-balance/\${id}/action"))
                 .replace("\${id}", id.toString()),
             tokenAddress = params.tokenAddress,
             blockNumber = params.blockNumber,

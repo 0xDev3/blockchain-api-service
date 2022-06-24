@@ -2,18 +2,26 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
+import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20SendRequestRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
@@ -38,6 +46,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
         private const val SEND_SCREEN_BEFORE_ACTION_MESSAGE = "send-screen-before-action-message"
         private const val SEND_SCREEN_AFTER_ACTION_MESSAGE = "send-screen-after-action-message"
         private val TX_HASH = TransactionHash("tx-hash")
+        private val PROJECT_ID = UUID.randomUUID()
+        private val OWNER_ID = UUID.randomUUID()
     }
 
     @Suppress("unused")
@@ -49,6 +59,33 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
     @Autowired
     private lateinit var dslContext: DSLContext
 
+    @BeforeEach
+    fun beforeEach() {
+        dslContext.delete(ApiKeyTable.API_KEY).execute()
+        dslContext.delete(ProjectTable.PROJECT).execute()
+        dslContext.delete(UserIdentifierTable.USER_IDENTIFIER).execute()
+
+        dslContext.executeInsert(
+            UserIdentifierRecord(
+                id = OWNER_ID,
+                userIdentifier = "user-identifier",
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+            )
+        )
+
+        dslContext.executeInsert(
+            ProjectRecord(
+                id = PROJECT_ID,
+                ownerId = OWNER_ID,
+                issuerContractAddress = ContractAddress("0"),
+                baseRedirectUrl = BaseUrl("base-redirect-url"),
+                chainId = ChainId(1337L),
+                customRpcUrl = "custom-rpc-url",
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+    }
+
     @Test
     fun mustCorrectlyFetchErc20SendRequestById() {
         val id = UUID.randomUUID()
@@ -57,6 +94,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(
                 Erc20SendRequestRecord(
                     id = id,
+                    projectId = PROJECT_ID,
                     chainId = CHAIN_ID,
                     redirectUrl = REDIRECT_URL,
                     tokenAddress = TOKEN_ADDRESS,
@@ -66,7 +104,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                     arbitraryData = ARBITRARY_DATA,
                     screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                     screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
-                    txHash = TX_HASH
+                    txHash = TX_HASH,
+                    createdAt = TestData.TIMESTAMP
                 )
             )
         }
@@ -78,6 +117,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     Erc20SendRequest(
                         id = id,
+                        projectId = PROJECT_ID,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
@@ -89,7 +129,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                         screenConfig = ScreenConfig(
                             beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
-                        )
+                        ),
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -110,6 +151,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
         val senderRequests = listOf(
             Erc20SendRequestRecord(
                 id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -119,10 +161,12 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
-                txHash = TX_HASH
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
             ),
             Erc20SendRequestRecord(
                 id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -132,12 +176,14 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
-                txHash = TX_HASH
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
             ),
         )
         val otherRequests = listOf(
             Erc20SendRequestRecord(
                 id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -147,10 +193,12 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
-                txHash = TX_HASH
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
             ),
             Erc20SendRequestRecord(
                 id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -160,7 +208,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
-                txHash = TX_HASH
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
             )
         )
 
@@ -176,6 +225,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                     senderRequests.map {
                         Erc20SendRequest(
                             id = it.id!!,
+                            projectId = it.projectId!!,
                             chainId = it.chainId!!,
                             redirectUrl = it.redirectUrl!!,
                             tokenAddress = it.tokenAddress!!,
@@ -187,7 +237,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                             screenConfig = ScreenConfig(
                                 beforeActionMessage = it.screenBeforeActionMessage,
                                 afterActionMessage = it.screenAfterActionMessage
-                            )
+                            ),
+                            createdAt = it.createdAt!!
                         )
                     }
                 )
@@ -199,6 +250,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
         val recipientRequests = listOf(
             Erc20SendRequestRecord(
                 id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -208,10 +260,12 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
-                txHash = TX_HASH
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
             ),
             Erc20SendRequestRecord(
                 id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -221,12 +275,14 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
-                txHash = TX_HASH
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
             ),
         )
         val otherRequests = listOf(
             Erc20SendRequestRecord(
                 id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -236,7 +292,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 screenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
-                txHash = TX_HASH
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
             )
         )
 
@@ -252,6 +309,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                     recipientRequests.map {
                         Erc20SendRequest(
                             id = it.id!!,
+                            projectId = it.projectId!!,
                             chainId = it.chainId!!,
                             redirectUrl = it.redirectUrl!!,
                             tokenAddress = it.tokenAddress!!,
@@ -263,7 +321,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                             screenConfig = ScreenConfig(
                                 beforeActionMessage = it.screenBeforeActionMessage,
                                 afterActionMessage = it.screenAfterActionMessage
-                            )
+                            ),
+                            createdAt = it.createdAt!!
                         )
                     }
                 )
@@ -275,6 +334,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreErc20SendRequestParams(
             id = id,
+            projectId = PROJECT_ID,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
@@ -285,7 +345,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
 
         val storedErc20SendRequest = suppose("ERC20 send request is stored in database") {
@@ -294,6 +355,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
 
         val expectedErc20SendRequest = Erc20SendRequest(
             id = id,
+            projectId = PROJECT_ID,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
@@ -305,7 +367,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
 
         verify("storing ERC20 send request returns correct result") {
@@ -326,6 +389,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreErc20SendRequestParams(
             id = id,
+            projectId = PROJECT_ID,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
@@ -336,7 +400,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
 
         suppose("ERC20 send request is stored in database") {
@@ -355,6 +420,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     Erc20SendRequest(
                         id = id,
+                        projectId = PROJECT_ID,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
@@ -366,7 +432,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                         screenConfig = ScreenConfig(
                             beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
-                        )
+                        ),
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -377,6 +444,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreErc20SendRequestParams(
             id = id,
+            projectId = PROJECT_ID,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
@@ -387,7 +455,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
 
         suppose("ERC20 send request is stored in database") {
@@ -411,6 +480,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     Erc20SendRequest(
                         id = id,
+                        projectId = PROJECT_ID,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
@@ -422,7 +492,8 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
                         screenConfig = ScreenConfig(
                             beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
-                        )
+                        ),
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }

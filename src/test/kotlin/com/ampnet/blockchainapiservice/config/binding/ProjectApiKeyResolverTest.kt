@@ -8,6 +8,7 @@ import com.ampnet.blockchainapiservice.model.result.ApiKey
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ApiKeyRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import org.assertj.core.api.Assertions.assertThat
@@ -20,7 +21,7 @@ import org.springframework.web.context.request.NativeWebRequest
 import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 
-class ApiKeyResolverTest : TestBase() {
+class ProjectApiKeyResolverTest : TestBase() {
 
     companion object {
         // @formatter:off
@@ -107,7 +108,7 @@ class ApiKeyResolverTest : TestBase() {
             id = apiKey.projectId,
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
-            redirectUrl = "redirect-url",
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
             customRpcUrl = "custom-rpc-url",
             createdAt = TestData.TIMESTAMP

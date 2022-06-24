@@ -10,6 +10,7 @@ import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.params.ParamsFactory
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Project
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionData
@@ -57,7 +58,7 @@ class Erc20CommonServiceTest : TestBase() {
             id = UUID.randomUUID(),
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
-            redirectUrl = "redirect-url",
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
             customRpcUrl = "custom-rpc-url",
             createdAt = TestData.TIMESTAMP
