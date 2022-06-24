@@ -12,5 +12,10 @@ import java.util.UUID
 interface Erc20BalanceRequestService {
     fun createErc20BalanceRequest(params: CreateErc20BalanceRequestParams, project: Project): Erc20BalanceRequest
     fun getErc20BalanceRequest(id: UUID, rpcSpec: RpcUrlSpec): FullErc20BalanceRequest
+    fun getErc20BalanceRequestsByProjectId(
+        projectId: UUID,
+        rpcSpec: RpcUrlSpec
+    ): List<FullErc20BalanceRequest>
+
     fun attachWalletAddressAndSignedMessage(id: UUID, walletAddress: WalletAddress, signedMessage: SignedMessage)
 }

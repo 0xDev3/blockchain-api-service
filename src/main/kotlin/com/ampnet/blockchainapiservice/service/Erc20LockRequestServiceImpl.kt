@@ -61,24 +61,15 @@ class Erc20LockRequestServiceImpl(
             "ERC20 lock request not found for ID: $id"
         )
 
-        val transactionInfo = erc20CommonService.fetchTransactionInfo(
-            txHash = erc20LockRequest.txHash,
-            chainId = erc20LockRequest.chainId,
-            rpcSpec = rpcSpec
-        )
-        val data = encodeFunctionData(
-            tokenAddress = erc20LockRequest.tokenAddress,
-            tokenAmount = erc20LockRequest.tokenAmount,
-            lockDuration = erc20LockRequest.lockDuration,
-            id = id
-        )
-        val status = erc20LockRequest.determineStatus(transactionInfo, data)
+        return erc20LockRequest.appendTransactionData(rpcSpec)
+    }
 
-        return erc20LockRequest.withTransactionData(
-            status = status,
-            data = data,
-            transactionInfo = transactionInfo
-        )
+    override fun getErc20LockRequestsByProjectId(
+        projectId: UUID,
+        rpcSpec: RpcUrlSpec
+    ): List<WithTransactionData<Erc20LockRequest>> {
+        logger.debug { "Fetching ERC20 lock requests for projectId: $projectId, rpcSpec: $rpcSpec" }
+        return erc20LockRequestRepository.getAllByProjectId(projectId).map { it.appendTransactionData(rpcSpec) }
     }
 
     override fun attachTxHash(id: UUID, txHash: TransactionHash) {
@@ -109,6 +100,27 @@ class Erc20LockRequestServiceImpl(
             abiOutputTypes = emptyList(),
             additionalData = emptyList()
         )
+
+    private fun Erc20LockRequest.appendTransactionData(rpcSpec: RpcUrlSpec): WithTransactionData<Erc20LockRequest> {
+        val transactionInfo = erc20CommonService.fetchTransactionInfo(
+            txHash = txHash,
+            chainId = chainId,
+            rpcSpec = rpcSpec
+        )
+        val data = encodeFunctionData(
+            tokenAddress = tokenAddress,
+            tokenAmount = tokenAmount,
+            lockDuration = lockDuration,
+            id = id
+        )
+        val status = determineStatus(transactionInfo, data)
+
+        return withTransactionData(
+            status = status,
+            data = data,
+            transactionInfo = transactionInfo
+        )
+    }
 
     private fun Erc20LockRequest.determineStatus(
         transactionInfo: BlockchainTransactionInfo?,

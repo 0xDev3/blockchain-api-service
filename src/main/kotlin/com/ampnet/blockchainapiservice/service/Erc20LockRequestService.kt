@@ -16,5 +16,10 @@ interface Erc20LockRequestService {
     ): WithFunctionData<Erc20LockRequest>
 
     fun getErc20LockRequest(id: UUID, rpcSpec: RpcUrlSpec): WithTransactionData<Erc20LockRequest>
+    fun getErc20LockRequestsByProjectId(
+        projectId: UUID,
+        rpcSpec: RpcUrlSpec
+    ): List<WithTransactionData<Erc20LockRequest>>
+
     fun attachTxHash(id: UUID, txHash: TransactionHash)
 }

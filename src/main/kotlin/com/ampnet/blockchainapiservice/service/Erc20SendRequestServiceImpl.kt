@@ -23,6 +23,7 @@ import org.web3j.abi.datatypes.Utf8String
 import java.util.UUID
 
 @Service
+@Suppress("TooManyFunctions")
 class Erc20SendRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val erc20SendRequestRepository: Erc20SendRequestRepository,
@@ -53,6 +54,14 @@ class Erc20SendRequestServiceImpl(
         )
 
         return erc20SendRequest.appendTransactionData(rpcSpec)
+    }
+
+    override fun getErc20SendRequestsByProjectId(
+        projectId: UUID,
+        rpcSpec: RpcUrlSpec
+    ): List<WithTransactionData<Erc20SendRequest>> {
+        logger.debug { "Fetching ERC20 send requests for projectId: $projectId, rpcSpec: $rpcSpec" }
+        return erc20SendRequestRepository.getAllByProjectId(projectId).map { it.appendTransactionData(rpcSpec) }
     }
 
     override fun getErc20SendRequestsBySender(

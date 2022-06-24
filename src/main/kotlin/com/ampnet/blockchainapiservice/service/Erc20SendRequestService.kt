@@ -17,6 +17,11 @@ interface Erc20SendRequestService {
     ): WithFunctionData<Erc20SendRequest>
 
     fun getErc20SendRequest(id: UUID, rpcSpec: RpcUrlSpec): WithTransactionData<Erc20SendRequest>
+    fun getErc20SendRequestsByProjectId(
+        projectId: UUID,
+        rpcSpec: RpcUrlSpec
+    ): List<WithTransactionData<Erc20SendRequest>>
+
     fun getErc20SendRequestsBySender(
         sender: WalletAddress,
         rpcSpec: RpcUrlSpec

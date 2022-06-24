@@ -581,6 +581,244 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchErc20SendRequestsByProjectId() {
+        val mainAccount = accounts[0]
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(mainAccount.address),
+                listOf(BigInteger("10000")),
+                mainAccount.address
+            ).sendAndMine()
+        }
+
+        val tokenAddress = ContractAddress(contract.contractAddress)
+        val amount = Balance(BigInteger.TEN)
+        val senderAddress = WalletAddress(mainAccount.address)
+        val recipientAddress = WalletAddress(accounts[1].address)
+
+        val createResponse = suppose("request to create ERC20 send request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "token_address": "${tokenAddress.rawValue}",
+                                "amount": "${amount.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
+        }
+
+        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+            contract.transferAndMine(recipientAddress, amount)
+                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+        }
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.waitAndMine()
+        }
+
+        suppose("transaction hash is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
+        }
+
+        val fetchResponse = suppose("request to fetch ERC20 send requests by project ID is made") {
+            val fetchResponse = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/send/by-project/${createResponse.projectId}")
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(fetchResponse.response.contentAsString, Erc20SendRequestsResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(fetchResponse).withMessage()
+                .isEqualTo(
+                    Erc20SendRequestsResponse(
+                        listOf(
+                            Erc20SendRequestResponse(
+                                id = createResponse.id,
+                                projectId = PROJECT_ID,
+                                status = Status.FAILED,
+                                chainId = PROJECT.chainId.value,
+                                tokenAddress = tokenAddress.rawValue,
+                                amount = amount.rawValue,
+                                senderAddress = senderAddress.rawValue,
+                                recipientAddress = recipientAddress.rawValue,
+                                arbitraryData = createResponse.arbitraryData,
+                                screenConfig = ScreenConfig(
+                                    beforeActionMessage = "before-action-message",
+                                    afterActionMessage = "after-action-message"
+                                ),
+                                redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
+                                sendTx = TransactionResponse(
+                                    txHash = txHash.value,
+                                    from = senderAddress.rawValue,
+                                    to = tokenAddress.rawValue,
+                                    data = createResponse.sendTx.data,
+                                    blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
+                                    timestamp = fetchResponse.requests[0].sendTx.timestamp
+                                ),
+                                createdAt = createResponse.createdAt
+                            )
+                        )
+                    )
+                )
+
+            assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
+                .isNotZero()
+            assertThat(fetchResponse.requests[0].sendTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.requests[0].createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20SendRequestsByProjectIdWhenCustomRpcUrlIsSpecified() {
+        val mainAccount = accounts[0]
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(mainAccount.address),
+                listOf(BigInteger("10000")),
+                mainAccount.address
+            ).sendAndMine()
+        }
+
+        val chainId = Chain.HARDHAT_TESTNET.id
+        val redirectUrl = "https://example.com/\${id}"
+        val tokenAddress = ContractAddress(contract.contractAddress)
+        val amount = Balance(BigInteger.TEN)
+        val senderAddress = WalletAddress(mainAccount.address)
+        val recipientAddress = WalletAddress(accounts[1].address)
+
+        val createResponse = suppose("request to create ERC20 send request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "chain_id": ${chainId.value},
+                                "redirect_url": "$redirectUrl",
+                                "token_address": "${tokenAddress.rawValue}",
+                                "amount": "${amount.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "recipient_address": "${recipientAddress.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
+        }
+
+        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+            contract.transferAndMine(recipientAddress, amount)
+                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+        }
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.waitAndMine()
+        }
+
+        suppose("transaction hash is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
+        }
+
+        val fetchResponse = suppose("request to fetch ERC20 send requests by project ID is made") {
+            val fetchResponse = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/send/by-project/${createResponse.projectId}")
+                    .header(
+                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
+                        "http://localhost:${hardhatContainer.mappedPort}"
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(fetchResponse.response.contentAsString, Erc20SendRequestsResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(fetchResponse).withMessage()
+                .isEqualTo(
+                    Erc20SendRequestsResponse(
+                        listOf(
+                            Erc20SendRequestResponse(
+                                id = createResponse.id,
+                                projectId = PROJECT_ID,
+                                status = Status.FAILED,
+                                chainId = chainId.value,
+                                tokenAddress = tokenAddress.rawValue,
+                                amount = amount.rawValue,
+                                senderAddress = senderAddress.rawValue,
+                                recipientAddress = recipientAddress.rawValue,
+                                arbitraryData = createResponse.arbitraryData,
+                                screenConfig = ScreenConfig(
+                                    beforeActionMessage = "before-action-message",
+                                    afterActionMessage = "after-action-message"
+                                ),
+                                redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                                sendTx = TransactionResponse(
+                                    txHash = txHash.value,
+                                    from = senderAddress.rawValue,
+                                    to = tokenAddress.rawValue,
+                                    data = createResponse.sendTx.data,
+                                    blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
+                                    timestamp = fetchResponse.requests[0].sendTx.timestamp
+                                ),
+                                createdAt = createResponse.createdAt
+                            )
+                        )
+                    )
+                )
+
+            assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
+                .isNotZero()
+            assertThat(fetchResponse.requests[0].sendTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.requests[0].createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
     fun mustCorrectlyFetchErc20SendRequestsBySenderAddress() {
         val mainAccount = accounts[0]
 
@@ -761,7 +999,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
         }
 
-        val fetchResponse = suppose("request to fetch ERC20 send request by sender address is made") {
+        val fetchResponse = suppose("request to fetch ERC20 send requests by sender address is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/send/by-sender/${createResponse.senderAddress}")
                     .header(
@@ -995,7 +1233,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
         }
 
-        val fetchResponse = suppose("request to fetch ERC20 send request by recipient address is made") {
+        val fetchResponse = suppose("request to fetch ERC20 send requests by recipient address is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/send/by-recipient/${createResponse.recipientAddress}")
                     .header(
