@@ -147,6 +147,121 @@ class JooqErc20BalanceRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchErc20LockRequestsByProject() {
+        val otherProjectId = UUID.randomUUID()
+
+        suppose("some other project is in database") {
+            dslContext.executeInsert(
+                ProjectRecord(
+                    id = otherProjectId,
+                    ownerId = OWNER_ID,
+                    issuerContractAddress = ContractAddress("1"),
+                    baseRedirectUrl = BaseUrl("base-redirect-url"),
+                    chainId = ChainId(1337L),
+                    customRpcUrl = "custom-rpc-url",
+                    createdAt = TestData.TIMESTAMP
+                )
+            )
+        }
+
+        val projectRequests = listOf(
+            Erc20BalanceRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                blockNumber = BLOCK_NUMBER,
+                requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE,
+                actualWalletAddress = ACTUAL_WALLET_ADDRESS,
+                signedMessage = SIGNED_MESSAGE,
+                createdAt = TestData.TIMESTAMP
+            ),
+            Erc20BalanceRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                blockNumber = BLOCK_NUMBER,
+                requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE,
+                actualWalletAddress = ACTUAL_WALLET_ADDRESS,
+                signedMessage = SIGNED_MESSAGE,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+        val otherRequests = listOf(
+            Erc20BalanceRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = otherProjectId,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                blockNumber = BLOCK_NUMBER,
+                requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE,
+                actualWalletAddress = ACTUAL_WALLET_ADDRESS,
+                signedMessage = SIGNED_MESSAGE,
+                createdAt = TestData.TIMESTAMP
+            ),
+            Erc20BalanceRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = otherProjectId,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                blockNumber = BLOCK_NUMBER,
+                requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = BALANCE_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = BALANCE_SCREEN_AFTER_ACTION_MESSAGE,
+                actualWalletAddress = ACTUAL_WALLET_ADDRESS,
+                signedMessage = SIGNED_MESSAGE,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+
+        suppose("some ERC20 balance requests exist in database") {
+            dslContext.batchInsert(projectRequests + otherRequests).execute()
+        }
+
+        verify("ERC20 balance requests are correctly fetched by project") {
+            val result = repository.getAllByProjectId(PROJECT_ID)
+
+            assertThat(result).withMessage()
+                .containsExactlyInAnyOrderElementsOf(
+                    projectRequests.map {
+                        Erc20BalanceRequest(
+                            id = it.id!!,
+                            projectId = it.projectId!!,
+                            chainId = it.chainId!!,
+                            redirectUrl = it.redirectUrl!!,
+                            tokenAddress = it.tokenAddress!!,
+                            blockNumber = it.blockNumber,
+                            requestedWalletAddress = it.requestedWalletAddress,
+                            actualWalletAddress = it.actualWalletAddress,
+                            signedMessage = it.signedMessage,
+                            arbitraryData = it.arbitraryData,
+                            screenConfig = ScreenConfig(
+                                beforeActionMessage = it.screenBeforeActionMessage,
+                                afterActionMessage = it.screenAfterActionMessage
+                            ),
+                            createdAt = it.createdAt!!
+                        )
+                    }
+                )
+        }
+    }
+
+    @Test
     fun mustCorrectlyStoreErc20BalanceRequest() {
         val id = UUID.randomUUID()
         val params = StoreErc20BalanceRequestParams(

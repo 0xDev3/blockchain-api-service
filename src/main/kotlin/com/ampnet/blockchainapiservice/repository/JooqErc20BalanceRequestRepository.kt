@@ -47,6 +47,14 @@ class JooqErc20BalanceRequestRepository(private val dslContext: DSLContext) : Er
             .fetchOne { it.toModel() }
     }
 
+    override fun getAllByProjectId(projectId: UUID): List<Erc20BalanceRequest> {
+        logger.debug { "Get ERC20 balance requests filtered by projectId: $projectId" }
+        return dslContext.selectFrom(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST)
+            .where(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.PROJECT_ID.eq(projectId))
+            .orderBy(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.CREATED_AT.asc())
+            .fetch { it.toModel() }
+    }
+
     override fun setSignedMessage(id: UUID, walletAddress: WalletAddress, signedMessage: SignedMessage): Boolean {
         logger.info {
             "Set walletAddress and signedMessage for ERC20 balance request, id: $id, walletAddress: $walletAddress," +
