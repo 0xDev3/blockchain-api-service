@@ -1,12 +1,14 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
+import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import com.ampnet.blockchainapiservice.config.binding.annotation.RpcUrlBinding
 import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20SendRequest
 import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse
 import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestsResponse
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.Erc20SendRequestService
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -24,10 +26,11 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
 
     @PostMapping("/v1/send")
     fun createErc20SendRequest(
+        @ApiKeyBinding project: Project,
         @RequestBody requestBody: CreateErc20SendRequest
     ): ResponseEntity<Erc20SendRequestResponse> {
         val params = CreateErc20SendRequestParams(requestBody)
-        val createdRequest = erc20SendRequestService.createErc20SendRequest(params)
+        val createdRequest = erc20SendRequestService.createErc20SendRequest(params, project)
         return ResponseEntity.ok(Erc20SendRequestResponse(createdRequest))
     }
 
@@ -38,6 +41,15 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
     ): ResponseEntity<Erc20SendRequestResponse> {
         val sendRequest = erc20SendRequestService.getErc20SendRequest(id, rpcSpec)
         return ResponseEntity.ok(Erc20SendRequestResponse(sendRequest))
+    }
+
+    @GetMapping("/v1/send/by-project/{projectId}")
+    fun getErc20SendRequestsByProjectId(
+        @PathVariable("projectId") projectId: UUID,
+        @RpcUrlBinding rpcSpec: RpcUrlSpec
+    ): ResponseEntity<Erc20SendRequestsResponse> {
+        val sendRequests = erc20SendRequestService.getErc20SendRequestsByProjectId(projectId, rpcSpec)
+        return ResponseEntity.ok(Erc20SendRequestsResponse(sendRequests.map { Erc20SendRequestResponse(it) }))
     }
 
     @GetMapping("/v1/send/by-sender/{sender}")

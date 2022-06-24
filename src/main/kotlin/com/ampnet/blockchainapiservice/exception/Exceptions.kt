@@ -44,26 +44,6 @@ class BlockchainReadException(message: String) : ServiceException(
     }
 }
 
-class NonExistentClientIdException(clientId: String) : ServiceException(
-    errorCode = ErrorCode.NON_EXISTENT_CLIENT_ID,
-    httpStatus = HttpStatus.BAD_REQUEST,
-    message = "No client info for client ID: $clientId"
-) {
-    companion object {
-        private const val serialVersionUID: Long = -4336261431216079400L
-    }
-}
-
-class IncompleteRequestException(message: String) : ServiceException(
-    errorCode = ErrorCode.INCOMPLETE_REQUEST,
-    httpStatus = HttpStatus.BAD_REQUEST,
-    message = message
-) {
-    companion object {
-        private const val serialVersionUID: Long = -1417774323990169443L
-    }
-}
-
 class CannotAttachTxInfoException(message: String) : ServiceException(
         errorCode = ErrorCode.TX_INFO_ALREADY_SET,
         httpStatus = HttpStatus.BAD_REQUEST,
@@ -101,5 +81,15 @@ class ApiKeyAlreadyExistsException(projectId: UUID) : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = 6676987534485377215L
+    }
+}
+
+class NonExistentApiKeyException : ServiceException(
+    errorCode = ErrorCode.NON_EXISTENT_API_KEY,
+    httpStatus = HttpStatus.UNAUTHORIZED,
+    message = "Non existent API key provided in request"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -176593491332037627L
     }
 }

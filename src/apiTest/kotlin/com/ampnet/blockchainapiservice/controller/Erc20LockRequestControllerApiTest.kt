@@ -4,19 +4,28 @@ import com.ampnet.blockchainapiservice.ControllerTestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.SimpleLockManager
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
+import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ClientInfoTable
+import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20LockRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ClientInfoRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestResponse
+import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestsResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
 import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20LockRequestRepository
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.DurationSeconds
 import com.ampnet.blockchainapiservice.util.Status
@@ -37,6 +46,21 @@ import java.util.UUID
 
 class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
+    companion object {
+        private val PROJECT_ID = UUID.randomUUID()
+        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT = Project(
+            id = PROJECT_ID,
+            ownerId = OWNER_ID,
+            issuerContractAddress = ContractAddress("0"),
+            baseRedirectUrl = BaseUrl("https://example.com/"),
+            chainId = Chain.HARDHAT_TESTNET.id,
+            customRpcUrl = "custom-rpc-url",
+            createdAt = TestData.TIMESTAMP
+        )
+        private const val API_KEY = "api-key"
+    }
+
     private val accounts = HardhatTestContainer.accounts
 
     @Autowired
@@ -47,32 +71,44 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.deleteFrom(ClientInfoTable.CLIENT_INFO).execute()
         dslContext.deleteFrom(Erc20LockRequestTable.ERC20_LOCK_REQUEST).execute()
+        dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
+        dslContext.deleteFrom(ProjectTable.PROJECT).execute()
+        dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+
+        dslContext.executeInsert(
+            UserIdentifierRecord(
+                id = OWNER_ID,
+                userIdentifier = "user-identifier",
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+            )
+        )
+
+        dslContext.executeInsert(
+            ProjectRecord(
+                id = PROJECT.id,
+                ownerId = PROJECT.ownerId,
+                issuerContractAddress = PROJECT.issuerContractAddress,
+                baseRedirectUrl = PROJECT.baseRedirectUrl,
+                chainId = PROJECT.chainId,
+                customRpcUrl = PROJECT.customRpcUrl,
+                createdAt = PROJECT.createdAt
+            )
+        )
+
+        dslContext.executeInsert(
+            ApiKeyRecord(
+                id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
+                apiKey = API_KEY,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
     }
 
     @Test
-    fun mustCorrectlyCreateErc20LockRequestViaClientId() {
-        val clientId = "client-id"
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
+    fun mustCorrectlyCreateErc20LockRequest() {
         val tokenAddress = ContractAddress("cafebabe")
-
-        suppose("some client info exists in database") {
-            dslContext.insertInto(ClientInfoTable.CLIENT_INFO)
-                .set(
-                    ClientInfoRecord(
-                        clientId = "client-id",
-                        chainId = chainId,
-                        sendRedirectUrl = null,
-                        balanceRedirectUrl = null,
-                        lockRedirectUrl = redirectUrl,
-                        tokenAddress = tokenAddress
-                    )
-                )
-                .execute()
-        }
-
         val amount = Balance(BigInteger.TEN)
         val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
         val lockContractAddress = ContractAddress("b")
@@ -81,107 +117,11 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create ERC20 lock request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/lock")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "client_id": "$clientId",
-                                "amount": "${amount.rawValue}",
-                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
-                                "lock_contract_address": "${lockContractAddress.rawValue}",
-                                "sender_address": "${senderAddress.rawValue}",
-                                "arbitrary_data": {
-                                    "test": true
-                                },
-                                "screen_config": {
-                                    "before_action_message": "before-action-message",
-                                    "after_action_message": "after-action-message"
-                                }
-                            }
-                        """.trimIndent()
-                    )
-            )
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andReturn()
-
-            objectMapper.readValue(response.response.contentAsString, Erc20LockRequestResponse::class.java)
-        }
-
-        verify("correct response is returned") {
-            assertThat(response).withMessage()
-                .isEqualTo(
-                    Erc20LockRequestResponse(
-                        id = response.id,
-                        status = Status.PENDING,
-                        chainId = chainId.value,
-                        tokenAddress = tokenAddress.rawValue,
-                        amount = amount.rawValue,
-                        lockDurationInSeconds = lockDuration.rawValue,
-                        unlocksAt = null,
-                        lockContractAddress = lockContractAddress.rawValue,
-                        senderAddress = senderAddress.rawValue,
-                        arbitraryData = response.arbitraryData,
-                        screenConfig = ScreenConfig(
-                            beforeActionMessage = "before-action-message",
-                            afterActionMessage = "after-action-message"
-                        ),
-                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
-                        lockTx = TransactionResponse(
-                            txHash = null,
-                            from = senderAddress.rawValue,
-                            to = tokenAddress.rawValue,
-                            data = response.lockTx.data,
-                            blockConfirmations = null,
-                            timestamp = null
-                        )
-                    )
-                )
-        }
-
-        verify("ERC20 lock request is correctly stored in database") {
-            val storedRequest = erc20LockRequestRepository.getById(response.id)
-
-            assertThat(storedRequest).withMessage()
-                .isEqualTo(
-                    Erc20LockRequest(
-                        id = response.id,
-                        chainId = chainId,
-                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
-                        tokenAddress = tokenAddress,
-                        tokenAmount = amount,
-                        lockDuration = lockDuration,
-                        lockContractAddress = lockContractAddress,
-                        tokenSenderAddress = senderAddress,
-                        txHash = null,
-                        arbitraryData = response.arbitraryData,
-                        screenConfig = ScreenConfig(
-                            beforeActionMessage = "before-action-message",
-                            afterActionMessage = "after-action-message"
-                        )
-                    )
-                )
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCreateErc20LockRequestViaChainIdRedirectUrlAndTokenAddress() {
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
-        val tokenAddress = ContractAddress("a")
-        val amount = Balance(BigInteger.TEN)
-        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
-        val lockContractAddress = ContractAddress("b")
-        val senderAddress = WalletAddress("c")
-
-        val response = suppose("request to create ERC20 lock request is made") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/lock")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                            {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "lock_duration_in_seconds": "${lockDuration.rawValue}",
@@ -209,8 +149,9 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = response.id,
+                        projectId = PROJECT_ID,
                         status = Status.PENDING,
-                        chainId = chainId.value,
+                        chainId = PROJECT.chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
                         lockDurationInSeconds = lockDuration.rawValue,
@@ -222,7 +163,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${response.id}",
                         lockTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -230,9 +171,13 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             data = response.lockTx.data,
                             blockConfirmations = null,
                             timestamp = null
-                        )
+                        ),
+                        createdAt = response.createdAt
                     )
                 )
+
+            assertThat(response.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("ERC20 lock request is correctly stored in database") {
@@ -242,8 +187,9 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20LockRequest(
                         id = response.id,
-                        chainId = chainId,
-                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
+                        projectId = PROJECT_ID,
+                        chainId = PROJECT.chainId,
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${response.id}",
                         tokenAddress = tokenAddress,
                         tokenAmount = amount,
                         lockDuration = lockDuration,
@@ -254,61 +200,29 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                         screenConfig = ScreenConfig(
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
-                        )
+                        ),
+                        createdAt = storedRequest!!.createdAt
                     )
                 )
+
+            assertThat(storedRequest.createdAt.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
     @Test
-    fun mustReturn400BadRequestForNonExistentClientId() {
+    fun mustCorrectlyCreateErc20LockRequestWithRedirectUrl() {
+        val tokenAddress = ContractAddress("cafebabe")
         val amount = Balance(BigInteger.TEN)
         val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
         val lockContractAddress = ContractAddress("b")
         val senderAddress = WalletAddress("c")
+        val redirectUrl = "https://custom-url/\${id}"
 
-        verify("400 is returned for non-existent clientId") {
+        val response = suppose("request to create ERC20 lock request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/lock")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                            {
-                                "client_id": "non-existent-client-id",
-                                "amount": "${amount.rawValue}",
-                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
-                                "lock_contract_address": "${lockContractAddress.rawValue}",
-                                "sender_address": "${senderAddress.rawValue}",
-                                "arbitrary_data": {
-                                    "test": true
-                                },
-                                "screen_config": {
-                                    "before_action_message": "before-action-message",
-                                    "after_action_message": "after-action-message"
-                                }
-                            }
-                        """.trimIndent()
-                    )
-            )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_CLIENT_ID)
-        }
-    }
-
-    @Test
-    fun mustReturn400BadRequestForMissingChainId() {
-        val redirectUrl = "https://example.com"
-        val tokenAddress = ContractAddress("a")
-        val amount = Balance(BigInteger.TEN)
-        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
-        val lockContractAddress = ContractAddress("b")
-        val senderAddress = WalletAddress("c")
-
-        verify("400 is returned for missing chainId") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/lock")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -330,30 +244,94 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                         """.trimIndent()
                     )
             )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_REQUEST)
+            objectMapper.readValue(response.response.contentAsString, Erc20LockRequestResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    Erc20LockRequestResponse(
+                        id = response.id,
+                        projectId = PROJECT_ID,
+                        status = Status.PENDING,
+                        chainId = PROJECT.chainId.value,
+                        tokenAddress = tokenAddress.rawValue,
+                        amount = amount.rawValue,
+                        lockDurationInSeconds = lockDuration.rawValue,
+                        unlocksAt = null,
+                        lockContractAddress = lockContractAddress.rawValue,
+                        senderAddress = senderAddress.rawValue,
+                        arbitraryData = response.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        redirectUrl = "https://custom-url/${response.id}",
+                        lockTx = TransactionResponse(
+                            txHash = null,
+                            from = senderAddress.rawValue,
+                            to = tokenAddress.rawValue,
+                            data = response.lockTx.data,
+                            blockConfirmations = null,
+                            timestamp = null
+                        ),
+                        createdAt = response.createdAt
+                    )
+                )
+
+            assertThat(response.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+
+        verify("ERC20 lock request is correctly stored in database") {
+            val storedRequest = erc20LockRequestRepository.getById(response.id)
+
+            assertThat(storedRequest).withMessage()
+                .isEqualTo(
+                    Erc20LockRequest(
+                        id = response.id,
+                        projectId = PROJECT_ID,
+                        chainId = PROJECT.chainId,
+                        redirectUrl = "https://custom-url/${response.id}",
+                        tokenAddress = tokenAddress,
+                        tokenAmount = amount,
+                        lockDuration = lockDuration,
+                        lockContractAddress = lockContractAddress,
+                        tokenSenderAddress = senderAddress,
+                        txHash = null,
+                        arbitraryData = response.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        createdAt = storedRequest!!.createdAt
+                    )
+                )
+
+            assertThat(storedRequest.createdAt.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
     @Test
-    fun mustReturn400BadRequestForMissingRedirectUrl() {
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val tokenAddress = ContractAddress("a")
+    fun mustReturn401UnauthorizedWhenCreatingErc20LockRequestWithInvalidApiKey() {
+        val tokenAddress = ContractAddress("cafebabe")
         val amount = Balance(BigInteger.TEN)
         val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
         val lockContractAddress = ContractAddress("b")
         val senderAddress = WalletAddress("c")
 
-        verify("400 is returned for missing redirectUrl") {
+        verify("401 is returned for invalid API key") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/lock")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "lock_duration_in_seconds": "${lockDuration.rawValue}",
@@ -370,50 +348,10 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                         """.trimIndent()
                     )
             )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_REQUEST)
-        }
-    }
-
-    @Test
-    fun mustReturn400BadRequestForMissingTokenAddress() {
-        val redirectUrl = "https://example.com"
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val amount = Balance(BigInteger.TEN)
-        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
-        val lockContractAddress = ContractAddress("b")
-        val senderAddress = WalletAddress("c")
-
-        verify("400 is returned for missing redirectUrl") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/lock")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                            {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
-                                "amount": "${amount.rawValue}",
-                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
-                                "lock_contract_address": "${lockContractAddress.rawValue}",
-                                "sender_address": "${senderAddress.rawValue}",
-                                "arbitrary_data": {
-                                    "test": true
-                                },
-                                "screen_config": {
-                                    "before_action_message": "before-action-message",
-                                    "after_action_message": "after-action-message"
-                                }
-                            }
-                        """.trimIndent()
-                    )
-            )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_REQUEST)
+            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 
@@ -429,8 +367,6 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             ).sendAndMine()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
         val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
@@ -440,12 +376,11 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create ERC20 lock request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/lock")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "lock_duration_in_seconds": "${lockDuration.rawValue}",
@@ -483,7 +418,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction info is attached to ERC20 lock request") {
+        suppose("transaction hash is attached to ERC20 lock request") {
             erc20LockRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
@@ -502,8 +437,9 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = createResponse.id,
+                        projectId = PROJECT_ID,
                         status = Status.SUCCESS,
-                        chainId = chainId.value,
+                        chainId = PROJECT.chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
                         lockDurationInSeconds = lockDuration.rawValue,
@@ -515,7 +451,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${createResponse.id}",
                         lockTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -523,13 +459,16 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.lockTx.data,
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
                             timestamp = fetchResponse.lockTx.timestamp
-                        )
+                        ),
+                        createdAt = createResponse.createdAt
                     )
                 )
 
             assertThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.lockTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -546,8 +485,6 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             ).sendAndMine()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress("a")
         val amount = Balance(BigInteger.TEN)
         val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
@@ -557,12 +494,11 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create ERC20 lock request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/lock")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "lock_duration_in_seconds": "${lockDuration.rawValue}",
@@ -600,7 +536,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction info is attached to ERC20 lock request") {
+        suppose("transaction hash is attached to ERC20 lock request") {
             erc20LockRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
@@ -623,8 +559,9 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = createResponse.id,
+                        projectId = PROJECT_ID,
                         status = Status.SUCCESS,
-                        chainId = chainId.value,
+                        chainId = PROJECT.chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
                         lockDurationInSeconds = lockDuration.rawValue,
@@ -636,7 +573,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${createResponse.id}",
                         lockTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -644,13 +581,264 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.lockTx.data,
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
                             timestamp = fetchResponse.lockTx.timestamp
-                        )
+                        ),
+                        createdAt = fetchResponse.createdAt
                     )
                 )
 
             assertThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.lockTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20LockRequestsByProjectId() {
+        val mainAccount = accounts[0]
+
+        val lockContract = suppose("simple lock manager contract is deployed") {
+            SimpleLockManager.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider()
+            ).sendAndMine()
+        }
+
+        val tokenAddress = ContractAddress("a")
+        val amount = Balance(BigInteger.TEN)
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
+        val lockContractAddress = ContractAddress(lockContract.contractAddress)
+        val senderAddress = WalletAddress(mainAccount.address)
+
+        val createResponse = suppose("request to create ERC20 lock request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/lock")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "token_address": "${tokenAddress.rawValue}",
+                                "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
+                                "lock_contract_address": "${lockContractAddress.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(createResponse.response.contentAsString, Erc20LockRequestResponse::class.java)
+        }
+
+        val txHash = suppose("some token lock transaction is made") {
+            lockContract.lockAndMine(
+                tokenAddress = tokenAddress,
+                amount = amount,
+                lockDuration = lockDuration,
+                info = createResponse.id.toString(),
+                unlockPrivilegeWallet = ZeroAddress
+            )
+                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+        }
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.waitAndMine()
+        }
+
+        suppose("transaction info is attached to ERC20 lock request") {
+            erc20LockRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
+        }
+
+        val fetchResponse = suppose("request to fetch ERC20 lock requests by project ID is made") {
+            val fetchResponse = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/lock/by-project/${createResponse.projectId}")
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(fetchResponse.response.contentAsString, Erc20LockRequestsResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(fetchResponse).withMessage()
+                .isEqualTo(
+                    Erc20LockRequestsResponse(
+                        listOf(
+                            Erc20LockRequestResponse(
+                                id = createResponse.id,
+                                projectId = PROJECT_ID,
+                                status = Status.SUCCESS,
+                                chainId = PROJECT.chainId.value,
+                                tokenAddress = tokenAddress.rawValue,
+                                amount = amount.rawValue,
+                                lockDurationInSeconds = lockDuration.rawValue,
+                                unlocksAt = (fetchResponse.requests[0].lockTx.timestamp!! + lockDuration.toDuration()),
+                                lockContractAddress = lockContractAddress.rawValue,
+                                senderAddress = senderAddress.rawValue,
+                                arbitraryData = createResponse.arbitraryData,
+                                screenConfig = ScreenConfig(
+                                    beforeActionMessage = "before-action-message",
+                                    afterActionMessage = "after-action-message"
+                                ),
+                                redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${createResponse.id}",
+                                lockTx = TransactionResponse(
+                                    txHash = txHash.value,
+                                    from = senderAddress.rawValue,
+                                    to = lockContractAddress.rawValue,
+                                    data = createResponse.lockTx.data,
+                                    blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
+                                    timestamp = fetchResponse.requests[0].lockTx.timestamp
+                                ),
+                                createdAt = createResponse.createdAt
+                            )
+                        )
+                    )
+                )
+
+            assertThat(fetchResponse.requests[0].lockTx.blockConfirmations)
+                .isNotZero()
+            assertThat(fetchResponse.requests[0].lockTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.requests[0].createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20LockRequestsByProjectIdWhenCustomRpcUrlIsSpecified() {
+        val mainAccount = accounts[0]
+
+        val lockContract = suppose("simple lock manager contract is deployed") {
+            SimpleLockManager.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider()
+            ).sendAndMine()
+        }
+
+        val tokenAddress = ContractAddress("a")
+        val amount = Balance(BigInteger.TEN)
+        val lockDuration = DurationSeconds(BigInteger.valueOf(100L))
+        val lockContractAddress = ContractAddress(lockContract.contractAddress)
+        val senderAddress = WalletAddress(mainAccount.address)
+
+        val createResponse = suppose("request to create ERC20 lock request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/lock")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "token_address": "${tokenAddress.rawValue}",
+                                "amount": "${amount.rawValue}",
+                                "lock_duration_in_seconds": "${lockDuration.rawValue}",
+                                "lock_contract_address": "${lockContractAddress.rawValue}",
+                                "sender_address": "${senderAddress.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(createResponse.response.contentAsString, Erc20LockRequestResponse::class.java)
+        }
+
+        val txHash = suppose("some token lock transaction is made") {
+            lockContract.lockAndMine(
+                tokenAddress = tokenAddress,
+                amount = amount,
+                lockDuration = lockDuration,
+                info = createResponse.id.toString(),
+                unlockPrivilegeWallet = ZeroAddress
+            )
+                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+        }
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.waitAndMine()
+        }
+
+        suppose("transaction info is attached to ERC20 lock request") {
+            erc20LockRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
+        }
+
+        val fetchResponse = suppose("request to fetch ERC20 lock requests by project ID is made") {
+            val fetchResponse = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/lock/by-project/${createResponse.projectId}")
+                    .header(
+                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
+                        "http://localhost:${hardhatContainer.mappedPort}"
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(fetchResponse.response.contentAsString, Erc20LockRequestsResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(fetchResponse).withMessage()
+                .isEqualTo(
+                    Erc20LockRequestsResponse(
+                        listOf(
+                            Erc20LockRequestResponse(
+                                id = createResponse.id,
+                                projectId = PROJECT_ID,
+                                status = Status.SUCCESS,
+                                chainId = PROJECT.chainId.value,
+                                tokenAddress = tokenAddress.rawValue,
+                                amount = amount.rawValue,
+                                lockDurationInSeconds = lockDuration.rawValue,
+                                unlocksAt = (fetchResponse.requests[0].lockTx.timestamp!! + lockDuration.toDuration()),
+                                lockContractAddress = lockContractAddress.rawValue,
+                                senderAddress = senderAddress.rawValue,
+                                arbitraryData = createResponse.arbitraryData,
+                                screenConfig = ScreenConfig(
+                                    beforeActionMessage = "before-action-message",
+                                    afterActionMessage = "after-action-message"
+                                ),
+                                redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${createResponse.id}",
+                                lockTx = TransactionResponse(
+                                    txHash = txHash.value,
+                                    from = senderAddress.rawValue,
+                                    to = lockContractAddress.rawValue,
+                                    data = createResponse.lockTx.data,
+                                    blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
+                                    timestamp = fetchResponse.requests[0].lockTx.timestamp
+                                ),
+                                createdAt = fetchResponse.requests[0].createdAt
+                            )
+                        )
+                    )
+                )
+
+            assertThat(fetchResponse.requests[0].lockTx.blockConfirmations)
+                .isNotZero()
+            assertThat(fetchResponse.requests[0].lockTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -677,6 +865,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             erc20LockRequestRepository.store(
                 StoreErc20LockRequestParams(
                     id = id,
+                    projectId = PROJECT_ID,
                     chainId = Chain.HARDHAT_TESTNET.id,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
@@ -688,7 +877,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     screenConfig = ScreenConfig(
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"
-                    )
+                    ),
+                    createdAt = TestData.TIMESTAMP
                 )
             )
         }
@@ -730,6 +920,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             erc20LockRequestRepository.store(
                 StoreErc20LockRequestParams(
                     id = id,
+                    projectId = PROJECT_ID,
                     chainId = Chain.HARDHAT_TESTNET.id,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
@@ -741,7 +932,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     screenConfig = ScreenConfig(
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"
-                    )
+                    ),
+                    createdAt = TestData.TIMESTAMP
                 )
             )
             erc20LockRequestRepository.setTxInfo(id, txHash, tokenSender)

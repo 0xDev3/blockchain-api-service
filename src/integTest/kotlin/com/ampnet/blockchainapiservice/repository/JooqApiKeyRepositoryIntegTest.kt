@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
@@ -10,9 +11,9 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectReco
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.result.ApiKey
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.UtcDateTime
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import java.time.Duration
-import java.time.OffsetDateTime
 import java.util.UUID
 
 @JooqTest
@@ -34,7 +34,6 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         private val PROJECT_ID = UUID.randomUUID()
         private val OWNER_ID = UUID.randomUUID()
         private const val API_KEY = "api-key"
-        private val CREATED_AT = UtcDateTime(OffsetDateTime.parse("2022-01-01T00:00:00Z"))
     }
 
     @Suppress("unused")
@@ -48,9 +47,9 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.delete(UserIdentifierTable.USER_IDENTIFIER).execute()
-        dslContext.delete(ProjectTable.PROJECT).execute()
         dslContext.delete(ApiKeyTable.API_KEY).execute()
+        dslContext.delete(ProjectTable.PROJECT).execute()
+        dslContext.delete(UserIdentifierTable.USER_IDENTIFIER).execute()
 
         dslContext.executeInsert(
             UserIdentifierRecord(
@@ -65,10 +64,10 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                 id = PROJECT_ID,
                 ownerId = OWNER_ID,
                 issuerContractAddress = ContractAddress("0"),
-                redirectUrl = "redirect-url",
+                baseRedirectUrl = BaseUrl("base-redirect-url"),
                 chainId = ChainId(1337L),
                 customRpcUrl = "custom-rpc-url",
-                createdAt = CREATED_AT
+                createdAt = TestData.TIMESTAMP
             )
         )
     }
@@ -83,7 +82,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     apiKey = API_KEY,
-                    createdAt = CREATED_AT
+                    createdAt = TestData.TIMESTAMP
                 )
             )
         }
@@ -97,7 +96,37 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                         id = id,
                         projectId = PROJECT_ID,
                         apiKey = API_KEY,
-                        createdAt = CREATED_AT
+                        createdAt = TestData.TIMESTAMP
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchApiKeyByValue() {
+        val id = UUID.randomUUID()
+
+        suppose("some API key is stored in database") {
+            dslContext.executeInsert(
+                ApiKeyRecord(
+                    id = id,
+                    projectId = PROJECT_ID,
+                    apiKey = API_KEY,
+                    createdAt = TestData.TIMESTAMP
+                )
+            )
+        }
+
+        verify("API key is correctly fetched by ID") {
+            val result = repository.getByValue(API_KEY)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    ApiKey(
+                        id = id,
+                        projectId = PROJECT_ID,
+                        apiKey = API_KEY,
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -121,13 +150,13 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                     id = UUID.randomUUID(),
                     projectId = PROJECT_ID,
                     apiKey = "api-key-1",
-                    createdAt = CREATED_AT
+                    createdAt = TestData.TIMESTAMP
                 ),
                 ApiKeyRecord(
                     id = UUID.randomUUID(),
                     projectId = PROJECT_ID,
                     apiKey = "api-key-2",
-                    createdAt = CREATED_AT + Duration.ofSeconds(10L)
+                    createdAt = TestData.TIMESTAMP + Duration.ofSeconds(10L)
                 )
             ).execute()
         }
@@ -150,7 +179,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                     id = UUID.randomUUID(),
                     projectId = PROJECT_ID,
                     apiKey = API_KEY,
-                    createdAt = CREATED_AT
+                    createdAt = TestData.TIMESTAMP
                 )
             )
         }
@@ -170,7 +199,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
             id = id,
             projectId = PROJECT_ID,
             apiKey = API_KEY,
-            createdAt = CREATED_AT
+            createdAt = TestData.TIMESTAMP
         )
 
         val storedApiKey = suppose("API key is stored in database") {

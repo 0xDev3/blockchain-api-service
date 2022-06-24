@@ -7,19 +7,17 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxInfoException
-import com.ampnet.blockchainapiservice.exception.IncompleteRequestException
-import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
-import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
-import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20LockRequestRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.DurationSeconds
@@ -45,10 +43,16 @@ import org.mockito.kotlin.verify as verifyMock
 class Erc20LockRequestServiceTest : TestBase() {
 
     companion object {
-        private const val CLIENT_ID = "client-id"
-        private val CREATE_PARAMS = CreateErc20LockRequestParams(
-            clientId = CLIENT_ID,
+        private val PROJECT = Project(
+            id = UUID.randomUUID(),
+            ownerId = UUID.randomUUID(),
+            issuerContractAddress = ContractAddress("a"),
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
+            customRpcUrl = "custom-rpc-url",
+            createdAt = TestData.TIMESTAMP
+        )
+        private val CREATE_PARAMS = CreateErc20LockRequestParams(
             redirectUrl = "redirect-url/\${id}",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.valueOf(123456L)),
@@ -65,7 +69,7 @@ class Erc20LockRequestServiceTest : TestBase() {
     }
 
     @Test
-    fun mustSuccessfullyCreateErc20LockRequestWhenClientIdIsProvided() {
+    fun mustSuccessfullyCreateErc20LockRequest() {
         val uuidProvider = mock<UuidProvider>()
         val id = UUID.randomUUID()
 
@@ -74,119 +78,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 .willReturn(id)
         }
 
-        val functionEncoderService = mock<FunctionEncoderService>()
-        val encodedData = FunctionData("encoded")
-        val tokenAddress = ContractAddress("cafebabe")
+        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
-        suppose("function data will be encoded") {
-            given(
-                functionEncoderService.encode(
-                    functionName = "lock",
-                    arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
-                )
-            )
-                .willReturn(encodedData)
-        }
-
-        val chainId = ChainId(123456789L)
-        val redirectUrl = "different-redirect-url/\${id}/rest"
-        val clientInfoRepository = mock<ClientInfoRepository>()
-
-        suppose("client info will be fetched from database") {
-            given(clientInfoRepository.getById(CLIENT_ID))
-                .willReturn(
-                    ClientInfo(
-                        clientId = CLIENT_ID,
-                        chainId = chainId,
-                        sendRedirectUrl = null,
-                        balanceRedirectUrl = null,
-                        lockRedirectUrl = redirectUrl,
-                        tokenAddress = tokenAddress
-                    )
-                )
-        }
-
-        val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
-
-        val storeParams = StoreErc20LockRequestParams(
-            id = id,
-            chainId = chainId,
-            redirectUrl = redirectUrl.replace("\${id}", id.toString()),
-            tokenAddress = tokenAddress,
-            tokenAmount = CREATE_PARAMS.tokenAmount,
-            lockDuration = CREATE_PARAMS.lockDuration,
-            lockContractAddress = CREATE_PARAMS.lockContractAddress,
-            tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
-            arbitraryData = CREATE_PARAMS.arbitraryData,
-            screenConfig = CREATE_PARAMS.screenConfig
-        )
-
-        val storedRequest = Erc20LockRequest(
-            id = id,
-            chainId = chainId,
-            redirectUrl = storeParams.redirectUrl,
-            tokenAddress = tokenAddress,
-            tokenAmount = CREATE_PARAMS.tokenAmount,
-            lockDuration = CREATE_PARAMS.lockDuration,
-            lockContractAddress = CREATE_PARAMS.lockContractAddress,
-            tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
-            txHash = null,
-            arbitraryData = CREATE_PARAMS.arbitraryData,
-            screenConfig = CREATE_PARAMS.screenConfig
-        )
-
-        suppose("ERC20 lock request is stored in database") {
-            given(erc20LockRequestRepository.store(storeParams))
-                .willReturn(storedRequest)
-        }
-
-        val service = Erc20LockRequestServiceImpl(
-            functionEncoderService = functionEncoderService,
-            erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = uuidProvider,
-                clientInfoRepository = clientInfoRepository,
-                blockchainService = mock()
-            )
-        )
-
-        val createParams = CREATE_PARAMS.copy(
-            chainId = null,
-            redirectUrl = null,
-            tokenAddress = null
-        )
-
-        verify("ERC20 lock request is correctly created") {
-            assertThat(service.createErc20LockRequest(createParams)).withMessage()
-                .isEqualTo(
-                    WithFunctionData(
-                        storedRequest.copy(redirectUrl = storedRequest.redirectUrl.replace("\${id}", id.toString())),
-                        encodedData
-                    )
-                )
-
-            verifyMock(erc20LockRequestRepository)
-                .store(storeParams)
-            verifyNoMoreInteractions(erc20LockRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustSuccessfullyCreateErc20LockRequestWhenClientIdIsNotProvided() {
-        val uuidProvider = mock<UuidProvider>()
-        val id = UUID.randomUUID()
-
-        suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
-                .willReturn(id)
+        suppose("some timestamp will be returned") {
+            given(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(TestData.TIMESTAMP)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
@@ -197,7 +93,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenAddress!!),
+                        FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount),
                         FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.lockDuration),
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
@@ -211,34 +107,37 @@ class Erc20LockRequestServiceTest : TestBase() {
         }
 
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
-        val chainId = CREATE_PARAMS.chainId!!
         val redirectUrl = CREATE_PARAMS.redirectUrl!!
 
         val storeParams = StoreErc20LockRequestParams(
             id = id,
-            chainId = chainId,
+            projectId = PROJECT.id,
+            chainId = PROJECT.chainId,
             redirectUrl = redirectUrl.replace("\${id}", id.toString()),
-            tokenAddress = CREATE_PARAMS.tokenAddress!!,
+            tokenAddress = CREATE_PARAMS.tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = CREATE_PARAMS.lockContractAddress,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             arbitraryData = CREATE_PARAMS.arbitraryData,
-            screenConfig = CREATE_PARAMS.screenConfig
+            screenConfig = CREATE_PARAMS.screenConfig,
+            createdAt = TestData.TIMESTAMP
         )
 
         val storedRequest = Erc20LockRequest(
             id = id,
-            chainId = chainId,
+            projectId = PROJECT.id,
+            chainId = PROJECT.chainId,
             redirectUrl = storeParams.redirectUrl,
-            tokenAddress = CREATE_PARAMS.tokenAddress!!,
+            tokenAddress = CREATE_PARAMS.tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             lockDuration = CREATE_PARAMS.lockDuration,
             lockContractAddress = CREATE_PARAMS.lockContractAddress,
             tokenSenderAddress = CREATE_PARAMS.tokenSenderAddress,
             txHash = null,
             arbitraryData = CREATE_PARAMS.arbitraryData,
-            screenConfig = CREATE_PARAMS.screenConfig
+            screenConfig = CREATE_PARAMS.screenConfig,
+            createdAt = TestData.TIMESTAMP
         )
 
         suppose("ERC20 lock request is stored in database") {
@@ -246,146 +145,23 @@ class Erc20LockRequestServiceTest : TestBase() {
                 .willReturn(storedRequest)
         }
 
-        val createParams = suppose("clientId is missing from params") {
-            CREATE_PARAMS.copy(clientId = null)
-        }
-
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = uuidProvider,
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = utcDateTimeProvider,
                 blockchainService = mock()
             )
         )
 
         verify("ERC20 lock request is correctly created") {
-            assertThat(service.createErc20LockRequest(createParams)).withMessage()
+            assertThat(service.createErc20LockRequest(CREATE_PARAMS, PROJECT)).withMessage()
                 .isEqualTo(WithFunctionData(storedRequest, encodedData))
 
             verifyMock(erc20LockRequestRepository)
                 .store(storeParams)
             verifyNoMoreInteractions(erc20LockRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowNonExistentClientIdExceptionWhenClientInfoIsNotInDatabase() {
-        val clientInfoRepository = mock<ClientInfoRepository>()
-
-        suppose("client info does not exist in database") {
-            given(clientInfoRepository.getById(CLIENT_ID))
-                .willReturn(null)
-        }
-
-        val service = Erc20LockRequestServiceImpl(
-            functionEncoderService = mock(),
-            erc20LockRequestRepository = mock(),
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = mock(),
-                clientInfoRepository = clientInfoRepository,
-                blockchainService = mock()
-            )
-        )
-
-        verify("NonExistentClientIdException is thrown") {
-            assertThrows<NonExistentClientIdException> {
-                service.createErc20LockRequest(CREATE_PARAMS)
-            }
-        }
-    }
-
-    @Test
-    fun mustThrowIncompleteRequestExceptionWhenClientIdAndChainIdAreMissing() {
-        val params = suppose("clientId and chainId are missing from params") {
-            CREATE_PARAMS.copy(clientId = null, chainId = null)
-        }
-
-        val uuidProvider = mock<UuidProvider>()
-        val uuid = UUID.randomUUID()
-
-        suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
-                .willReturn(uuid)
-        }
-
-        val service = Erc20LockRequestServiceImpl(
-            functionEncoderService = mock(),
-            erc20LockRequestRepository = mock(),
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = uuidProvider,
-                clientInfoRepository = mock(),
-                blockchainService = mock()
-            )
-        )
-
-        verify("IncompleteRequestException is thrown") {
-            assertThrows<IncompleteRequestException> {
-                service.createErc20LockRequest(params)
-            }
-        }
-    }
-
-    @Test
-    fun mustThrowIncompleteRequestExceptionWhenClientIdAndRedirectUrlAreMissing() {
-        val params = suppose("clientId and redirectUrl are missing from params") {
-            CREATE_PARAMS.copy(clientId = null, redirectUrl = null)
-        }
-
-        val uuidProvider = mock<UuidProvider>()
-        val uuid = UUID.randomUUID()
-
-        suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
-                .willReturn(uuid)
-        }
-
-        val service = Erc20LockRequestServiceImpl(
-            functionEncoderService = mock(),
-            erc20LockRequestRepository = mock(),
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = uuidProvider,
-                clientInfoRepository = mock(),
-                blockchainService = mock()
-            )
-        )
-
-        verify("IncompleteRequestException is thrown") {
-            assertThrows<IncompleteRequestException> {
-                service.createErc20LockRequest(params)
-            }
-        }
-    }
-
-    @Test
-    fun mustThrowIncompleteRequestExceptionWhenClientIdAndTokenAddressAreMissing() {
-        val params = suppose("clientId and tokenAddress are missing from params") {
-            CREATE_PARAMS.copy(clientId = null, tokenAddress = null)
-        }
-
-        val uuidProvider = mock<UuidProvider>()
-        val uuid = UUID.randomUUID()
-
-        suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
-                .willReturn(uuid)
-        }
-
-        val service = Erc20LockRequestServiceImpl(
-            functionEncoderService = mock(),
-            erc20LockRequestRepository = mock(),
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = uuidProvider,
-                clientInfoRepository = mock(),
-                blockchainService = mock()
-            )
-        )
-
-        verify("IncompleteRequestException is thrown") {
-            assertThrows<IncompleteRequestException> {
-                service.createErc20LockRequest(params)
-            }
         }
     }
 
@@ -403,7 +179,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = mock()
             )
         )
@@ -420,6 +196,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT.id,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
@@ -432,7 +209,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
@@ -467,7 +245,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = mock()
             )
         )
@@ -489,6 +267,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT.id,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
@@ -501,7 +280,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
@@ -544,7 +324,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = mock()
             )
         )
@@ -566,6 +346,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT.id,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
@@ -578,7 +359,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
@@ -630,7 +412,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -652,6 +434,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT.id,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
@@ -664,7 +447,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
@@ -716,7 +500,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -738,6 +522,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT.id,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
@@ -750,7 +535,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
@@ -802,7 +588,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -824,6 +610,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT.id,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
@@ -836,7 +623,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
@@ -888,7 +676,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -910,6 +698,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT.id,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
@@ -922,7 +711,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
@@ -974,7 +764,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -996,6 +786,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT.id,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
@@ -1008,7 +799,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
@@ -1060,7 +852,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -1082,6 +874,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT.id,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
@@ -1094,7 +887,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
@@ -1146,7 +940,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -1179,7 +973,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = mock()
             )
         )
@@ -1190,6 +984,96 @@ class Erc20LockRequestServiceTest : TestBase() {
             verifyMock(erc20LockRequestRepository)
                 .setTxInfo(id, TX_HASH, caller)
             verifyNoMoreInteractions(erc20LockRequestRepository)
+        }
+    }
+
+    fun mustCorrectlyReturnListOfErc20LockRequestsByProjectId() {
+        val id = UUID.randomUUID()
+        val lockRequest = Erc20LockRequest(
+            id = id,
+            projectId = PROJECT.id,
+            chainId = Chain.HARDHAT_TESTNET.id,
+            redirectUrl = "test",
+            tokenAddress = ContractAddress("a"),
+            tokenAmount = Balance(BigInteger.TEN),
+            lockDuration = CREATE_PARAMS.lockDuration,
+            lockContractAddress = ContractAddress("b"),
+            tokenSenderAddress = WalletAddress("c"),
+            txHash = TX_HASH,
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
+            ),
+            createdAt = TestData.TIMESTAMP
+        )
+        val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
+
+        suppose("ERC20 lock request exists in database") {
+            given(erc20LockRequestRepository.getAllByProjectId(PROJECT.id))
+                .willReturn(listOf(lockRequest))
+        }
+
+        val blockchainService = mock<BlockchainService>()
+        val chainSpec = ChainSpec(lockRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val encodedData = FunctionData("encoded")
+        val transactionInfo = BlockchainTransactionInfo(
+            hash = TX_HASH,
+            from = lockRequest.tokenSenderAddress!!,
+            to = lockRequest.lockContractAddress,
+            data = encodedData,
+            blockConfirmations = BigInteger.ONE,
+            timestamp = TestData.TIMESTAMP,
+            success = true
+        )
+
+        suppose("transaction is mined") {
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+                .willReturn(transactionInfo)
+        }
+
+        val functionEncoderService = mock<FunctionEncoderService>()
+
+        suppose("function data will be encoded") {
+            given(
+                functionEncoderService.encode(
+                    functionName = "lock",
+                    arguments = listOf(
+                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
+                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
+                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
+                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                    ),
+                    abiOutputTypes = emptyList(),
+                    additionalData = emptyList()
+                )
+            )
+                .willReturn(encodedData)
+        }
+
+        val service = Erc20LockRequestServiceImpl(
+            functionEncoderService = functionEncoderService,
+            erc20LockRequestRepository = erc20LockRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = blockchainService
+            )
+        )
+
+        verify("ERC20 lock request with successful status is returned") {
+            assertThat(service.getErc20LockRequestsByProjectId(projectId = PROJECT.id, rpcSpec = chainSpec.rpcSpec))
+                .withMessage()
+                .isEqualTo(
+                    listOf(
+                        lockRequest.withTransactionData(
+                            status = Status.SUCCESS,
+                            data = encodedData,
+                            transactionInfo = transactionInfo
+                        )
+                    )
+                )
         }
     }
 
@@ -1209,7 +1093,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             erc20LockRequestRepository = erc20LockRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = mock()
             )
         )

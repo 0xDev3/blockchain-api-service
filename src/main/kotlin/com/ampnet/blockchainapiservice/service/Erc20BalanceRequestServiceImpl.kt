@@ -8,6 +8,7 @@ import com.ampnet.blockchainapiservice.model.params.CreateErc20BalanceRequestPar
 import com.ampnet.blockchainapiservice.model.params.StoreErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20BalanceRequestRepository
 import com.ampnet.blockchainapiservice.util.BlockName
 import com.ampnet.blockchainapiservice.util.Erc20Balance
@@ -28,10 +29,13 @@ class Erc20BalanceRequestServiceImpl(
 
     companion object : KLogging()
 
-    override fun createErc20BalanceRequest(params: CreateErc20BalanceRequestParams): Erc20BalanceRequest {
-        logger.info { "Creating ERC20 balance request, params: $params" }
+    override fun createErc20BalanceRequest(
+        params: CreateErc20BalanceRequestParams,
+        project: Project
+    ): Erc20BalanceRequest {
+        logger.info { "Creating ERC20 balance request, params: $params, project: $project" }
         return erc20BalanceRequestRepository.store(
-            erc20CommonService.createDatabaseParams(StoreErc20BalanceRequestParams, params)
+            erc20CommonService.createDatabaseParams(StoreErc20BalanceRequestParams, params, project)
         )
     }
 
@@ -43,24 +47,15 @@ class Erc20BalanceRequestServiceImpl(
             "ERC20 balance check request not found for ID: $id"
         )
 
-        val balance = erc20BalanceRequest.actualWalletAddress?.let {
-            blockchainService.fetchErc20AccountBalance(
-                chainSpec = ChainSpec(
-                    chainId = erc20BalanceRequest.chainId,
-                    rpcSpec = rpcSpec
-                ),
-                contractAddress = erc20BalanceRequest.tokenAddress,
-                walletAddress = it,
-                blockParameter = erc20BalanceRequest.blockNumber ?: BlockName.LATEST
-            )
-        }
-        val status = erc20BalanceRequest.determineStatus(balance)
+        return erc20BalanceRequest.appendBalanceData(rpcSpec)
+    }
 
-        return FullErc20BalanceRequest.fromErc20BalanceRequest(
-            request = erc20BalanceRequest,
-            status = status,
-            balance = balance
-        )
+    override fun getErc20BalanceRequestsByProjectId(
+        projectId: UUID,
+        rpcSpec: RpcUrlSpec
+    ): List<FullErc20BalanceRequest> {
+        logger.debug { "Fetching ERC20 balance requests for projectId: $projectId, rpcSpec: $rpcSpec" }
+        return erc20BalanceRequestRepository.getAllByProjectId(projectId).map { it.appendBalanceData(rpcSpec) }
     }
 
     override fun attachWalletAddressAndSignedMessage(
@@ -80,6 +75,27 @@ class Erc20BalanceRequestServiceImpl(
                 "Unable to attach signed message to ERC20 balance request with ID: $id"
             )
         }
+    }
+
+    private fun Erc20BalanceRequest.appendBalanceData(rpcSpec: RpcUrlSpec): FullErc20BalanceRequest {
+        val balance = actualWalletAddress?.let {
+            blockchainService.fetchErc20AccountBalance(
+                chainSpec = ChainSpec(
+                    chainId = chainId,
+                    rpcSpec = rpcSpec
+                ),
+                contractAddress = tokenAddress,
+                walletAddress = it,
+                blockParameter = blockNumber ?: BlockName.LATEST
+            )
+        }
+        val status = determineStatus(balance)
+
+        return FullErc20BalanceRequest.fromErc20BalanceRequest(
+            request = this,
+            status = status,
+            balance = balance
+        )
     }
 
     private fun Erc20BalanceRequest.determineStatus(balance: Erc20Balance?): Status =

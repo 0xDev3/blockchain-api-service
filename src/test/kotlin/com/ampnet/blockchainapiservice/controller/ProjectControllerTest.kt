@@ -14,6 +14,7 @@ import com.ampnet.blockchainapiservice.model.result.ApiKey
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import com.ampnet.blockchainapiservice.service.ProjectService
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -36,7 +37,7 @@ class ProjectControllerTest : TestBase() {
     fun mustCorrectlyCreateProject() {
         val params = CreateProjectParams(
             issuerContractAddress = ContractAddress("155034"),
-            redirectUrl = "redirect-url",
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = Chain.HARDHAT_TESTNET.id,
             customRpcUrl = "custom-rpc-url"
         )
@@ -44,7 +45,7 @@ class ProjectControllerTest : TestBase() {
             id = UUID.randomUUID(),
             ownerId = UUID.randomUUID(),
             issuerContractAddress = params.issuerContractAddress,
-            redirectUrl = params.redirectUrl,
+            baseRedirectUrl = params.baseRedirectUrl,
             chainId = params.chainId,
             customRpcUrl = params.customRpcUrl,
             createdAt = CREATED_AT
@@ -66,7 +67,7 @@ class ProjectControllerTest : TestBase() {
         verify("controller returns correct response") {
             val request = CreateProjectRequest(
                 issuerContractAddress = params.issuerContractAddress.rawValue,
-                redirectUrl = params.redirectUrl,
+                baseRedirectUrl = params.baseRedirectUrl.value,
                 chainId = params.chainId.value,
                 customRpcUrl = params.customRpcUrl
             )
@@ -86,7 +87,7 @@ class ProjectControllerTest : TestBase() {
             id = UUID.randomUUID(),
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("155034"),
-            redirectUrl = "redirect-url",
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = Chain.HARDHAT_TESTNET.id,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
@@ -121,7 +122,7 @@ class ProjectControllerTest : TestBase() {
             id = UUID.randomUUID(),
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("155034"),
-            redirectUrl = "redirect-url",
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = Chain.HARDHAT_TESTNET.id,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
@@ -161,7 +162,7 @@ class ProjectControllerTest : TestBase() {
                 id = UUID.randomUUID(),
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("155034a"),
-                redirectUrl = "redirect-url-1",
+                baseRedirectUrl = BaseUrl("base-redirect-url-1"),
                 chainId = Chain.HARDHAT_TESTNET.id,
                 customRpcUrl = "custom-rpc-url-1",
                 createdAt = CREATED_AT
@@ -170,7 +171,7 @@ class ProjectControllerTest : TestBase() {
                 id = UUID.randomUUID(),
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("155034b"),
-                redirectUrl = "redirect-url-2",
+                baseRedirectUrl = BaseUrl("base-redirect-url-2"),
                 chainId = Chain.HARDHAT_TESTNET.id,
                 customRpcUrl = "custom-rpc-url-2",
                 createdAt = CREATED_AT
