@@ -1,0 +1,20 @@
+=== Fetch ERC20 Balance Check Requests by Project ID
+Fetches stored ERC20 balance check requests with their current status filtered by project ID.
+
+Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
+specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC
+URL, use `X-RPC-URL-OVERRIDE` header.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequestsByProjectId/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequestsByProjectId/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestsResponse.adoc[]

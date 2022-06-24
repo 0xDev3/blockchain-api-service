@@ -23,6 +23,7 @@ import org.web3j.abi.datatypes.Utf8String
 import java.util.UUID
 
 @Service
+@Suppress("TooManyFunctions")
 class Erc20SendRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val erc20SendRequestRepository: Erc20SendRequestRepository,
