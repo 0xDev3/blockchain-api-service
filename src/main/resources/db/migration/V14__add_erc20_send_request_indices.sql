@@ -1,0 +1,3 @@
+CREATE INDEX erc20_send_request_token_sender_address ON blockchain_api_service.erc20_send_request(token_sender_address);
+CREATE INDEX erc20_send_request_token_recipient_address
+    ON blockchain_api_service.erc20_send_request(token_recipient_address);

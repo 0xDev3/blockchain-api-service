@@ -5,10 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import java.math.BigInteger
 
 data class CreateErc20BalanceRequest(
-    val clientId: String?,
-    val chainId: Long?,
     val redirectUrl: String?,
-    val tokenAddress: String?,
+    val tokenAddress: String,
     val blockNumber: BigInteger?,
     val walletAddress: String?,
     val arbitraryData: JsonNode?,
