@@ -459,8 +459,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 send request") {
-            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 send request is made") {
@@ -569,8 +569,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 send request") {
-            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 send request is made") {
@@ -696,8 +696,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 send request") {
-            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 send requests by sender address is made") {
@@ -810,8 +810,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 send request") {
-            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 send request by sender address is made") {
@@ -928,8 +928,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 send request") {
-            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 send requests by recipient address is made") {
@@ -1042,8 +1042,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 send request") {
-            erc20SendRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 send request") {
+            erc20SendRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 send request by recipient address is made") {
@@ -1102,6 +1102,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
     @Test
     fun mustCorrectlyAttachTransactionHash() {
         val id = UUID.randomUUID()
+        val tokenSender = WalletAddress("b")
 
         suppose("some ERC20 send request without transaction hash exists in database") {
             erc20SendRequestRepository.store(
@@ -1111,7 +1112,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     tokenAmount = Balance(BigInteger.TEN),
-                    tokenSenderAddress = WalletAddress("b"),
+                    tokenSenderAddress = tokenSender,
                     tokenRecipientAddress = WalletAddress("c"),
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,
                     screenConfig = ScreenConfig(
@@ -1124,14 +1125,15 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
         val txHash = TransactionHash("tx-hash")
 
-        suppose("request to attach transaction hash to ERC20 send request is made") {
+        suppose("request to attach transaction info to ERC20 send request is made") {
             mockMvc.perform(
                 MockMvcRequestBuilders.put("/v1/send/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "tx_hash": "${txHash.value}"
+                                "tx_hash": "${txHash.value}",
+                                "caller": "${tokenSender.rawValue}"
                             }
                         """.trimIndent()
                     )
@@ -1140,7 +1142,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                 .andReturn()
         }
 
-        verify("transaction hash is correctly attached to ERC20 send request") {
+        verify("transaction info is correctly attached to ERC20 send request") {
             val storedRequest = erc20SendRequestRepository.getById(id)
 
             assertThat(storedRequest?.txHash)
@@ -1152,6 +1154,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
     fun mustReturn400BadRequestWhenTransactionHashIsNotAttached() {
         val id = UUID.randomUUID()
         val txHash = TransactionHash("tx-hash")
+        val tokenSender = WalletAddress("b")
 
         suppose("some ERC20 send request with transaction hash exists in database") {
             erc20SendRequestRepository.store(
@@ -1161,7 +1164,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     tokenAmount = Balance(BigInteger.TEN),
-                    tokenSenderAddress = WalletAddress("b"),
+                    tokenSenderAddress = tokenSender,
                     tokenRecipientAddress = WalletAddress("c"),
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,
                     screenConfig = ScreenConfig(
@@ -1170,17 +1173,18 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
             )
-            erc20SendRequestRepository.setTxHash(id, txHash)
+            erc20SendRequestRepository.setTxInfo(id, txHash, tokenSender)
         }
 
-        verify("400 is returned when attaching transaction hash") {
+        verify("400 is returned when attaching transaction info") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.put("/v1/send/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "tx_hash": "different-tx-hash"
+                                "tx_hash": "different-tx-hash",
+                                "caller": "${tokenSender.rawValue}"
                             }
                         """.trimIndent()
                     )
@@ -1188,7 +1192,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TX_HASH_ALREADY_SET)
+            verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
         verify("transaction hash is not changed in database") {

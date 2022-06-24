@@ -11,5 +11,5 @@ interface Erc20SendRequestRepository {
     fun getById(id: UUID): Erc20SendRequest?
     fun getBySender(sender: WalletAddress): List<Erc20SendRequest>
     fun getByRecipient(recipient: WalletAddress): List<Erc20SendRequest>
-    fun setTxHash(id: UUID, txHash: TransactionHash): Boolean
+    fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean
 }

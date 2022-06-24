@@ -1,7 +1,7 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
-import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
+import com.ampnet.blockchainapiservice.exception.CannotAttachTxInfoException
 import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
@@ -77,13 +77,13 @@ class Erc20LockRequestServiceImpl(
         )
     }
 
-    override fun attachTxHash(id: UUID, txHash: TransactionHash) {
-        logger.info { "Attach txHash to ERC20 lock request, id: $id, txHash: $txHash" }
+    override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
+        logger.info { "Attach txInfo to ERC20 lock request, id: $id, txHash: $txHash, caller: $caller" }
 
-        val txHashAttached = erc20LockRequestRepository.setTxHash(id, txHash)
+        val txInfoAttached = erc20LockRequestRepository.setTxInfo(id, txHash, caller)
 
-        if (txHashAttached.not()) {
-            throw CannotAttachTxHashException("Unable to attach transaction hash to ERC20 lock request with ID: $id")
+        if (txInfoAttached.not()) {
+            throw CannotAttachTxInfoException("Unable to attach transaction info to ERC20 lock request with ID: $id")
         }
     }
 
