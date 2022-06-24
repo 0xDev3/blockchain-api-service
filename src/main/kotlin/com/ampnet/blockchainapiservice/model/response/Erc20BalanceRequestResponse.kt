@@ -13,6 +13,7 @@ import java.util.UUID
 
 data class Erc20BalanceRequestResponse(
     val id: UUID,
+    val projectId: UUID,
     val status: Status,
     val chainId: Long,
     val redirectUrl: String,
@@ -24,10 +25,12 @@ data class Erc20BalanceRequestResponse(
     val screenConfig: ScreenConfig?,
     val balance: BalanceResponse?,
     val messageToSign: String,
-    val signedMessage: String?
+    val signedMessage: String?,
+    val createdAt: OffsetDateTime
 ) {
     constructor(balanceRequest: Erc20BalanceRequest) : this(
         id = balanceRequest.id,
+        projectId = balanceRequest.projectId,
         status = Status.PENDING,
         chainId = balanceRequest.chainId.value,
         redirectUrl = balanceRequest.redirectUrl,
@@ -38,11 +41,13 @@ data class Erc20BalanceRequestResponse(
         screenConfig = balanceRequest.screenConfig.orEmpty(),
         balance = null,
         messageToSign = balanceRequest.messageToSign,
-        signedMessage = balanceRequest.signedMessage?.value
+        signedMessage = balanceRequest.signedMessage?.value,
+        createdAt = balanceRequest.createdAt.value
     )
 
     constructor(balanceRequest: FullErc20BalanceRequest) : this(
         id = balanceRequest.id,
+        projectId = balanceRequest.projectId,
         status = balanceRequest.status,
         chainId = balanceRequest.chainId.value,
         redirectUrl = balanceRequest.redirectUrl,
@@ -60,7 +65,8 @@ data class Erc20BalanceRequestResponse(
             )
         },
         messageToSign = balanceRequest.messageToSign,
-        signedMessage = balanceRequest.signedMessage?.value
+        signedMessage = balanceRequest.signedMessage?.value,
+        createdAt = balanceRequest.createdAt.value
     )
 }
 

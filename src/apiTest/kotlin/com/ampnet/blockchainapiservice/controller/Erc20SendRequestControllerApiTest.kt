@@ -4,20 +4,28 @@ import com.ampnet.blockchainapiservice.ControllerTestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
+import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ClientInfoTable
+import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20SendRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ClientInfoRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse
 import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestsResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
@@ -36,6 +44,21 @@ import java.util.UUID
 
 class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
+    companion object {
+        private val PROJECT_ID = UUID.randomUUID()
+        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT = Project(
+            id = PROJECT_ID,
+            ownerId = OWNER_ID,
+            issuerContractAddress = ContractAddress("0"),
+            baseRedirectUrl = BaseUrl("https://example.com/"),
+            chainId = Chain.HARDHAT_TESTNET.id,
+            customRpcUrl = "custom-rpc-url",
+            createdAt = TestData.TIMESTAMP
+        )
+        private const val API_KEY = "api-key"
+    }
+
     private val accounts = HardhatTestContainer.accounts
 
     @Autowired
@@ -46,32 +69,44 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.deleteFrom(ClientInfoTable.CLIENT_INFO).execute()
         dslContext.deleteFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST).execute()
+        dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
+        dslContext.deleteFrom(ProjectTable.PROJECT).execute()
+        dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+
+        dslContext.executeInsert(
+            UserIdentifierRecord(
+                id = OWNER_ID,
+                userIdentifier = "user-identifier",
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+            )
+        )
+
+        dslContext.executeInsert(
+            ProjectRecord(
+                id = PROJECT.id,
+                ownerId = PROJECT.ownerId,
+                issuerContractAddress = PROJECT.issuerContractAddress,
+                baseRedirectUrl = PROJECT.baseRedirectUrl,
+                chainId = PROJECT.chainId,
+                customRpcUrl = PROJECT.customRpcUrl,
+                createdAt = PROJECT.createdAt
+            )
+        )
+
+        dslContext.executeInsert(
+            ApiKeyRecord(
+                id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
+                apiKey = API_KEY,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
     }
 
     @Test
-    fun mustCorrectlyCreateErc20SendRequestViaClientId() {
-        val clientId = "client-id"
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
+    fun mustCorrectlyCreateErc20SendRequest() {
         val tokenAddress = ContractAddress("cafebabe")
-
-        suppose("some client info exists in database") {
-            dslContext.insertInto(ClientInfoTable.CLIENT_INFO)
-                .set(
-                    ClientInfoRecord(
-                        clientId = "client-id",
-                        chainId = chainId,
-                        sendRedirectUrl = redirectUrl,
-                        balanceRedirectUrl = null,
-                        lockRedirectUrl = null,
-                        tokenAddress = tokenAddress
-                    )
-                )
-                .execute()
-        }
-
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress("b")
         val recipientAddress = WalletAddress("c")
@@ -79,102 +114,11 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create ERC20 send request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "client_id": "$clientId",
-                                "amount": "${amount.rawValue}",
-                                "sender_address": "${senderAddress.rawValue}",
-                                "recipient_address": "${recipientAddress.rawValue}",
-                                "arbitrary_data": {
-                                    "test": true
-                                },
-                                "screen_config": {
-                                    "before_action_message": "before-action-message",
-                                    "after_action_message": "after-action-message"
-                                }
-                            }
-                        """.trimIndent()
-                    )
-            )
-                .andExpect(MockMvcResultMatchers.status().isOk)
-                .andReturn()
-
-            objectMapper.readValue(response.response.contentAsString, Erc20SendRequestResponse::class.java)
-        }
-
-        verify("correct response is returned") {
-            assertThat(response).withMessage()
-                .isEqualTo(
-                    Erc20SendRequestResponse(
-                        id = response.id,
-                        status = Status.PENDING,
-                        chainId = chainId.value,
-                        tokenAddress = tokenAddress.rawValue,
-                        amount = amount.rawValue,
-                        senderAddress = senderAddress.rawValue,
-                        recipientAddress = recipientAddress.rawValue,
-                        arbitraryData = response.arbitraryData,
-                        screenConfig = ScreenConfig(
-                            beforeActionMessage = "before-action-message",
-                            afterActionMessage = "after-action-message"
-                        ),
-                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
-                        sendTx = TransactionResponse(
-                            txHash = null,
-                            from = senderAddress.rawValue,
-                            to = tokenAddress.rawValue,
-                            data = response.sendTx.data,
-                            blockConfirmations = null,
-                            timestamp = null
-                        )
-                    )
-                )
-        }
-
-        verify("ERC20 send request is correctly stored in database") {
-            val storedRequest = erc20SendRequestRepository.getById(response.id)
-
-            assertThat(storedRequest).withMessage()
-                .isEqualTo(
-                    Erc20SendRequest(
-                        id = response.id,
-                        chainId = chainId,
-                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
-                        tokenAddress = tokenAddress,
-                        tokenAmount = amount,
-                        tokenSenderAddress = senderAddress,
-                        tokenRecipientAddress = recipientAddress,
-                        txHash = null,
-                        arbitraryData = response.arbitraryData,
-                        screenConfig = ScreenConfig(
-                            beforeActionMessage = "before-action-message",
-                            afterActionMessage = "after-action-message"
-                        )
-                    )
-                )
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCreateErc20SendRequestViaChainIdRedirectUrlAndTokenAddress() {
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
-        val tokenAddress = ContractAddress("a")
-        val amount = Balance(BigInteger.TEN)
-        val senderAddress = WalletAddress("b")
-        val recipientAddress = WalletAddress("c")
-
-        val response = suppose("request to create ERC20 send request is made") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/send")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                            {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
@@ -201,8 +145,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20SendRequestResponse(
                         id = response.id,
+                        projectId = PROJECT_ID,
                         status = Status.PENDING,
-                        chainId = chainId.value,
+                        chainId = PROJECT.chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
                         senderAddress = senderAddress.rawValue,
@@ -212,7 +157,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${response.id}",
                         sendTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -220,9 +165,13 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             data = response.sendTx.data,
                             blockConfirmations = null,
                             timestamp = null
-                        )
+                        ),
+                        createdAt = response.createdAt
                     )
                 )
+
+            assertThat(response.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("ERC20 send request is correctly stored in database") {
@@ -232,8 +181,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20SendRequest(
                         id = response.id,
-                        chainId = chainId,
-                        redirectUrl = redirectUrl.replace("\${id}", response.id.toString()),
+                        projectId = PROJECT_ID,
+                        chainId = PROJECT.chainId,
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${response.id}",
                         tokenAddress = tokenAddress,
                         tokenAmount = amount,
                         tokenSenderAddress = senderAddress,
@@ -243,58 +193,28 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         screenConfig = ScreenConfig(
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
-                        )
+                        ),
+                        createdAt = storedRequest!!.createdAt
                     )
                 )
+
+            assertThat(storedRequest.createdAt.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
     @Test
-    fun mustReturn400BadRequestForNonExistentClientId() {
+    fun mustCorrectlyCreateErc20SendRequestWithRedirectUrl() {
+        val tokenAddress = ContractAddress("cafebabe")
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress("b")
         val recipientAddress = WalletAddress("c")
+        val redirectUrl = "https://custom-url/\${id}"
 
-        verify("400 is returned for non-existent clientId") {
+        val response = suppose("request to create ERC20 send request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                            {
-                                "client_id": "non-existent-client-id",
-                                "amount": "${amount.rawValue}",
-                                "sender_address": "${senderAddress.rawValue}",
-                                "recipient_address": "${recipientAddress.rawValue}",
-                                "arbitrary_data": {
-                                    "test": true
-                                },
-                                "screen_config": {
-                                    "before_action_message": "before-action-message",
-                                    "after_action_message": "after-action-message"
-                                }
-                            }
-                        """.trimIndent()
-                    )
-            )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_CLIENT_ID)
-        }
-    }
-
-    @Test
-    fun mustReturn400BadRequestForMissingChainId() {
-        val redirectUrl = "https://example.com"
-        val tokenAddress = ContractAddress("a")
-        val amount = Balance(BigInteger.TEN)
-        val senderAddress = WalletAddress("b")
-        val recipientAddress = WalletAddress("c")
-
-        verify("400 is returned for missing chainId") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -315,29 +235,90 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         """.trimIndent()
                     )
             )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_REQUEST)
+            objectMapper.readValue(response.response.contentAsString, Erc20SendRequestResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    Erc20SendRequestResponse(
+                        id = response.id,
+                        projectId = PROJECT_ID,
+                        status = Status.PENDING,
+                        chainId = PROJECT.chainId.value,
+                        tokenAddress = tokenAddress.rawValue,
+                        amount = amount.rawValue,
+                        senderAddress = senderAddress.rawValue,
+                        recipientAddress = recipientAddress.rawValue,
+                        arbitraryData = response.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        redirectUrl = "https://custom-url/${response.id}",
+                        sendTx = TransactionResponse(
+                            txHash = null,
+                            from = senderAddress.rawValue,
+                            to = tokenAddress.rawValue,
+                            data = response.sendTx.data,
+                            blockConfirmations = null,
+                            timestamp = null
+                        ),
+                        createdAt = response.createdAt
+                    )
+                )
+
+            assertThat(response.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+
+        verify("ERC20 send request is correctly stored in database") {
+            val storedRequest = erc20SendRequestRepository.getById(response.id)
+
+            assertThat(storedRequest).withMessage()
+                .isEqualTo(
+                    Erc20SendRequest(
+                        id = response.id,
+                        projectId = PROJECT_ID,
+                        chainId = PROJECT.chainId,
+                        redirectUrl = "https://custom-url/${response.id}",
+                        tokenAddress = tokenAddress,
+                        tokenAmount = amount,
+                        tokenSenderAddress = senderAddress,
+                        tokenRecipientAddress = recipientAddress,
+                        txHash = null,
+                        arbitraryData = response.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        createdAt = storedRequest!!.createdAt
+                    )
+                )
+
+            assertThat(storedRequest.createdAt.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
     @Test
-    fun mustReturn400BadRequestForMissingRedirectUrl() {
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val tokenAddress = ContractAddress("a")
+    fun mustReturn401UnauthorizedWhenCreatingErc20SendRequestWithInvalidApiKey() {
+        val tokenAddress = ContractAddress("cafebabe")
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress("b")
         val recipientAddress = WalletAddress("c")
 
-        verify("400 is returned for missing redirectUrl") {
+        verify("401 is returned for invalid API key") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
@@ -353,48 +334,10 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         """.trimIndent()
                     )
             )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_REQUEST)
-        }
-    }
-
-    @Test
-    fun mustReturn400BadRequestForMissingTokenAddress() {
-        val redirectUrl = "https://example.com"
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val amount = Balance(BigInteger.TEN)
-        val senderAddress = WalletAddress("b")
-        val recipientAddress = WalletAddress("c")
-
-        verify("400 is returned for missing redirectUrl") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/send")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                            {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
-                                "amount": "${amount.rawValue}",
-                                "sender_address": "${senderAddress.rawValue}",
-                                "recipient_address": "${recipientAddress.rawValue}",
-                                "arbitrary_data": {
-                                    "test": true
-                                },
-                                "screen_config": {
-                                    "before_action_message": "before-action-message",
-                                    "after_action_message": "after-action-message"
-                                }
-                            }
-                        """.trimIndent()
-                    )
-            )
-                .andExpect(MockMvcResultMatchers.status().isBadRequest)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.INCOMPLETE_REQUEST)
+            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 
@@ -413,8 +356,6 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             ).sendAndMine()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress(mainAccount.address)
@@ -423,12 +364,11 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
@@ -478,8 +418,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20SendRequestResponse(
                         id = createResponse.id,
+                        projectId = PROJECT_ID,
                         status = Status.FAILED,
-                        chainId = chainId.value,
+                        chainId = PROJECT.chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
                         senderAddress = senderAddress.rawValue,
@@ -489,7 +430,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -497,13 +438,16 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.sendTx.data,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
                             timestamp = fetchResponse.sendTx.timestamp
-                        )
+                        ),
+                        createdAt = fetchResponse.createdAt
                     )
                 )
 
             assertThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.sendTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -523,8 +467,6 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             ).sendAndMine()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress(mainAccount.address)
@@ -533,12 +475,11 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
@@ -592,8 +533,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20SendRequestResponse(
                         id = createResponse.id,
+                        projectId = PROJECT_ID,
                         status = Status.FAILED,
-                        chainId = chainId.value,
+                        chainId = PROJECT.chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
                         senderAddress = senderAddress.rawValue,
@@ -603,7 +545,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -611,13 +553,16 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.sendTx.data,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
                             timestamp = fetchResponse.sendTx.timestamp
-                        )
+                        ),
+                        createdAt = fetchResponse.createdAt
                     )
                 )
 
             assertThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.sendTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -650,8 +595,6 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             ).sendAndMine()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress(mainAccount.address)
@@ -660,12 +603,11 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
@@ -717,8 +659,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
+                                projectId = PROJECT_ID,
                                 status = Status.FAILED,
-                                chainId = chainId.value,
+                                chainId = PROJECT.chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 amount = amount.rawValue,
                                 senderAddress = senderAddress.rawValue,
@@ -728,7 +671,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                                redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -736,7 +679,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
-                                )
+                                ),
+                                createdAt = createResponse.createdAt
                             )
                         )
                     )
@@ -745,6 +689,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.requests[0].sendTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -774,6 +720,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -835,6 +782,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
+                                projectId = PROJECT_ID,
                                 status = Status.FAILED,
                                 chainId = chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
@@ -854,7 +802,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
-                                )
+                                ),
+                                createdAt = createResponse.createdAt
                             )
                         )
                     )
@@ -863,6 +812,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.requests[0].sendTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -882,8 +833,6 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             ).sendAndMine()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress(mainAccount.address)
@@ -892,12 +841,11 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
@@ -949,8 +897,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
+                                projectId = PROJECT_ID,
                                 status = Status.FAILED,
-                                chainId = chainId.value,
+                                chainId = PROJECT.chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 amount = amount.rawValue,
                                 senderAddress = senderAddress.rawValue,
@@ -960,7 +909,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                                redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -968,7 +917,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
-                                )
+                                ),
+                                createdAt = createResponse.createdAt
                             )
                         )
                     )
@@ -977,6 +927,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.requests[0].sendTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -996,8 +948,6 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             ).sendAndMine()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
-        val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress(mainAccount.address)
@@ -1006,12 +956,11 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
-                                "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "amount": "${amount.rawValue}",
                                 "sender_address": "${senderAddress.rawValue}",
@@ -1067,8 +1016,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
+                                projectId = PROJECT_ID,
                                 status = Status.FAILED,
-                                chainId = chainId.value,
+                                chainId = PROJECT.chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 amount = amount.rawValue,
                                 senderAddress = senderAddress.rawValue,
@@ -1078,7 +1028,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                                redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -1086,7 +1036,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
-                                )
+                                ),
+                                createdAt = fetchResponse.requests[0].createdAt
                             )
                         )
                     )
@@ -1095,6 +1046,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
             assertThat(fetchResponse.requests[0].sendTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1107,6 +1060,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             erc20SendRequestRepository.store(
                 StoreErc20SendRequestParams(
                     id = id,
+                    projectId = PROJECT_ID,
                     chainId = Chain.HARDHAT_TESTNET.id,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
@@ -1117,7 +1071,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                     screenConfig = ScreenConfig(
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"
-                    )
+                    ),
+                    createdAt = TestData.TIMESTAMP
                 )
             )
         }
@@ -1157,6 +1112,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             erc20SendRequestRepository.store(
                 StoreErc20SendRequestParams(
                     id = id,
+                    projectId = PROJECT_ID,
                     chainId = Chain.HARDHAT_TESTNET.id,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
@@ -1167,7 +1123,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                     screenConfig = ScreenConfig(
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"
-                    )
+                    ),
+                    createdAt = TestData.TIMESTAMP
                 )
             )
             erc20SendRequestRepository.setTxHash(id, txHash)

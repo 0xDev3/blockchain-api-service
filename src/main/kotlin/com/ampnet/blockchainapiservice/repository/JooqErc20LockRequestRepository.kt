@@ -22,6 +22,7 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
         logger.info { "Store ERC20 lock request, params: $params" }
         val record = Erc20LockRequestRecord(
             id = params.id,
+            projectId = params.projectId,
             chainId = params.chainId,
             redirectUrl = params.redirectUrl,
             tokenAddress = params.tokenAddress,
@@ -32,7 +33,8 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
             arbitraryData = params.arbitraryData,
             screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
             screenAfterActionMessage = params.screenConfig.afterActionMessage,
-            txHash = null
+            txHash = null,
+            createdAt = params.createdAt
         )
         dslContext.executeInsert(record)
         return record.toModel()
@@ -61,6 +63,7 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
     private fun IErc20LockRequestRecord.toModel(): Erc20LockRequest =
         Erc20LockRequest(
             id = id!!,
+            projectId = projectId!!,
             chainId = chainId!!,
             redirectUrl = redirectUrl!!,
             tokenAddress = tokenAddress!!,
@@ -73,6 +76,7 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
             screenConfig = ScreenConfig(
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage
-            )
+            ),
+            createdAt = createdAt!!
         )
 }

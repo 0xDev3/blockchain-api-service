@@ -23,6 +23,7 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
         logger.info { "Store ERC20 send request, params: $params" }
         val record = Erc20SendRequestRecord(
             id = params.id,
+            projectId = params.projectId,
             chainId = params.chainId,
             redirectUrl = params.redirectUrl,
             tokenAddress = params.tokenAddress,
@@ -32,7 +33,8 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
             arbitraryData = params.arbitraryData,
             screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
             screenAfterActionMessage = params.screenConfig.afterActionMessage,
-            txHash = null
+            txHash = null,
+            createdAt = params.createdAt
         )
         dslContext.executeInsert(record)
         return record.toModel()
@@ -49,6 +51,7 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
         logger.debug { "Get ERC20 send requests filtered by sender address: $sender" }
         return dslContext.selectFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST)
             .where(Erc20SendRequestTable.ERC20_SEND_REQUEST.TOKEN_SENDER_ADDRESS.eq(sender))
+            .orderBy(Erc20SendRequestTable.ERC20_SEND_REQUEST.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
@@ -56,6 +59,7 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
         logger.debug { "Get ERC20 send requests filtered by recipient address: $recipient" }
         return dslContext.selectFrom(Erc20SendRequestTable.ERC20_SEND_REQUEST)
             .where(Erc20SendRequestTable.ERC20_SEND_REQUEST.TOKEN_RECIPIENT_ADDRESS.eq(recipient))
+            .orderBy(Erc20SendRequestTable.ERC20_SEND_REQUEST.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
@@ -75,6 +79,7 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
     private fun IErc20SendRequestRecord.toModel(): Erc20SendRequest =
         Erc20SendRequest(
             id = id!!,
+            projectId = projectId!!,
             chainId = chainId!!,
             redirectUrl = redirectUrl!!,
             tokenAddress = tokenAddress!!,
@@ -86,6 +91,7 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
             screenConfig = ScreenConfig(
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage
-            )
+            ),
+            createdAt = createdAt!!
         )
 }
