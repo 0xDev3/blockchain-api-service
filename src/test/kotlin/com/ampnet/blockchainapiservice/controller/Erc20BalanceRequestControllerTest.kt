@@ -11,6 +11,7 @@ import com.ampnet.blockchainapiservice.model.request.AttachSignedMessageRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.response.BalanceResponse
 import com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse
+import com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestsResponse
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.Project
@@ -187,6 +188,84 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                             messageToSign = result.messageToSign,
                             signedMessage = result.signedMessage?.value,
                             createdAt = result.createdAt.value
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20BalanceRequestsByProjectId() {
+        val id = UUID.randomUUID()
+        val projectId = UUID.randomUUID()
+        val rpcSpec = RpcUrlSpec("url", "url-override")
+        val service = mock<Erc20BalanceRequestService>()
+        val result = FullErc20BalanceRequest(
+            id = id,
+            projectId = projectId,
+            status = Status.SUCCESS,
+            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            redirectUrl = "redirect-url",
+            tokenAddress = ContractAddress("abc"),
+            blockNumber = BlockNumber(BigInteger.TEN),
+            requestedWalletAddress = WalletAddress("def"),
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
+            ),
+            balance = Erc20Balance(
+                wallet = WalletAddress("def"),
+                blockNumber = BlockNumber(BigInteger.TEN),
+                timestamp = UtcDateTime.ofEpochSeconds(0L),
+                amount = Balance(BigInteger.ONE)
+            ),
+            messageToSign = "message-to-sign",
+            signedMessage = SignedMessage("signed-message"),
+            createdAt = TestData.TIMESTAMP
+        )
+
+        suppose("some ERC20 balance requests will be fetched by project ID") {
+            given(service.getErc20BalanceRequestsByProjectId(projectId, rpcSpec))
+                .willReturn(listOf(result))
+        }
+
+        val controller = Erc20BalanceRequestController(service)
+
+        verify("controller returns correct response") {
+            val response = controller.getErc20BalanceRequestsByProjectId(projectId, rpcSpec)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        Erc20BalanceRequestsResponse(
+                            listOf(
+                                Erc20BalanceRequestResponse(
+                                    id = result.id,
+                                    projectId = result.projectId,
+                                    status = result.status,
+                                    chainId = result.chainId.value,
+                                    redirectUrl = result.redirectUrl,
+                                    tokenAddress = result.tokenAddress.rawValue,
+                                    blockNumber = result.blockNumber?.value,
+                                    walletAddress = result.requestedWalletAddress?.rawValue,
+                                    arbitraryData = result.arbitraryData,
+                                    screenConfig = result.screenConfig,
+                                    balance = result.balance?.let {
+                                        BalanceResponse(
+                                            wallet = it.wallet.rawValue,
+                                            blockNumber = it.blockNumber.value,
+                                            timestamp = it.timestamp.value,
+                                            amount = it.amount.rawValue
+                                        )
+                                    },
+                                    messageToSign = result.messageToSign,
+                                    signedMessage = result.signedMessage?.value,
+                                    createdAt = result.createdAt.value
+                                )
+                            )
                         )
                     )
                 )
