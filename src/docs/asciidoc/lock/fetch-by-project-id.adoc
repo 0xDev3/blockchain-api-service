@@ -1,0 +1,20 @@
+=== Fetch ERC20 Lock Requests by Project ID
+Fetches stored ERC20 lock requests with their current status filtered by project ID.
+
+Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
+specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC
+URL, use `X-RPC-URL-OVERRIDE` header.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyFetchErc20LockRequestsByProjectId/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyFetchErc20LockRequestsByProjectId/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20LockRequestsResponse.adoc[]

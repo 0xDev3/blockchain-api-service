@@ -7,19 +7,18 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachSignedMessageException
-import com.ampnet.blockchainapiservice.exception.IncompleteRequestException
-import com.ampnet.blockchainapiservice.exception.NonExistentClientIdException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20BalanceRequestParams
-import com.ampnet.blockchainapiservice.model.result.ClientInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
-import com.ampnet.blockchainapiservice.repository.ClientInfoRepository
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20BalanceRequestRepository
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.BlockNumber
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.Erc20Balance
 import com.ampnet.blockchainapiservice.util.SignedMessage
@@ -31,7 +30,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
@@ -40,26 +38,7 @@ import org.mockito.kotlin.verify as verifyMock
 class Erc20BalanceRequestServiceTest : TestBase() {
 
     @Test
-    fun mustSuccessfullyCreateErc20BalanceRequestWhenClientIdIsProvided() {
-        val clientId = "test-client-id"
-        val chainId = Chain.MATIC_TESTNET_MUMBAI.id
-        val redirectUrl = "redirect-url/\${id}"
-        val tokenAddress = ContractAddress("abc")
-        val clientInfo = ClientInfo(
-            clientId = clientId,
-            chainId = chainId,
-            sendRedirectUrl = null,
-            balanceRedirectUrl = redirectUrl,
-            lockRedirectUrl = null,
-            tokenAddress = tokenAddress
-        )
-        val clientInfoRepository = mock<ClientInfoRepository>()
-
-        suppose("some client info is fetched from database") {
-            given(clientInfoRepository.getById(clientId))
-                .willReturn(clientInfo)
-        }
-
+    fun mustSuccessfullyCreateErc20BalanceRequest() {
         val uuid = UUID.randomUUID()
         val uuidProvider = mock<UuidProvider>()
 
@@ -68,86 +47,26 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .willReturn(uuid)
         }
 
-        val createParams = CreateErc20BalanceRequestParams(
-            clientId = clientId,
-            chainId = null,
-            redirectUrl = null,
-            tokenAddress = null,
-            blockNumber = BlockNumber(BigInteger.TEN),
-            requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = ScreenConfig(
-                beforeActionMessage = "before-action-message",
-                afterActionMessage = "after-action-message"
-            )
-        )
-        val fullRedirectUrl = redirectUrl.replace("\${id}", uuid.toString())
-        val databaseParams = StoreErc20BalanceRequestParams(
-            id = uuid,
-            chainId = chainId,
-            redirectUrl = fullRedirectUrl,
-            tokenAddress = tokenAddress,
-            blockNumber = createParams.blockNumber,
-            requestedWalletAddress = createParams.requestedWalletAddress,
-            arbitraryData = createParams.arbitraryData,
-            screenConfig = createParams.screenConfig
-        )
-        val databaseResponse = Erc20BalanceRequest(
-            id = uuid,
-            chainId = chainId,
-            redirectUrl = fullRedirectUrl,
-            tokenAddress = tokenAddress,
-            blockNumber = createParams.blockNumber,
-            requestedWalletAddress = createParams.requestedWalletAddress,
-            actualWalletAddress = null,
-            signedMessage = null,
-            arbitraryData = createParams.arbitraryData,
-            screenConfig = createParams.screenConfig
-        )
-        val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
+        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
-        suppose("ERC20 balance request is stored in database") {
-            given(erc20BalanceRequestRepository.store(databaseParams))
-                .willReturn(databaseResponse)
+        suppose("some timestamp will be returned") {
+            given(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(TestData.TIMESTAMP)
         }
 
-        val service = Erc20BalanceRequestServiceImpl(
-            signatureCheckerService = mock(),
-            blockchainService = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = uuidProvider,
-                clientInfoRepository = clientInfoRepository,
-                blockchainService = mock()
-            )
+        val project = Project(
+            id = UUID.randomUUID(),
+            ownerId = UUID.randomUUID(),
+            issuerContractAddress = ContractAddress("a"),
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
+            chainId = ChainId(1337L),
+            customRpcUrl = "custom-rpc-url",
+            createdAt = TestData.TIMESTAMP
         )
 
-        verify("ERC20 balance request is correctly created") {
-            assertThat(service.createErc20BalanceRequest(createParams)).withMessage()
-                .isEqualTo(databaseResponse)
-
-            verifyMock(erc20BalanceRequestRepository)
-                .store(databaseParams)
-            verifyNoMoreInteractions(erc20BalanceRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustSuccessfullyCreateErc20BalanceRequestWhenClientIdIsNotProvided() {
-        val uuid = UUID.randomUUID()
-        val uuidProvider = mock<UuidProvider>()
-
-        suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
-                .willReturn(uuid)
-        }
-
-        val chainId = Chain.MATIC_TESTNET_MUMBAI.id
         val redirectUrl = "redirect-url/\${id}"
         val tokenAddress = ContractAddress("abc")
         val createParams = CreateErc20BalanceRequestParams(
-            clientId = null,
-            chainId = chainId,
             redirectUrl = redirectUrl,
             tokenAddress = tokenAddress,
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -161,17 +80,20 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         val fullRedirectUrl = redirectUrl.replace("\${id}", uuid.toString())
         val databaseParams = StoreErc20BalanceRequestParams(
             id = uuid,
-            chainId = chainId,
+            projectId = project.id,
+            chainId = project.chainId,
             redirectUrl = fullRedirectUrl,
             tokenAddress = tokenAddress,
             blockNumber = createParams.blockNumber,
             requestedWalletAddress = createParams.requestedWalletAddress,
             arbitraryData = createParams.arbitraryData,
-            screenConfig = createParams.screenConfig
+            screenConfig = createParams.screenConfig,
+            createdAt = TestData.TIMESTAMP
         )
         val databaseResponse = Erc20BalanceRequest(
             id = uuid,
-            chainId = chainId,
+            projectId = project.id,
+            chainId = project.chainId,
             redirectUrl = fullRedirectUrl,
             tokenAddress = tokenAddress,
             blockNumber = createParams.blockNumber,
@@ -179,7 +101,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             actualWalletAddress = null,
             signedMessage = null,
             arbitraryData = createParams.arbitraryData,
-            screenConfig = createParams.screenConfig
+            screenConfig = createParams.screenConfig,
+            createdAt = TestData.TIMESTAMP
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
 
@@ -194,198 +117,18 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = uuidProvider,
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = utcDateTimeProvider,
                 blockchainService = mock()
             )
         )
 
         verify("ERC20 balance request is correctly created") {
-            assertThat(service.createErc20BalanceRequest(createParams)).withMessage()
+            assertThat(service.createErc20BalanceRequest(createParams, project)).withMessage()
                 .isEqualTo(databaseResponse)
 
             verifyMock(erc20BalanceRequestRepository)
                 .store(databaseParams)
             verifyNoMoreInteractions(erc20BalanceRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowNonExistentClientIdExceptionWhenClientInfoIsNotInDatabase() {
-        val clientId = "test-client-id"
-        val clientInfoRepository = mock<ClientInfoRepository>()
-
-        suppose("client info is not in database") {
-            given(clientInfoRepository.getById(clientId))
-                .willReturn(null)
-        }
-
-        val createParams = CreateErc20BalanceRequestParams(
-            clientId = clientId,
-            chainId = null,
-            redirectUrl = null,
-            tokenAddress = null,
-            blockNumber = BlockNumber(BigInteger.TEN),
-            requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = ScreenConfig(
-                beforeActionMessage = "before-action-message",
-                afterActionMessage = "after-action-message"
-            )
-        )
-
-        val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
-        val service = Erc20BalanceRequestServiceImpl(
-            signatureCheckerService = mock(),
-            blockchainService = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = mock(),
-                clientInfoRepository = clientInfoRepository,
-                blockchainService = mock()
-            )
-        )
-
-        verify("NonExistentClientIdException is thrown") {
-            assertThrows<NonExistentClientIdException>(message) {
-                service.createErc20BalanceRequest(createParams)
-            }
-
-            verifyNoInteractions(erc20BalanceRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowIncompleteRequestExceptionWhenClientIdAndChainIdAreMissing() {
-        val uuid = UUID.randomUUID()
-        val uuidProvider = mock<UuidProvider>()
-
-        suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
-                .willReturn(uuid)
-        }
-
-        val createParams = CreateErc20BalanceRequestParams(
-            clientId = null,
-            chainId = null,
-            redirectUrl = "redirect-url/\${id}",
-            tokenAddress = ContractAddress("abc"),
-            blockNumber = BlockNumber(BigInteger.TEN),
-            requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = ScreenConfig(
-                beforeActionMessage = "before-action-message",
-                afterActionMessage = "after-action-message"
-            )
-        )
-
-        val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
-        val service = Erc20BalanceRequestServiceImpl(
-            signatureCheckerService = mock(),
-            blockchainService = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = uuidProvider,
-                clientInfoRepository = mock(),
-                blockchainService = mock()
-            )
-        )
-
-        verify("IncompleteRequestException is thrown") {
-            assertThrows<IncompleteRequestException>(message) {
-                service.createErc20BalanceRequest(createParams)
-            }
-
-            verifyNoInteractions(erc20BalanceRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowIncompleteRequestExceptionWhenClientIdAndRedirectUrlAreMissing() {
-        val uuid = UUID.randomUUID()
-        val uuidProvider = mock<UuidProvider>()
-
-        suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
-                .willReturn(uuid)
-        }
-
-        val createParams = CreateErc20BalanceRequestParams(
-            clientId = null,
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
-            redirectUrl = null,
-            tokenAddress = ContractAddress("abc"),
-            blockNumber = BlockNumber(BigInteger.TEN),
-            requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = ScreenConfig(
-                beforeActionMessage = "before-action-message",
-                afterActionMessage = "after-action-message"
-            )
-        )
-
-        val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
-        val service = Erc20BalanceRequestServiceImpl(
-            signatureCheckerService = mock(),
-            blockchainService = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = uuidProvider,
-                clientInfoRepository = mock(),
-                blockchainService = mock()
-            )
-        )
-
-        verify("IncompleteRequestException is thrown") {
-            assertThrows<IncompleteRequestException>(message) {
-                service.createErc20BalanceRequest(createParams)
-            }
-
-            verifyNoInteractions(erc20BalanceRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowIncompleteRequestExceptionWhenClientIdAndTokenAddressAreMissing() {
-        val uuid = UUID.randomUUID()
-        val uuidProvider = mock<UuidProvider>()
-
-        suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
-                .willReturn(uuid)
-        }
-
-        val createParams = CreateErc20BalanceRequestParams(
-            clientId = null,
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
-            redirectUrl = "redirect-url/\${id}",
-            tokenAddress = null,
-            blockNumber = BlockNumber(BigInteger.TEN),
-            requestedWalletAddress = WalletAddress("def"),
-            arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = ScreenConfig(
-                beforeActionMessage = "before-action-message",
-                afterActionMessage = "after-action-message"
-            )
-        )
-
-        val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
-        val service = Erc20BalanceRequestServiceImpl(
-            signatureCheckerService = mock(),
-            blockchainService = mock(),
-            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = uuidProvider,
-                clientInfoRepository = mock(),
-                blockchainService = mock()
-            )
-        )
-
-        verify("IncompleteRequestException is thrown") {
-            assertThrows<IncompleteRequestException>(message) {
-                service.createErc20BalanceRequest(createParams)
-            }
-
-            verifyNoInteractions(erc20BalanceRequestRepository)
         }
     }
 
@@ -405,7 +148,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = mock()
             )
         )
@@ -422,6 +165,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         val uuid = UUID.randomUUID()
         val erc20BalanceRequest = Erc20BalanceRequest(
             id = uuid,
+            projectId = UUID.randomUUID(),
             chainId = Chain.MATIC_TESTNET_MUMBAI.id,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
@@ -433,7 +177,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
 
@@ -448,7 +193,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = mock()
             )
         )
@@ -460,6 +205,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .isEqualTo(
                     FullErc20BalanceRequest(
                         id = uuid,
+                        projectId = erc20BalanceRequest.projectId,
                         status = Status.PENDING,
                         chainId = erc20BalanceRequest.chainId,
                         redirectUrl = erc20BalanceRequest.redirectUrl,
@@ -470,7 +216,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         screenConfig = erc20BalanceRequest.screenConfig,
                         balance = null,
                         messageToSign = erc20BalanceRequest.messageToSign,
-                        signedMessage = null
+                        signedMessage = null,
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -481,6 +228,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         val uuid = UUID.randomUUID()
         val erc20BalanceRequest = Erc20BalanceRequest(
             id = uuid,
+            projectId = UUID.randomUUID(),
             chainId = Chain.MATIC_TESTNET_MUMBAI.id,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
@@ -492,7 +240,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
 
@@ -530,7 +279,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -542,6 +291,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .isEqualTo(
                     FullErc20BalanceRequest(
                         id = uuid,
+                        projectId = erc20BalanceRequest.projectId,
                         status = Status.PENDING,
                         chainId = erc20BalanceRequest.chainId,
                         redirectUrl = erc20BalanceRequest.redirectUrl,
@@ -552,7 +302,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         screenConfig = erc20BalanceRequest.screenConfig,
                         balance = balance,
                         messageToSign = erc20BalanceRequest.messageToSign,
-                        signedMessage = null
+                        signedMessage = null,
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -563,6 +314,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         val uuid = UUID.randomUUID()
         val erc20BalanceRequest = Erc20BalanceRequest(
             id = uuid,
+            projectId = UUID.randomUUID(),
             chainId = Chain.MATIC_TESTNET_MUMBAI.id,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
@@ -574,7 +326,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
 
@@ -612,7 +365,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -624,6 +377,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .isEqualTo(
                     FullErc20BalanceRequest(
                         id = uuid,
+                        projectId = erc20BalanceRequest.projectId,
                         status = Status.FAILED,
                         chainId = erc20BalanceRequest.chainId,
                         redirectUrl = erc20BalanceRequest.redirectUrl,
@@ -634,7 +388,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         screenConfig = erc20BalanceRequest.screenConfig,
                         balance = balance,
                         messageToSign = erc20BalanceRequest.messageToSign,
-                        signedMessage = erc20BalanceRequest.signedMessage
+                        signedMessage = erc20BalanceRequest.signedMessage,
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -645,6 +400,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         val uuid = UUID.randomUUID()
         val erc20BalanceRequest = Erc20BalanceRequest(
             id = uuid,
+            projectId = UUID.randomUUID(),
             chainId = Chain.MATIC_TESTNET_MUMBAI.id,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
@@ -656,7 +412,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
 
@@ -706,7 +463,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -718,6 +475,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .isEqualTo(
                     FullErc20BalanceRequest(
                         id = uuid,
+                        projectId = erc20BalanceRequest.projectId,
                         status = Status.FAILED,
                         chainId = erc20BalanceRequest.chainId,
                         redirectUrl = erc20BalanceRequest.redirectUrl,
@@ -728,7 +486,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         screenConfig = erc20BalanceRequest.screenConfig,
                         balance = balance,
                         messageToSign = erc20BalanceRequest.messageToSign,
-                        signedMessage = erc20BalanceRequest.signedMessage
+                        signedMessage = erc20BalanceRequest.signedMessage,
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -739,6 +498,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         val uuid = UUID.randomUUID()
         val erc20BalanceRequest = Erc20BalanceRequest(
             id = uuid,
+            projectId = UUID.randomUUID(),
             chainId = Chain.MATIC_TESTNET_MUMBAI.id,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
@@ -750,7 +510,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
 
@@ -800,7 +561,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -812,6 +573,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .isEqualTo(
                     FullErc20BalanceRequest(
                         id = uuid,
+                        projectId = erc20BalanceRequest.projectId,
                         status = Status.SUCCESS,
                         chainId = erc20BalanceRequest.chainId,
                         redirectUrl = erc20BalanceRequest.redirectUrl,
@@ -822,7 +584,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         screenConfig = erc20BalanceRequest.screenConfig,
                         balance = balance,
                         messageToSign = erc20BalanceRequest.messageToSign,
-                        signedMessage = erc20BalanceRequest.signedMessage
+                        signedMessage = erc20BalanceRequest.signedMessage,
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -833,6 +596,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         val uuid = UUID.randomUUID()
         val erc20BalanceRequest = Erc20BalanceRequest(
             id = uuid,
+            projectId = UUID.randomUUID(),
             chainId = Chain.MATIC_TESTNET_MUMBAI.id,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
@@ -844,7 +608,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
         val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
 
@@ -894,7 +659,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             )
         )
@@ -906,6 +671,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .isEqualTo(
                     FullErc20BalanceRequest(
                         id = uuid,
+                        projectId = erc20BalanceRequest.projectId,
                         status = Status.SUCCESS,
                         chainId = erc20BalanceRequest.chainId,
                         redirectUrl = erc20BalanceRequest.redirectUrl,
@@ -916,7 +682,108 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         screenConfig = erc20BalanceRequest.screenConfig,
                         balance = balance,
                         messageToSign = erc20BalanceRequest.messageToSign,
-                        signedMessage = erc20BalanceRequest.signedMessage
+                        signedMessage = erc20BalanceRequest.signedMessage,
+                        createdAt = erc20BalanceRequest.createdAt
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReturnListOfErc20BalanceRequestsByProjectId() {
+        val uuid = UUID.randomUUID()
+        val erc20BalanceRequest = Erc20BalanceRequest(
+            id = uuid,
+            projectId = UUID.randomUUID(),
+            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            redirectUrl = "redirect-url/$uuid",
+            tokenAddress = ContractAddress("abc"),
+            blockNumber = BlockNumber(BigInteger.TEN),
+            requestedWalletAddress = WalletAddress("def"),
+            actualWalletAddress = WalletAddress("def"),
+            signedMessage = SignedMessage("signed-message"),
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
+            ),
+            createdAt = TestData.TIMESTAMP
+        )
+        val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
+
+        suppose("ERC20 balance request is returned from database") {
+            given(erc20BalanceRequestRepository.getAllByProjectId(erc20BalanceRequest.projectId))
+                .willReturn(listOf(erc20BalanceRequest))
+        }
+
+        val rpcSpec = RpcUrlSpec(null, null)
+        val balance = Erc20Balance(
+            wallet = erc20BalanceRequest.actualWalletAddress!!,
+            blockNumber = erc20BalanceRequest.blockNumber!!,
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(BigInteger.ONE)
+        )
+        val blockchainService = mock<BlockchainService>()
+
+        suppose("blockchain service will return some ERC20 balance") {
+            given(
+                blockchainService.fetchErc20AccountBalance(
+                    chainSpec = ChainSpec(
+                        chainId = erc20BalanceRequest.chainId,
+                        rpcSpec = rpcSpec
+                    ),
+                    contractAddress = erc20BalanceRequest.tokenAddress,
+                    walletAddress = erc20BalanceRequest.actualWalletAddress!!,
+                    blockParameter = erc20BalanceRequest.blockNumber!!
+                )
+            ).willReturn(balance)
+        }
+
+        val signatureCheckerService = mock<SignatureCheckerService>()
+
+        suppose("signature checker will return true") {
+            given(
+                signatureCheckerService.signatureMatches(
+                    message = erc20BalanceRequest.messageToSign,
+                    signedMessage = erc20BalanceRequest.signedMessage!!,
+                    signer = erc20BalanceRequest.actualWalletAddress!!
+                )
+            ).willReturn(true)
+        }
+
+        val service = Erc20BalanceRequestServiceImpl(
+            signatureCheckerService = signatureCheckerService,
+            blockchainService = blockchainService,
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = blockchainService
+            )
+        )
+
+        verify("ERC20 balance request with successful status is returned") {
+            val result = service.getErc20BalanceRequestsByProjectId(erc20BalanceRequest.projectId, rpcSpec)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    listOf(
+                        FullErc20BalanceRequest(
+                            id = uuid,
+                            projectId = erc20BalanceRequest.projectId,
+                            status = Status.SUCCESS,
+                            chainId = erc20BalanceRequest.chainId,
+                            redirectUrl = erc20BalanceRequest.redirectUrl,
+                            tokenAddress = erc20BalanceRequest.tokenAddress,
+                            blockNumber = erc20BalanceRequest.blockNumber,
+                            requestedWalletAddress = erc20BalanceRequest.requestedWalletAddress,
+                            arbitraryData = erc20BalanceRequest.arbitraryData,
+                            screenConfig = erc20BalanceRequest.screenConfig,
+                            balance = balance,
+                            messageToSign = erc20BalanceRequest.messageToSign,
+                            signedMessage = erc20BalanceRequest.signedMessage,
+                            createdAt = erc20BalanceRequest.createdAt
+                        )
                     )
                 )
         }
@@ -940,7 +807,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = mock()
             )
         )
@@ -972,7 +839,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
             erc20BalanceRequestRepository = erc20BalanceRequestRepository,
             erc20CommonService = Erc20CommonServiceImpl(
                 uuidProvider = mock(),
-                clientInfoRepository = mock(),
+                utcDateTimeProvider = mock(),
                 blockchainService = mock()
             )
         )

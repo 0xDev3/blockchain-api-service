@@ -119,3 +119,14 @@ class UtcDateTimeConverter : Converter<OffsetDateTime, UtcDateTime> {
         private const val serialVersionUID: Long = -8529019904691898554L
     }
 }
+
+class BaseUrlConverter : Converter<String, BaseUrl> {
+    override fun from(value: String?): BaseUrl? = value?.let { BaseUrl(it) }
+    override fun to(value: BaseUrl?): String? = value?.value
+    override fun fromType(): Class<String> = String::class.java
+    override fun toType(): Class<BaseUrl> = BaseUrl::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = -593346707327357156L
+    }
+}

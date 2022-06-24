@@ -6,6 +6,7 @@ import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
@@ -22,6 +23,7 @@ import org.web3j.abi.datatypes.Utf8String
 import java.util.UUID
 
 @Service
+@Suppress("TooManyFunctions")
 class Erc20SendRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val erc20SendRequestRepository: Erc20SendRequestRepository,
@@ -30,10 +32,13 @@ class Erc20SendRequestServiceImpl(
 
     companion object : KLogging()
 
-    override fun createErc20SendRequest(params: CreateErc20SendRequestParams): WithFunctionData<Erc20SendRequest> {
-        logger.info { "Creating ERC20 send request, params: $params" }
+    override fun createErc20SendRequest(
+        params: CreateErc20SendRequestParams,
+        project: Project
+    ): WithFunctionData<Erc20SendRequest> {
+        logger.info { "Creating ERC20 send request, params: $params, project: $project" }
 
-        val databaseParams = erc20CommonService.createDatabaseParams(StoreErc20SendRequestParams, params)
+        val databaseParams = erc20CommonService.createDatabaseParams(StoreErc20SendRequestParams, params, project)
         val data = encodeFunctionData(params.tokenRecipientAddress, params.tokenAmount, databaseParams.id)
         val erc20SendRequest = erc20SendRequestRepository.store(databaseParams)
 
@@ -49,6 +54,14 @@ class Erc20SendRequestServiceImpl(
         )
 
         return erc20SendRequest.appendTransactionData(rpcSpec)
+    }
+
+    override fun getErc20SendRequestsByProjectId(
+        projectId: UUID,
+        rpcSpec: RpcUrlSpec
+    ): List<WithTransactionData<Erc20SendRequest>> {
+        logger.debug { "Fetching ERC20 send requests for projectId: $projectId, rpcSpec: $rpcSpec" }
+        return erc20SendRequestRepository.getAllByProjectId(projectId).map { it.appendTransactionData(rpcSpec) }
     }
 
     override fun getErc20SendRequestsBySender(

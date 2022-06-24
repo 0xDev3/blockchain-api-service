@@ -23,6 +23,7 @@ class JooqErc20BalanceRequestRepository(private val dslContext: DSLContext) : Er
         logger.info { "Store ERC20 balance request, params: $params" }
         val record = Erc20BalanceRequestRecord(
             id = params.id,
+            projectId = params.projectId,
             chainId = params.chainId,
             redirectUrl = params.redirectUrl,
             tokenAddress = params.tokenAddress,
@@ -32,7 +33,8 @@ class JooqErc20BalanceRequestRepository(private val dslContext: DSLContext) : Er
             screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
             screenAfterActionMessage = params.screenConfig.afterActionMessage,
             actualWalletAddress = null,
-            signedMessage = null
+            signedMessage = null,
+            createdAt = params.createdAt
         )
         dslContext.executeInsert(record)
         return record.toModel()
@@ -43,6 +45,14 @@ class JooqErc20BalanceRequestRepository(private val dslContext: DSLContext) : Er
         return dslContext.selectFrom(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST)
             .where(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.ID.eq(id))
             .fetchOne { it.toModel() }
+    }
+
+    override fun getAllByProjectId(projectId: UUID): List<Erc20BalanceRequest> {
+        logger.debug { "Get ERC20 balance requests filtered by projectId: $projectId" }
+        return dslContext.selectFrom(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST)
+            .where(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.PROJECT_ID.eq(projectId))
+            .orderBy(Erc20BalanceRequestTable.ERC20_BALANCE_REQUEST.CREATED_AT.asc())
+            .fetch { it.toModel() }
     }
 
     override fun setSignedMessage(id: UUID, walletAddress: WalletAddress, signedMessage: SignedMessage): Boolean {
@@ -66,6 +76,7 @@ class JooqErc20BalanceRequestRepository(private val dslContext: DSLContext) : Er
     private fun IErc20BalanceRequestRecord.toModel(): Erc20BalanceRequest =
         Erc20BalanceRequest(
             id = id!!,
+            projectId = projectId!!,
             chainId = chainId!!,
             redirectUrl = redirectUrl!!,
             tokenAddress = tokenAddress!!,
@@ -77,6 +88,7 @@ class JooqErc20BalanceRequestRepository(private val dslContext: DSLContext) : Er
             screenConfig = ScreenConfig(
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage
-            )
+            ),
+            createdAt = createdAt!!
         )
 }

@@ -9,6 +9,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 import javax.servlet.http.HttpServletRequest
 
+@Deprecated("for removal") // TODO remove in SD-880
 class RpcUrlSpecResolver : HandlerMethodArgumentResolver {
 
     companion object {

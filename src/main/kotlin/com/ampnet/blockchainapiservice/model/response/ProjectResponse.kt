@@ -8,7 +8,7 @@ data class ProjectResponse(
     val id: UUID,
     val ownerId: UUID,
     val issuerContractAddress: String,
-    val redirectUrl: String,
+    val baseRedirectUrl: String,
     val chainId: Long,
     val customRpcUrl: String?,
     val createdAt: OffsetDateTime
@@ -17,7 +17,7 @@ data class ProjectResponse(
         id = project.id,
         ownerId = project.ownerId,
         issuerContractAddress = project.issuerContractAddress.rawValue,
-        redirectUrl = project.redirectUrl,
+        baseRedirectUrl = project.baseRedirectUrl.value,
         chainId = project.chainId.value,
         customRpcUrl = project.customRpcUrl,
         createdAt = project.createdAt.value

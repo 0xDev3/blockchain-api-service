@@ -10,4 +10,5 @@ interface Erc20LockRequestRepository {
     fun store(params: StoreErc20LockRequestParams): Erc20LockRequest
     fun getById(id: UUID): Erc20LockRequest?
     fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean
+    fun getAllByProjectId(projectId: UUID): List<Erc20LockRequest>
 }

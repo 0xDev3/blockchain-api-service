@@ -11,11 +11,15 @@ import com.ampnet.blockchainapiservice.model.request.AttachSignedMessageRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.response.BalanceResponse
 import com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse
+import com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestsResponse
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
+import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.Erc20BalanceRequestService
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.BlockNumber
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.Erc20Balance
 import com.ampnet.blockchainapiservice.util.SignedMessage
@@ -37,8 +41,6 @@ class Erc20BalanceRequestControllerTest : TestBase() {
     @Test
     fun mustCorrectlyCreateErc20BalanceRequest() {
         val params = CreateErc20BalanceRequestParams(
-            clientId = "client-id",
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
             redirectUrl = "redirect-url",
             tokenAddress = ContractAddress("a"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -51,20 +53,31 @@ class Erc20BalanceRequestControllerTest : TestBase() {
         )
         val result = Erc20BalanceRequest(
             id = UUID.randomUUID(),
-            chainId = params.chainId!!,
+            projectId = UUID.randomUUID(),
+            chainId = ChainId(1337L),
             redirectUrl = params.redirectUrl!!,
-            tokenAddress = params.tokenAddress!!,
+            tokenAddress = params.tokenAddress,
             blockNumber = params.blockNumber,
             requestedWalletAddress = params.requestedWalletAddress,
             actualWalletAddress = null,
             signedMessage = null,
             arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = params.screenConfig
+            screenConfig = params.screenConfig,
+            createdAt = TestData.TIMESTAMP
+        )
+        val project = Project(
+            id = result.projectId,
+            ownerId = UUID.randomUUID(),
+            issuerContractAddress = ContractAddress("a"),
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
+            chainId = ChainId(1337L),
+            customRpcUrl = "custom-rpc-url",
+            createdAt = TestData.TIMESTAMP
         )
         val service = mock<Erc20BalanceRequestService>()
 
         suppose("ERC20 balance request will be created") {
-            given(service.createErc20BalanceRequest(params))
+            given(service.createErc20BalanceRequest(params, project))
                 .willReturn(result)
         }
 
@@ -72,16 +85,14 @@ class Erc20BalanceRequestControllerTest : TestBase() {
 
         verify("controller returns correct response") {
             val request = CreateErc20BalanceRequest(
-                clientId = params.clientId,
-                chainId = params.chainId?.value,
                 redirectUrl = params.redirectUrl,
-                tokenAddress = params.tokenAddress?.rawValue,
+                tokenAddress = params.tokenAddress.rawValue,
                 blockNumber = params.blockNumber?.value,
                 walletAddress = params.requestedWalletAddress?.rawValue,
                 arbitraryData = params.arbitraryData,
                 screenConfig = params.screenConfig
             )
-            val response = controller.createErc20BalanceRequest(request)
+            val response = controller.createErc20BalanceRequest(project, request)
 
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
@@ -91,6 +102,7 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                     ResponseEntity.ok(
                         Erc20BalanceRequestResponse(
                             id = result.id,
+                            projectId = project.id,
                             status = Status.PENDING,
                             chainId = result.chainId.value,
                             redirectUrl = result.redirectUrl,
@@ -101,7 +113,8 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                             screenConfig = result.screenConfig.orEmpty(),
                             balance = null,
                             messageToSign = result.messageToSign,
-                            signedMessage = result.signedMessage?.value
+                            signedMessage = result.signedMessage?.value,
+                            createdAt = TestData.TIMESTAMP.value
                         )
                     )
                 )
@@ -115,6 +128,7 @@ class Erc20BalanceRequestControllerTest : TestBase() {
         val service = mock<Erc20BalanceRequestService>()
         val result = FullErc20BalanceRequest(
             id = id,
+            projectId = UUID.randomUUID(),
             status = Status.SUCCESS,
             chainId = Chain.MATIC_TESTNET_MUMBAI.id,
             redirectUrl = "redirect-url",
@@ -133,7 +147,8 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                 amount = Balance(BigInteger.ONE)
             ),
             messageToSign = "message-to-sign",
-            signedMessage = SignedMessage("signed-message")
+            signedMessage = SignedMessage("signed-message"),
+            createdAt = TestData.TIMESTAMP
         )
 
         suppose("some ERC20 balance request will be fetched") {
@@ -153,6 +168,7 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                     ResponseEntity.ok(
                         Erc20BalanceRequestResponse(
                             id = result.id,
+                            projectId = result.projectId,
                             status = result.status,
                             chainId = result.chainId.value,
                             redirectUrl = result.redirectUrl,
@@ -170,7 +186,86 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                                 )
                             },
                             messageToSign = result.messageToSign,
-                            signedMessage = result.signedMessage?.value
+                            signedMessage = result.signedMessage?.value,
+                            createdAt = result.createdAt.value
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchErc20BalanceRequestsByProjectId() {
+        val id = UUID.randomUUID()
+        val projectId = UUID.randomUUID()
+        val rpcSpec = RpcUrlSpec("url", "url-override")
+        val service = mock<Erc20BalanceRequestService>()
+        val result = FullErc20BalanceRequest(
+            id = id,
+            projectId = projectId,
+            status = Status.SUCCESS,
+            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            redirectUrl = "redirect-url",
+            tokenAddress = ContractAddress("abc"),
+            blockNumber = BlockNumber(BigInteger.TEN),
+            requestedWalletAddress = WalletAddress("def"),
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
+            ),
+            balance = Erc20Balance(
+                wallet = WalletAddress("def"),
+                blockNumber = BlockNumber(BigInteger.TEN),
+                timestamp = UtcDateTime.ofEpochSeconds(0L),
+                amount = Balance(BigInteger.ONE)
+            ),
+            messageToSign = "message-to-sign",
+            signedMessage = SignedMessage("signed-message"),
+            createdAt = TestData.TIMESTAMP
+        )
+
+        suppose("some ERC20 balance requests will be fetched by project ID") {
+            given(service.getErc20BalanceRequestsByProjectId(projectId, rpcSpec))
+                .willReturn(listOf(result))
+        }
+
+        val controller = Erc20BalanceRequestController(service)
+
+        verify("controller returns correct response") {
+            val response = controller.getErc20BalanceRequestsByProjectId(projectId, rpcSpec)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        Erc20BalanceRequestsResponse(
+                            listOf(
+                                Erc20BalanceRequestResponse(
+                                    id = result.id,
+                                    projectId = result.projectId,
+                                    status = result.status,
+                                    chainId = result.chainId.value,
+                                    redirectUrl = result.redirectUrl,
+                                    tokenAddress = result.tokenAddress.rawValue,
+                                    blockNumber = result.blockNumber?.value,
+                                    walletAddress = result.requestedWalletAddress?.rawValue,
+                                    arbitraryData = result.arbitraryData,
+                                    screenConfig = result.screenConfig,
+                                    balance = result.balance?.let {
+                                        BalanceResponse(
+                                            wallet = it.wallet.rawValue,
+                                            blockNumber = it.blockNumber.value,
+                                            timestamp = it.timestamp.value,
+                                            amount = it.amount.rawValue
+                                        )
+                                    },
+                                    messageToSign = result.messageToSign,
+                                    signedMessage = result.signedMessage?.value,
+                                    createdAt = result.createdAt.value
+                                )
+                            )
                         )
                     )
                 )

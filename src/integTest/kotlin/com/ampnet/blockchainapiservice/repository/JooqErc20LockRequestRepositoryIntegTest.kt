@@ -2,12 +2,19 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
+import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20LockRequestRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.DurationSeconds
@@ -15,6 +22,7 @@ import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,6 +48,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         private const val LOCK_SCREEN_BEFORE_ACTION_MESSAGE = "lock-screen-before-action-message"
         private const val LOCK_SCREEN_AFTER_ACTION_MESSAGE = "lock-screen-after-action-message"
         private val TX_HASH = TransactionHash("tx-hash")
+        private val PROJECT_ID = UUID.randomUUID()
+        private val OWNER_ID = UUID.randomUUID()
     }
 
     @Suppress("unused")
@@ -51,6 +61,33 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
     @Autowired
     private lateinit var dslContext: DSLContext
 
+    @BeforeEach
+    fun beforeEach() {
+        dslContext.delete(ApiKeyTable.API_KEY).execute()
+        dslContext.delete(ProjectTable.PROJECT).execute()
+        dslContext.delete(UserIdentifierTable.USER_IDENTIFIER).execute()
+
+        dslContext.executeInsert(
+            UserIdentifierRecord(
+                id = OWNER_ID,
+                userIdentifier = "user-identifier",
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+            )
+        )
+
+        dslContext.executeInsert(
+            ProjectRecord(
+                id = PROJECT_ID,
+                ownerId = OWNER_ID,
+                issuerContractAddress = ContractAddress("0"),
+                baseRedirectUrl = BaseUrl("base-redirect-url"),
+                chainId = ChainId(1337L),
+                customRpcUrl = "custom-rpc-url",
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+    }
+
     @Test
     fun mustCorrectlyFetchErc20LockRequestById() {
         val id = UUID.randomUUID()
@@ -59,6 +96,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(
                 Erc20LockRequestRecord(
                     id = id,
+                    projectId = PROJECT_ID,
                     chainId = CHAIN_ID,
                     redirectUrl = REDIRECT_URL,
                     tokenAddress = TOKEN_ADDRESS,
@@ -69,7 +107,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                     arbitraryData = ARBITRARY_DATA,
                     screenBeforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                     screenAfterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE,
-                    txHash = TX_HASH
+                    txHash = TX_HASH,
+                    createdAt = TestData.TIMESTAMP
                 )
             )
         }
@@ -81,6 +120,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     Erc20LockRequest(
                         id = id,
+                        projectId = PROJECT_ID,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
@@ -93,7 +133,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                         screenConfig = ScreenConfig(
                             beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
-                        )
+                        ),
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -110,10 +151,131 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchErc20LockRequestsByProject() {
+        val otherProjectId = UUID.randomUUID()
+
+        suppose("some other project is in database") {
+            dslContext.executeInsert(
+                ProjectRecord(
+                    id = otherProjectId,
+                    ownerId = OWNER_ID,
+                    issuerContractAddress = ContractAddress("1"),
+                    baseRedirectUrl = BaseUrl("base-redirect-url"),
+                    chainId = ChainId(1337L),
+                    customRpcUrl = "custom-rpc-url",
+                    createdAt = TestData.TIMESTAMP
+                )
+            )
+        }
+
+        val projectRequests = listOf(
+            Erc20LockRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                lockDurationSeconds = LOCK_DURATION,
+                lockContractAddress = LOCK_CONTRACT_ADDRESS,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
+            ),
+            Erc20LockRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = PROJECT_ID,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                lockDurationSeconds = LOCK_DURATION,
+                lockContractAddress = LOCK_CONTRACT_ADDRESS,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+        val otherRequests = listOf(
+            Erc20LockRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = otherProjectId,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                lockDurationSeconds = LOCK_DURATION,
+                lockContractAddress = LOCK_CONTRACT_ADDRESS,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
+            ),
+            Erc20LockRequestRecord(
+                id = UUID.randomUUID(),
+                projectId = otherProjectId,
+                chainId = CHAIN_ID,
+                redirectUrl = REDIRECT_URL,
+                tokenAddress = TOKEN_ADDRESS,
+                tokenAmount = TOKEN_AMOUNT,
+                lockDurationSeconds = LOCK_DURATION,
+                lockContractAddress = LOCK_CONTRACT_ADDRESS,
+                tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                arbitraryData = ARBITRARY_DATA,
+                screenBeforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                screenAfterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE,
+                txHash = TX_HASH,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+
+        suppose("some ERC20 lock requests exist in database") {
+            dslContext.batchInsert(projectRequests + otherRequests).execute()
+        }
+
+        verify("ERC20 lock requests are correctly fetched by project") {
+            val result = repository.getAllByProjectId(PROJECT_ID)
+
+            assertThat(result).withMessage()
+                .containsExactlyInAnyOrderElementsOf(
+                    projectRequests.map {
+                        Erc20LockRequest(
+                            id = it.id!!,
+                            projectId = it.projectId!!,
+                            chainId = it.chainId!!,
+                            redirectUrl = it.redirectUrl!!,
+                            tokenAddress = it.tokenAddress!!,
+                            tokenAmount = it.tokenAmount!!,
+                            lockDuration = it.lockDurationSeconds!!,
+                            lockContractAddress = it.lockContractAddress!!,
+                            tokenSenderAddress = it.tokenSenderAddress,
+                            txHash = it.txHash,
+                            arbitraryData = it.arbitraryData,
+                            screenConfig = ScreenConfig(
+                                beforeActionMessage = it.screenBeforeActionMessage,
+                                afterActionMessage = it.screenAfterActionMessage
+                            ),
+                            createdAt = it.createdAt!!
+                        )
+                    }
+                )
+        }
+    }
+
+    @Test
     fun mustCorrectlyStoreErc20LockRequest() {
         val id = UUID.randomUUID()
         val params = StoreErc20LockRequestParams(
             id = id,
+            projectId = PROJECT_ID,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
@@ -125,7 +287,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
 
         val storedErc20LockRequest = suppose("ERC20 lock request is stored in database") {
@@ -134,6 +297,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
 
         val expectedErc20LockRequest = Erc20LockRequest(
             id = id,
+            projectId = PROJECT_ID,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
@@ -146,7 +310,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
 
         verify("storing ERC20 lock request returns correct result") {
@@ -167,6 +332,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreErc20LockRequestParams(
             id = id,
+            projectId = PROJECT_ID,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
@@ -178,7 +344,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
 
         suppose("ERC20 lock request is stored in database") {
@@ -197,6 +364,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     Erc20LockRequest(
                         id = id,
+                        projectId = PROJECT_ID,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
@@ -209,7 +377,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                         screenConfig = ScreenConfig(
                             beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
-                        )
+                        ),
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -221,6 +390,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         val params = StoreErc20LockRequestParams(
             id = id,
             chainId = CHAIN_ID,
+            projectId = PROJECT_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
             tokenAmount = TOKEN_AMOUNT,
@@ -231,7 +401,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
 
         suppose("ERC20 lock request is stored in database") {
@@ -251,6 +422,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     Erc20LockRequest(
                         id = id,
+                        projectId = PROJECT_ID,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
@@ -263,7 +435,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                         screenConfig = ScreenConfig(
                             beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
-                        )
+                        ),
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
@@ -274,6 +447,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreErc20LockRequestParams(
             id = id,
+            projectId = PROJECT_ID,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
@@ -285,7 +459,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             screenConfig = ScreenConfig(
                 beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
-            )
+            ),
+            createdAt = TestData.TIMESTAMP
         )
 
         suppose("ERC20 lock request is stored in database") {
@@ -314,6 +489,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     Erc20LockRequest(
                         id = id,
+                        projectId = PROJECT_ID,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         tokenAddress = TOKEN_ADDRESS,
@@ -326,7 +502,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                         screenConfig = ScreenConfig(
                             beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
-                        )
+                        ),
+                        createdAt = TestData.TIMESTAMP
                     )
                 )
         }
