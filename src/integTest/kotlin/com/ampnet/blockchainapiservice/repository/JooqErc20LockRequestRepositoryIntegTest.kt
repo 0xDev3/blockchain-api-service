@@ -328,12 +328,69 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlySetTxHashForErc20LockRequestWithNullTxHash() {
+    fun mustCorrectlySetTxInfoForErc20LockRequestWithNullTxHash() {
         val id = UUID.randomUUID()
         val params = StoreErc20LockRequestParams(
             id = id,
             projectId = PROJECT_ID,
             chainId = CHAIN_ID,
+            redirectUrl = REDIRECT_URL,
+            tokenAddress = TOKEN_ADDRESS,
+            tokenAmount = TOKEN_AMOUNT,
+            lockDuration = LOCK_DURATION,
+            lockContractAddress = LOCK_CONTRACT_ADDRESS,
+            tokenSenderAddress = null,
+            arbitraryData = ARBITRARY_DATA,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
+            ),
+            createdAt = TestData.TIMESTAMP
+        )
+
+        suppose("ERC20 lock request is stored in database") {
+            repository.store(params)
+        }
+
+        verify("setting txInfo will succeed") {
+            assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
+                .isTrue()
+        }
+
+        verify("txInfo is correctly set in database") {
+            val result = repository.getById(id)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    Erc20LockRequest(
+                        id = id,
+                        projectId = PROJECT_ID,
+                        chainId = CHAIN_ID,
+                        redirectUrl = REDIRECT_URL,
+                        tokenAddress = TOKEN_ADDRESS,
+                        tokenAmount = TOKEN_AMOUNT,
+                        lockDuration = LOCK_DURATION,
+                        lockContractAddress = LOCK_CONTRACT_ADDRESS,
+                        tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                        txHash = TX_HASH,
+                        arbitraryData = ARBITRARY_DATA,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = LOCK_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = LOCK_SCREEN_AFTER_ACTION_MESSAGE
+                        ),
+                        createdAt = TestData.TIMESTAMP
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustNotUpdateTokenSenderAddressForErc20LockRequestWhenTokenSenderIsAlreadySet() {
+        val id = UUID.randomUUID()
+        val params = StoreErc20LockRequestParams(
+            id = id,
+            chainId = CHAIN_ID,
+            projectId = PROJECT_ID,
             redirectUrl = REDIRECT_URL,
             tokenAddress = TOKEN_ADDRESS,
             tokenAmount = TOKEN_AMOUNT,
@@ -352,12 +409,13 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting txHash will succeed") {
-            assertThat(repository.setTxHash(id, TX_HASH)).withMessage()
+        verify("setting txInfo will succeed") {
+            val ignoredTokenSender = WalletAddress("f")
+            assertThat(repository.setTxInfo(id, TX_HASH, ignoredTokenSender)).withMessage()
                 .isTrue()
         }
 
-        verify("txHash was correctly set in database") {
+        verify("txHash was correctly set while token sender was not updated") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
@@ -409,14 +467,19 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting txHash will succeed") {
-            assertThat(repository.setTxHash(id, TX_HASH)).withMessage()
+        verify("setting txInfo will succeed") {
+            assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
-        verify("setting another txHash will not succeed") {
-            assertThat(repository.setTxHash(id, TransactionHash("different-tx-hash"))).withMessage()
-                .isFalse()
+        verify("setting another txInfo will not succeed") {
+            assertThat(
+                repository.setTxInfo(
+                    id,
+                    TransactionHash("different-tx-hash"),
+                    TOKEN_SENDER_ADDRESS
+                )
+            ).withMessage().isFalse()
         }
 
         verify("first txHash remains in database") {

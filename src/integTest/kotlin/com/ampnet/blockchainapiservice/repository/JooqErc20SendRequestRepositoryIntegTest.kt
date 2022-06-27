@@ -500,7 +500,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlySetTxHashForErc20SendRequestWithNullTxHash() {
+    fun mustCorrectlySetTxInfoForErc20SendRequestWithNullTxHash() {
         val id = UUID.randomUUID()
         val params = StoreErc20SendRequestParams(
             id = id,
@@ -523,12 +523,12 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting txHash will succeed") {
-            assertThat(repository.setTxHash(id, TX_HASH)).withMessage()
+        verify("setting txInfo will succeed") {
+            assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
-        verify("txHash was correctly set in database") {
+        verify("txInfo was correctly set in database") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
@@ -555,7 +555,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustNotSetTxHashForErc20SendRequestWhenTxHashIsAlreadySet() {
+    fun mustNotUpdateTokenSenderAddressForErc20SendRequestWhenTokenSenderIsAlreadySet() {
         val id = UUID.randomUUID()
         val params = StoreErc20SendRequestParams(
             id = id,
@@ -578,14 +578,75 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting txHash will succeed") {
-            assertThat(repository.setTxHash(id, TX_HASH)).withMessage()
+        verify("setting txInfo will succeed") {
+            val ignoredTokenSender = WalletAddress("f")
+            assertThat(repository.setTxInfo(id, TX_HASH, ignoredTokenSender)).withMessage()
                 .isTrue()
         }
 
-        verify("setting another txHash will not succeed") {
-            assertThat(repository.setTxHash(id, TransactionHash("different-tx-hash"))).withMessage()
-                .isFalse()
+        verify("txHash was correctly set while token sender was not updated") {
+            val result = repository.getById(id)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    Erc20SendRequest(
+                        id = id,
+                        chainId = CHAIN_ID,
+                        projectId = PROJECT_ID,
+                        redirectUrl = REDIRECT_URL,
+                        tokenAddress = TOKEN_ADDRESS,
+                        tokenAmount = TOKEN_AMOUNT,
+                        tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+                        tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+                        txHash = TX_HASH,
+                        arbitraryData = ARBITRARY_DATA,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        ),
+                        createdAt = TestData.TIMESTAMP
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustNotSetTxHashForErc20SendRequestWhenTxHashIsAlreadySet() {
+        val id = UUID.randomUUID()
+        val params = StoreErc20SendRequestParams(
+            id = id,
+            chainId = CHAIN_ID,
+            projectId = PROJECT_ID,
+            redirectUrl = REDIRECT_URL,
+            tokenAddress = TOKEN_ADDRESS,
+            tokenAmount = TOKEN_AMOUNT,
+            tokenSenderAddress = TOKEN_SENDER_ADDRESS,
+            tokenRecipientAddress = TOKEN_RECIPIENT_ADDRESS,
+            arbitraryData = ARBITRARY_DATA,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            ),
+            createdAt = TestData.TIMESTAMP
+        )
+
+        suppose("ERC20 send request is stored in database") {
+            repository.store(params)
+        }
+
+        verify("setting txInfo will succeed") {
+            assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
+                .isTrue()
+        }
+
+        verify("setting another txInfo will not succeed") {
+            assertThat(
+                repository.setTxInfo(
+                    id,
+                    TransactionHash("different-tx-hash"),
+                    TOKEN_SENDER_ADDRESS
+                )
+            ).withMessage().isFalse()
         }
 
         verify("first txHash remains in database") {
