@@ -32,5 +32,5 @@ interface Erc20SendRequestService {
         rpcSpec: RpcUrlSpec
     ): List<WithTransactionData<Erc20SendRequest>>
 
-    fun attachTxHash(id: UUID, txHash: TransactionHash)
+    fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress)
 }

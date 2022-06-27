@@ -1,6 +1,7 @@
 === Fetch ERC20 Send Requests by Sender Address
 Fetches stored ERC20 send requests with their current status filtered by sender address *which was specified at the
-moment of request creation*.
+moment of request creation (if specified) or attached via along with transaction info (if not specified during request
+creation)*.
 
 Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
 specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC

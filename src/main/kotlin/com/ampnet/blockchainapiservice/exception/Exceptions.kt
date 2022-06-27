@@ -44,13 +44,13 @@ class BlockchainReadException(message: String) : ServiceException(
     }
 }
 
-class CannotAttachTxHashException(message: String) : ServiceException(
-    errorCode = ErrorCode.TX_HASH_ALREADY_SET,
+class CannotAttachTxInfoException(message: String) : ServiceException(
+    errorCode = ErrorCode.TX_INFO_ALREADY_SET,
     httpStatus = HttpStatus.BAD_REQUEST,
     message = message
 ) {
     companion object {
-        private const val serialVersionUID: Long = 2487635142233013917L
+        private const val serialVersionUID: Long = 2973294387463968605L
     }
 }
 

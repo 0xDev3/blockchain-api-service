@@ -6,7 +6,7 @@ import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
-import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
+import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest
 import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestResponse
 import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestsResponse
@@ -301,22 +301,23 @@ class Erc20LockRequestControllerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyAttachTransactionHash() {
+    fun mustCorrectlyAttachTransactionInfo() {
         val service = mock<Erc20LockRequestService>()
         val controller = Erc20LockRequestController(service)
 
         val id = UUID.randomUUID()
         val txHash = "tx-hash"
+        val caller = "c"
 
-        suppose("transaction hash will be attached") {
-            val request = AttachTransactionHashRequest(txHash)
-            controller.attachTransactionHash(id, request)
+        suppose("transaction info will be attached") {
+            val request = AttachTransactionInfoRequest(txHash, caller)
+            controller.attachTransactionInfo(id, request)
             JsonSchemaDocumentation.createSchema(request.javaClass)
         }
 
-        verify("transaction hash is correctly attached") {
+        verify("transaction info is correctly attached") {
             verifyMock(service)
-                .attachTxHash(id, TransactionHash(txHash))
+                .attachTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
 
             verifyNoMoreInteractions(service)
         }

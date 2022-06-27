@@ -418,8 +418,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 lock request") {
-            erc20LockRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 lock request") {
+            erc20LockRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 lock request is made") {
@@ -536,8 +536,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 lock request") {
-            erc20LockRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 lock request") {
+            erc20LockRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 lock request is made") {
@@ -658,8 +658,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 lock request") {
-            erc20LockRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 lock request") {
+            erc20LockRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 lock requests by project ID is made") {
@@ -780,8 +780,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 lock request") {
-            erc20LockRequestRepository.setTxHash(createResponse.id, txHash)
+        suppose("transaction info is attached to ERC20 lock request") {
+            erc20LockRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
         val fetchResponse = suppose("request to fetch ERC20 lock requests by project ID is made") {
@@ -857,10 +857,11 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyAttachTransactionHash() {
+    fun mustCorrectlyAttachTransactionInfo() {
         val id = UUID.randomUUID()
+        val tokenSender = WalletAddress("c")
 
-        suppose("some ERC20 lock request without transaction hash exists in database") {
+        suppose("some ERC20 lock request without transaction info exists in database") {
             erc20LockRequestRepository.store(
                 StoreErc20LockRequestParams(
                     id = id,
@@ -884,14 +885,15 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         val txHash = TransactionHash("tx-hash")
 
-        suppose("request to attach transaction hash to ERC20 lock request is made") {
+        suppose("request to attach transaction info to ERC20 lock request is made") {
             mockMvc.perform(
                 MockMvcRequestBuilders.put("/v1/lock/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "tx_hash": "${txHash.value}"
+                                "tx_hash": "${txHash.value}",
+                                "caller_address": "${tokenSender.rawValue}"
                             }
                         """.trimIndent()
                     )
@@ -900,7 +902,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .andReturn()
         }
 
-        verify("transaction hash is correctly attached to ERC20 lock request") {
+        verify("transaction info is correctly attached to ERC20 lock request") {
             val storedRequest = erc20LockRequestRepository.getById(id)
 
             assertThat(storedRequest?.txHash)
@@ -909,11 +911,12 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn400BadRequestWhenTransactionHashIsNotAttached() {
+    fun mustReturn400BadRequestWhenTransactionInfoIsNotAttached() {
         val id = UUID.randomUUID()
         val txHash = TransactionHash("tx-hash")
+        val tokenSender = WalletAddress("c")
 
-        suppose("some ERC20 lock request with transaction hash exists in database") {
+        suppose("some ERC20 lock request with transaction info exists in database") {
             erc20LockRequestRepository.store(
                 StoreErc20LockRequestParams(
                     id = id,
@@ -924,7 +927,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     tokenAmount = Balance(BigInteger.TEN),
                     lockDuration = DurationSeconds(BigInteger.valueOf(100L)),
                     lockContractAddress = ContractAddress("b"),
-                    tokenSenderAddress = WalletAddress("c"),
+                    tokenSenderAddress = tokenSender,
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,
                     screenConfig = ScreenConfig(
                         beforeActionMessage = "before-action-message",
@@ -933,17 +936,18 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     createdAt = TestData.TIMESTAMP
                 )
             )
-            erc20LockRequestRepository.setTxHash(id, txHash)
+            erc20LockRequestRepository.setTxInfo(id, txHash, tokenSender)
         }
 
-        verify("400 is returned when attaching transaction hash") {
+        verify("400 is returned when attaching transaction info") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.put("/v1/lock/$id")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "tx_hash": "different-tx-hash"
+                                "tx_hash": "different-tx-hash",
+                                "caller_address": "${tokenSender.rawValue}"
                             }
                         """.trimIndent()
                     )
@@ -951,10 +955,10 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TX_HASH_ALREADY_SET)
+            verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
-        verify("transaction hash is not changed in database") {
+        verify("transaction info is not changed in database") {
             val storedRequest = erc20LockRequestRepository.getById(id)
 
             assertThat(storedRequest?.txHash)

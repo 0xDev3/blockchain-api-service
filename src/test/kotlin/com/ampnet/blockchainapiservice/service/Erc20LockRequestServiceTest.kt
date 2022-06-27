@@ -6,7 +6,7 @@ import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
-import com.ampnet.blockchainapiservice.exception.CannotAttachTxHashException
+import com.ampnet.blockchainapiservice.exception.CannotAttachTxInfoException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
@@ -1049,12 +1049,13 @@ class Erc20LockRequestServiceTest : TestBase() {
     }
 
     @Test
-    fun mustSuccessfullyAttachTxHash() {
+    fun mustSuccessfullyAttachTxInfo() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
         val id = UUID.randomUUID()
+        val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
-        suppose("txHash will be successfully attached to the request") {
-            given(erc20LockRequestRepository.setTxHash(id, TX_HASH))
+        suppose("txInfo will be successfully attached to the request") {
+            given(erc20LockRequestRepository.setTxInfo(id, TX_HASH, caller))
                 .willReturn(true)
         }
 
@@ -1068,22 +1069,23 @@ class Erc20LockRequestServiceTest : TestBase() {
             )
         )
 
-        verify("txHash was successfully attached") {
-            service.attachTxHash(id, TX_HASH)
+        verify("txInfo was successfully attached") {
+            service.attachTxInfo(id, TX_HASH, caller)
 
             verifyMock(erc20LockRequestRepository)
-                .setTxHash(id, TX_HASH)
+                .setTxInfo(id, TX_HASH, caller)
             verifyNoMoreInteractions(erc20LockRequestRepository)
         }
     }
 
     @Test
-    fun mustThrowCannotAttachTxHashExceptionWhenAttachingTxHashFails() {
+    fun mustThrowCannotAttachTxInfoExceptionWhenAttachingTxInfoFails() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
         val id = UUID.randomUUID()
+        val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
-        suppose("attaching txHash will fails") {
-            given(erc20LockRequestRepository.setTxHash(id, TX_HASH))
+        suppose("attaching txInfo will fail") {
+            given(erc20LockRequestRepository.setTxInfo(id, TX_HASH, caller))
                 .willReturn(false)
         }
 
@@ -1097,13 +1099,13 @@ class Erc20LockRequestServiceTest : TestBase() {
             )
         )
 
-        verify("CannotAttachTxHashException is thrown") {
-            assertThrows<CannotAttachTxHashException>(message) {
-                service.attachTxHash(id, TX_HASH)
+        verify("CannotAttachTxInfoException is thrown") {
+            assertThrows<CannotAttachTxInfoException>(message) {
+                service.attachTxInfo(id, TX_HASH, caller)
             }
 
             verifyMock(erc20LockRequestRepository)
-                .setTxHash(id, TX_HASH)
+                .setTxInfo(id, TX_HASH, caller)
             verifyNoMoreInteractions(erc20LockRequestRepository)
         }
     }

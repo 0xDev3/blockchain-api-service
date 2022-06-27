@@ -4,7 +4,7 @@ import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import com.ampnet.blockchainapiservice.config.binding.annotation.RpcUrlBinding
 import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
-import com.ampnet.blockchainapiservice.model.request.AttachTransactionHashRequest
+import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20SendRequest
 import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse
 import com.ampnet.blockchainapiservice.model.response.Erc20SendRequestsResponse
@@ -71,10 +71,14 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
     }
 
     @PutMapping("/v1/send/{id}")
-    fun attachTransactionHash(
+    fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
-        @RequestBody requestBody: AttachTransactionHashRequest
+        @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
-        erc20SendRequestService.attachTxHash(id, TransactionHash(requestBody.txHash))
+        erc20SendRequestService.attachTxInfo(
+            id,
+            TransactionHash(requestBody.txHash),
+            WalletAddress(requestBody.callerAddress)
+        )
     }
 }

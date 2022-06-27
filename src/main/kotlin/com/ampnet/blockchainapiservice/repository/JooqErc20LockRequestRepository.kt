@@ -7,9 +7,11 @@ import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
 import com.ampnet.blockchainapiservice.util.TransactionHash
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
+import org.jooq.impl.DSL.coalesce
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
@@ -55,10 +57,14 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
             .fetch { it.toModel() }
     }
 
-    override fun setTxHash(id: UUID, txHash: TransactionHash): Boolean {
-        logger.info { "Set txHash for ERC20 lock request, id: $id, txHash: $txHash" }
+    override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
+        logger.info { "Set txInfo for ERC20 lock request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(Erc20LockRequestTable.ERC20_LOCK_REQUEST)
             .set(Erc20LockRequestTable.ERC20_LOCK_REQUEST.TX_HASH, txHash)
+            .set(
+                Erc20LockRequestTable.ERC20_LOCK_REQUEST.TOKEN_SENDER_ADDRESS,
+                coalesce(Erc20LockRequestTable.ERC20_LOCK_REQUEST.TOKEN_SENDER_ADDRESS, caller)
+            )
             .where(
                 DSL.and(
                     Erc20LockRequestTable.ERC20_LOCK_REQUEST.ID.eq(id),
