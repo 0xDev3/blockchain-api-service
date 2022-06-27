@@ -49,6 +49,14 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
             .fetchOne { it.toModel() }
     }
 
+    override fun getAllByProjectId(projectId: UUID): List<Erc20LockRequest> {
+        logger.debug { "Get ERC20 lock requests filtered by projectId: $projectId" }
+        return dslContext.selectFrom(Erc20LockRequestTable.ERC20_LOCK_REQUEST)
+            .where(Erc20LockRequestTable.ERC20_LOCK_REQUEST.PROJECT_ID.eq(projectId))
+            .orderBy(Erc20LockRequestTable.ERC20_LOCK_REQUEST.CREATED_AT.asc())
+            .fetch { it.toModel() }
+    }
+
     override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
         logger.info { "Set txInfo for ERC20 lock request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(Erc20LockRequestTable.ERC20_LOCK_REQUEST)
@@ -64,14 +72,6 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
                 )
             )
             .execute() > 0
-    }
-
-    override fun getAllByProjectId(projectId: UUID): List<Erc20LockRequest> {
-        logger.debug { "Get ERC20 lock requests filtered by projectId: $projectId" }
-        return dslContext.selectFrom(Erc20LockRequestTable.ERC20_LOCK_REQUEST)
-            .where(Erc20LockRequestTable.ERC20_LOCK_REQUEST.PROJECT_ID.eq(projectId))
-            .orderBy(Erc20LockRequestTable.ERC20_LOCK_REQUEST.CREATED_AT.asc())
-            .fetch { it.toModel() }
     }
 
     private fun IErc20LockRequestRecord.toModel(): Erc20LockRequest =

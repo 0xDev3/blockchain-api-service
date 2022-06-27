@@ -1181,7 +1181,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
-        suppose("tx info will be successfully attached to the request") {
+        suppose("txInfo will be successfully attached to the request") {
             given(erc20SendRequestRepository.setTxInfo(id, TX_HASH, caller))
                 .willReturn(true)
         }
@@ -1196,7 +1196,7 @@ class Erc20SendRequestServiceTest : TestBase() {
             )
         )
 
-        verify("tx info was successfully attached") {
+        verify("txInfo was successfully attached") {
             service.attachTxInfo(id, TX_HASH, caller)
 
             verifyMock(erc20SendRequestRepository)
@@ -1211,7 +1211,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
-        suppose("attaching tx info will fail") {
+        suppose("attaching txInfo will fail") {
             given(erc20SendRequestRepository.setTxInfo(id, TX_HASH, caller))
                 .willReturn(false)
         }

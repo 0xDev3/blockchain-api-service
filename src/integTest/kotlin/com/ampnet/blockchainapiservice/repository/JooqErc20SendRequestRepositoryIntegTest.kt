@@ -10,9 +10,7 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20SendRe
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
-import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
@@ -502,7 +500,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlySetTxHashForErc20SendRequestWithNullTxHash() {
+    fun mustCorrectlySetTxInfoForErc20SendRequestWithNullTxHash() {
         val id = UUID.randomUUID()
         val params = StoreErc20SendRequestParams(
             id = id,
@@ -525,12 +523,12 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting tx info will succeed") {
+        verify("setting txInfo will succeed") {
             assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
-        verify("txHash was correctly set in database") {
+        verify("txInfo was correctly set in database") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
@@ -580,7 +578,7 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting txHash will succeed") {
+        verify("setting txInfo will succeed") {
             val ignoredTokenSender = WalletAddress("f")
             assertThat(repository.setTxInfo(id, TX_HASH, ignoredTokenSender)).withMessage()
                 .isTrue()
@@ -636,12 +634,12 @@ class JooqErc20SendRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting tx info will succeed") {
+        verify("setting txInfo will succeed") {
             assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
-        verify("setting another tx info will not succeed") {
+        verify("setting another txInfo will not succeed") {
             assertThat(
                 repository.setTxInfo(
                     id,
