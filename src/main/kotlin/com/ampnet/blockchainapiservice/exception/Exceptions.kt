@@ -45,9 +45,9 @@ class BlockchainReadException(message: String) : ServiceException(
 }
 
 class CannotAttachTxInfoException(message: String) : ServiceException(
-        errorCode = ErrorCode.TX_INFO_ALREADY_SET,
-        httpStatus = HttpStatus.BAD_REQUEST,
-        message = message
+    errorCode = ErrorCode.TX_INFO_ALREADY_SET,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = message
 ) {
     companion object {
         private const val serialVersionUID: Long = 2973294387463968605L

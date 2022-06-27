@@ -958,35 +958,6 @@ class Erc20LockRequestServiceTest : TestBase() {
     }
 
     @Test
-    fun mustSuccessfullyAttachTxInfo() {
-        val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
-        val id = UUID.randomUUID()
-        val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
-
-        suppose("tx info will be successfully attached to the request") {
-            given(erc20LockRequestRepository.setTxInfo(id, TX_HASH, caller))
-                .willReturn(true)
-        }
-
-        val service = Erc20LockRequestServiceImpl(
-            functionEncoderService = mock(),
-            erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
-                uuidProvider = mock(),
-                utcDateTimeProvider = mock(),
-                blockchainService = mock()
-            )
-        )
-
-        verify("tx info was successfully attached") {
-            service.attachTxInfo(id, TX_HASH, caller)
-
-            verifyMock(erc20LockRequestRepository)
-                .setTxInfo(id, TX_HASH, caller)
-            verifyNoMoreInteractions(erc20LockRequestRepository)
-        }
-    }
-
     fun mustCorrectlyReturnListOfErc20LockRequestsByProjectId() {
         val id = UUID.randomUUID()
         val lockRequest = Erc20LockRequest(
@@ -1078,12 +1049,42 @@ class Erc20LockRequestServiceTest : TestBase() {
     }
 
     @Test
+    fun mustSuccessfullyAttachTxInfo() {
+        val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
+        val id = UUID.randomUUID()
+        val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
+
+        suppose("txInfo will be successfully attached to the request") {
+            given(erc20LockRequestRepository.setTxInfo(id, TX_HASH, caller))
+                .willReturn(true)
+        }
+
+        val service = Erc20LockRequestServiceImpl(
+            functionEncoderService = mock(),
+            erc20LockRequestRepository = erc20LockRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = mock()
+            )
+        )
+
+        verify("txInfo was successfully attached") {
+            service.attachTxInfo(id, TX_HASH, caller)
+
+            verifyMock(erc20LockRequestRepository)
+                .setTxInfo(id, TX_HASH, caller)
+            verifyNoMoreInteractions(erc20LockRequestRepository)
+        }
+    }
+
+    @Test
     fun mustThrowCannotAttachTxInfoExceptionWhenAttachingTxInfoFails() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
         val id = UUID.randomUUID()
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
-        suppose("attaching tx info will fail") {
+        suppose("attaching txInfo will fail") {
             given(erc20LockRequestRepository.setTxInfo(id, TX_HASH, caller))
                 .willReturn(false)
         }

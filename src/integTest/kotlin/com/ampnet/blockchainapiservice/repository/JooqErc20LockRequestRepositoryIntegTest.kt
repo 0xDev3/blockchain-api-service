@@ -328,7 +328,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlySetTxHashForErc20LockRequestWithNullTxHash() {
+    fun mustCorrectlySetTxInfoForErc20LockRequestWithNullTxHash() {
         val id = UUID.randomUUID()
         val params = StoreErc20LockRequestParams(
             id = id,
@@ -352,12 +352,12 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting tx info will succeed") {
+        verify("setting txInfo will succeed") {
             assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
-        verify("txHash and caller were correctly set in database") {
+        verify("txInfo is correctly set in database") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
@@ -409,7 +409,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting txHash will succeed") {
+        verify("setting txInfo will succeed") {
             val ignoredTokenSender = WalletAddress("f")
             assertThat(repository.setTxInfo(id, TX_HASH, ignoredTokenSender)).withMessage()
                 .isTrue()
@@ -467,12 +467,12 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting txHash will succeed") {
+        verify("setting txInfo will succeed") {
             assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
-        verify("setting another txHash will not succeed") {
+        verify("setting another txInfo will not succeed") {
             assertThat(
                 repository.setTxInfo(
                     id,

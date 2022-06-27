@@ -57,6 +57,10 @@ class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockR
         @PathVariable("id") id: UUID,
         @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
-        erc20LockRequestService.attachTxInfo(id, TransactionHash(requestBody.txHash), WalletAddress(requestBody.caller))
+        erc20LockRequestService.attachTxInfo(
+            id,
+            TransactionHash(requestBody.txHash),
+            WalletAddress(requestBody.callerAddress)
+        )
     }
 }

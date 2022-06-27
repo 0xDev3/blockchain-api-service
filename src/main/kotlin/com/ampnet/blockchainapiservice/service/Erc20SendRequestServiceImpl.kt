@@ -81,7 +81,7 @@ class Erc20SendRequestServiceImpl(
     }
 
     override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
-        logger.info { "Attach tx info to ERC20 send request, id: $id, txHash: $txHash, caller: $caller" }
+        logger.info { "Attach txInfo to ERC20 send request, id: $id, txHash: $txHash, caller: $caller" }
 
         val txInfoAttached = erc20SendRequestRepository.setTxInfo(id, txHash, caller)
 

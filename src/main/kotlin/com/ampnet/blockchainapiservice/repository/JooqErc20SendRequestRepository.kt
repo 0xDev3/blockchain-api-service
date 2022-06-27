@@ -73,7 +73,7 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
     }
 
     override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
-        logger.info { "Set tx info for ERC20 send request, id: $id, txHash: $txHash, caller: $caller" }
+        logger.info { "Set txInfo for ERC20 send request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(Erc20SendRequestTable.ERC20_SEND_REQUEST)
             .set(Erc20SendRequestTable.ERC20_SEND_REQUEST.TX_HASH, txHash)
             .set(

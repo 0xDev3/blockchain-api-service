@@ -78,7 +78,7 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
         erc20SendRequestService.attachTxInfo(
             id,
             TransactionHash(requestBody.txHash),
-            WalletAddress(requestBody.caller)
+            WalletAddress(requestBody.callerAddress)
         )
     }
 }

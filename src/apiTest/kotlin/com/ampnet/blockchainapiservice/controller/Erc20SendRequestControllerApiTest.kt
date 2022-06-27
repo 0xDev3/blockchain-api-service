@@ -399,7 +399,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 send request") {
+        suppose("transaction info is attached to ERC20 send request") {
             erc20SendRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
@@ -510,7 +510,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             hardhatContainer.waitAndMine()
         }
 
-        suppose("transaction hash is attached to ERC20 send request") {
+        suppose("transaction info is attached to ERC20 send request") {
             erc20SendRequestRepository.setTxInfo(createResponse.id, txHash, senderAddress)
         }
 
@@ -1291,11 +1291,11 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyAttachTransactionHash() {
+    fun mustCorrectlyAttachTransactionInfo() {
         val id = UUID.randomUUID()
         val tokenSender = WalletAddress("b")
 
-        suppose("some ERC20 send request without transaction hash exists in database") {
+        suppose("some ERC20 send request without transaction info exists in database") {
             erc20SendRequestRepository.store(
                 StoreErc20SendRequestParams(
                     id = id,
@@ -1326,7 +1326,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         """
                             {
                                 "tx_hash": "${txHash.value}",
-                                "caller": "${tokenSender.rawValue}"
+                                "caller_address": "${tokenSender.rawValue}"
                             }
                         """.trimIndent()
                     )
@@ -1344,12 +1344,12 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn400BadRequestWhenTransactionHashIsNotAttached() {
+    fun mustReturn400BadRequestWhenTransactionInfoIsNotAttached() {
         val id = UUID.randomUUID()
         val txHash = TransactionHash("tx-hash")
         val tokenSender = WalletAddress("b")
 
-        suppose("some ERC20 send request with transaction hash exists in database") {
+        suppose("some ERC20 send request with transaction info exists in database") {
             erc20SendRequestRepository.store(
                 StoreErc20SendRequestParams(
                     id = id,
@@ -1379,7 +1379,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         """
                             {
                                 "tx_hash": "different-tx-hash",
-                                "caller": "${tokenSender.rawValue}"
+                                "caller_address": "${tokenSender.rawValue}"
                             }
                         """.trimIndent()
                     )
@@ -1390,7 +1390,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
-        verify("transaction hash is not changed in database") {
+        verify("transaction info is not changed in database") {
             val storedRequest = erc20SendRequestRepository.getById(id)
 
             assertThat(storedRequest?.txHash)
