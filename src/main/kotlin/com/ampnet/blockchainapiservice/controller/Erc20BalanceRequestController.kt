@@ -29,7 +29,7 @@ class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc2
         @ApiKeyBinding project: Project,
         @RequestBody requestBody: CreateErc20BalanceRequest
     ): ResponseEntity<Erc20BalanceRequestResponse> {
-        val params = CreateErc20BalanceRequestParams(requestBody)
+        val params = CreateErc20BalanceRequestParams(requestBody.validate())
         val createdRequest = erc20BalanceRequestService.createErc20BalanceRequest(params, project)
         return ResponseEntity.ok(Erc20BalanceRequestResponse(createdRequest))
     }
