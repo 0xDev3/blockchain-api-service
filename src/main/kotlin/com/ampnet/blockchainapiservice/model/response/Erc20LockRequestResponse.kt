@@ -50,6 +50,7 @@ data class Erc20LockRequestResponse(
             from = lockRequest.value.tokenSenderAddress?.rawValue,
             to = lockRequest.value.tokenAddress.rawValue,
             data = lockRequest.data.value,
+            value = null,
             blockConfirmations = null,
             timestamp = null
         ),
@@ -74,7 +75,8 @@ data class Erc20LockRequestResponse(
             txHash = lockRequest.transactionData.txHash?.value,
             from = lockRequest.transactionData.fromAddress?.rawValue,
             to = lockRequest.transactionData.toAddress.rawValue,
-            data = lockRequest.transactionData.data.value,
+            data = lockRequest.transactionData.data?.value,
+            value = null,
             blockConfirmations = lockRequest.transactionData.blockConfirmations,
             timestamp = lockRequest.transactionData.timestamp?.value
         ),

@@ -15,7 +15,7 @@ data class StoreErc20SendRequestParams(
     val projectId: UUID,
     val chainId: ChainId,
     val redirectUrl: String,
-    val tokenAddress: ContractAddress,
+    val tokenAddress: ContractAddress?,
     val tokenAmount: Balance,
     val tokenSenderAddress: WalletAddress?,
     val tokenRecipientAddress: WalletAddress,

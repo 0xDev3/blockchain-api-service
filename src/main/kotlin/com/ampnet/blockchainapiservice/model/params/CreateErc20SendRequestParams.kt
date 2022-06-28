@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode
 
 data class CreateErc20SendRequestParams(
     val redirectUrl: String?,
-    val tokenAddress: ContractAddress,
+    val tokenAddress: ContractAddress?,
     val tokenAmount: Balance,
     val tokenSenderAddress: WalletAddress?,
     val tokenRecipientAddress: WalletAddress,
@@ -18,7 +18,7 @@ data class CreateErc20SendRequestParams(
 ) {
     constructor(requestBody: CreateErc20SendRequest) : this(
         redirectUrl = requestBody.redirectUrl,
-        tokenAddress = ContractAddress(requestBody.tokenAddress),
+        tokenAddress = requestBody.tokenAddress?.let { ContractAddress(it) },
         tokenAmount = Balance(requestBody.amount),
         tokenSenderAddress = requestBody.senderAddress?.let { WalletAddress(it) },
         tokenRecipientAddress = WalletAddress(requestBody.recipientAddress),

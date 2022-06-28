@@ -169,6 +169,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.lockTx.data,
+                            value = null,
                             blockConfirmations = null,
                             timestamp = null
                         ),
@@ -275,6 +276,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.lockTx.data,
+                            value = null,
                             blockConfirmations = null,
                             timestamp = null
                         ),
@@ -457,6 +459,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = lockContractAddress.rawValue,
                             data = createResponse.lockTx.data,
+                            value = null,
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
                             timestamp = fetchResponse.lockTx.timestamp
                         ),
@@ -573,13 +576,14 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value
-                            + "/request-lock/${createResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-lock/${createResponse.id}/action",
                         lockTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
                             to = lockContractAddress.rawValue,
                             data = createResponse.lockTx.data,
+                            value = null,
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
                             timestamp = fetchResponse.lockTx.timestamp
                         ),
@@ -694,13 +698,14 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = PROJECT.baseRedirectUrl.value
-                                    + "/request-lock/${createResponse.id}/action",
+                                redirectUrl = PROJECT.baseRedirectUrl.value +
+                                    "/request-lock/${createResponse.id}/action",
                                 lockTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
                                     to = lockContractAddress.rawValue,
                                     data = createResponse.lockTx.data,
+                                    value = null,
                                     blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].lockTx.timestamp
                                 ),
@@ -821,13 +826,14 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = PROJECT.baseRedirectUrl.value
-                                    + "/request-lock/${createResponse.id}/action",
+                                redirectUrl = PROJECT.baseRedirectUrl.value +
+                                    "/request-lock/${createResponse.id}/action",
                                 lockTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
                                     to = lockContractAddress.rawValue,
                                     data = createResponse.lockTx.data,
+                                    value = null,
                                     blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].lockTx.timestamp
                                 ),

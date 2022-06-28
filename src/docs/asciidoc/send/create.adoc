@@ -5,17 +5,20 @@ request ID can be interpolated into the `redirect_url` by placing `${id}` placeh
 desired in the URL. The placeholder must strictly have dollar sign and brackets to be interpolated, and only `id` field
 can be interpolated.
 
+If `asset_type` is set to `NATIVE`, then chain-native currency will be send (i.e. Ether) and then `token_address` must
+not be present. If `asset_type` is set to `TOKEN`, then `token_address` must be present.
+
 *This request requires and API key present in the `X-API-KEY` header.*
 
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestWithRedirectUrl/http-request.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestForSomeTokenWithRedirectUrl/http-request.adoc[]
 ====
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestWithRedirectUrl/http-response.adoc[]
+include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestForSomeTokenWithRedirectUrl/http-response.adoc[]
 ====
 
 Schemas:

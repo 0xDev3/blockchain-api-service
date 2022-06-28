@@ -29,7 +29,7 @@ class Erc20SendRequestController(private val erc20SendRequestService: Erc20SendR
         @ApiKeyBinding project: Project,
         @RequestBody requestBody: CreateErc20SendRequest
     ): ResponseEntity<Erc20SendRequestResponse> {
-        val params = CreateErc20SendRequestParams(requestBody)
+        val params = CreateErc20SendRequestParams(requestBody.validate())
         val createdRequest = erc20SendRequestService.createErc20SendRequest(params, project)
         return ResponseEntity.ok(Erc20SendRequestResponse(createdRequest))
     }
