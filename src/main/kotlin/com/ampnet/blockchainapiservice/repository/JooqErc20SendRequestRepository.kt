@@ -95,7 +95,7 @@ class JooqErc20SendRequestRepository(private val dslContext: DSLContext) : Erc20
             projectId = projectId!!,
             chainId = chainId!!,
             redirectUrl = redirectUrl!!,
-            tokenAddress = tokenAddress!!,
+            tokenAddress = tokenAddress,
             tokenAmount = tokenAmount!!,
             tokenSenderAddress = tokenSenderAddress,
             tokenRecipientAddress = tokenRecipientAddress!!,

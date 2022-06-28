@@ -10,12 +10,13 @@ import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.ampnet.blockchainapiservice.util.WithFunctionData
+import com.ampnet.blockchainapiservice.util.WithFunctionDataOrEthValue
 import com.ampnet.blockchainapiservice.util.WithTransactionData
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -35,14 +36,17 @@ class Erc20SendRequestServiceImpl(
     override fun createErc20SendRequest(
         params: CreateErc20SendRequestParams,
         project: Project
-    ): WithFunctionData<Erc20SendRequest> {
+    ): WithFunctionDataOrEthValue<Erc20SendRequest> {
         logger.info { "Creating ERC20 send request, params: $params, project: $project" }
 
         val databaseParams = erc20CommonService.createDatabaseParams(StoreErc20SendRequestParams, params, project)
-        val data = encodeFunctionData(params.tokenRecipientAddress, params.tokenAmount, databaseParams.id)
+        val data = databaseParams.tokenAddress?.let {
+            encodeFunctionData(params.tokenRecipientAddress, params.tokenAmount, databaseParams.id)
+        }
+        val ethValue = if (databaseParams.tokenAddress == null) databaseParams.tokenAmount else null
         val erc20SendRequest = erc20SendRequestRepository.store(databaseParams)
 
-        return WithFunctionData(erc20SendRequest, data)
+        return WithFunctionDataOrEthValue(erc20SendRequest, data, ethValue)
     }
 
     override fun getErc20SendRequest(id: UUID, rpcSpec: RpcUrlSpec): WithTransactionData<Erc20SendRequest> {
@@ -107,19 +111,20 @@ class Erc20SendRequestServiceImpl(
             chainId = chainId,
             rpcSpec = rpcSpec
         )
-        val data = encodeFunctionData(tokenRecipientAddress, tokenAmount, id)
+        val data = tokenAddress?.let { encodeFunctionData(tokenRecipientAddress, tokenAmount, id) }
         val status = determineStatus(transactionInfo, data)
 
         return withTransactionData(
             status = status,
             data = data,
+            value = if (tokenAddress == null) tokenAmount else null,
             transactionInfo = transactionInfo
         )
     }
 
     private fun Erc20SendRequest.determineStatus(
         transactionInfo: BlockchainTransactionInfo?,
-        expectedData: FunctionData
+        expectedData: FunctionData?
     ): Status =
         if (transactionInfo == null) { // implies that either txHash is null or transaction is not yet mined
             Status.PENDING
@@ -131,13 +136,33 @@ class Erc20SendRequestServiceImpl(
 
     private fun Erc20SendRequest.isSuccess(
         transactionInfo: BlockchainTransactionInfo,
-        expectedData: FunctionData
+        expectedData: FunctionData?
     ): Boolean =
-        transactionInfo.success && tokenAddress == transactionInfo.to.toContractAddress() &&
-            txHash == transactionInfo.hash &&
-            senderAddressMatches(tokenSenderAddress, transactionInfo.from) &&
-            transactionInfo.data == expectedData
+        transactionInfo.success &&
+            transactionInfo.hashMatches(txHash) &&
+            transactionInfo.tokenAddressMatches(tokenAddress) &&
+            transactionInfo.recipientAddressMatches(tokenAddress, tokenRecipientAddress) &&
+            transactionInfo.senderAddressMatches(tokenSenderAddress) &&
+            transactionInfo.dataMatches(expectedData) &&
+            transactionInfo.valueMatches(if (tokenAddress == null) tokenAmount else null)
 
-    private fun senderAddressMatches(senderAddress: WalletAddress?, fromAddress: WalletAddress): Boolean =
-        senderAddress == null || senderAddress == fromAddress
+    private fun BlockchainTransactionInfo.tokenAddressMatches(tokenAddress: ContractAddress?): Boolean =
+        (tokenAddress != null && to.toContractAddress() == tokenAddress) || tokenAddress == null
+
+    private fun BlockchainTransactionInfo.recipientAddressMatches(
+        tokenAddress: ContractAddress?,
+        recipientAddress: WalletAddress
+    ): Boolean = (tokenAddress == null && to.toWalletAddress() == recipientAddress) || tokenAddress != null
+
+    private fun BlockchainTransactionInfo.hashMatches(expectedHash: TransactionHash?): Boolean =
+        hash == expectedHash
+
+    private fun BlockchainTransactionInfo.senderAddressMatches(senderAddress: WalletAddress?): Boolean =
+        senderAddress == null || from == senderAddress
+
+    private fun BlockchainTransactionInfo.dataMatches(expectedData: FunctionData?): Boolean =
+        expectedData == null || data == expectedData
+
+    private fun BlockchainTransactionInfo.valueMatches(expectedValue: Balance?): Boolean =
+        expectedValue == null || value == expectedValue
 }

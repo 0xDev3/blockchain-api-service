@@ -86,6 +86,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
                 from = WalletAddress(transaction.from),
                 to = WalletAddress(transaction.to),
                 data = FunctionData(transaction.input),
+                value = Balance(transaction.value),
                 blockConfirmations = blockConfirmations,
                 timestamp = timestamp,
                 success = receipt.isStatusOK

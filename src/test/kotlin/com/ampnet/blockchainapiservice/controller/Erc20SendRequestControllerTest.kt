@@ -14,6 +14,7 @@ import com.ampnet.blockchainapiservice.model.response.TransactionResponse
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.Erc20SendRequestService
+import com.ampnet.blockchainapiservice.util.AssetType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -23,7 +24,7 @@ import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.ampnet.blockchainapiservice.util.WithFunctionData
+import com.ampnet.blockchainapiservice.util.WithFunctionDataOrEthValue
 import com.ampnet.blockchainapiservice.util.WithTransactionData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -79,7 +80,7 @@ class Erc20SendRequestControllerTest : TestBase() {
 
         suppose("ERC20 send request will be created") {
             given(service.createErc20SendRequest(params, project))
-                .willReturn(WithFunctionData(result, data))
+                .willReturn(WithFunctionDataOrEthValue(result, data, null))
         }
 
         val controller = Erc20SendRequestController(service)
@@ -87,7 +88,8 @@ class Erc20SendRequestControllerTest : TestBase() {
         verify("controller returns correct response") {
             val request = CreateErc20SendRequest(
                 redirectUrl = params.redirectUrl,
-                tokenAddress = params.tokenAddress.rawValue,
+                tokenAddress = params.tokenAddress?.rawValue,
+                assetType = AssetType.TOKEN,
                 amount = params.tokenAmount.rawValue,
                 senderAddress = params.tokenSenderAddress?.rawValue,
                 recipientAddress = params.tokenRecipientAddress.rawValue,
@@ -107,7 +109,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                             projectId = project.id,
                             status = Status.PENDING,
                             chainId = result.chainId.value,
-                            tokenAddress = result.tokenAddress.rawValue,
+                            tokenAddress = result.tokenAddress?.rawValue,
+                            assetType = AssetType.TOKEN,
                             amount = result.tokenAmount.rawValue,
                             senderAddress = result.tokenSenderAddress?.rawValue,
                             recipientAddress = result.tokenRecipientAddress.rawValue,
@@ -117,8 +120,9 @@ class Erc20SendRequestControllerTest : TestBase() {
                             sendTx = TransactionResponse(
                                 txHash = null,
                                 from = result.tokenSenderAddress?.rawValue,
-                                to = result.tokenAddress.rawValue,
+                                to = result.tokenAddress!!.rawValue,
                                 data = data.value,
+                                value = null,
                                 blockConfirmations = null,
                                 timestamp = null
                             ),
@@ -159,6 +163,7 @@ class Erc20SendRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
+                value = null,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -184,7 +189,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                             projectId = result.value.projectId,
                             status = result.status,
                             chainId = result.value.chainId.value,
-                            tokenAddress = result.value.tokenAddress.rawValue,
+                            tokenAddress = result.value.tokenAddress?.rawValue,
+                            assetType = AssetType.TOKEN,
                             amount = result.value.tokenAmount.rawValue,
                             senderAddress = result.value.tokenSenderAddress?.rawValue,
                             recipientAddress = result.value.tokenRecipientAddress.rawValue,
@@ -195,7 +201,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                                 txHash = result.transactionData.txHash?.value,
                                 from = result.transactionData.fromAddress?.rawValue,
                                 to = result.transactionData.toAddress.rawValue,
-                                data = result.transactionData.data.value,
+                                data = result.transactionData.data?.value,
+                                value = null,
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = TestData.TIMESTAMP.value
                             ),
@@ -237,6 +244,7 @@ class Erc20SendRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
+                value = null,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -264,7 +272,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                                     projectId = result.value.projectId,
                                     status = result.status,
                                     chainId = result.value.chainId.value,
-                                    tokenAddress = result.value.tokenAddress.rawValue,
+                                    tokenAddress = result.value.tokenAddress?.rawValue,
+                                    assetType = AssetType.TOKEN,
                                     amount = result.value.tokenAmount.rawValue,
                                     senderAddress = result.value.tokenSenderAddress?.rawValue,
                                     recipientAddress = result.value.tokenRecipientAddress.rawValue,
@@ -275,7 +284,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                                         txHash = result.transactionData.txHash?.value,
                                         from = result.transactionData.fromAddress?.rawValue,
                                         to = result.transactionData.toAddress.rawValue,
-                                        data = result.transactionData.data.value,
+                                        data = result.transactionData.data?.value,
+                                        value = null,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
@@ -319,6 +329,7 @@ class Erc20SendRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
+                value = null,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -346,7 +357,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                                     projectId = result.value.projectId,
                                     status = result.status,
                                     chainId = result.value.chainId.value,
-                                    tokenAddress = result.value.tokenAddress.rawValue,
+                                    tokenAddress = result.value.tokenAddress?.rawValue,
+                                    assetType = AssetType.TOKEN,
                                     amount = result.value.tokenAmount.rawValue,
                                     senderAddress = result.value.tokenSenderAddress?.rawValue,
                                     recipientAddress = result.value.tokenRecipientAddress.rawValue,
@@ -357,7 +369,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                                         txHash = result.transactionData.txHash?.value,
                                         from = result.transactionData.fromAddress?.rawValue,
                                         to = result.transactionData.toAddress.rawValue,
-                                        data = result.transactionData.data.value,
+                                        data = result.transactionData.data?.value,
+                                        value = null,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
@@ -401,6 +414,7 @@ class Erc20SendRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
+                value = null,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -428,7 +442,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                                     projectId = result.value.projectId,
                                     status = result.status,
                                     chainId = result.value.chainId.value,
-                                    tokenAddress = result.value.tokenAddress.rawValue,
+                                    tokenAddress = result.value.tokenAddress?.rawValue,
+                                    assetType = AssetType.TOKEN,
                                     amount = result.value.tokenAmount.rawValue,
                                     senderAddress = result.value.tokenSenderAddress?.rawValue,
                                     recipientAddress = result.value.tokenRecipientAddress.rawValue,
@@ -439,7 +454,8 @@ class Erc20SendRequestControllerTest : TestBase() {
                                         txHash = result.transactionData.txHash?.value,
                                         from = result.transactionData.fromAddress?.rawValue,
                                         to = result.transactionData.toAddress.rawValue,
-                                        data = result.transactionData.data.value,
+                                        data = result.transactionData.data?.value,
+                                        value = null,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),

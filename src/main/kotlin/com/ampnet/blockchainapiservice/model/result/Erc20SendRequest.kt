@@ -19,7 +19,7 @@ data class Erc20SendRequest(
     val projectId: UUID,
     val chainId: ChainId,
     val redirectUrl: String,
-    val tokenAddress: ContractAddress,
+    val tokenAddress: ContractAddress?,
     val tokenAmount: Balance,
     val tokenSenderAddress: WalletAddress?,
     val tokenRecipientAddress: WalletAddress,
@@ -30,7 +30,8 @@ data class Erc20SendRequest(
 ) {
     fun withTransactionData(
         status: Status,
-        data: FunctionData,
+        data: FunctionData?,
+        value: Balance?,
         transactionInfo: BlockchainTransactionInfo?
     ): WithTransactionData<Erc20SendRequest> =
         WithTransactionData(
@@ -39,8 +40,9 @@ data class Erc20SendRequest(
             transactionData = TransactionData(
                 txHash = this.txHash,
                 fromAddress = transactionInfo?.from,
-                toAddress = transactionInfo?.to ?: this.tokenAddress,
+                toAddress = transactionInfo?.to ?: this.tokenAddress ?: this.tokenRecipientAddress,
                 data = data,
+                value = value,
                 blockConfirmations = transactionInfo?.blockConfirmations,
                 timestamp = transactionInfo?.timestamp
             )

@@ -367,7 +367,7 @@ tasks.asciidoctor {
             "date" to SimpleDateFormat("yyyy-MM-dd").format(Date())
         )
     )
-    dependsOn(tasks["fullTest"])
+    //dependsOn(tasks["fullTest"])
 }
 
 tasks.register<Copy>("copyDocs") {
