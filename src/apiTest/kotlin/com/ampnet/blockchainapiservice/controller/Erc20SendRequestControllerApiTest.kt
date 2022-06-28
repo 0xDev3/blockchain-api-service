@@ -157,7 +157,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${response.id}",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id}/action",
                         sendTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -183,7 +183,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${response.id}",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id}/action",
                         tokenAddress = tokenAddress,
                         tokenAmount = amount,
                         tokenSenderAddress = senderAddress,
@@ -430,7 +430,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id}/action",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -545,7 +545,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id}/action",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -671,7 +671,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
+                                redirectUrl = PROJECT.baseRedirectUrl.value
+                                    + "/request-send/${createResponse.id}/action",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -909,7 +910,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
+                                redirectUrl = PROJECT.baseRedirectUrl.value
+                                    + "/request-send/${createResponse.id}/action",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -1147,7 +1149,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
+                                redirectUrl = PROJECT.baseRedirectUrl.value
+                                    + "/request-send/${createResponse.id}/action",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -1266,7 +1269,8 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = PROJECT.baseRedirectUrl.value + "/send/${createResponse.id}",
+                                redirectUrl = PROJECT.baseRedirectUrl.value
+                                    + "/request-send/${createResponse.id}/action",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,

@@ -33,8 +33,7 @@ data class StoreErc20SendRequestParams(
             id = id,
             projectId = project.id,
             chainId = project.chainId,
-            // TODO check path on FE
-            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/send/\${id}"))
+            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/request-send/\${id}/action"))
                 .replace("\${id}", id.toString()),
             tokenAddress = params.tokenAddress,
             tokenAmount = params.tokenAmount,

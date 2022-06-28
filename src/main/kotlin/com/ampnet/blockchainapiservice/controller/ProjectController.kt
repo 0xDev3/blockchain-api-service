@@ -24,7 +24,7 @@ import java.util.UUID
 @RestController
 class ProjectController(private val projectService: ProjectService) {
 
-    @PostMapping("/api/v1/projects")
+    @PostMapping("/v1/projects")
     fun createProject(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @RequestBody requestBody: CreateProjectRequest
@@ -41,7 +41,7 @@ class ProjectController(private val projectService: ProjectService) {
         return ResponseEntity.ok(ProjectResponse(project))
     }
 
-    @GetMapping("/api/v1/projects/{id}")
+    @GetMapping("/v1/projects/{id}")
     fun getById(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @PathVariable id: UUID
@@ -50,7 +50,7 @@ class ProjectController(private val projectService: ProjectService) {
         return ResponseEntity.ok(ProjectResponse(project))
     }
 
-    @GetMapping("/api/v1/projects/by-issuer/{issuerAddress}")
+    @GetMapping("/v1/projects/by-issuer/{issuerAddress}")
     fun getByIssuerAddress(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @PathVariable issuerAddress: String
@@ -59,13 +59,13 @@ class ProjectController(private val projectService: ProjectService) {
         return ResponseEntity.ok(ProjectResponse(project))
     }
 
-    @GetMapping("/api/v1/projects")
+    @GetMapping("/v1/projects")
     fun getAll(@UserIdentifierBinding userIdentifier: UserIdentifier): ResponseEntity<ProjectsResponse> {
         val projects = projectService.getAllProjectsForUser(userIdentifier)
         return ResponseEntity.ok(ProjectsResponse(projects.map { ProjectResponse(it) }))
     }
 
-    @GetMapping("/api/v1/projects/{id}/api-key")
+    @GetMapping("/v1/projects/{id}/api-key")
     fun getApiKey(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @PathVariable id: UUID
@@ -75,7 +75,7 @@ class ProjectController(private val projectService: ProjectService) {
         return ResponseEntity.ok(ApiKeyResponse(apiKey))
     }
 
-    @PostMapping("/api/v1/projects/{id}/api-key")
+    @PostMapping("/v1/projects/{id}/api-key")
     fun createApiKey(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @PathVariable id: UUID
