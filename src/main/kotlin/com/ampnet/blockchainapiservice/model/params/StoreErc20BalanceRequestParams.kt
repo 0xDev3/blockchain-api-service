@@ -15,7 +15,7 @@ data class StoreErc20BalanceRequestParams(
     val projectId: UUID,
     val chainId: ChainId,
     val redirectUrl: String,
-    val tokenAddress: ContractAddress,
+    val tokenAddress: ContractAddress?,
     val blockNumber: BlockNumber?,
     val requestedWalletAddress: WalletAddress?,
     val arbitraryData: JsonNode?,
