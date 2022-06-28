@@ -63,7 +63,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create project is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/projects")
+                MockMvcRequestBuilders.post("/v1/projects")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -151,7 +151,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch project is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/projects/${project.id}")
+                MockMvcRequestBuilders.get("/v1/projects/${project.id}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -180,7 +180,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonExistentProjectId() {
         verify("404 is returned for non-existent project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/projects/${UUID.randomUUID()}")
+                MockMvcRequestBuilders.get("/v1/projects/${UUID.randomUUID()}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -217,7 +217,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-existent project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/projects/${project.id}")
+                MockMvcRequestBuilders.get("/v1/projects/${project.id}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -254,7 +254,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch project is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/projects/by-issuer/${project.issuerContractAddress.rawValue}")
+                MockMvcRequestBuilders.get("/v1/projects/by-issuer/${project.issuerContractAddress.rawValue}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -283,7 +283,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonExistentProjectIssuerAddress() {
         verify("404 is returned for non-existent project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/projects/by-issuer/${ContractAddress("dead").rawValue}")
+                MockMvcRequestBuilders.get("/v1/projects/by-issuer/${ContractAddress("dead").rawValue}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -320,7 +320,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-existent project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/projects/by-issuer/${project.issuerContractAddress.rawValue}")
+                MockMvcRequestBuilders.get("/v1/projects/by-issuer/${project.issuerContractAddress.rawValue}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -367,7 +367,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch project is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/projects")
+                MockMvcRequestBuilders.get("/v1/projects")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -443,7 +443,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch API key is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.get("/v1/projects/${project.id}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -492,7 +492,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-existent project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/api/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.get("/v1/projects/${project.id}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -529,7 +529,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create API key is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.post("/v1/projects/${project.id}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -601,7 +601,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for project which already has API key") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.post("/v1/projects/${project.id}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
@@ -638,7 +638,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-owned project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/api/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.post("/v1/projects/${project.id}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()

@@ -163,7 +163,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${response.id}",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-lock/${response.id}/action",
                         lockTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -189,7 +189,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${response.id}",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-lock/${response.id}/action",
                         tokenAddress = tokenAddress,
                         tokenAmount = amount,
                         lockDuration = lockDuration,
@@ -451,7 +451,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${createResponse.id}",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-lock/${createResponse.id}/action",
                         lockTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -573,7 +573,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${createResponse.id}",
+                        redirectUrl = PROJECT.baseRedirectUrl.value
+                            + "/request-lock/${createResponse.id}/action",
                         lockTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -693,7 +694,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${createResponse.id}",
+                                redirectUrl = PROJECT.baseRedirectUrl.value
+                                    + "/request-lock/${createResponse.id}/action",
                                 lockTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -819,7 +821,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = PROJECT.baseRedirectUrl.value + "/lock/${createResponse.id}",
+                                redirectUrl = PROJECT.baseRedirectUrl.value
+                                    + "/request-lock/${createResponse.id}/action",
                                 lockTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,

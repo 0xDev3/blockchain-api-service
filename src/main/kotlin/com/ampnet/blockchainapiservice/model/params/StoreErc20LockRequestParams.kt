@@ -35,8 +35,7 @@ data class StoreErc20LockRequestParams(
             id = id,
             projectId = project.id,
             chainId = project.chainId,
-            // TODO check path on FE
-            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/lock/\${id}"))
+            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/request-lock/\${id}/action"))
                 .replace("\${id}", id.toString()),
             tokenAddress = params.tokenAddress,
             tokenAmount = params.tokenAmount,
