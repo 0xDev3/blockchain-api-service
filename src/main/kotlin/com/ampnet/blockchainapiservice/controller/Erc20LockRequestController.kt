@@ -1,8 +1,6 @@
 package com.ampnet.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
-import com.ampnet.blockchainapiservice.config.binding.annotation.RpcUrlBinding
 import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest
@@ -36,19 +34,17 @@ class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockR
 
     @GetMapping("/v1/lock/{id}")
     fun getErc20LockRequest(
-        @PathVariable("id") id: UUID,
-        @RpcUrlBinding rpcSpec: RpcUrlSpec
+        @PathVariable("id") id: UUID
     ): ResponseEntity<Erc20LockRequestResponse> {
-        val lockRequest = erc20LockRequestService.getErc20LockRequest(id, rpcSpec)
+        val lockRequest = erc20LockRequestService.getErc20LockRequest(id)
         return ResponseEntity.ok(Erc20LockRequestResponse(lockRequest))
     }
 
     @GetMapping("/v1/lock/by-project/{projectId}")
     fun getErc20LockRequestsByProjectId(
-        @PathVariable("projectId") projectId: UUID,
-        @RpcUrlBinding rpcSpec: RpcUrlSpec
+        @PathVariable("projectId") projectId: UUID
     ): ResponseEntity<Erc20LockRequestsResponse> {
-        val lockRequests = erc20LockRequestService.getErc20LockRequestsByProjectId(projectId, rpcSpec)
+        val lockRequests = erc20LockRequestService.getErc20LockRequestsByProjectId(projectId)
         return ResponseEntity.ok(Erc20LockRequestsResponse(lockRequests.map { Erc20LockRequestResponse(it) }))
     }
 

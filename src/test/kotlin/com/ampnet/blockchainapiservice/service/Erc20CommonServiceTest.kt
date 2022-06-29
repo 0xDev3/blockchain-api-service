@@ -5,7 +5,6 @@ import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.params.ParamsFactory
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
@@ -114,7 +113,7 @@ class Erc20CommonServiceTest : TestBase() {
     fun mustCorrectlyFetchTransactionInfoWhenTxHashIsNotNull() {
         val chainSpec = ChainSpec(
             chainId = Chain.HARDHAT_TESTNET.id,
-            rpcSpec = RpcUrlSpec("1", "2")
+            customRpcUrl = "custom-rpc-url"
         )
         val txHash = TransactionHash("tx-hash")
         val transactionInfo = BlockchainTransactionInfo(
@@ -145,7 +144,7 @@ class Erc20CommonServiceTest : TestBase() {
             val result = service.fetchTransactionInfo(
                 txHash = txHash,
                 chainId = chainSpec.chainId,
-                rpcSpec = chainSpec.rpcSpec
+                customRpcUrl = chainSpec.customRpcUrl
             )
 
             assertThat(result).withMessage()
@@ -165,7 +164,7 @@ class Erc20CommonServiceTest : TestBase() {
             val result = service.fetchTransactionInfo(
                 txHash = null,
                 chainId = Chain.HARDHAT_TESTNET.id,
-                rpcSpec = RpcUrlSpec(null, null)
+                customRpcUrl = null
             )
 
             assertThat(result).withMessage()

@@ -1,8 +1,6 @@
 package com.ampnet.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
-import com.ampnet.blockchainapiservice.config.binding.annotation.RpcUrlBinding
 import com.ampnet.blockchainapiservice.model.params.CreateErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachSignedMessageRequest
 import com.ampnet.blockchainapiservice.model.request.CreateErc20BalanceRequest
@@ -36,19 +34,17 @@ class Erc20BalanceRequestController(private val erc20BalanceRequestService: Erc2
 
     @GetMapping("/v1/balance/{id}")
     fun getErc20BalanceRequest(
-        @PathVariable("id") id: UUID,
-        @RpcUrlBinding rpcSpec: RpcUrlSpec
+        @PathVariable("id") id: UUID
     ): ResponseEntity<Erc20BalanceRequestResponse> {
-        val balanceRequest = erc20BalanceRequestService.getErc20BalanceRequest(id, rpcSpec)
+        val balanceRequest = erc20BalanceRequestService.getErc20BalanceRequest(id)
         return ResponseEntity.ok(Erc20BalanceRequestResponse(balanceRequest))
     }
 
     @GetMapping("/v1/balance/by-project/{projectId}")
     fun getErc20BalanceRequestsByProjectId(
-        @PathVariable("projectId") projectId: UUID,
-        @RpcUrlBinding rpcSpec: RpcUrlSpec
+        @PathVariable("projectId") projectId: UUID
     ): ResponseEntity<Erc20BalanceRequestsResponse> {
-        val balanceRequests = erc20BalanceRequestService.getErc20BalanceRequestsByProjectId(projectId, rpcSpec)
+        val balanceRequests = erc20BalanceRequestService.getErc20BalanceRequestsByProjectId(projectId)
         return ResponseEntity.ok(Erc20BalanceRequestsResponse(balanceRequests.map { Erc20BalanceRequestResponse(it) }))
     }
 
