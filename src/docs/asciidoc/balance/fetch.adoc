@@ -7,10 +7,6 @@ signed message is invalid or does not match specified `wallet_address`, request 
 `block_number` was specified during request creation, then ERC20 balance will be fetched only for that block number, and
 if `block_number` was not specified then the latest ERC20 balance will be fetched every time this resource is requested.
 
-Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
-specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC
-URL, use `X-RPC-URL-OVERRIDE` header.
-
 .Request Example
 [%collapsible]
 ====
