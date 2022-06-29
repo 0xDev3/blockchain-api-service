@@ -50,12 +50,17 @@ class ProjectController(private val projectService: ProjectService) {
         return ResponseEntity.ok(ProjectResponse(project))
     }
 
-    @GetMapping("/v1/projects/by-issuer/{issuerAddress}")
+    @GetMapping("/v1/projects/by-chain/{chainId}/by-issuer/{issuerAddress}")
     fun getByIssuerAddress(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
+        @PathVariable chainId: Long,
         @PathVariable issuerAddress: String
     ): ResponseEntity<ProjectResponse> {
-        val project = projectService.getProjectByIssuerAddress(userIdentifier, ContractAddress(issuerAddress))
+        val project = projectService.getProjectByIssuer(
+            userIdentifier = userIdentifier,
+            issuerContactAddress = ContractAddress(issuerAddress),
+            chainId = ChainId(chainId)
+        )
         return ResponseEntity.ok(ProjectResponse(project))
     }
 

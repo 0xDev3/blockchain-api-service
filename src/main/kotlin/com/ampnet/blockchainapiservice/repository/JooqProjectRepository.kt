@@ -1,12 +1,16 @@
 package com.ampnet.blockchainapiservice.repository
 
+import com.ampnet.blockchainapiservice.exception.DuplicateIssuerContractAddressException
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.model.result.Project
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
@@ -26,7 +30,13 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
             customRpcUrl = project.customRpcUrl,
             createdAt = project.createdAt
         )
-        dslContext.executeInsert(record)
+
+        try {
+            dslContext.executeInsert(record)
+        } catch (e: DuplicateKeyException) {
+            throw DuplicateIssuerContractAddressException(project.issuerContractAddress, project.chainId)
+        }
+
         return record.toModel()
     }
 
@@ -37,10 +47,15 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
             .fetchOne { it.toModel() }
     }
 
-    override fun getByIssuerContractAddress(issuerContractAddress: ContractAddress): Project? {
-        logger.debug { "Get project by issuerContractAddress: $issuerContractAddress" }
+    override fun getByIssuer(issuerContractAddress: ContractAddress, chainId: ChainId): Project? {
+        logger.debug { "Get project by issuerContractAddress: $issuerContractAddress, chainId: $chainId" }
         return dslContext.selectFrom(ProjectTable.PROJECT)
-            .where(ProjectTable.PROJECT.ISSUER_CONTRACT_ADDRESS.eq(issuerContractAddress))
+            .where(
+                DSL.and(
+                    ProjectTable.PROJECT.ISSUER_CONTRACT_ADDRESS.eq(issuerContractAddress),
+                    ProjectTable.PROJECT.CHAIN_ID.eq(chainId)
+                )
+            )
             .fetchOne { it.toModel() }
     }
 

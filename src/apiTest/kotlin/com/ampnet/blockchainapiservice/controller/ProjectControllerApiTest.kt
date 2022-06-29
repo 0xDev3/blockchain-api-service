@@ -228,7 +228,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
     @Test
     @WithMockUser
-    fun mustCorrectlyReturnProjectByIssuerAddress() {
+    fun mustCorrectlyReturnProjectByIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
             walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
@@ -254,7 +254,9 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch project is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/projects/by-issuer/${project.issuerContractAddress.rawValue}")
+                MockMvcRequestBuilders.get(
+                    "/v1/projects/by-chain/${project.chainId.value}/by-issuer/${project.issuerContractAddress.rawValue}"
+                )
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -280,10 +282,10 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
     @Test
     @WithMockUser
-    fun mustReturn404NotFoundForNonExistentProjectIssuerAddress() {
+    fun mustReturn404NotFoundForNonExistentProjectIssuer() {
         verify("404 is returned for non-existent project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/projects/by-issuer/${ContractAddress("dead").rawValue}")
+                MockMvcRequestBuilders.get("/v1/projects/by-chain/0/by-issuer/${ContractAddress("dead").rawValue}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -294,7 +296,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
     @Test
     @WithMockUser
-    fun mustReturn404NotFoundForNonOwnedProjectIssuerAddress() {
+    fun mustReturn404NotFoundForNonOwnedProjectIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
             walletAddress = WalletAddress("0cafe0babe")
@@ -320,7 +322,9 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-existent project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/projects/by-issuer/${project.issuerContractAddress.rawValue}")
+                MockMvcRequestBuilders.get(
+                    "/v1/projects/by-chain/${project.chainId.value}/by-issuer/${project.issuerContractAddress.rawValue}"
+                )
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
