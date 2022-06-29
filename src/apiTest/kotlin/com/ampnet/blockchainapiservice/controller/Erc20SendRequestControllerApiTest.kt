@@ -5,7 +5,6 @@ import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.SimpleERC20
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
-import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
@@ -27,6 +26,7 @@ import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.AssetType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
@@ -56,7 +56,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
             chainId = Chain.HARDHAT_TESTNET.id,
-            customRpcUrl = "custom-rpc-url",
+            customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
         private const val API_KEY = "api-key"
@@ -760,10 +760,14 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val senderAddress = WalletAddress(mainAccount.address)
         val recipientAddress = WalletAddress(accounts[1].address)
 
+        val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
+            insertProjectWithCustomRpcUrl()
+        }
+
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -804,13 +808,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch ERC20 send request is made") {
-            val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/send/${createResponse.id}")
-                    .header(
-                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
-                        "http://localhost:${hardhatContainer.mappedPort}"
-                    )
-            )
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/send/${createResponse.id}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -822,9 +820,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20SendRequestResponse(
                         id = createResponse.id,
-                        projectId = PROJECT_ID,
+                        projectId = projectId,
                         status = Status.FAILED,
-                        chainId = PROJECT.chainId.value,
+                        chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         assetType = AssetType.TOKEN,
                         amount = amount.rawValue,
@@ -970,10 +968,14 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val senderAddress = WalletAddress(mainAccount.address)
         val recipientAddress = WalletAddress("cafebabe")
 
+        val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
+            insertProjectWithCustomRpcUrl()
+        }
+
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1018,13 +1020,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch ERC20 send request is made") {
-            val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/send/${createResponse.id}")
-                    .header(
-                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
-                        "http://localhost:${hardhatContainer.mappedPort}"
-                    )
-            )
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/send/${createResponse.id}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -1036,9 +1032,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20SendRequestResponse(
                         id = createResponse.id,
-                        projectId = PROJECT_ID,
+                        projectId = projectId,
                         status = Status.SUCCESS,
-                        chainId = PROJECT.chainId.value,
+                        chainId = chainId.value,
                         tokenAddress = null,
                         assetType = AssetType.NATIVE,
                         amount = amount.rawValue,
@@ -1219,22 +1215,24 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             ).sendAndMine()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress(mainAccount.address)
         val recipientAddress = WalletAddress(accounts[1].address)
 
+        val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
+            insertProjectWithCustomRpcUrl()
+        }
+
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "asset_type": "TOKEN",
@@ -1272,13 +1270,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch ERC20 send requests by project ID is made") {
-            val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/send/by-project/${createResponse.projectId}")
-                    .header(
-                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
-                        "http://localhost:${hardhatContainer.mappedPort}"
-                    )
-            )
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/send/by-project/$projectId"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -1292,7 +1284,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
-                                projectId = PROJECT_ID,
+                                projectId = projectId,
                                 status = Status.FAILED,
                                 chainId = chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
@@ -1464,22 +1456,24 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             ).sendAndMine()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
         val redirectUrl = "https://example.com/\${id}"
         val tokenAddress = ContractAddress(contract.contractAddress)
         val amount = Balance(BigInteger.TEN)
         val senderAddress = WalletAddress(mainAccount.address)
         val recipientAddress = WalletAddress(accounts[1].address)
 
+        val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
+            insertProjectWithCustomRpcUrl()
+        }
+
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
                             {
-                                "chain_id": ${chainId.value},
                                 "redirect_url": "$redirectUrl",
                                 "token_address": "${tokenAddress.rawValue}",
                                 "asset_type": "TOKEN",
@@ -1519,10 +1513,6 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val fetchResponse = suppose("request to fetch ERC20 send requests by sender address is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/send/by-sender/${createResponse.senderAddress}")
-                    .header(
-                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
-                        "http://localhost:${hardhatContainer.mappedPort}"
-                    )
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1537,7 +1527,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
-                                projectId = PROJECT_ID,
+                                projectId = projectId,
                                 status = Status.FAILED,
                                 chainId = chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
@@ -1714,10 +1704,14 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val senderAddress = WalletAddress(mainAccount.address)
         val recipientAddress = WalletAddress(accounts[1].address)
 
+        val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
+            insertProjectWithCustomRpcUrl()
+        }
+
         val createResponse = suppose("request to create ERC20 send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1760,10 +1754,6 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
         val fetchResponse = suppose("request to fetch ERC20 send requests by recipient address is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/send/by-recipient/${createResponse.recipientAddress}")
-                    .header(
-                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
-                        "http://localhost:${hardhatContainer.mappedPort}"
-                    )
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1778,9 +1768,9 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
-                                projectId = PROJECT_ID,
+                                projectId = projectId,
                                 status = Status.FAILED,
-                                chainId = PROJECT.chainId.value,
+                                chainId = chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 assetType = AssetType.TOKEN,
                                 amount = amount.rawValue,
@@ -1923,5 +1913,35 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             assertThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
+    }
+
+    private fun insertProjectWithCustomRpcUrl(): Triple<UUID, ChainId, String> {
+        val projectId = UUID.randomUUID()
+        val chainId = ChainId(1337L)
+
+        dslContext.executeInsert(
+            ProjectRecord(
+                id = projectId,
+                ownerId = PROJECT.ownerId,
+                issuerContractAddress = ContractAddress("1"),
+                baseRedirectUrl = PROJECT.baseRedirectUrl,
+                chainId = chainId,
+                customRpcUrl = "http://localhost:${hardhatContainer.mappedPort}",
+                createdAt = PROJECT.createdAt
+            )
+        )
+
+        val apiKey = "another-api-key"
+
+        dslContext.executeInsert(
+            ApiKeyRecord(
+                id = UUID.randomUUID(),
+                projectId = projectId,
+                apiKey = apiKey,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+
+        return Triple(projectId, chainId, apiKey)
     }
 }

@@ -1,6 +1,5 @@
 package com.ampnet.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxInfoException
 import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20SendRequestParams
@@ -8,6 +7,7 @@ import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
+import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -28,7 +28,8 @@ import java.util.UUID
 class Erc20SendRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val erc20SendRequestRepository: Erc20SendRequestRepository,
-    private val erc20CommonService: Erc20CommonService
+    private val erc20CommonService: Erc20CommonService,
+    private val projectRepository: ProjectRepository
 ) : Erc20SendRequestService {
 
     companion object : KLogging()
@@ -49,39 +50,40 @@ class Erc20SendRequestServiceImpl(
         return WithFunctionDataOrEthValue(erc20SendRequest, data, ethValue)
     }
 
-    override fun getErc20SendRequest(id: UUID, rpcSpec: RpcUrlSpec): WithTransactionData<Erc20SendRequest> {
-        logger.debug { "Fetching ERC20 send request, id: $id, rpcSpec: $rpcSpec" }
+    override fun getErc20SendRequest(id: UUID): WithTransactionData<Erc20SendRequest> {
+        logger.debug { "Fetching ERC20 send request, id: $id" }
 
         val erc20SendRequest = erc20CommonService.fetchResource(
             erc20SendRequestRepository.getById(id),
             "ERC20 send request not found for ID: $id"
         )
+        val project = projectRepository.getById(erc20SendRequest.projectId)!!
 
-        return erc20SendRequest.appendTransactionData(rpcSpec)
+        return erc20SendRequest.appendTransactionData(project)
     }
 
-    override fun getErc20SendRequestsByProjectId(
-        projectId: UUID,
-        rpcSpec: RpcUrlSpec
-    ): List<WithTransactionData<Erc20SendRequest>> {
-        logger.debug { "Fetching ERC20 send requests for projectId: $projectId, rpcSpec: $rpcSpec" }
-        return erc20SendRequestRepository.getAllByProjectId(projectId).map { it.appendTransactionData(rpcSpec) }
+    override fun getErc20SendRequestsByProjectId(projectId: UUID): List<WithTransactionData<Erc20SendRequest>> {
+        logger.debug { "Fetching ERC20 send requests for projectId: $projectId" }
+        val project = projectRepository.getById(projectId)!!
+        return erc20SendRequestRepository.getAllByProjectId(projectId).map { it.appendTransactionData(project) }
     }
 
-    override fun getErc20SendRequestsBySender(
-        sender: WalletAddress,
-        rpcSpec: RpcUrlSpec
-    ): List<WithTransactionData<Erc20SendRequest>> {
-        logger.debug { "Fetching ERC20 send requests for sender: $sender, rpcSpec: $rpcSpec" }
-        return erc20SendRequestRepository.getBySender(sender).map { it.appendTransactionData(rpcSpec) }
+    override fun getErc20SendRequestsBySender(sender: WalletAddress): List<WithTransactionData<Erc20SendRequest>> {
+        logger.debug { "Fetching ERC20 send requests for sender: $sender" }
+        return erc20SendRequestRepository.getBySender(sender).map {
+            val project = projectRepository.getById(it.projectId)!!
+            it.appendTransactionData(project)
+        }
     }
 
     override fun getErc20SendRequestsByRecipient(
-        recipient: WalletAddress,
-        rpcSpec: RpcUrlSpec
+        recipient: WalletAddress
     ): List<WithTransactionData<Erc20SendRequest>> {
-        logger.debug { "Fetching ERC20 send requests for recipient: $recipient, rpcSpec: $rpcSpec" }
-        return erc20SendRequestRepository.getByRecipient(recipient).map { it.appendTransactionData(rpcSpec) }
+        logger.debug { "Fetching ERC20 send requests for recipient: $recipient" }
+        return erc20SendRequestRepository.getByRecipient(recipient).map {
+            val project = projectRepository.getById(it.projectId)!!
+            it.appendTransactionData(project)
+        }
     }
 
     override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
@@ -105,11 +107,11 @@ class Erc20SendRequestServiceImpl(
             additionalData = listOf(Utf8String(id.toString()))
         )
 
-    private fun Erc20SendRequest.appendTransactionData(rpcSpec: RpcUrlSpec): WithTransactionData<Erc20SendRequest> {
+    private fun Erc20SendRequest.appendTransactionData(project: Project): WithTransactionData<Erc20SendRequest> {
         val transactionInfo = erc20CommonService.fetchTransactionInfo(
             txHash = txHash,
             chainId = chainId,
-            rpcSpec = rpcSpec
+            customRpcUrl = project.customRpcUrl
         )
         val data = tokenAddress?.let { encodeFunctionData(tokenRecipientAddress, tokenAmount, id) }
         val status = determineStatus(transactionInfo, data)

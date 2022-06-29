@@ -5,7 +5,6 @@ import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.SimpleLockManager
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
-import com.ampnet.blockchainapiservice.config.binding.RpcUrlSpecResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
@@ -26,6 +25,7 @@ import com.ampnet.blockchainapiservice.repository.Erc20LockRequestRepository
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.DurationSeconds
 import com.ampnet.blockchainapiservice.util.Status
@@ -55,7 +55,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
             chainId = Chain.HARDHAT_TESTNET.id,
-            customRpcUrl = "custom-rpc-url",
+            customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
         private const val API_KEY = "api-key"
@@ -494,10 +494,14 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         val lockContractAddress = ContractAddress(lockContract.contractAddress)
         val senderAddress = WalletAddress(mainAccount.address)
 
+        val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
+            insertProjectWithCustomRpcUrl()
+        }
+
         val createResponse = suppose("request to create ERC20 lock request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/lock")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -544,13 +548,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch ERC20 lock request is made") {
-            val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/lock/${createResponse.id}")
-                    .header(
-                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
-                        "http://localhost:${hardhatContainer.mappedPort}"
-                    )
-            )
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/lock/${createResponse.id}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -562,9 +560,9 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = createResponse.id,
-                        projectId = PROJECT_ID,
+                        projectId = projectId,
                         status = Status.SUCCESS,
-                        chainId = PROJECT.chainId.value,
+                        chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
                         lockDurationInSeconds = lockDuration.rawValue,
@@ -742,10 +740,14 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         val lockContractAddress = ContractAddress(lockContract.contractAddress)
         val senderAddress = WalletAddress(mainAccount.address)
 
+        val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
+            insertProjectWithCustomRpcUrl()
+        }
+
         val createResponse = suppose("request to create ERC20 lock request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/lock")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -792,13 +794,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch ERC20 lock requests by project ID is made") {
-            val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/lock/by-project/${createResponse.projectId}")
-                    .header(
-                        RpcUrlSpecResolver.RPC_URL_OVERRIDE_HEADER,
-                        "http://localhost:${hardhatContainer.mappedPort}"
-                    )
-            )
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/lock/by-project/$projectId"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -812,9 +808,9 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             Erc20LockRequestResponse(
                                 id = createResponse.id,
-                                projectId = PROJECT_ID,
+                                projectId = projectId,
                                 status = Status.SUCCESS,
-                                chainId = PROJECT.chainId.value,
+                                chainId = chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 amount = amount.rawValue,
                                 lockDurationInSeconds = lockDuration.rawValue,
@@ -973,5 +969,35 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             assertThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
+    }
+
+    private fun insertProjectWithCustomRpcUrl(): Triple<UUID, ChainId, String> {
+        val projectId = UUID.randomUUID()
+        val chainId = ChainId(1337L)
+
+        dslContext.executeInsert(
+            ProjectRecord(
+                id = projectId,
+                ownerId = PROJECT.ownerId,
+                issuerContractAddress = ContractAddress("1"),
+                baseRedirectUrl = PROJECT.baseRedirectUrl,
+                chainId = chainId,
+                customRpcUrl = "http://localhost:${hardhatContainer.mappedPort}",
+                createdAt = PROJECT.createdAt
+            )
+        )
+
+        val apiKey = "another-api-key"
+
+        dslContext.executeInsert(
+            ApiKeyRecord(
+                id = UUID.randomUUID(),
+                projectId = projectId,
+                apiKey = apiKey,
+                createdAt = TestData.TIMESTAMP
+            )
+        )
+
+        return Triple(projectId, chainId, apiKey)
     }
 }

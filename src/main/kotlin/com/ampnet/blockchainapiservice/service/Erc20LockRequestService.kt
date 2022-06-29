@@ -1,6 +1,5 @@
 package com.ampnet.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
 import com.ampnet.blockchainapiservice.model.result.Project
@@ -16,12 +15,7 @@ interface Erc20LockRequestService {
         project: Project
     ): WithFunctionData<Erc20LockRequest>
 
-    fun getErc20LockRequest(id: UUID, rpcSpec: RpcUrlSpec): WithTransactionData<Erc20LockRequest>
-
-    fun getErc20LockRequestsByProjectId(
-        projectId: UUID,
-        rpcSpec: RpcUrlSpec
-    ): List<WithTransactionData<Erc20LockRequest>>
-
+    fun getErc20LockRequest(id: UUID): WithTransactionData<Erc20LockRequest>
+    fun getErc20LockRequestsByProjectId(projectId: UUID): List<WithTransactionData<Erc20LockRequest>>
     fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress)
 }
