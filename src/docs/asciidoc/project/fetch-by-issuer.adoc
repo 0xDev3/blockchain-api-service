@@ -1,16 +1,16 @@
-=== Fetch Project by Issuer Contact Address
-Fetches project by issuer contract address.
+=== Fetch Project by Chain ID and Issuer Contact Address
+Fetches project by chain ID and issuer contract address.
 
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/ProjectControllerApiTest/mustCorrectlyReturnProjectByIssuerAddress/http-request.adoc[]
+include::{snippets}/ProjectControllerApiTest/mustCorrectlyReturnProjectByIssuer/http-request.adoc[]
 ====
 
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/ProjectControllerApiTest/mustCorrectlyReturnProjectByIssuerAddress/http-response.adoc[]
+include::{snippets}/ProjectControllerApiTest/mustCorrectlyReturnProjectByIssuer/http-response.adoc[]
 ====
 .Response Schema
 include::{snippets}/com.ampnet.blockchainapiservice.model.response.ProjectResponse.adoc[]

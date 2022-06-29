@@ -2,6 +2,7 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
+import com.ampnet.blockchainapiservice.exception.DuplicateIssuerContractAddressException
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
@@ -18,6 +19,7 @@ import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
@@ -107,7 +109,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchProjectByIssuerContractAddress() {
+    fun mustCorrectlyFetchProjectByIssuer() {
         val id = UUID.randomUUID()
 
         suppose("some project is stored in database") {
@@ -125,7 +127,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         }
 
         verify("project is correctly fetched by issuer contract address") {
-            val result = repository.getByIssuerContractAddress(ISSUER_CONTRACT_ADDRESS)
+            val result = repository.getByIssuer(ISSUER_CONTRACT_ADDRESS, CHAIN_ID)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -145,7 +147,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentProjectByIssuerContractAddress() {
         verify("null is returned when fetching non-existent project") {
-            val result = repository.getByIssuerContractAddress(ContractAddress("dead"))
+            val result = repository.getByIssuer(ContractAddress("dead"), ChainId(0L))
 
             assertThat(result).withMessage()
                 .isNull()
@@ -214,6 +216,39 @@ class JooqProjectRepositoryIntegTest : TestBase() {
 
             assertThat(result).withMessage()
                 .isEqualTo(project)
+        }
+    }
+
+    @Test
+    fun mustThrowDuplicateIssuerContractAddressExceptionWhenStoringProjectWithDuplicateIssuerContractAddress() {
+        suppose("project is stored in database") {
+            repository.store(
+                Project(
+                    id = UUID.randomUUID(),
+                    ownerId = OWNER_ID,
+                    issuerContractAddress = ISSUER_CONTRACT_ADDRESS,
+                    baseRedirectUrl = BASE_REDIRECT_URL,
+                    chainId = CHAIN_ID,
+                    customRpcUrl = CUSTOM_RPC_URL,
+                    createdAt = TestData.TIMESTAMP
+                )
+            )
+        }
+
+        verify("storing project with duplicate issuer and chainId throws DuplicateIssuerContractAddressException") {
+            assertThrows<DuplicateIssuerContractAddressException>(message) {
+                repository.store(
+                    Project(
+                        id = UUID.randomUUID(),
+                        ownerId = OWNER_ID,
+                        issuerContractAddress = ISSUER_CONTRACT_ADDRESS,
+                        baseRedirectUrl = BASE_REDIRECT_URL,
+                        chainId = CHAIN_ID,
+                        customRpcUrl = CUSTOM_RPC_URL,
+                        createdAt = TestData.TIMESTAMP
+                    )
+                )
+            }
         }
     }
 }
