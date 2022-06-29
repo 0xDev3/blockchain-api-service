@@ -22,7 +22,7 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
             blockchainPropertiesMap.computeIfAbsent(chain.id) {
                 generateBlockchainProperties(chain)
             }
-        }else {
+        } else {
             throw UnsupportedChainIdException(chainSpec.chainId)
         }
     }
