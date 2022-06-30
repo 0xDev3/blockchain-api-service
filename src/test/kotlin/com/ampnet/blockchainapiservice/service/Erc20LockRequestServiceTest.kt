@@ -377,6 +377,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
             data = encodedData,
+            value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = false
@@ -465,6 +466,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = WalletAddress("dead"),
             data = encodedData,
+            value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -553,6 +555,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
             data = encodedData,
+            value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -641,6 +644,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = WalletAddress("dead"),
             to = lockRequest.lockContractAddress,
             data = encodedData,
+            value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -729,6 +733,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
             data = FunctionData("wrong-data"),
+            value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -817,6 +822,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = WalletAddress("0cafe0babe"),
             to = lockRequest.lockContractAddress,
             data = encodedData,
+            value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -905,6 +911,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
             data = encodedData,
+            value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -993,6 +1000,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
             data = encodedData,
+            value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true

@@ -15,7 +15,7 @@ data class StoreErc20SendRequestParams(
     val projectId: UUID,
     val chainId: ChainId,
     val redirectUrl: String,
-    val tokenAddress: ContractAddress,
+    val tokenAddress: ContractAddress?,
     val tokenAmount: Balance,
     val tokenSenderAddress: WalletAddress?,
     val tokenRecipientAddress: WalletAddress,
@@ -33,8 +33,7 @@ data class StoreErc20SendRequestParams(
             id = id,
             projectId = project.id,
             chainId = project.chainId,
-            // TODO check path on FE
-            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/send/\${id}"))
+            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/request-send/\${id}/action"))
                 .replace("\${id}", id.toString()),
             tokenAddress = params.tokenAddress,
             tokenAmount = params.tokenAmount,

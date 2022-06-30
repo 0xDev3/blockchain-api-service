@@ -111,6 +111,7 @@ enum class BlockName(private val web3BlockName: DefaultBlockParameterName) : Blo
 @JvmInline
 value class FunctionData private constructor(val value: String) {
     companion object {
+        val EMPTY = FunctionData("0x")
         operator fun invoke(value: String) = FunctionData(value.lowercase())
     }
 }

@@ -8,7 +8,8 @@ data class TransactionData(
     val txHash: TransactionHash?,
     val fromAddress: WalletAddress?,
     val toAddress: EthereumAddress,
-    val data: FunctionData,
+    val data: FunctionData?,
+    val value: Balance?,
     val blockConfirmations: BigInteger?,
     val timestamp: UtcDateTime?
 )

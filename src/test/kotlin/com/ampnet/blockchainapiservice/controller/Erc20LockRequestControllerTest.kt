@@ -125,6 +125,7 @@ class Erc20LockRequestControllerTest : TestBase() {
                                 from = result.tokenSenderAddress?.rawValue,
                                 to = result.tokenAddress.rawValue,
                                 data = data.value,
+                                value = null,
                                 blockConfirmations = null,
                                 timestamp = null
                             ),
@@ -166,6 +167,7 @@ class Erc20LockRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
+                value = null,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -204,7 +206,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                                 txHash = result.transactionData.txHash?.value,
                                 from = result.transactionData.fromAddress?.rawValue,
                                 to = result.transactionData.toAddress.rawValue,
-                                data = result.transactionData.data.value,
+                                data = result.transactionData.data?.value,
+                                value = null,
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = TestData.TIMESTAMP.value
                             ),
@@ -247,6 +250,7 @@ class Erc20LockRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
+                value = null,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -287,7 +291,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                                         txHash = result.transactionData.txHash?.value,
                                         from = result.transactionData.fromAddress?.rawValue,
                                         to = result.transactionData.toAddress.rawValue,
-                                        data = result.transactionData.data.value,
+                                        data = result.transactionData.data?.value,
+                                        value = null,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
