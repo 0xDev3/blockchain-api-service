@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.exception
 
 import com.ampnet.blockchainapiservice.util.ChainId
+import com.ampnet.blockchainapiservice.util.ContractAddress
 import org.springframework.http.HttpStatus
 import java.util.UUID
 
@@ -111,5 +112,15 @@ class TokenAddressNotAllowedException : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = -2512631824095658324L
+    }
+}
+
+class DuplicateIssuerContractAddressException(issuer: ContractAddress, chainId: ChainId) : ServiceException(
+    errorCode = ErrorCode.DUPLICATE_ISSUER_CONTRACT_ADDRESS_FOR_CHAIN_ID,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Issuer address ${issuer.rawValue} is already assigned to a project with chain ID: ${chainId.value}"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -344230356993636309L
     }
 }

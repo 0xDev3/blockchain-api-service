@@ -135,14 +135,18 @@ class ProjectControllerTest : TestBase() {
         val service = mock<ProjectService>()
 
         suppose("project will be returned") {
-            given(service.getProjectByIssuerAddress(userIdentifier, result.issuerContractAddress))
+            given(service.getProjectByIssuer(userIdentifier, result.issuerContractAddress, result.chainId))
                 .willReturn(result)
         }
 
         val controller = ProjectController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getByIssuerAddress(userIdentifier, result.issuerContractAddress.rawValue)
+            val response = controller.getByIssuerAddress(
+                userIdentifier = userIdentifier,
+                chainId = result.chainId.value,
+                issuerAddress = result.issuerContractAddress.rawValue
+            )
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 

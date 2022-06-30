@@ -7,6 +7,7 @@ import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.model.result.UserIdentifier
 import com.ampnet.blockchainapiservice.repository.ApiKeyRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -53,15 +54,17 @@ class ProjectServiceImpl(
             ?: throw ResourceNotFoundException("Project not found for ID: $id")
     }
 
-    override fun getProjectByIssuerAddress(
+    override fun getProjectByIssuer(
         userIdentifier: UserIdentifier,
-        issuerContactAddress: ContractAddress
+        issuerContactAddress: ContractAddress,
+        chainId: ChainId
     ): Project {
         logger.debug {
-            "Fetching project by issuer, userIdentifier: $userIdentifier, issuerContractAddress: $issuerContactAddress"
+            "Fetching project by issuer, userIdentifier: $userIdentifier," +
+                " issuerContractAddress: $issuerContactAddress, chainId: $chainId"
         }
 
-        return projectRepository.getByIssuerContractAddress(issuerContactAddress)
+        return projectRepository.getByIssuer(issuerContactAddress, chainId)
             ?.takeIf { it.ownerId == userIdentifier.id }
             ?: throw ResourceNotFoundException("Project not found for issuer contract address: $issuerContactAddress")
     }
