@@ -1,6 +1,6 @@
 package com.ampnet.blockchainapiservice.util
 
-data class Erc20Balance(
+data class AccountBalance(
     val wallet: WalletAddress,
     val blockNumber: BlockNumber,
     val timestamp: UtcDateTime,

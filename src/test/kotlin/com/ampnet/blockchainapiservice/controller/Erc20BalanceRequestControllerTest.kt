@@ -16,12 +16,13 @@ import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.Erc20BalanceRequestService
+import com.ampnet.blockchainapiservice.util.AccountBalance
+import com.ampnet.blockchainapiservice.util.AssetType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.BlockNumber
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.Erc20Balance
 import com.ampnet.blockchainapiservice.util.SignedMessage
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.UtcDateTime
@@ -86,7 +87,8 @@ class Erc20BalanceRequestControllerTest : TestBase() {
         verify("controller returns correct response") {
             val request = CreateErc20BalanceRequest(
                 redirectUrl = params.redirectUrl,
-                tokenAddress = params.tokenAddress.rawValue,
+                tokenAddress = params.tokenAddress?.rawValue,
+                assetType = AssetType.TOKEN,
                 blockNumber = params.blockNumber?.value,
                 walletAddress = params.requestedWalletAddress?.rawValue,
                 arbitraryData = params.arbitraryData,
@@ -106,7 +108,8 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                             status = Status.PENDING,
                             chainId = result.chainId.value,
                             redirectUrl = result.redirectUrl,
-                            tokenAddress = result.tokenAddress.rawValue,
+                            tokenAddress = result.tokenAddress?.rawValue,
+                            assetType = AssetType.TOKEN,
                             blockNumber = result.blockNumber?.value,
                             walletAddress = result.requestedWalletAddress?.rawValue,
                             arbitraryData = result.arbitraryData,
@@ -140,7 +143,7 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
             ),
-            balance = Erc20Balance(
+            balance = AccountBalance(
                 wallet = WalletAddress("def"),
                 blockNumber = BlockNumber(BigInteger.TEN),
                 timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -172,7 +175,8 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                             status = result.status,
                             chainId = result.chainId.value,
                             redirectUrl = result.redirectUrl,
-                            tokenAddress = result.tokenAddress.rawValue,
+                            tokenAddress = result.tokenAddress?.rawValue,
+                            assetType = AssetType.TOKEN,
                             blockNumber = result.blockNumber?.value,
                             walletAddress = result.requestedWalletAddress?.rawValue,
                             arbitraryData = result.arbitraryData,
@@ -214,7 +218,7 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                 beforeActionMessage = "before-action-message",
                 afterActionMessage = "after-action-message"
             ),
-            balance = Erc20Balance(
+            balance = AccountBalance(
                 wallet = WalletAddress("def"),
                 blockNumber = BlockNumber(BigInteger.TEN),
                 timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -248,7 +252,8 @@ class Erc20BalanceRequestControllerTest : TestBase() {
                                     status = result.status,
                                     chainId = result.chainId.value,
                                     redirectUrl = result.redirectUrl,
-                                    tokenAddress = result.tokenAddress.rawValue,
+                                    tokenAddress = result.tokenAddress?.rawValue,
+                                    assetType = AssetType.TOKEN,
                                     blockNumber = result.blockNumber?.value,
                                     walletAddress = result.requestedWalletAddress?.rawValue,
                                     arbitraryData = result.arbitraryData,

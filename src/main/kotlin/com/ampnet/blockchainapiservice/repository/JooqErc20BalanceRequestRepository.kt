@@ -79,7 +79,7 @@ class JooqErc20BalanceRequestRepository(private val dslContext: DSLContext) : Er
             projectId = projectId!!,
             chainId = chainId!!,
             redirectUrl = redirectUrl!!,
-            tokenAddress = tokenAddress!!,
+            tokenAddress = tokenAddress,
             blockNumber = blockNumber,
             requestedWalletAddress = requestedWalletAddress,
             actualWalletAddress = actualWalletAddress,

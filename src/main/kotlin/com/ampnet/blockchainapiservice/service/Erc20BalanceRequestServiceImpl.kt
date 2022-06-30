@@ -10,8 +10,8 @@ import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20BalanceRequestRepository
+import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.BlockName
-import com.ampnet.blockchainapiservice.util.Erc20Balance
 import com.ampnet.blockchainapiservice.util.SignedMessage
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -78,17 +78,7 @@ class Erc20BalanceRequestServiceImpl(
     }
 
     private fun Erc20BalanceRequest.appendBalanceData(rpcSpec: RpcUrlSpec): FullErc20BalanceRequest {
-        val balance = actualWalletAddress?.let {
-            blockchainService.fetchErc20AccountBalance(
-                chainSpec = ChainSpec(
-                    chainId = chainId,
-                    rpcSpec = rpcSpec
-                ),
-                contractAddress = tokenAddress,
-                walletAddress = it,
-                blockParameter = blockNumber ?: BlockName.LATEST
-            )
-        }
+        val balance = actualWalletAddress?.let { fetchBalance(it, rpcSpec) }
         val status = determineStatus(balance)
 
         return FullErc20BalanceRequest.fromErc20BalanceRequest(
@@ -98,7 +88,29 @@ class Erc20BalanceRequestServiceImpl(
         )
     }
 
-    private fun Erc20BalanceRequest.determineStatus(balance: Erc20Balance?): Status =
+    private fun Erc20BalanceRequest.fetchBalance(walletAddress: WalletAddress, rpcSpec: RpcUrlSpec): AccountBalance {
+        val chainSpec = ChainSpec(
+            chainId = chainId,
+            rpcSpec = rpcSpec
+        )
+
+        return if (tokenAddress != null) {
+            blockchainService.fetchErc20AccountBalance(
+                chainSpec = chainSpec,
+                contractAddress = tokenAddress,
+                walletAddress = walletAddress,
+                blockParameter = blockNumber ?: BlockName.LATEST
+            )
+        } else {
+            blockchainService.fetchAccountBalance(
+                chainSpec = chainSpec,
+                walletAddress = walletAddress,
+                blockParameter = blockNumber ?: BlockName.LATEST
+            )
+        }
+    }
+
+    private fun Erc20BalanceRequest.determineStatus(balance: AccountBalance?): Status =
         if (balance == null || this.signedMessage == null) {
             Status.PENDING
         } else if (isSuccess()) {
