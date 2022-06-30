@@ -34,6 +34,12 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
             Chain.ETHEREUM_MAIN.id -> applicationProperties.chainEthereum
             Chain.GOERLI_TESTNET.id -> applicationProperties.chainGoerli
             Chain.HARDHAT_TESTNET.id -> applicationProperties.chainHardhatTestnet
+            Chain.BSC.id -> applicationProperties.chainBsc
+            Chain.XDAI.id -> applicationProperties.chainXdai
+            Chain.FANTOM.id -> applicationProperties.chainFantom
+            Chain.MOONRIVER.id -> applicationProperties.chainMoonriver
+            Chain.AVAX.id -> applicationProperties.chainAvalanche
+            Chain.AURORA.id -> applicationProperties.chainAurora
             else -> null
         }
     }
