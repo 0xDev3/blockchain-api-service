@@ -10,6 +10,7 @@ import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import com.ampnet.blockchainapiservice.repository.ApiKeyRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.BaseUrl
+import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -204,7 +205,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by issuer address") {
-            given(projectRepository.getByIssuerContractAddress(project.issuerContractAddress))
+            given(projectRepository.getByIssuer(project.issuerContractAddress, project.chainId))
                 .willReturn(project)
         }
 
@@ -222,7 +223,8 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("project is fetched from database by issuer address") {
-            assertThat(service.getProjectByIssuerAddress(userIdentifier, project.issuerContractAddress)).withMessage()
+            assertThat(service.getProjectByIssuer(userIdentifier, project.issuerContractAddress, project.chainId))
+                .withMessage()
                 .isEqualTo(project)
         }
     }
@@ -231,9 +233,10 @@ class ProjectServiceTest : TestBase() {
     fun mustThrowResourceNotFoundExceptionWhenFetchingNonExistentProjectByIssuerAddress() {
         val projectRepository = mock<ProjectRepository>()
         val issuerAddress = ContractAddress("dead")
+        val chainId = ChainId(1337L)
 
         suppose("null will be returned for project issuer address") {
-            given(projectRepository.getByIssuerContractAddress(issuerAddress))
+            given(projectRepository.getByIssuer(issuerAddress, chainId))
                 .willReturn(null)
         }
 
@@ -252,7 +255,7 @@ class ProjectServiceTest : TestBase() {
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
-                service.getProjectByIssuerAddress(userIdentifier, issuerAddress)
+                service.getProjectByIssuer(userIdentifier, issuerAddress, chainId)
             }
         }
     }
@@ -271,7 +274,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by issuer address") {
-            given(projectRepository.getByIssuerContractAddress(project.issuerContractAddress))
+            given(projectRepository.getByIssuer(project.issuerContractAddress, project.chainId))
                 .willReturn(project)
         }
 
@@ -290,7 +293,7 @@ class ProjectServiceTest : TestBase() {
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
-                service.getProjectByIssuerAddress(userIdentifier, project.issuerContractAddress)
+                service.getProjectByIssuer(userIdentifier, project.issuerContractAddress, project.chainId)
             }
         }
     }
