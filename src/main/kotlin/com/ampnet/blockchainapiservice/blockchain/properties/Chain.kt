@@ -28,6 +28,36 @@ enum class Chain(val id: ChainId, val rpcUrl: String, val infura: String?) {
         ChainId(31337),
         "http://hardhat:8545",
         "http://localhost:" // used in tests to inject HARDHAT_PORT via infuraId
+    ),
+    BSC(
+        ChainId(56),
+        "https://bsc-dataseed.binance.org/",
+        null
+    ),
+    XDAI(
+        ChainId(100),
+        "https://rpc.xdaichain.com/ ",
+        null
+    ),
+    FANTOM(
+        ChainId(250),
+        "https://rpc.ftm.tools/",
+        null
+    ),
+    MOONRIVER(
+        ChainId(1285),
+        "https://rpc.moonriver.moonbeam.network/",
+        null
+    ),
+    AVAX(
+        ChainId(43114),
+        "https://api.avax.network/ext/bc/C/rpc",
+        null
+    ),
+    AURORA(
+        ChainId(1313161554),
+        "https://mainnet.aurora.dev/",
+        null
     );
 
     companion object {
