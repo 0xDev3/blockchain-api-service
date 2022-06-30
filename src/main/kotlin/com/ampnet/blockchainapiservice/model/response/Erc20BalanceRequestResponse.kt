@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.model.response
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
+import com.ampnet.blockchainapiservice.util.AssetType
 import com.ampnet.blockchainapiservice.util.Status
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -17,7 +18,8 @@ data class Erc20BalanceRequestResponse(
     val status: Status,
     val chainId: Long,
     val redirectUrl: String,
-    val tokenAddress: String,
+    val tokenAddress: String?,
+    val assetType: AssetType,
     @JsonSerialize(using = ToStringSerializer::class)
     val blockNumber: BigInteger?,
     val walletAddress: String?,
@@ -34,7 +36,8 @@ data class Erc20BalanceRequestResponse(
         status = Status.PENDING,
         chainId = balanceRequest.chainId.value,
         redirectUrl = balanceRequest.redirectUrl,
-        tokenAddress = balanceRequest.tokenAddress.rawValue,
+        tokenAddress = balanceRequest.tokenAddress?.rawValue,
+        assetType = if (balanceRequest.tokenAddress != null) AssetType.TOKEN else AssetType.NATIVE,
         blockNumber = balanceRequest.blockNumber?.value,
         walletAddress = balanceRequest.requestedWalletAddress?.rawValue,
         arbitraryData = balanceRequest.arbitraryData,
@@ -51,7 +54,8 @@ data class Erc20BalanceRequestResponse(
         status = balanceRequest.status,
         chainId = balanceRequest.chainId.value,
         redirectUrl = balanceRequest.redirectUrl,
-        tokenAddress = balanceRequest.tokenAddress.rawValue,
+        tokenAddress = balanceRequest.tokenAddress?.rawValue,
+        assetType = if (balanceRequest.tokenAddress != null) AssetType.TOKEN else AssetType.NATIVE,
         blockNumber = balanceRequest.blockNumber?.value,
         walletAddress = balanceRequest.requestedWalletAddress?.rawValue,
         arbitraryData = balanceRequest.arbitraryData,

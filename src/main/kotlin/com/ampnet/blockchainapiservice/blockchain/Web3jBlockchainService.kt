@@ -5,11 +5,11 @@ import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
+import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
 import com.ampnet.blockchainapiservice.util.BlockParameter
 import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.Erc20Balance
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.UtcDateTime
@@ -32,13 +32,33 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
     companion object : KLogging()
 
     private val chainHandler = ChainPropertiesHandler(applicationProperties)
+    override fun fetchAccountBalance(
+        chainSpec: ChainSpec,
+        walletAddress: WalletAddress,
+        blockParameter: BlockParameter
+    ): AccountBalance {
+        logger.debug {
+            "Fetching account balance, chainSpec: $chainSpec, walletAddress: $walletAddress," +
+                " blockParameter: $blockParameter"
+        }
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
+        val ethBlock = blockchainProperties.web3j.ethGetBlockByNumber(blockParameter.toWeb3Parameter(), false)
+            .send().block
+        val blockNumber = BlockNumber(ethBlock.number)
+        val timestamp = UtcDateTime.ofEpochSeconds(ethBlock.timestamp.longValueExact())
+        val balance = blockchainProperties.web3j.ethGetBalance(walletAddress.rawValue, blockNumber.toWeb3Parameter())
+            .sendSafely()?.balance?.let { Balance(it) }
+            ?: throw BlockchainReadException("Unable to read balance of address: ${walletAddress.rawValue}")
+
+        return AccountBalance(walletAddress, blockNumber, timestamp, balance)
+    }
 
     override fun fetchErc20AccountBalance(
         chainSpec: ChainSpec,
         contractAddress: ContractAddress,
         walletAddress: WalletAddress,
         blockParameter: BlockParameter
-    ): Erc20Balance {
+    ): AccountBalance {
         logger.debug {
             "Fetching ERC20 balance, chainSpec: $chainSpec, contractAddress: $contractAddress," +
                 " walletAddress: $walletAddress, blockParameter: $blockParameter"
@@ -59,7 +79,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
         contract.setDefaultBlockParameter(blockNumber.toWeb3Parameter())
 
         return contract.balanceOf(walletAddress.rawValue).sendSafely()
-            ?.let { Erc20Balance(walletAddress, blockNumber, timestamp, Balance(it)) }
+            ?.let { AccountBalance(walletAddress, blockNumber, timestamp, Balance(it)) }
             ?: throw BlockchainReadException(
                 "Unable to read ERC20 contract at address: ${contractAddress.rawValue}" +
                     " on chain ID: ${chainSpec.chainId.value}"

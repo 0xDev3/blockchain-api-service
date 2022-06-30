@@ -1,10 +1,10 @@
 package com.ampnet.blockchainapiservice.model.result
 
 import com.ampnet.blockchainapiservice.model.ScreenConfig
+import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.BlockNumber
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.Erc20Balance
 import com.ampnet.blockchainapiservice.util.SignedMessage
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.UtcDateTime
@@ -18,12 +18,12 @@ data class FullErc20BalanceRequest(
     val status: Status,
     val chainId: ChainId,
     val redirectUrl: String,
-    val tokenAddress: ContractAddress,
+    val tokenAddress: ContractAddress?,
     val blockNumber: BlockNumber?,
     val requestedWalletAddress: WalletAddress?,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig,
-    val balance: Erc20Balance?,
+    val balance: AccountBalance?,
     val messageToSign: String,
     val signedMessage: SignedMessage?,
     val createdAt: UtcDateTime
@@ -32,7 +32,7 @@ data class FullErc20BalanceRequest(
         fun fromErc20BalanceRequest(
             request: Erc20BalanceRequest,
             status: Status,
-            balance: Erc20Balance?
+            balance: AccountBalance?
         ) = FullErc20BalanceRequest(
             id = request.id,
             projectId = request.projectId,

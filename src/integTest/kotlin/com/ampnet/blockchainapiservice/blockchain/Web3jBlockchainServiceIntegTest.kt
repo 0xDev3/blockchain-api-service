@@ -10,11 +10,11 @@ import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.service.EthereumFunctionEncoderService
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
+import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.Erc20Balance
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
@@ -48,9 +48,130 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchAccountBalanceForLatestBlock() {
+        val mainAccount = accounts[0]
+        val value = Convert.toWei(BigDecimal.ONE, Convert.Unit.ETHER)
+        val accountBalance = AccountBalance(
+            wallet = WalletAddress("cafebabe"),
+            blockNumber = BlockNumber(BigInteger.ZERO),
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(value.toBigInteger())
+        )
+
+        suppose("some regular transfer transaction is made") {
+            Transfer.sendFunds(
+                hardhatContainer.web3j,
+                mainAccount,
+                accountBalance.wallet.rawValue,
+                value,
+                Convert.Unit.WEI
+            ).sendAndMine()
+        }
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.waitAndMine()
+        }
+
+        verify("correct account balance is fetched for latest block") {
+            val service = Web3jBlockchainService(hardhatProperties())
+            val fetchedAccountBalance = service.fetchAccountBalance(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                walletAddress = accountBalance.wallet
+            )
+
+            assertThat(fetchedAccountBalance).withMessage()
+                .isEqualTo(
+                    accountBalance.copy(
+                        blockNumber = fetchedAccountBalance.blockNumber,
+                        timestamp = fetchedAccountBalance.timestamp
+                    )
+                )
+            assertThat(fetchedAccountBalance.blockNumber.value)
+                .isPositive()
+            assertThat(fetchedAccountBalance.timestamp.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchAccountBalanceForSpecifiedBlockNumber() {
+        val mainAccount = accounts[0]
+        val value = Convert.toWei(BigDecimal.ONE, Convert.Unit.ETHER)
+        val accountBalance = AccountBalance(
+            wallet = WalletAddress("cafebabe"),
+            blockNumber = BlockNumber(BigInteger.ZERO),
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(value.toBigInteger())
+        )
+
+        suppose("some regular transfer transaction is made") {
+            Transfer.sendFunds(
+                hardhatContainer.web3j,
+                mainAccount,
+                accountBalance.wallet.rawValue,
+                value,
+                Convert.Unit.WEI
+            ).sendAndMine()
+        }
+
+        val blockNumberBeforeSendingBalance = hardhatContainer.blockNumber()
+
+        suppose("some regular transfer transaction is made") {
+            Transfer.sendFunds(
+                hardhatContainer.web3j,
+                mainAccount,
+                accountBalance.wallet.rawValue,
+                value,
+                Convert.Unit.WEI
+            ).sendAndMine()
+        }
+
+        val service = Web3jBlockchainService(hardhatProperties())
+
+        verify("correct ETH balance is fetched for block number before ETH transfer is made") {
+            val fetchedAccountBalance = service.fetchAccountBalance(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                walletAddress = accountBalance.wallet,
+                blockParameter = blockNumberBeforeSendingBalance
+            )
+
+            assertThat(fetchedAccountBalance).withMessage()
+                .isEqualTo(
+                    accountBalance.copy(
+                        blockNumber = blockNumberBeforeSendingBalance,
+                        timestamp = fetchedAccountBalance.timestamp
+                    )
+                )
+            assertThat(fetchedAccountBalance.timestamp.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+
+        val blockNumberAfterSendingBalance = hardhatContainer.blockNumber()
+
+        verify("correct ETH balance is fetched for block number after ETH transfer is made") {
+            val fetchedAccountBalance = service.fetchAccountBalance(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                walletAddress = accountBalance.wallet,
+                blockParameter = blockNumberAfterSendingBalance
+            )
+
+            assertThat(fetchedAccountBalance).withMessage()
+                .isEqualTo(
+                    accountBalance.copy(
+                        amount = Balance(value.toBigInteger().multiply(BigInteger.TWO)),
+                        blockNumber = blockNumberAfterSendingBalance,
+                        timestamp = fetchedAccountBalance.timestamp
+                    )
+                )
+            assertThat(fetchedAccountBalance.timestamp.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
     fun mustCorrectlyFetchErc20BalanceForLatestBlock() {
         val mainAccount = accounts[0]
-        val accountBalance = Erc20Balance(
+        val accountBalance = AccountBalance(
             wallet = WalletAddress(mainAccount.address),
             blockNumber = BlockNumber(BigInteger.ZERO),
             timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -93,7 +214,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchErc20BalanceForSpecifiedBlockNumber() {
         val mainAccount = accounts[0]
-        val accountBalance = Erc20Balance(
+        val accountBalance = AccountBalance(
             wallet = WalletAddress(mainAccount.address),
             blockNumber = BlockNumber(BigInteger.ZERO),
             timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -179,7 +300,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchContractTransactionInfoForSuccessfulTransaction() {
         val mainAccount = accounts[0]
-        val accountBalance = Erc20Balance(
+        val accountBalance = AccountBalance(
             wallet = WalletAddress(mainAccount.address),
             blockNumber = BlockNumber(BigInteger.ZERO),
             timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -251,7 +372,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchContractTransactionInfoForFailedTransaction() {
         val mainAccount = accounts[0]
-        val accountBalance = Erc20Balance(
+        val accountBalance = AccountBalance(
             wallet = WalletAddress(mainAccount.address),
             blockNumber = BlockNumber(BigInteger.ZERO),
             timestamp = UtcDateTime.ofEpochSeconds(0L),

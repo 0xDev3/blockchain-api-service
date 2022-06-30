@@ -14,13 +14,13 @@ URL, use `X-RPC-URL-OVERRIDE` header.
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequest/http-request.adoc[]
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequestForSomeToken/http-request.adoc[]
 ====
 
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequest/http-response.adoc[]
+include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequestForSomeToken/http-response.adoc[]
 ====
 .Response Schema
 include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse.adoc[]

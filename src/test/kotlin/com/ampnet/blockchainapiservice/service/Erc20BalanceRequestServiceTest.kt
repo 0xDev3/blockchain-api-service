@@ -15,12 +15,12 @@ import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20BalanceRequestRepository
+import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.BlockNumber
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.Erc20Balance
 import com.ampnet.blockchainapiservice.util.SignedMessage
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.UtcDateTime
@@ -251,7 +251,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val rpcSpec = RpcUrlSpec(null, null)
-        val balance = Erc20Balance(
+        val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
             timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -266,7 +266,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         chainId = erc20BalanceRequest.chainId,
                         rpcSpec = rpcSpec
                     ),
-                    contractAddress = erc20BalanceRequest.tokenAddress,
+                    contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
                     blockParameter = erc20BalanceRequest.blockNumber!!
                 )
@@ -337,7 +337,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val rpcSpec = RpcUrlSpec(null, null)
-        val balance = Erc20Balance(
+        val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
             timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -352,7 +352,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         chainId = erc20BalanceRequest.chainId,
                         rpcSpec = rpcSpec
                     ),
-                    contractAddress = erc20BalanceRequest.tokenAddress,
+                    contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
                     blockParameter = erc20BalanceRequest.blockNumber!!
                 )
@@ -423,7 +423,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val rpcSpec = RpcUrlSpec(null, null)
-        val balance = Erc20Balance(
+        val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
             timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -438,7 +438,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         chainId = erc20BalanceRequest.chainId,
                         rpcSpec = rpcSpec
                     ),
-                    contractAddress = erc20BalanceRequest.tokenAddress,
+                    contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
                     blockParameter = erc20BalanceRequest.blockNumber!!
                 )
@@ -521,7 +521,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val rpcSpec = RpcUrlSpec(null, null)
-        val balance = Erc20Balance(
+        val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
             timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -536,7 +536,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         chainId = erc20BalanceRequest.chainId,
                         rpcSpec = rpcSpec
                     ),
-                    contractAddress = erc20BalanceRequest.tokenAddress,
+                    contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
                     blockParameter = erc20BalanceRequest.blockNumber!!
                 )
@@ -619,7 +619,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val rpcSpec = RpcUrlSpec(null, null)
-        val balance = Erc20Balance(
+        val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
             timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -634,7 +634,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         chainId = erc20BalanceRequest.chainId,
                         rpcSpec = rpcSpec
                     ),
-                    contractAddress = erc20BalanceRequest.tokenAddress,
+                    contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
                     blockParameter = erc20BalanceRequest.blockNumber!!
                 )
@@ -690,6 +690,200 @@ class Erc20BalanceRequestServiceTest : TestBase() {
     }
 
     @Test
+    fun mustReturnErc20BalanceRequestWithSuccessfulStatusWhenRequestedWalletAddressIsNullForNativeToken() {
+        val uuid = UUID.randomUUID()
+        val erc20BalanceRequest = Erc20BalanceRequest(
+            id = uuid,
+            projectId = UUID.randomUUID(),
+            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            redirectUrl = "redirect-url/$uuid",
+            tokenAddress = null,
+            blockNumber = BlockNumber(BigInteger.TEN),
+            requestedWalletAddress = null,
+            actualWalletAddress = WalletAddress("def"),
+            signedMessage = SignedMessage("signed-message"),
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
+            ),
+            createdAt = TestData.TIMESTAMP
+        )
+        val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
+
+        suppose("ERC20 balance request is returned from database") {
+            given(erc20BalanceRequestRepository.getById(uuid))
+                .willReturn(erc20BalanceRequest)
+        }
+
+        val rpcSpec = RpcUrlSpec(null, null)
+        val balance = AccountBalance(
+            wallet = erc20BalanceRequest.actualWalletAddress!!,
+            blockNumber = erc20BalanceRequest.blockNumber!!,
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(BigInteger.ONE)
+        )
+        val blockchainService = mock<BlockchainService>()
+
+        suppose("blockchain service will return some ERC20 balance") {
+            given(
+                blockchainService.fetchAccountBalance(
+                    chainSpec = ChainSpec(
+                        chainId = erc20BalanceRequest.chainId,
+                        rpcSpec = rpcSpec
+                    ),
+                    walletAddress = erc20BalanceRequest.actualWalletAddress!!,
+                    blockParameter = erc20BalanceRequest.blockNumber!!
+                )
+            ).willReturn(balance)
+        }
+
+        val signatureCheckerService = mock<SignatureCheckerService>()
+
+        suppose("signature checker will return true") {
+            given(
+                signatureCheckerService.signatureMatches(
+                    message = erc20BalanceRequest.messageToSign,
+                    signedMessage = erc20BalanceRequest.signedMessage!!,
+                    signer = erc20BalanceRequest.actualWalletAddress!!
+                )
+            ).willReturn(true)
+        }
+
+        val service = Erc20BalanceRequestServiceImpl(
+            signatureCheckerService = signatureCheckerService,
+            blockchainService = blockchainService,
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = blockchainService
+            )
+        )
+
+        verify("ERC20 balance request with successful status is returned") {
+            val result = service.getErc20BalanceRequest(uuid, rpcSpec)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    FullErc20BalanceRequest(
+                        id = uuid,
+                        projectId = erc20BalanceRequest.projectId,
+                        status = Status.SUCCESS,
+                        chainId = erc20BalanceRequest.chainId,
+                        redirectUrl = erc20BalanceRequest.redirectUrl,
+                        tokenAddress = null,
+                        blockNumber = erc20BalanceRequest.blockNumber,
+                        requestedWalletAddress = erc20BalanceRequest.requestedWalletAddress,
+                        arbitraryData = erc20BalanceRequest.arbitraryData,
+                        screenConfig = erc20BalanceRequest.screenConfig,
+                        balance = balance,
+                        messageToSign = erc20BalanceRequest.messageToSign,
+                        signedMessage = erc20BalanceRequest.signedMessage,
+                        createdAt = TestData.TIMESTAMP
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustReturnErc20BalanceRequestWithSuccessfulStatusWhenRequestedWalletAddressIsSpecifiedForNativeToken() {
+        val uuid = UUID.randomUUID()
+        val erc20BalanceRequest = Erc20BalanceRequest(
+            id = uuid,
+            projectId = UUID.randomUUID(),
+            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            redirectUrl = "redirect-url/$uuid",
+            tokenAddress = null,
+            blockNumber = BlockNumber(BigInteger.TEN),
+            requestedWalletAddress = WalletAddress("def"),
+            actualWalletAddress = WalletAddress("def"),
+            signedMessage = SignedMessage("signed-message"),
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
+            ),
+            createdAt = TestData.TIMESTAMP
+        )
+        val erc20BalanceRequestRepository = mock<Erc20BalanceRequestRepository>()
+
+        suppose("ERC20 balance request is returned from database") {
+            given(erc20BalanceRequestRepository.getById(uuid))
+                .willReturn(erc20BalanceRequest)
+        }
+
+        val rpcSpec = RpcUrlSpec(null, null)
+        val balance = AccountBalance(
+            wallet = erc20BalanceRequest.actualWalletAddress!!,
+            blockNumber = erc20BalanceRequest.blockNumber!!,
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(BigInteger.ONE)
+        )
+        val blockchainService = mock<BlockchainService>()
+
+        suppose("blockchain service will return some ERC20 balance") {
+            given(
+                blockchainService.fetchAccountBalance(
+                    chainSpec = ChainSpec(
+                        chainId = erc20BalanceRequest.chainId,
+                        rpcSpec = rpcSpec
+                    ),
+                    walletAddress = erc20BalanceRequest.actualWalletAddress!!,
+                    blockParameter = erc20BalanceRequest.blockNumber!!
+                )
+            ).willReturn(balance)
+        }
+
+        val signatureCheckerService = mock<SignatureCheckerService>()
+
+        suppose("signature checker will return true") {
+            given(
+                signatureCheckerService.signatureMatches(
+                    message = erc20BalanceRequest.messageToSign,
+                    signedMessage = erc20BalanceRequest.signedMessage!!,
+                    signer = erc20BalanceRequest.actualWalletAddress!!
+                )
+            ).willReturn(true)
+        }
+
+        val service = Erc20BalanceRequestServiceImpl(
+            signatureCheckerService = signatureCheckerService,
+            blockchainService = blockchainService,
+            erc20BalanceRequestRepository = erc20BalanceRequestRepository,
+            erc20CommonService = Erc20CommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = blockchainService
+            )
+        )
+
+        verify("ERC20 balance request with successful status is returned") {
+            val result = service.getErc20BalanceRequest(uuid, rpcSpec)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    FullErc20BalanceRequest(
+                        id = uuid,
+                        projectId = erc20BalanceRequest.projectId,
+                        status = Status.SUCCESS,
+                        chainId = erc20BalanceRequest.chainId,
+                        redirectUrl = erc20BalanceRequest.redirectUrl,
+                        tokenAddress = null,
+                        blockNumber = erc20BalanceRequest.blockNumber,
+                        requestedWalletAddress = erc20BalanceRequest.requestedWalletAddress,
+                        arbitraryData = erc20BalanceRequest.arbitraryData,
+                        screenConfig = erc20BalanceRequest.screenConfig,
+                        balance = balance,
+                        messageToSign = erc20BalanceRequest.messageToSign,
+                        signedMessage = erc20BalanceRequest.signedMessage,
+                        createdAt = erc20BalanceRequest.createdAt
+                    )
+                )
+        }
+    }
+
+    @Test
     fun mustCorrectlyReturnListOfErc20BalanceRequestsByProjectId() {
         val uuid = UUID.randomUUID()
         val erc20BalanceRequest = Erc20BalanceRequest(
@@ -717,7 +911,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
         }
 
         val rpcSpec = RpcUrlSpec(null, null)
-        val balance = Erc20Balance(
+        val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
             timestamp = UtcDateTime.ofEpochSeconds(0L),
@@ -732,7 +926,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                         chainId = erc20BalanceRequest.chainId,
                         rpcSpec = rpcSpec
                     ),
-                    contractAddress = erc20BalanceRequest.tokenAddress,
+                    contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
                     blockParameter = erc20BalanceRequest.blockNumber!!
                 )
