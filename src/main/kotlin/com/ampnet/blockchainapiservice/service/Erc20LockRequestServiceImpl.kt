@@ -1,6 +1,5 @@
 package com.ampnet.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxInfoException
 import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
@@ -8,6 +7,7 @@ import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20LockRequestRepository
+import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -29,7 +29,8 @@ import java.util.UUID
 class Erc20LockRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val erc20LockRequestRepository: Erc20LockRequestRepository,
-    private val erc20CommonService: Erc20CommonServiceImpl
+    private val erc20CommonService: Erc20CommonService,
+    private val projectRepository: ProjectRepository
 ) : Erc20LockRequestService {
 
     companion object : KLogging()
@@ -53,23 +54,22 @@ class Erc20LockRequestServiceImpl(
         return WithFunctionData(erc20LockRequest, data)
     }
 
-    override fun getErc20LockRequest(id: UUID, rpcSpec: RpcUrlSpec): WithTransactionData<Erc20LockRequest> {
-        logger.debug { "Fetching ERC20 lock request, id: $id, rpcSpec: $rpcSpec" }
+    override fun getErc20LockRequest(id: UUID): WithTransactionData<Erc20LockRequest> {
+        logger.debug { "Fetching ERC20 lock request, id: $id" }
 
         val erc20LockRequest = erc20CommonService.fetchResource(
             erc20LockRequestRepository.getById(id),
             "ERC20 lock request not found for ID: $id"
         )
+        val project = projectRepository.getById(erc20LockRequest.projectId)!!
 
-        return erc20LockRequest.appendTransactionData(rpcSpec)
+        return erc20LockRequest.appendTransactionData(project)
     }
 
-    override fun getErc20LockRequestsByProjectId(
-        projectId: UUID,
-        rpcSpec: RpcUrlSpec
-    ): List<WithTransactionData<Erc20LockRequest>> {
-        logger.debug { "Fetching ERC20 lock requests for projectId: $projectId, rpcSpec: $rpcSpec" }
-        return erc20LockRequestRepository.getAllByProjectId(projectId).map { it.appendTransactionData(rpcSpec) }
+    override fun getErc20LockRequestsByProjectId(projectId: UUID): List<WithTransactionData<Erc20LockRequest>> {
+        logger.debug { "Fetching ERC20 lock requests for projectId: $projectId" }
+        val project = projectRepository.getById(projectId)!!
+        return erc20LockRequestRepository.getAllByProjectId(projectId).map { it.appendTransactionData(project) }
     }
 
     override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
@@ -101,11 +101,11 @@ class Erc20LockRequestServiceImpl(
             additionalData = emptyList()
         )
 
-    private fun Erc20LockRequest.appendTransactionData(rpcSpec: RpcUrlSpec): WithTransactionData<Erc20LockRequest> {
+    private fun Erc20LockRequest.appendTransactionData(project: Project): WithTransactionData<Erc20LockRequest> {
         val transactionInfo = erc20CommonService.fetchTransactionInfo(
             txHash = txHash,
             chainId = chainId,
-            rpcSpec = rpcSpec
+            customRpcUrl = project.customRpcUrl
         )
         val data = encodeFunctionData(
             tokenAddress = tokenAddress,

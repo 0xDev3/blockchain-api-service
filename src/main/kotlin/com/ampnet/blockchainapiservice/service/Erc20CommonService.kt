@@ -1,6 +1,5 @@
 package com.ampnet.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.params.ParamsFactory
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Project
@@ -13,6 +12,6 @@ interface Erc20CommonService {
     fun fetchTransactionInfo(
         txHash: TransactionHash?,
         chainId: ChainId,
-        rpcSpec: RpcUrlSpec
+        customRpcUrl: String?
     ): BlockchainTransactionInfo?
 }

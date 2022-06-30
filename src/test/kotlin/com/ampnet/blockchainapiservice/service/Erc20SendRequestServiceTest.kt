@@ -5,7 +5,6 @@ import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxInfoException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
@@ -15,6 +14,7 @@ import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Erc20SendRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20SendRequestRepository
+import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
@@ -144,7 +144,8 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = mock()
         )
 
         verify("ERC20 send request is correctly created") {
@@ -218,7 +219,8 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = mock()
         )
 
         verify("ERC20 send request is correctly created") {
@@ -247,12 +249,13 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
-                service.getErc20SendRequest(id = UUID.randomUUID(), rpcSpec = RpcUrlSpec(null, null))
+                service.getErc20SendRequest(id = UUID.randomUUID())
             }
         }
     }
@@ -309,11 +312,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with pending status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = RpcUrlSpec(null, null))).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.PENDING,
@@ -353,7 +357,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
 
         suppose("transaction is not yet mined") {
             given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
@@ -385,11 +389,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with pending status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.PENDING,
@@ -429,7 +434,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
@@ -471,11 +476,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with successful status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -515,7 +521,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
@@ -557,11 +563,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with failed status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -601,7 +608,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TransactionHash("wrong-hash"),
@@ -643,11 +650,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with failed status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -687,7 +695,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
@@ -729,11 +737,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with failed status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -773,7 +782,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
@@ -815,11 +824,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with failed status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -859,7 +869,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = sendRequest.tokenSenderAddress!!,
@@ -883,11 +893,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with failed status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -927,7 +938,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = sendRequest.tokenSenderAddress!!,
@@ -951,11 +962,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with failed status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -995,7 +1007,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
@@ -1037,11 +1049,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with successful status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -1081,7 +1094,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
@@ -1123,11 +1136,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with successful status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -1167,7 +1181,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = WalletAddress("0cafe0babe"),
@@ -1191,11 +1205,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with successful status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -1235,7 +1250,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = sendRequest.tokenSenderAddress!!,
@@ -1259,11 +1274,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with successful status is returned") {
-            assertThat(service.getErc20SendRequest(id = id, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -1303,7 +1319,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
@@ -1345,11 +1361,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with successful status is returned") {
-            assertThat(service.getErc20SendRequestsByProjectId(projectId = PROJECT.id, rpcSpec = chainSpec.rpcSpec))
+            assertThat(service.getErc20SendRequestsByProjectId(PROJECT.id))
                 .withMessage()
                 .isEqualTo(
                     listOf(
@@ -1393,7 +1410,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
@@ -1435,11 +1452,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with successful status is returned") {
-            assertThat(service.getErc20SendRequestsBySender(sender = sender, rpcSpec = chainSpec.rpcSpec)).withMessage()
+            assertThat(service.getErc20SendRequestsBySender(sender)).withMessage()
                 .isEqualTo(
                     listOf(
                         sendRequest.withTransactionData(
@@ -1482,7 +1500,7 @@ class Erc20SendRequestServiceTest : TestBase() {
         }
 
         val blockchainService = mock<BlockchainService>()
-        val chainSpec = ChainSpec(sendRequest.chainId, RpcUrlSpec("url", "url-override"))
+        val chainSpec = ChainSpec(sendRequest.chainId, null)
         val encodedData = FunctionData("encoded")
         val transactionInfo = BlockchainTransactionInfo(
             hash = TX_HASH,
@@ -1524,11 +1542,12 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
         verify("ERC20 send request with successful status is returned") {
-            assertThat(service.getErc20SendRequestsByRecipient(recipient = recipient, rpcSpec = chainSpec.rpcSpec))
+            assertThat(service.getErc20SendRequestsByRecipient(recipient))
                 .withMessage()
                 .isEqualTo(
                     listOf(
@@ -1561,7 +1580,8 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = mock()
         )
 
         verify("txInfo was successfully attached") {
@@ -1591,7 +1611,8 @@ class Erc20SendRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = mock()
         )
 
         verify("CannotAttachTxInfoException is thrown") {
@@ -1603,5 +1624,24 @@ class Erc20SendRequestServiceTest : TestBase() {
                 .setTxInfo(id, TX_HASH, caller)
             verifyNoMoreInteractions(erc20SendRequestRepository)
         }
+    }
+
+    private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
+        val projectRepository = mock<ProjectRepository>()
+
+        given(projectRepository.getById(projectId))
+            .willReturn(
+                Project(
+                    id = projectId,
+                    ownerId = UUID.randomUUID(),
+                    issuerContractAddress = ContractAddress("dead"),
+                    baseRedirectUrl = BaseUrl(""),
+                    chainId = ChainId(0L),
+                    customRpcUrl = null,
+                    createdAt = TestData.TIMESTAMP
+                )
+            )
+
+        return projectRepository
     }
 }

@@ -4,7 +4,6 @@ import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachSignedMessageRequest
@@ -127,7 +126,6 @@ class Erc20BalanceRequestControllerTest : TestBase() {
     @Test
     fun mustCorrectlyFetchErc20BalanceRequest() {
         val id = UUID.randomUUID()
-        val rpcSpec = RpcUrlSpec("url", "url-override")
         val service = mock<Erc20BalanceRequestService>()
         val result = FullErc20BalanceRequest(
             id = id,
@@ -155,14 +153,14 @@ class Erc20BalanceRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 balance request will be fetched") {
-            given(service.getErc20BalanceRequest(id, rpcSpec))
+            given(service.getErc20BalanceRequest(id))
                 .willReturn(result)
         }
 
         val controller = Erc20BalanceRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getErc20BalanceRequest(id, rpcSpec)
+            val response = controller.getErc20BalanceRequest(id)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -202,7 +200,6 @@ class Erc20BalanceRequestControllerTest : TestBase() {
     fun mustCorrectlyFetchErc20BalanceRequestsByProjectId() {
         val id = UUID.randomUUID()
         val projectId = UUID.randomUUID()
-        val rpcSpec = RpcUrlSpec("url", "url-override")
         val service = mock<Erc20BalanceRequestService>()
         val result = FullErc20BalanceRequest(
             id = id,
@@ -230,14 +227,14 @@ class Erc20BalanceRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 balance requests will be fetched by project ID") {
-            given(service.getErc20BalanceRequestsByProjectId(projectId, rpcSpec))
+            given(service.getErc20BalanceRequestsByProjectId(projectId))
                 .willReturn(listOf(result))
         }
 
         val controller = Erc20BalanceRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getErc20BalanceRequestsByProjectId(projectId, rpcSpec)
+            val response = controller.getErc20BalanceRequestsByProjectId(projectId)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 

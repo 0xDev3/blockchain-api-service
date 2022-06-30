@@ -3,7 +3,6 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateErc20SendRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
@@ -136,7 +135,6 @@ class Erc20SendRequestControllerTest : TestBase() {
     @Test
     fun mustCorrectlyFetchErc20SendRequest() {
         val id = UUID.randomUUID()
-        val rpcSpec = RpcUrlSpec("url", "url-override")
         val service = mock<Erc20SendRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
@@ -170,14 +168,14 @@ class Erc20SendRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 send request will be fetched") {
-            given(service.getErc20SendRequest(id, rpcSpec))
+            given(service.getErc20SendRequest(id))
                 .willReturn(result)
         }
 
         val controller = Erc20SendRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getErc20SendRequest(id, rpcSpec)
+            val response = controller.getErc20SendRequest(id)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -217,7 +215,6 @@ class Erc20SendRequestControllerTest : TestBase() {
     fun mustCorrectlyFetchErc20SendRequestsByProjectId() {
         val id = UUID.randomUUID()
         val projectId = UUID.randomUUID()
-        val rpcSpec = RpcUrlSpec("url", "url-override")
         val service = mock<Erc20SendRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
@@ -251,14 +248,14 @@ class Erc20SendRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 send requests will be fetched by project ID") {
-            given(service.getErc20SendRequestsByProjectId(projectId, rpcSpec))
+            given(service.getErc20SendRequestsByProjectId(projectId))
                 .willReturn(listOf(result))
         }
 
         val controller = Erc20SendRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getErc20SendRequestsByProjectId(projectId, rpcSpec)
+            val response = controller.getErc20SendRequestsByProjectId(projectId)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -302,7 +299,6 @@ class Erc20SendRequestControllerTest : TestBase() {
     fun mustCorrectlyFetchErc20SendRequestsBySender() {
         val id = UUID.randomUUID()
         val sender = WalletAddress("b")
-        val rpcSpec = RpcUrlSpec("url", "url-override")
         val service = mock<Erc20SendRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
@@ -336,14 +332,14 @@ class Erc20SendRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 send requests will be fetched by sender") {
-            given(service.getErc20SendRequestsBySender(sender, rpcSpec))
+            given(service.getErc20SendRequestsBySender(sender))
                 .willReturn(listOf(result))
         }
 
         val controller = Erc20SendRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getErc20SendRequestsBySender(sender, rpcSpec)
+            val response = controller.getErc20SendRequestsBySender(sender)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -387,7 +383,6 @@ class Erc20SendRequestControllerTest : TestBase() {
     fun mustCorrectlyFetchErc20SendRequestsByRecipient() {
         val id = UUID.randomUUID()
         val recipient = WalletAddress("c")
-        val rpcSpec = RpcUrlSpec("url", "url-override")
         val service = mock<Erc20SendRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
@@ -421,14 +416,14 @@ class Erc20SendRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 send requests will be fetched by recipient") {
-            given(service.getErc20SendRequestsByRecipient(recipient, rpcSpec))
+            given(service.getErc20SendRequestsByRecipient(recipient))
                 .willReturn(listOf(result))
         }
 
         val controller = Erc20SendRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getErc20SendRequestsByRecipient(recipient, rpcSpec)
+            val response = controller.getErc20SendRequestsByRecipient(recipient)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 

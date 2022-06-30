@@ -14,18 +14,14 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
     fun getBlockchainProperties(chainSpec: ChainSpec): ChainPropertiesWithServices {
         val chain = Chain.fromId(chainSpec.chainId)
 
-        return if (chainSpec.rpcSpec.urlOverride != null) {
+        return if (chainSpec.customRpcUrl != null) {
             ChainPropertiesWithServices(
-                web3j = Web3j.build(HttpService(chainSpec.rpcSpec.urlOverride))
+                web3j = Web3j.build(HttpService(chainSpec.customRpcUrl))
             )
         } else if (chain != null) {
             blockchainPropertiesMap.computeIfAbsent(chain.id) {
                 generateBlockchainProperties(chain)
             }
-        } else if (chainSpec.rpcSpec.url != null) {
-            ChainPropertiesWithServices(
-                web3j = Web3j.build(HttpService(chainSpec.rpcSpec.url))
-            )
         } else {
             throw UnsupportedChainIdException(chainSpec.chainId)
         }

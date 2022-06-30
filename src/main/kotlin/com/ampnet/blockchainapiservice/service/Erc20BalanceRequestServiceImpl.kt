@@ -2,7 +2,6 @@ package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachSignedMessageException
 import com.ampnet.blockchainapiservice.model.params.CreateErc20BalanceRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreErc20BalanceRequestParams
@@ -10,6 +9,7 @@ import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20BalanceRequestRepository
+import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.BlockName
 import com.ampnet.blockchainapiservice.util.SignedMessage
@@ -24,7 +24,8 @@ class Erc20BalanceRequestServiceImpl(
     private val signatureCheckerService: SignatureCheckerService,
     private val blockchainService: BlockchainService,
     private val erc20BalanceRequestRepository: Erc20BalanceRequestRepository,
-    private val erc20CommonService: Erc20CommonService
+    private val erc20CommonService: Erc20CommonService,
+    private val projectRepository: ProjectRepository
 ) : Erc20BalanceRequestService {
 
     companion object : KLogging()
@@ -39,23 +40,22 @@ class Erc20BalanceRequestServiceImpl(
         )
     }
 
-    override fun getErc20BalanceRequest(id: UUID, rpcSpec: RpcUrlSpec): FullErc20BalanceRequest {
-        logger.debug { "Fetching ERC20 balance request, id: $id, rpcSpec: $rpcSpec" }
+    override fun getErc20BalanceRequest(id: UUID): FullErc20BalanceRequest {
+        logger.debug { "Fetching ERC20 balance request, id: $id" }
 
         val erc20BalanceRequest = erc20CommonService.fetchResource(
             erc20BalanceRequestRepository.getById(id),
             "ERC20 balance check request not found for ID: $id"
         )
+        val project = projectRepository.getById(erc20BalanceRequest.projectId)!!
 
-        return erc20BalanceRequest.appendBalanceData(rpcSpec)
+        return erc20BalanceRequest.appendBalanceData(project)
     }
 
-    override fun getErc20BalanceRequestsByProjectId(
-        projectId: UUID,
-        rpcSpec: RpcUrlSpec
-    ): List<FullErc20BalanceRequest> {
-        logger.debug { "Fetching ERC20 balance requests for projectId: $projectId, rpcSpec: $rpcSpec" }
-        return erc20BalanceRequestRepository.getAllByProjectId(projectId).map { it.appendBalanceData(rpcSpec) }
+    override fun getErc20BalanceRequestsByProjectId(projectId: UUID): List<FullErc20BalanceRequest> {
+        logger.debug { "Fetching ERC20 balance requests for projectId: $projectId" }
+        val project = projectRepository.getById(projectId)!!
+        return erc20BalanceRequestRepository.getAllByProjectId(projectId).map { it.appendBalanceData(project) }
     }
 
     override fun attachWalletAddressAndSignedMessage(
@@ -77,8 +77,8 @@ class Erc20BalanceRequestServiceImpl(
         }
     }
 
-    private fun Erc20BalanceRequest.appendBalanceData(rpcSpec: RpcUrlSpec): FullErc20BalanceRequest {
-        val balance = actualWalletAddress?.let { fetchBalance(it, rpcSpec) }
+    private fun Erc20BalanceRequest.appendBalanceData(project: Project): FullErc20BalanceRequest {
+        val balance = actualWalletAddress?.let { fetchBalance(it, project) }
         val status = determineStatus(balance)
 
         return FullErc20BalanceRequest.fromErc20BalanceRequest(
@@ -88,10 +88,10 @@ class Erc20BalanceRequestServiceImpl(
         )
     }
 
-    private fun Erc20BalanceRequest.fetchBalance(walletAddress: WalletAddress, rpcSpec: RpcUrlSpec): AccountBalance {
+    private fun Erc20BalanceRequest.fetchBalance(walletAddress: WalletAddress, project: Project): AccountBalance {
         val chainSpec = ChainSpec(
             chainId = chainId,
-            rpcSpec = rpcSpec
+            customRpcUrl = project.customRpcUrl
         )
 
         return if (tokenAddress != null) {
