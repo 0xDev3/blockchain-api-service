@@ -93,3 +93,23 @@ class NonExistentApiKeyException : ServiceException(
         private const val serialVersionUID: Long = -176593491332037627L
     }
 }
+
+class MissingTokenAddressException : ServiceException(
+    errorCode = ErrorCode.MISSING_TOKEN_ADDRESS,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Token address is missing from the request"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -8004673014736666252L
+    }
+}
+
+class TokenAddressNotAllowedException : ServiceException(
+    errorCode = ErrorCode.TOKEN_ADDRESS_NOT_ALLOWED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Token address is not allowed for this request"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -2512631824095658324L
+    }
+}

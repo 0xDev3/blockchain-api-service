@@ -9,7 +9,9 @@ data class TransactionResponse(
     val txHash: String?,
     val from: String?,
     val to: String,
-    val data: String,
+    val data: String?,
+    @JsonSerialize(using = ToStringSerializer::class)
+    val value: BigInteger?,
     @JsonSerialize(using = ToStringSerializer::class)
     val blockConfirmations: BigInteger?,
     val timestamp: OffsetDateTime?

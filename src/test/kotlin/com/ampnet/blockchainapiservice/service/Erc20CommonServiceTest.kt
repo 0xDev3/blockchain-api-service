@@ -10,6 +10,7 @@ import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.params.ParamsFactory
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Project
+import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -121,6 +122,7 @@ class Erc20CommonServiceTest : TestBase() {
             from = WalletAddress("a"),
             to = WalletAddress("b"),
             data = FunctionData("data"),
+            value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ZERO,
             timestamp = TestData.TIMESTAMP,
             success = true

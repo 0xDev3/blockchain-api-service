@@ -223,6 +223,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         from = WalletAddress(mainAccount.address),
                         to = WalletAddress(contract.contractAddress),
                         data = transactionInfo.data,
+                        value = Balance(BigInteger.ZERO),
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
                         success = true
@@ -300,6 +301,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         from = WalletAddress(mainAccount.address),
                         to = WalletAddress(contract.contractAddress),
                         data = transactionInfo.data,
+                        value = Balance(BigInteger.ZERO),
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
                         success = false
@@ -327,13 +329,14 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchNonContractTransactionInfo() {
         val mainAccount = accounts[0]
-        val txHash = suppose("some ERC20 transfer transaction is made") {
+        val value = Convert.toWei(BigDecimal.ONE, Convert.Unit.ETHER)
+        val txHash = suppose("some regular transfer transaction is made") {
             Transfer.sendFunds(
                 hardhatContainer.web3j,
                 mainAccount,
                 accounts[1].address,
-                BigDecimal.ONE,
-                Convert.Unit.ETHER
+                value,
+                Convert.Unit.WEI
             ).sendAsync()?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
@@ -358,6 +361,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         from = WalletAddress(mainAccount.address),
                         to = WalletAddress(accounts[1].address),
                         data = FunctionData("0x"),
+                        value = Balance(value.toBigInteger()),
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
                         success = true
