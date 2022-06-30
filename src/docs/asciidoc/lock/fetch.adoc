@@ -5,10 +5,6 @@ addresses, `amount`, matching `data` and `txHash`). If there are any mismatches 
 on blockchain, the request will be marked as failed. If there is no attached transaction hash or if transaction for
 attached hash is not yet mined on blockchain, request will be in pending state.
 
-Custom RPC URL can be specified via optional `X-RPC-URL` header - this will NOT override the default RPC URL for the
-specified chain ID, it only allows you to specify RPC URL for non-natively supported chains. To override the default RPC
-URL, use `X-RPC-URL-OVERRIDE` header.
-
 .Request Example
 [%collapsible]
 ====

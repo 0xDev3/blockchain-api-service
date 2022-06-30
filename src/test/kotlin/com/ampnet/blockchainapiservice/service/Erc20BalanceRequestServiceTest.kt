@@ -5,7 +5,6 @@ import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.exception.CannotAttachSignedMessageException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
@@ -15,6 +14,7 @@ import com.ampnet.blockchainapiservice.model.result.Erc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.FullErc20BalanceRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20BalanceRequestRepository
+import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
@@ -119,7 +119,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = mock()
         )
 
         verify("ERC20 balance request is correctly created") {
@@ -150,12 +151,13 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
-                service.getErc20BalanceRequest(uuid, RpcUrlSpec(null, null))
+                service.getErc20BalanceRequest(uuid)
             }
         }
     }
@@ -195,11 +197,12 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(erc20BalanceRequest.projectId, null)
         )
 
         verify("ERC20 balance request with pending status is returned") {
-            val result = service.getErc20BalanceRequest(uuid, RpcUrlSpec(null, null))
+            val result = service.getErc20BalanceRequest(uuid)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -250,7 +253,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .willReturn(erc20BalanceRequest)
         }
 
-        val rpcSpec = RpcUrlSpec(null, null)
+        val customRpcUrl = "custom-rpc-url"
         val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
@@ -264,7 +267,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = erc20BalanceRequest.chainId,
-                        rpcSpec = rpcSpec
+                        customRpcUrl = customRpcUrl
                     ),
                     contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
@@ -281,11 +284,12 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(erc20BalanceRequest.projectId, customRpcUrl)
         )
 
         verify("ERC20 balance request with pending status is returned") {
-            val result = service.getErc20BalanceRequest(uuid, rpcSpec)
+            val result = service.getErc20BalanceRequest(uuid)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -336,7 +340,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .willReturn(erc20BalanceRequest)
         }
 
-        val rpcSpec = RpcUrlSpec(null, null)
+        val customRpcUrl = "custom-rpc-url"
         val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
@@ -350,7 +354,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = erc20BalanceRequest.chainId,
-                        rpcSpec = rpcSpec
+                        customRpcUrl = customRpcUrl
                     ),
                     contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
@@ -367,11 +371,12 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(erc20BalanceRequest.projectId, customRpcUrl)
         )
 
         verify("ERC20 balance request with failed status is returned") {
-            val result = service.getErc20BalanceRequest(uuid, rpcSpec)
+            val result = service.getErc20BalanceRequest(uuid)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -422,7 +427,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .willReturn(erc20BalanceRequest)
         }
 
-        val rpcSpec = RpcUrlSpec(null, null)
+        val customRpcUrl = "custom-rpc-url"
         val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
@@ -436,7 +441,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = erc20BalanceRequest.chainId,
-                        rpcSpec = rpcSpec
+                        customRpcUrl = customRpcUrl
                     ),
                     contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
@@ -465,11 +470,12 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(erc20BalanceRequest.projectId, customRpcUrl)
         )
 
         verify("ERC20 balance request with failed status is returned") {
-            val result = service.getErc20BalanceRequest(uuid, rpcSpec)
+            val result = service.getErc20BalanceRequest(uuid)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -520,7 +526,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .willReturn(erc20BalanceRequest)
         }
 
-        val rpcSpec = RpcUrlSpec(null, null)
+        val customRpcUrl = "custom-rpc-url"
         val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
@@ -534,7 +540,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = erc20BalanceRequest.chainId,
-                        rpcSpec = rpcSpec
+                        customRpcUrl = customRpcUrl
                     ),
                     contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
@@ -563,11 +569,12 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(erc20BalanceRequest.projectId, customRpcUrl)
         )
 
         verify("ERC20 balance request with successful status is returned") {
-            val result = service.getErc20BalanceRequest(uuid, rpcSpec)
+            val result = service.getErc20BalanceRequest(uuid)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -618,7 +625,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .willReturn(erc20BalanceRequest)
         }
 
-        val rpcSpec = RpcUrlSpec(null, null)
+        val customRpcUrl = "custom-rpc-url"
         val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
@@ -632,7 +639,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = erc20BalanceRequest.chainId,
-                        rpcSpec = rpcSpec
+                        customRpcUrl = customRpcUrl
                     ),
                     contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
@@ -661,11 +668,12 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(erc20BalanceRequest.projectId, customRpcUrl)
         )
 
         verify("ERC20 balance request with successful status is returned") {
-            val result = service.getErc20BalanceRequest(uuid, rpcSpec)
+            val result = service.getErc20BalanceRequest(uuid)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -716,7 +724,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .willReturn(erc20BalanceRequest)
         }
 
-        val rpcSpec = RpcUrlSpec(null, null)
+        val customRpcUrl = "custom-rpc-url"
         val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
@@ -730,7 +738,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 blockchainService.fetchAccountBalance(
                     chainSpec = ChainSpec(
                         chainId = erc20BalanceRequest.chainId,
-                        rpcSpec = rpcSpec
+                        customRpcUrl = customRpcUrl
                     ),
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
                     blockParameter = erc20BalanceRequest.blockNumber!!
@@ -758,11 +766,12 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(erc20BalanceRequest.projectId, customRpcUrl)
         )
 
         verify("ERC20 balance request with successful status is returned") {
-            val result = service.getErc20BalanceRequest(uuid, rpcSpec)
+            val result = service.getErc20BalanceRequest(uuid)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -813,7 +822,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .willReturn(erc20BalanceRequest)
         }
 
-        val rpcSpec = RpcUrlSpec(null, null)
+        val customRpcUrl = "custom-rpc-url"
         val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
@@ -827,7 +836,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 blockchainService.fetchAccountBalance(
                     chainSpec = ChainSpec(
                         chainId = erc20BalanceRequest.chainId,
-                        rpcSpec = rpcSpec
+                        customRpcUrl = customRpcUrl
                     ),
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
                     blockParameter = erc20BalanceRequest.blockNumber!!
@@ -855,11 +864,12 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(erc20BalanceRequest.projectId, customRpcUrl)
         )
 
         verify("ERC20 balance request with successful status is returned") {
-            val result = service.getErc20BalanceRequest(uuid, rpcSpec)
+            val result = service.getErc20BalanceRequest(uuid)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -910,7 +920,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .willReturn(listOf(erc20BalanceRequest))
         }
 
-        val rpcSpec = RpcUrlSpec(null, null)
+        val customRpcUrl = "custom-rpc-url"
         val balance = AccountBalance(
             wallet = erc20BalanceRequest.actualWalletAddress!!,
             blockNumber = erc20BalanceRequest.blockNumber!!,
@@ -924,7 +934,7 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = erc20BalanceRequest.chainId,
-                        rpcSpec = rpcSpec
+                        customRpcUrl = customRpcUrl
                     ),
                     contractAddress = erc20BalanceRequest.tokenAddress!!,
                     walletAddress = erc20BalanceRequest.actualWalletAddress!!,
@@ -953,11 +963,12 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
-            )
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(erc20BalanceRequest.projectId, customRpcUrl)
         )
 
         verify("ERC20 balance request with successful status is returned") {
-            val result = service.getErc20BalanceRequestsByProjectId(erc20BalanceRequest.projectId, rpcSpec)
+            val result = service.getErc20BalanceRequestsByProjectId(erc20BalanceRequest.projectId)
 
             assertThat(result).withMessage()
                 .isEqualTo(
@@ -1003,7 +1014,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = mock()
         )
 
         verify("wallet address and signed message are successfully attached") {
@@ -1035,7 +1047,8 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
-            )
+            ),
+            projectRepository = mock()
         )
 
         verify("CannotAttachSignedMessageException is thrown") {
@@ -1047,5 +1060,24 @@ class Erc20BalanceRequestServiceTest : TestBase() {
                 .setSignedMessage(uuid, walletAddress, signedMessage)
             verifyNoMoreInteractions(erc20BalanceRequestRepository)
         }
+    }
+
+    private fun projectRepositoryMockWithCustomRpcUrl(projectId: UUID, customRpcUrl: String?): ProjectRepository {
+        val projectRepository = mock<ProjectRepository>()
+
+        given(projectRepository.getById(projectId))
+            .willReturn(
+                Project(
+                    id = projectId,
+                    ownerId = UUID.randomUUID(),
+                    issuerContractAddress = ContractAddress("dead"),
+                    baseRedirectUrl = BaseUrl(""),
+                    chainId = ChainId(0L),
+                    customRpcUrl = customRpcUrl,
+                    createdAt = TestData.TIMESTAMP
+                )
+            )
+
+        return projectRepository
     }
 }

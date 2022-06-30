@@ -3,7 +3,6 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.blockchain.properties.RpcUrlSpec
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
@@ -139,7 +138,6 @@ class Erc20LockRequestControllerTest : TestBase() {
     @Test
     fun mustCorrectlyFetchErc20LockRequest() {
         val id = UUID.randomUUID()
-        val rpcSpec = RpcUrlSpec("url", "url-override")
         val service = mock<Erc20LockRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
@@ -174,14 +172,14 @@ class Erc20LockRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 lock request will be fetched") {
-            given(service.getErc20LockRequest(id, rpcSpec))
+            given(service.getErc20LockRequest(id))
                 .willReturn(result)
         }
 
         val controller = Erc20LockRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getErc20LockRequest(id, rpcSpec)
+            val response = controller.getErc20LockRequest(id)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -222,7 +220,6 @@ class Erc20LockRequestControllerTest : TestBase() {
     fun mustCorrectlyFetchErc20LockRequestsByProjectId() {
         val id = UUID.randomUUID()
         val projectId = UUID.randomUUID()
-        val rpcSpec = RpcUrlSpec("url", "url-override")
         val service = mock<Erc20LockRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
@@ -257,14 +254,14 @@ class Erc20LockRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 lock requests will be fetched by project ID") {
-            given(service.getErc20LockRequestsByProjectId(projectId, rpcSpec))
+            given(service.getErc20LockRequestsByProjectId(projectId))
                 .willReturn(listOf(result))
         }
 
         val controller = Erc20LockRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getErc20LockRequestsByProjectId(projectId, rpcSpec)
+            val response = controller.getErc20LockRequestsByProjectId(projectId)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
