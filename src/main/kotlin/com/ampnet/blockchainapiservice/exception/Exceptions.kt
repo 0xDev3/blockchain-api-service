@@ -8,7 +8,8 @@ import java.util.UUID
 abstract class ServiceException(
     val errorCode: ErrorCode,
     val httpStatus: HttpStatus,
-    override val message: String
+    override val message: String,
+    override val cause: Throwable? = null
 ) : RuntimeException(message) {
     companion object {
         private const val serialVersionUID: Long = 8974557457024980481L
@@ -32,6 +33,17 @@ class UnsupportedChainIdException(chainId: ChainId) : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = -8803854722161717146L
+    }
+}
+
+class TemporaryBlockchainReadException(cause: Throwable? = null) : ServiceException(
+    errorCode = ErrorCode.TEMPORARY_BLOCKCHAIN_READ_ERROR,
+    httpStatus = HttpStatus.SERVICE_UNAVAILABLE,
+    message = "Error reading block data from blockchain RPC provider, please try again later",
+    cause = cause
+) {
+    companion object {
+        private const val serialVersionUID: Long = -4056606709117095199L
     }
 }
 
