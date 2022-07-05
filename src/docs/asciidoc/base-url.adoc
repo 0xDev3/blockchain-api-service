@@ -1,0 +1,9 @@
+++++
+<p id="base-api-url-descriptor">
+Base API URL is
+</p>
+<script>
+document.getElementById('base-api-url-descriptor').innerHTML +=
+ " <code>" + window.location.protocol + "//" + window.location.host + "/api/blockchain-api/</code>";
+</script>
+++++

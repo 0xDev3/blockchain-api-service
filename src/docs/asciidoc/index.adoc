@@ -13,6 +13,8 @@ This document contains generated documentation for `AMPnet blockchain-api-servic
 endpoints to verify user wallet ownership as well as endpoints to fetch data from blockchain for verified wallets.
 Source code is available on https://github.com/AMPnet/blockchain-api-service[Github].
 
+include::src/docs/asciidoc/base-url.adoc[]
+
 == ERC20 Balance Checking API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 

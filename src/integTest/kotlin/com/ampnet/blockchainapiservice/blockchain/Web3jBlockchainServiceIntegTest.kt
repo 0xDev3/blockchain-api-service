@@ -356,8 +356,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     FunctionArgument(abiType = AbiType.Address, value = WalletAddress(accounts[1].address)),
                     FunctionArgument(abiType = AbiType.Uint256, value = accountBalance.amount)
                 ),
-                abiOutputTypes = listOf(AbiType.Bool),
-                additionalData = listOf()
+                abiOutputTypes = listOf(AbiType.Bool)
             )
 
             assertThat(transactionInfo.data).withMessage()
@@ -434,8 +433,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     FunctionArgument(abiType = AbiType.Address, value = WalletAddress(accounts[1].address)),
                     FunctionArgument(abiType = AbiType.Uint256, value = sendAmount)
                 ),
-                abiOutputTypes = listOf(AbiType.Bool),
-                additionalData = listOf()
+                abiOutputTypes = listOf(AbiType.Bool)
             )
 
             assertThat(transactionInfo.data).withMessage()
