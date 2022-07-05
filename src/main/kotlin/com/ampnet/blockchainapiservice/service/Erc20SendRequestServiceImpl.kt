@@ -20,7 +20,6 @@ import com.ampnet.blockchainapiservice.util.WithFunctionDataOrEthValue
 import com.ampnet.blockchainapiservice.util.WithTransactionData
 import mu.KLogging
 import org.springframework.stereotype.Service
-import org.web3j.abi.datatypes.Utf8String
 import java.util.UUID
 
 @Service
@@ -103,8 +102,7 @@ class Erc20SendRequestServiceImpl(
                 FunctionArgument(abiType = AbiType.Address, value = tokenRecipientAddress),
                 FunctionArgument(abiType = AbiType.Uint256, value = tokenAmount)
             ),
-            abiOutputTypes = listOf(AbiType.Bool),
-            additionalData = listOf(Utf8String(id.toString()))
+            abiOutputTypes = listOf(AbiType.Bool)
         )
 
     private fun Erc20SendRequest.appendTransactionData(project: Project): WithTransactionData<Erc20SendRequest> {

@@ -4,6 +4,7 @@ import com.ampnet.blockchainapiservice.blockchain.properties.ChainPropertiesHand
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.BlockchainReadException
+import com.ampnet.blockchainapiservice.exception.TemporaryBlockchainReadException
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
@@ -43,7 +44,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
         val ethBlock = blockchainProperties.web3j.ethGetBlockByNumber(blockParameter.toWeb3Parameter(), false)
-            .send().block
+            .sendWithGuarantee().block
         val blockNumber = BlockNumber(ethBlock.number)
         val timestamp = UtcDateTime.ofEpochSeconds(ethBlock.timestamp.longValueExact())
         val balance = blockchainProperties.web3j.ethGetBalance(walletAddress.rawValue, blockNumber.toWeb3Parameter())
@@ -65,7 +66,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
         val ethBlock = blockchainProperties.web3j.ethGetBlockByNumber(blockParameter.toWeb3Parameter(), false)
-            .send().block
+            .sendWithGuarantee().block
         val blockNumber = BlockNumber(ethBlock.number)
         val timestamp = UtcDateTime.ofEpochSeconds(ethBlock.timestamp.longValueExact())
 
@@ -111,6 +112,21 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
                 timestamp = timestamp,
                 success = receipt.isStatusOK
             )
+        }
+    }
+
+    @Suppress("ReturnCount")
+    fun <S, T : Response<*>?> Request<S, T>.sendWithGuarantee(): T {
+        try {
+            val value = this.send()
+            if (value?.hasError() == true) {
+                logger.warn { "Web3j call errors: ${value.error.message}" }
+                throw TemporaryBlockchainReadException()
+            }
+            return value
+        } catch (ex: IOException) {
+            logger.warn("Failed blockchain call", ex)
+            throw TemporaryBlockchainReadException(ex)
         }
     }
 

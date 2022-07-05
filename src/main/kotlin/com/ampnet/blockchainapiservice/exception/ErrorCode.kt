@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.exception
 enum class ErrorCode {
     RESOURCE_NOT_FOUND,
     UNSUPPORTED_CHAIN_ID,
+    TEMPORARY_BLOCKCHAIN_READ_ERROR,
     BLOCKCHAIN_READ_ERROR,
     TX_INFO_ALREADY_SET,
     SIGNED_MESSAGE_ALREADY_SET,

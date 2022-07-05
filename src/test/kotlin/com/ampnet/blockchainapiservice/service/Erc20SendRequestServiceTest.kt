@@ -33,7 +33,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.web3j.abi.datatypes.Utf8String
 import java.math.BigInteger
 import java.util.UUID
 import org.mockito.kotlin.verify as verifyMock
@@ -93,8 +92,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(uuid.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -298,8 +296,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -375,8 +372,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -462,8 +458,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -549,8 +544,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -636,8 +630,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -723,8 +716,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -810,8 +802,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -1035,8 +1026,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -1122,8 +1112,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -1347,8 +1336,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -1438,8 +1426,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)
@@ -1528,8 +1515,7 @@ class Erc20SendRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Address, value = sendRequest.tokenRecipientAddress),
                         FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.tokenAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool),
-                    additionalData = listOf(Utf8String(id.toString()))
+                    abiOutputTypes = listOf(AbiType.Bool)
                 )
             )
                 .willReturn(encodedData)

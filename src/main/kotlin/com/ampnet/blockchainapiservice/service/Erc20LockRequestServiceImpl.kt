@@ -97,8 +97,7 @@ class Erc20LockRequestServiceImpl(
                 FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                 FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
             ),
-            abiOutputTypes = emptyList(),
-            additionalData = emptyList()
+            abiOutputTypes = emptyList()
         )
 
     private fun Erc20LockRequest.appendTransactionData(project: Project): WithTransactionData<Erc20LockRequest> {

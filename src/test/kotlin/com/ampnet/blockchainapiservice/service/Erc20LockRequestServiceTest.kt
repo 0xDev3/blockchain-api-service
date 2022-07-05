@@ -99,8 +99,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -235,8 +234,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -315,8 +313,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -405,8 +402,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -495,8 +491,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -585,8 +580,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -675,8 +669,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -765,8 +758,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -855,8 +847,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -945,8 +936,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
@@ -1035,8 +1025,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
                         FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
                     ),
-                    abiOutputTypes = emptyList(),
-                    additionalData = emptyList()
+                    abiOutputTypes = emptyList()
                 )
             )
                 .willReturn(encodedData)
