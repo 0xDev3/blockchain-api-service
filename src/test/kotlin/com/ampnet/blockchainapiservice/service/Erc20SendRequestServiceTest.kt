@@ -33,7 +33,6 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoMoreInteractions
-import org.web3j.abi.datatypes.Utf8String
 import java.math.BigInteger
 import java.util.UUID
 import org.mockito.kotlin.verify as verifyMock
