@@ -676,7 +676,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+        val txHash = suppose("some ERC20 transfer transaction is made") {
             contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
@@ -705,7 +705,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                     Erc20SendRequestResponse(
                         id = createResponse.id,
                         projectId = PROJECT_ID,
-                        status = Status.FAILED,
+                        status = Status.SUCCESS,
                         chainId = PROJECT.chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         assetType = AssetType.TOKEN,
@@ -794,7 +794,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+        val txHash = suppose("some ERC20 transfer transaction is made") {
             contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
@@ -821,7 +821,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                     Erc20SendRequestResponse(
                         id = createResponse.id,
                         projectId = projectId,
-                        status = Status.FAILED,
+                        status = Status.SUCCESS,
                         chainId = chainId.value,
                         tokenAddress = tokenAddress.rawValue,
                         assetType = AssetType.TOKEN,
@@ -1131,7 +1131,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+        val txHash = suppose("some ERC20 transfer transaction is made") {
             contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
@@ -1162,7 +1162,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
                                 projectId = PROJECT_ID,
-                                status = Status.FAILED,
+                                status = Status.SUCCESS,
                                 chainId = PROJECT.chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 assetType = AssetType.TOKEN,
@@ -1256,7 +1256,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+        val txHash = suppose("some ERC20 transfer transaction is made") {
             contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
@@ -1285,7 +1285,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
                                 projectId = projectId,
-                                status = Status.FAILED,
+                                status = Status.SUCCESS,
                                 chainId = chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 assetType = AssetType.TOKEN,
@@ -1372,7 +1372,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+        val txHash = suppose("some ERC20 transfer transaction is made") {
             contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
@@ -1403,7 +1403,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
                                 projectId = PROJECT_ID,
-                                status = Status.FAILED,
+                                status = Status.SUCCESS,
                                 chainId = PROJECT.chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 assetType = AssetType.TOKEN,
@@ -1497,7 +1497,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+        val txHash = suppose("some ERC20 transfer transaction is made") {
             contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
@@ -1528,7 +1528,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
                                 projectId = projectId,
-                                status = Status.FAILED,
+                                status = Status.SUCCESS,
                                 chainId = chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 assetType = AssetType.TOKEN,
@@ -1615,7 +1615,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+        val txHash = suppose("some ERC20 transfer transaction is made") {
             contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
@@ -1646,7 +1646,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
                                 projectId = PROJECT_ID,
-                                status = Status.FAILED,
+                                status = Status.SUCCESS,
                                 chainId = PROJECT.chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 assetType = AssetType.TOKEN,
@@ -1738,7 +1738,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, Erc20SendRequestResponse::class.java)
         }
 
-        val txHash = suppose("some ERC20 transfer transaction is made without attached UUID") {
+        val txHash = suppose("some ERC20 transfer transaction is made") {
             contract.transferAndMine(recipientAddress, amount)
                 ?.get()?.transactionHash?.let { TransactionHash(it) }!!
         }
@@ -1769,7 +1769,7 @@ class Erc20SendRequestControllerApiTest : ControllerTestBase() {
                             Erc20SendRequestResponse(
                                 id = createResponse.id,
                                 projectId = projectId,
-                                status = Status.FAILED,
+                                status = Status.SUCCESS,
                                 chainId = chainId.value,
                                 tokenAddress = tokenAddress.rawValue,
                                 assetType = AssetType.TOKEN,
