@@ -147,7 +147,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
                 blockchainService = mock()
@@ -177,7 +177,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = mock(),
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
@@ -243,7 +243,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
@@ -322,7 +322,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
@@ -411,7 +411,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
@@ -500,7 +500,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
@@ -589,7 +589,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
@@ -678,7 +678,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
@@ -767,7 +767,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
@@ -856,7 +856,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
@@ -945,7 +945,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
@@ -1034,7 +1034,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
@@ -1071,7 +1071,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = mock(),
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
@@ -1102,7 +1102,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = mock(),
             erc20LockRequestRepository = erc20LockRequestRepository,
-            erc20CommonService = Erc20CommonServiceImpl(
+            ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
