@@ -29,7 +29,7 @@ import java.util.UUID
 class Erc20LockRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val erc20LockRequestRepository: Erc20LockRequestRepository,
-    private val erc20CommonService: Erc20CommonService,
+    private val ethCommonService: EthCommonService,
     private val projectRepository: ProjectRepository
 ) : Erc20LockRequestService {
 
@@ -41,7 +41,7 @@ class Erc20LockRequestServiceImpl(
     ): WithFunctionData<Erc20LockRequest> {
         logger.info { "Creating ERC20 lock request, params: $params, project: $project" }
 
-        val databaseParams = erc20CommonService.createDatabaseParams(StoreErc20LockRequestParams, params, project)
+        val databaseParams = ethCommonService.createDatabaseParams(StoreErc20LockRequestParams, params, project)
         val data = encodeFunctionData(
             tokenAddress = databaseParams.tokenAddress,
             tokenAmount = databaseParams.tokenAmount,
@@ -57,7 +57,7 @@ class Erc20LockRequestServiceImpl(
     override fun getErc20LockRequest(id: UUID): WithTransactionData<Erc20LockRequest> {
         logger.debug { "Fetching ERC20 lock request, id: $id" }
 
-        val erc20LockRequest = erc20CommonService.fetchResource(
+        val erc20LockRequest = ethCommonService.fetchResource(
             erc20LockRequestRepository.getById(id),
             "ERC20 lock request not found for ID: $id"
         )
@@ -101,7 +101,7 @@ class Erc20LockRequestServiceImpl(
         )
 
     private fun Erc20LockRequest.appendTransactionData(project: Project): WithTransactionData<Erc20LockRequest> {
-        val transactionInfo = erc20CommonService.fetchTransactionInfo(
+        val transactionInfo = ethCommonService.fetchTransactionInfo(
             txHash = txHash,
             chainId = chainId,
             customRpcUrl = project.customRpcUrl
