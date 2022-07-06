@@ -180,7 +180,7 @@ jooq {
                             ForcedType().apply {
                                 userType = "com.ampnet.blockchainapiservice.util.Balance"
                                 converter = "com.ampnet.blockchainapiservice.util.BalanceConverter"
-                                includeExpression = "token_amount"
+                                includeExpression = ".*_amount"
                                 includeTypes = "NUMERIC"
                             },
                             ForcedType().apply {
@@ -247,17 +247,6 @@ jooq {
                         name = "org.jooq.codegen.DefaultGeneratorStrategy"
                         matchers = Matchers().apply {
                             tables = listOf(
-                                MatchersTableType().apply {
-                                    expression = "erc20_.*"
-                                    tableClass = MatcherRule().apply {
-                                        transform = MatcherTransformType.PASCAL
-                                        expression = "$0_table"
-                                        recordImplements =
-                                            "com.ampnet.blockchainapiservice.model.database.record.Erc20Record"
-                                        tableImplements =
-                                            "com.ampnet.blockchainapiservice.model.database.table.Erc20Table"
-                                    }
-                                },
                                 MatchersTableType().apply {
                                     tableClass = MatcherRule().apply {
                                         transform = MatcherTransformType.PASCAL
