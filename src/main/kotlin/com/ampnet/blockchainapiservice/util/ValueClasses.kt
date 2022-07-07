@@ -138,3 +138,31 @@ value class BaseUrl private constructor(val value: String) {
         )
     }
 }
+
+@JvmInline
+value class ContractId private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = ContractId(value.replace('/', '.').lowercase())
+    }
+}
+
+@JvmInline
+value class ContractBinaryData private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = ContractBinaryData(value.lowercase())
+    }
+}
+
+@JvmInline
+value class ContractTag private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = ContractTag(value.replace('/', '.').lowercase())
+    }
+}
+
+@JvmInline
+value class ContractTrait private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = ContractTrait(value.replace('/', '.').lowercase())
+    }
+}
