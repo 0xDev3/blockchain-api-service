@@ -1,0 +1,4 @@
+{
+    "tags": ["tag.example"],
+    "implements": ["trait.example"]
+}
