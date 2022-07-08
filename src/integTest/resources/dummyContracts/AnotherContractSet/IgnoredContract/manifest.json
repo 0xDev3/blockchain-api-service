@@ -1,0 +1,4 @@
+{
+    "tags": ["tag.ignored"],
+    "implements": ["trait.ignored"]
+}
