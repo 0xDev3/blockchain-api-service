@@ -1,4 +1,4 @@
-CREATE TABLE blockchain_api_service.deployed_contract (
+CREATE TABLE blockchain_api_service.contract_deployment_request (
     id                           UUID                     PRIMARY KEY,
     contract_id                  VARCHAR                  NOT NULL,
     contract_data                BYTEA                    NOT NULL,
@@ -12,13 +12,19 @@ CREATE TABLE blockchain_api_service.deployed_contract (
     screen_before_action_message VARCHAR,
     screen_after_action_message  VARCHAR,
     contract_address             VARCHAR,
+    deployer_address             VARCHAR,
     tx_hash                      VARCHAR
 );
 
-CREATE INDEX deployed_contract_contract_id ON blockchain_api_service.deployed_contract(contract_id);
-CREATE INDEX deployed_contract_project_id ON blockchain_api_service.deployed_contract(project_id);
-CREATE INDEX deployed_contract_created_at ON blockchain_api_service.deployed_contract(created_at);
+CREATE INDEX contract_deployment_request_contract_id ON blockchain_api_service.contract_deployment_request(contract_id);
+CREATE INDEX contract_deployment_request_project_id ON blockchain_api_service.contract_deployment_request(project_id);
+CREATE INDEX contract_deployment_request_created_at ON blockchain_api_service.contract_deployment_request(created_at);
+CREATE INDEX contract_deployment_contract_address
+    ON blockchain_api_service.contract_deployment_request(contract_address);
+CREATE INDEX contract_deployment_deployer_address
+    ON blockchain_api_service.contract_deployment_request(deployer_address);
 
-CREATE INDEX deployed_contract_contract_tags ON blockchain_api_service.deployed_contract USING gin(contract_tags);
-CREATE INDEX deployed_contract_contract_implements
-    ON blockchain_api_service.deployed_contract USING gin(contract_implements);
+CREATE INDEX contract_deployment_request_contract_tags
+    ON blockchain_api_service.contract_deployment_request USING gin(contract_tags);
+CREATE INDEX contract_deployment_request_contract_implements
+    ON blockchain_api_service.contract_deployment_request USING gin(contract_implements);
