@@ -169,7 +169,7 @@ jooq {
                             ForcedType().apply {
                                 userType = "com.ampnet.blockchainapiservice.util.ContractAddress"
                                 converter = "com.ampnet.blockchainapiservice.util.ContractAddressConverter"
-                                includeExpression = "token_address|.*_contract_address"
+                                includeExpression = "token_address|.*_contract_address|contract_address"
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
@@ -225,6 +225,18 @@ jooq {
                                 converter = "com.ampnet.blockchainapiservice.util.BaseUrlConverter"
                                 includeExpression = "base_redirect_url"
                                 includeTypes = "VARCHAR"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.ContractId"
+                                converter = "com.ampnet.blockchainapiservice.util.ContractIdConverter"
+                                includeExpression = "contract_id"
+                                includeTypes = "VARCHAR"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.ContractBinaryData"
+                                converter = "com.ampnet.blockchainapiservice.util.ContractBinaryDataConverter"
+                                includeExpression = "contract_data"
+                                includeTypes = "BYTEA"
                             }
                         )
                     }
