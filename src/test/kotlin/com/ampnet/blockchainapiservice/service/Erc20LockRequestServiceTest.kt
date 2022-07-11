@@ -377,6 +377,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -466,6 +467,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = lockRequest.tokenSenderAddress!!,
             to = WalletAddress("dead"),
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -555,6 +557,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             hash = TransactionHash("wrong-hash"),
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -644,6 +647,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = WalletAddress("dead"),
             to = lockRequest.lockContractAddress,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -733,6 +737,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
+            deployedContractAddress = null,
             data = FunctionData("wrong-data"),
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -822,6 +827,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = WalletAddress("0cafe0babe"),
             to = lockRequest.lockContractAddress,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -911,6 +917,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -1000,6 +1007,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = lockRequest.tokenSenderAddress!!,
             to = lockRequest.lockContractAddress,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -1054,6 +1062,28 @@ class Erc20LockRequestServiceTest : TestBase() {
                         )
                     )
                 )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReturnEmptyListOfErc20LockRequestsForNonExistentProject() {
+        val projectId = UUID.randomUUID()
+        val service = Erc20LockRequestServiceImpl(
+            functionEncoderService = mock(),
+            erc20LockRequestRepository = mock(),
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = mock()
+            ),
+            projectRepository = projectRepositoryMock(projectId)
+        )
+
+        verify("empty list is returned") {
+            val result = service.getErc20LockRequestsByProjectId(projectId)
+
+            assertThat(result).withMessage()
+                .isEmpty()
         }
     }
 

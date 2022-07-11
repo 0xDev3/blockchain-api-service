@@ -54,7 +54,7 @@ class AssetSendRequestServiceImpl(
 
         val assetSendRequest = ethCommonService.fetchResource(
             assetSendRequestRepository.getById(id),
-            "asset send request not found for ID: $id"
+            "Asset send request not found for ID: $id"
         )
         val project = projectRepository.getById(assetSendRequest.projectId)!!
 
@@ -63,8 +63,9 @@ class AssetSendRequestServiceImpl(
 
     override fun getAssetSendRequestsByProjectId(projectId: UUID): List<WithTransactionData<AssetSendRequest>> {
         logger.debug { "Fetching asset send requests for projectId: $projectId" }
-        val project = projectRepository.getById(projectId)!!
-        return assetSendRequestRepository.getAllByProjectId(projectId).map { it.appendTransactionData(project) }
+        return projectRepository.getById(projectId)?.let {
+            assetSendRequestRepository.getAllByProjectId(projectId).map { req -> req.appendTransactionData(it) }
+        } ?: emptyList()
     }
 
     override fun getAssetSendRequestsBySender(sender: WalletAddress): List<WithTransactionData<AssetSendRequest>> {

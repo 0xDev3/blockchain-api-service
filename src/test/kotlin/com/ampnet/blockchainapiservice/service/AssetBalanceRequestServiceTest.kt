@@ -995,6 +995,29 @@ class AssetBalanceRequestServiceTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyReturnEmptyListOfAssetBalanceRequestsForNonExistentProject() {
+        val projectId = UUID.randomUUID()
+        val service = AssetBalanceRequestServiceImpl(
+            signatureCheckerService = mock(),
+            blockchainService = mock(),
+            assetBalanceRequestRepository = mock(),
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = mock()
+            ),
+            projectRepository = projectRepositoryMockWithCustomRpcUrl(projectId, null)
+        )
+
+        verify("empty list is returned") {
+            val result = service.getAssetBalanceRequestsByProjectId(projectId)
+
+            assertThat(result).withMessage()
+                .isEmpty()
+        }
+    }
+
+    @Test
     fun mustAttachWalletAddressAndSignedMessage() {
         val uuid = UUID.randomUUID()
         val walletAddress = WalletAddress("a")

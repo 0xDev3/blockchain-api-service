@@ -114,6 +114,9 @@ value class FunctionData private constructor(val value: String) {
         val EMPTY = FunctionData("0x")
         operator fun invoke(value: String) = FunctionData(value.lowercase())
     }
+
+    val withoutPrefix
+        get(): String = value.removePrefix("0x")
 }
 
 @JvmInline

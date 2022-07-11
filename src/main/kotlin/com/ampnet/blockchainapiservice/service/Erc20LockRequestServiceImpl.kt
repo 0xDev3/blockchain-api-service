@@ -68,8 +68,9 @@ class Erc20LockRequestServiceImpl(
 
     override fun getErc20LockRequestsByProjectId(projectId: UUID): List<WithTransactionData<Erc20LockRequest>> {
         logger.debug { "Fetching ERC20 lock requests for projectId: $projectId" }
-        val project = projectRepository.getById(projectId)!!
-        return erc20LockRequestRepository.getAllByProjectId(projectId).map { it.appendTransactionData(project) }
+        return projectRepository.getById(projectId)?.let {
+            erc20LockRequestRepository.getAllByProjectId(projectId).map { req -> req.appendTransactionData(it) }
+        } ?: emptyList()
     }
 
     override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
