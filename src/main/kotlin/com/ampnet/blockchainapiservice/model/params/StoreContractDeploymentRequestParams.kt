@@ -7,6 +7,7 @@ import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
 import com.ampnet.blockchainapiservice.util.ContractTrait
 import com.ampnet.blockchainapiservice.util.UtcDateTime
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
 import java.util.UUID
 
@@ -16,6 +17,7 @@ data class StoreContractDeploymentRequestParams(
     val contractData: ContractBinaryData,
     val contractTags: List<ContractTag>,
     val contractImplements: List<ContractTrait>,
+    val deployerAddress: WalletAddress?,
     val chainId: ChainId,
     val redirectUrl: String,
     val projectId: UUID,
