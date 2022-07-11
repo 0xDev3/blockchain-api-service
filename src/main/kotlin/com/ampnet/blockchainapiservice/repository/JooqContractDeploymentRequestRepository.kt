@@ -25,7 +25,7 @@ import java.util.UUID
 @Repository
 class JooqContractDeploymentRequestRepository(
     private val dslContext: DSLContext
-) : ContractDeploymentRequestRepository { // TODO test
+) : ContractDeploymentRequestRepository {
 
     companion object : KLogging()
 
@@ -45,7 +45,7 @@ class JooqContractDeploymentRequestRepository(
             screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
             screenAfterActionMessage = params.screenConfig.afterActionMessage,
             contractAddress = null,
-            deployerAddress = null,
+            deployerAddress = params.deployerAddress,
             txHash = null
         )
         dslContext.executeInsert(record)
@@ -70,7 +70,7 @@ class JooqContractDeploymentRequestRepository(
             filters.contractIds.orCondition(),
             filters.contractTags.orAndCondition { it.contractTagsAndCondition() },
             filters.contractImplements.orAndCondition { it.contractTraitsAndCondition() },
-            filters.deployed.takeIf { it }?.let {
+            filters.deployedOnly.takeIf { it }?.let {
                 ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_ADDRESS.isNotNull()
             }
         )

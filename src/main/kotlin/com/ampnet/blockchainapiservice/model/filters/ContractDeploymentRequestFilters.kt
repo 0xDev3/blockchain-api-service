@@ -8,5 +8,5 @@ data class ContractDeploymentRequestFilters(
     val contractIds: OrList<ContractId>,
     val contractTags: OrList<AndList<ContractTag>>,
     val contractImplements: OrList<AndList<ContractTrait>>,
-    val deployed: Boolean
+    val deployedOnly: Boolean
 )
