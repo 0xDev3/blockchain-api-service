@@ -16,6 +16,7 @@ import com.ampnet.blockchainapiservice.model.filters.OrList
 import com.ampnet.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
 import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
+import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
+import java.math.BigInteger
 import java.util.UUID
 
 @JooqTest
@@ -46,6 +48,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         private val OWNER_ID = UUID.randomUUID()
         private val CONTRACT_ID = ContractId("contract-id")
         private val CONTRACT_DATA = ContractBinaryData("00")
+        private val INITIAL_ETH_AMOUNT = Balance(BigInteger("10000"))
         private val CHAIN_ID = ChainId(1337L)
         private const val REDIRECT_URL = "redirect-url"
         private val ARBITRARY_DATA = TestData.EMPTY_JSON_OBJECT
@@ -333,6 +336,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             contractTags = listOf(ContractTag("test-tag")),
             contractImplements = listOf(ContractTrait("test-trait")),
             deployerAddress = null,
+            initialEthAmount = INITIAL_ETH_AMOUNT,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             projectId = PROJECT_ID_1,
@@ -354,6 +358,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
             contractImplements = listOf(ContractTrait("test-trait")),
+            initialEthAmount = INITIAL_ETH_AMOUNT,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             projectId = PROJECT_ID_1,
@@ -389,6 +394,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             contractTags = listOf(ContractTag("test-tag")),
             contractImplements = listOf(ContractTrait("test-trait")),
             deployerAddress = null,
+            initialEthAmount = INITIAL_ETH_AMOUNT,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
             projectId = PROJECT_ID_1,
@@ -420,6 +426,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         contractData = CONTRACT_DATA,
                         contractTags = listOf(ContractTag("test-tag")),
                         contractImplements = listOf(ContractTrait("test-trait")),
+                        initialEthAmount = INITIAL_ETH_AMOUNT,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         projectId = PROJECT_ID_1,
@@ -444,6 +451,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
             contractImplements = listOf(ContractTrait("test-trait")),
+            initialEthAmount = INITIAL_ETH_AMOUNT,
             deployerAddress = DEPLOYER_ADDRESS,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
@@ -477,6 +485,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         contractData = CONTRACT_DATA,
                         contractTags = listOf(ContractTag("test-tag")),
                         contractImplements = listOf(ContractTrait("test-trait")),
+                        initialEthAmount = INITIAL_ETH_AMOUNT,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         projectId = PROJECT_ID_1,
@@ -501,6 +510,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
             contractImplements = listOf(ContractTrait("test-trait")),
+            initialEthAmount = INITIAL_ETH_AMOUNT,
             deployerAddress = null,
             chainId = CHAIN_ID,
             redirectUrl = REDIRECT_URL,
@@ -545,6 +555,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         contractData = CONTRACT_DATA,
                         contractTags = listOf(ContractTag("test-tag")),
                         contractImplements = listOf(ContractTrait("test-trait")),
+                        initialEthAmount = INITIAL_ETH_AMOUNT,
                         chainId = CHAIN_ID,
                         redirectUrl = REDIRECT_URL,
                         projectId = PROJECT_ID_1,
@@ -575,6 +586,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         contractData = CONTRACT_DATA,
         contractTags = contractTags.toTypedArray(),
         contractImplements = contractImplements.toTypedArray(),
+        initialEthAmount = INITIAL_ETH_AMOUNT,
         chainId = CHAIN_ID,
         redirectUrl = REDIRECT_URL,
         projectId = projectId,
@@ -594,6 +606,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             contractData = contractData!!,
             contractTags = contractTags!!.map { ContractTag(it!!) },
             contractImplements = contractImplements!!.map { ContractTrait(it!!) },
+            initialEthAmount = INITIAL_ETH_AMOUNT,
             chainId = chainId!!,
             redirectUrl = redirectUrl!!,
             projectId = projectId!!,

@@ -39,7 +39,7 @@ data class AssetSendRequest(
             status = status,
             transactionData = TransactionData(
                 txHash = this.txHash,
-                fromAddress = transactionInfo?.from,
+                fromAddress = transactionInfo?.from ?: this.assetSenderAddress,
                 toAddress = transactionInfo?.to ?: this.tokenAddress ?: this.assetRecipientAddress,
                 data = data,
                 value = value,

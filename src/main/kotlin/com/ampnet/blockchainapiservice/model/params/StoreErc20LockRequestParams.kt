@@ -26,6 +26,8 @@ data class StoreErc20LockRequestParams(
     val createdAt: UtcDateTime
 ) {
     companion object : ParamsFactory<CreateErc20LockRequestParams, StoreErc20LockRequestParams> {
+        private const val PATH = "/request-lock/\${id}/action"
+
         override fun fromCreateParams(
             id: UUID,
             params: CreateErc20LockRequestParams,
@@ -35,8 +37,7 @@ data class StoreErc20LockRequestParams(
             id = id,
             projectId = project.id,
             chainId = project.chainId,
-            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/request-lock/\${id}/action"))
-                .replace("\${id}", id.toString()),
+            redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
             tokenAddress = params.tokenAddress,
             tokenAmount = params.tokenAmount,
             lockDuration = params.lockDuration,

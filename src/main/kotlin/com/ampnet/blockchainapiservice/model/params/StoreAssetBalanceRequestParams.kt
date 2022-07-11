@@ -23,6 +23,8 @@ data class StoreAssetBalanceRequestParams(
     val createdAt: UtcDateTime
 ) {
     companion object : ParamsFactory<CreateAssetBalanceRequestParams, StoreAssetBalanceRequestParams> {
+        private const val PATH = "/request-balance/\${id}/action"
+
         override fun fromCreateParams(
             id: UUID,
             params: CreateAssetBalanceRequestParams,
@@ -32,8 +34,7 @@ data class StoreAssetBalanceRequestParams(
             id = id,
             projectId = project.id,
             chainId = project.chainId,
-            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/request-balance/\${id}/action"))
-                .replace("\${id}", id.toString()),
+            redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
             tokenAddress = params.tokenAddress,
             blockNumber = params.blockNumber,
             requestedWalletAddress = params.requestedWalletAddress,
