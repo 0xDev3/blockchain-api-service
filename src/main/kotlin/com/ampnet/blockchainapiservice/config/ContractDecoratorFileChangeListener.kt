@@ -69,9 +69,7 @@ class ContractDecoratorFileChangeListener(
 
         if (artifact.isFile && manifest.isFile) {
             val binary = objectMapper.readTree(artifact)
-                .get("data")
                 .get("bytecode")
-                .get("object")
                 .asText()
                 .let { ContractBinaryData(it) }
 

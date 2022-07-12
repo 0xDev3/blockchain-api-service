@@ -1,7 +1,3 @@
 {
-    "data": {
-        "bytecode": {
-            "object": "0x1"
-        }
-    }
+    "bytecode": "0x1"
 }

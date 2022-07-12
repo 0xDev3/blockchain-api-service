@@ -151,6 +151,12 @@ value class ContractBinaryData private constructor(val value: String) {
     companion object {
         operator fun invoke(value: String) = ContractBinaryData(value.lowercase())
     }
+
+    constructor(binary: ByteArray) : this(binary.joinToString(separator = "") { "%02x".format(it) })
+
+    @Suppress("MagicNumber")
+    val binary: ByteArray
+        get() = value.chunked(2).map { it.toByte(16) }.toByteArray()
 }
 
 @JvmInline
