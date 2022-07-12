@@ -156,11 +156,11 @@ class ContractDeploymentRequestServiceImpl(
         deployerAddress == null || from == deployerAddress
 
     private fun BlockchainTransactionInfo.contractAddressMatches(contractAddress: ContractAddress?): Boolean =
-        contractAddress != null && contractAddress == deployedContractAddress
+        deployedContractAddress != null && contractAddress == deployedContractAddress
 
     private fun BlockchainTransactionInfo.dataMatches(expectedData: FunctionData): Boolean =
         data == expectedData
 
-    private fun BlockchainTransactionInfo.valueMatches(expectedValue: Balance?): Boolean =
-        expectedValue == null || value == expectedValue
+    private fun BlockchainTransactionInfo.valueMatches(expectedValue: Balance): Boolean =
+        value == expectedValue
 }

@@ -746,7 +746,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("empty list is returned") {
-            val result = service.getContractDeploymentRequestsByProjectIdAndFilters(projectId, filters)
+            val result = service.getContractDeploymentRequestsByProjectIdAndFilters(PROJECT.id, filters)
 
             assertThat(result).withMessage()
                 .isEmpty()
