@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
+@Suppress("TooManyFunctions")
 class ContractDeploymentRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,

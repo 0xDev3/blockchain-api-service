@@ -420,7 +420,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(lockRequest.projectId)
         )
 
-        verify("ERC20 lock request with successful status is returned") {
+        verify("ERC20 lock request with failed status is returned") {
             assertThat(service.getErc20LockRequest(id)).withMessage()
                 .isEqualTo(
                     lockRequest.withTransactionData(
