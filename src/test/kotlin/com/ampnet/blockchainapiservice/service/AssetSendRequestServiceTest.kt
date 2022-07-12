@@ -476,7 +476,7 @@ class AssetSendRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
-        verify("asset send request with successful status is returned") {
+        verify("asset send request with failed status is returned") {
             assertThat(service.getAssetSendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(

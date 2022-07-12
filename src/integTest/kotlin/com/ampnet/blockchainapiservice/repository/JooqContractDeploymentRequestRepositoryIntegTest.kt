@@ -73,7 +73,6 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         dslContext.delete(ApiKeyTable.API_KEY).execute()
         dslContext.delete(ProjectTable.PROJECT).execute()
         dslContext.delete(UserIdentifierTable.USER_IDENTIFIER).execute()
-//        dslContext.delete(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST).execute()
 
         dslContext.executeInsert(
             UserIdentifierRecord(
