@@ -24,6 +24,8 @@ data class StoreAssetSendRequestParams(
     val createdAt: UtcDateTime
 ) {
     companion object : ParamsFactory<CreateAssetSendRequestParams, StoreAssetSendRequestParams> {
+        private const val PATH = "/request-send/\${id}/action"
+
         override fun fromCreateParams(
             id: UUID,
             params: CreateAssetSendRequestParams,
@@ -33,8 +35,7 @@ data class StoreAssetSendRequestParams(
             id = id,
             projectId = project.id,
             chainId = project.chainId,
-            redirectUrl = (params.redirectUrl ?: (project.baseRedirectUrl.value + "/request-send/\${id}/action"))
-                .replace("\${id}", id.toString()),
+            redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
             tokenAddress = params.tokenAddress,
             assetAmount = params.assetAmount,
             assetSenderAddress = params.assetSenderAddress,

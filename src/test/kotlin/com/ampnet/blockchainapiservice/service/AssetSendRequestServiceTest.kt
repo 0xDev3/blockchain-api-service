@@ -436,6 +436,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = sendRequest.tokenAddress!!,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -475,7 +476,7 @@ class AssetSendRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(sendRequest.projectId)
         )
 
-        verify("asset send request with successful status is returned") {
+        verify("asset send request with failed status is returned") {
             assertThat(service.getAssetSendRequest(id)).withMessage()
                 .isEqualTo(
                     sendRequest.withTransactionData(
@@ -522,6 +523,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = WalletAddress("dead"),
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -608,6 +610,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TransactionHash("wrong-hash"),
             from = sendRequest.assetSenderAddress!!,
             to = sendRequest.tokenAddress!!,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -694,6 +697,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = WalletAddress("dead"),
             to = sendRequest.tokenAddress!!,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -780,6 +784,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = sendRequest.tokenAddress!!,
+            deployedContractAddress = null,
             data = FunctionData("wrong-data"),
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -865,6 +870,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = WalletAddress("dead"),
+            deployedContractAddress = null,
             data = FunctionData.EMPTY,
             value = sendRequest.assetAmount,
             blockConfirmations = BigInteger.ONE,
@@ -934,6 +940,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = sendRequest.assetRecipientAddress,
+            deployedContractAddress = null,
             data = FunctionData.EMPTY,
             value = Balance(BigInteger.ONE),
             blockConfirmations = BigInteger.ONE,
@@ -1004,6 +1011,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = WalletAddress("0cafe0babe"),
             to = sendRequest.tokenAddress!!,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -1090,6 +1098,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = sendRequest.tokenAddress!!,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -1175,6 +1184,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = WalletAddress("0cafe0babe"),
             to = sendRequest.assetRecipientAddress,
+            deployedContractAddress = null,
             data = FunctionData.EMPTY,
             value = sendRequest.assetAmount,
             blockConfirmations = BigInteger.ONE,
@@ -1244,6 +1254,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = sendRequest.assetRecipientAddress,
+            deployedContractAddress = null,
             data = FunctionData.EMPTY,
             value = sendRequest.assetAmount,
             blockConfirmations = BigInteger.ONE,
@@ -1314,6 +1325,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = sendRequest.tokenAddress!!,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -1370,6 +1382,28 @@ class AssetSendRequestServiceTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyReturnEmptyListOfAssetSendRequestsForNonExistentProject() {
+        val projectId = UUID.randomUUID()
+        val service = AssetSendRequestServiceImpl(
+            functionEncoderService = mock(),
+            assetSendRequestRepository = mock(),
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = mock()
+            ),
+            projectRepository = projectRepositoryMock(projectId)
+        )
+
+        verify("empty list is returned") {
+            val result = service.getAssetSendRequestsByProjectId(projectId)
+
+            assertThat(result).withMessage()
+                .isEmpty()
+        }
+    }
+
+    @Test
     fun mustCorrectlyReturnListOfAssetSendRequestsBySenderAddress() {
         val id = UUID.randomUUID()
         val sender = WalletAddress("b")
@@ -1404,6 +1438,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = sendRequest.tokenAddress!!,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,
@@ -1493,6 +1528,7 @@ class AssetSendRequestServiceTest : TestBase() {
             hash = TX_HASH,
             from = sendRequest.assetSenderAddress!!,
             to = sendRequest.tokenAddress!!,
+            deployedContractAddress = null,
             data = encodedData,
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ONE,

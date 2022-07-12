@@ -120,6 +120,7 @@ class EthCommonServiceTest : TestBase() {
             hash = txHash,
             from = WalletAddress("a"),
             to = WalletAddress("b"),
+            deployedContractAddress = null,
             data = FunctionData("data"),
             value = Balance(BigInteger.ZERO),
             blockConfirmations = BigInteger.ZERO,

@@ -15,6 +15,7 @@ import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
+import com.ampnet.blockchainapiservice.util.ZeroAddress
 import com.ampnet.blockchainapiservice.util.bind
 import com.ampnet.blockchainapiservice.util.shortCircuiting
 import mu.KLogging
@@ -105,7 +106,8 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
             BlockchainTransactionInfo(
                 hash = TransactionHash(transaction.hash),
                 from = WalletAddress(transaction.from),
-                to = WalletAddress(transaction.to),
+                to = transaction.to?.let { WalletAddress(it) } ?: ZeroAddress.toWalletAddress(),
+                deployedContractAddress = receipt.contractAddress?.let { ContractAddress(it) },
                 data = FunctionData(transaction.input),
                 value = Balance(transaction.value),
                 blockConfirmations = blockConfirmations,
