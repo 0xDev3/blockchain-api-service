@@ -54,8 +54,9 @@ class AssetBalanceRequestServiceImpl(
 
     override fun getAssetBalanceRequestsByProjectId(projectId: UUID): List<FullAssetBalanceRequest> {
         logger.debug { "Fetching asset balance requests for projectId: $projectId" }
-        val project = projectRepository.getById(projectId)!!
-        return assetBalanceRequestRepository.getAllByProjectId(projectId).map { it.appendBalanceData(project) }
+        return projectRepository.getById(projectId)?.let {
+            assetBalanceRequestRepository.getAllByProjectId(projectId).map { req -> req.appendBalanceData(it) }
+        } ?: emptyList()
     }
 
     override fun attachWalletAddressAndSignedMessage(

@@ -10,4 +10,6 @@ interface FunctionEncoderService {
         arguments: List<FunctionArgument<*, *>>,
         abiOutputTypes: List<AbiType<*>>
     ): FunctionData
+
+    fun encodeConstructor(arguments: List<FunctionArgument<*, *>>): FunctionData
 }
