@@ -143,9 +143,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-3"))
         )
         val project1NonDeployedContractsWithMatchingCid = listOf(
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-1"), contractAddress = null),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-2"), contractAddress = null),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-3"), contractAddress = null)
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-1"), txHash = null),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-2"), txHash = null),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-3"), txHash = null)
         )
         val project1ContractsWithNonMatchingCid = listOf(
             createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("ignored-cid")),
@@ -200,7 +200,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 ContractId("cid-1"),
                 contractTags = listOf("tag-1", "tag-2"),
                 contractImplements = listOf("trait-1", "trait-2"),
-                contractAddress = null
+                txHash = null
             ),
             createRecord(
                 id = uuid(),
@@ -384,7 +384,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlySetTxInfoForContractDeploymentRequestWithNullTxHashAndContractAddress() {
+    fun mustCorrectlySetTxInfoForContractDeploymentRequestWithNullTxHash() {
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
@@ -410,7 +410,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, CONTRACT_ADDRESS, DEPLOYER_ADDRESS)).withMessage()
+            assertThat(repository.setTxInfo(id, TX_HASH, DEPLOYER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
@@ -433,7 +433,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         arbitraryData = ARBITRARY_DATA,
                         screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
                         screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
-                        contractAddress = CONTRACT_ADDRESS,
+                        contractAddress = null,
                         deployerAddress = DEPLOYER_ADDRESS,
                         txHash = TX_HASH
                     )
@@ -469,7 +469,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
         verify("setting txInfo will succeed") {
             val ignoredDeployer = WalletAddress("f")
-            assertThat(repository.setTxInfo(id, TX_HASH, CONTRACT_ADDRESS, ignoredDeployer)).withMessage()
+            assertThat(repository.setTxInfo(id, TX_HASH, ignoredDeployer)).withMessage()
                 .isTrue()
         }
 
@@ -492,7 +492,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         arbitraryData = ARBITRARY_DATA,
                         screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
                         screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
-                        contractAddress = CONTRACT_ADDRESS,
+                        contractAddress = null,
                         deployerAddress = DEPLOYER_ADDRESS,
                         txHash = TX_HASH
                     )
@@ -501,7 +501,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustNotSetTxInfoForContractDeploymentRequestWhenTxHashAndContractAddressAreAlreadySet() {
+    fun mustNotSetTxInfoForContractDeploymentRequestWhenTxHashIsAlreadySet() {
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
@@ -527,7 +527,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, CONTRACT_ADDRESS, DEPLOYER_ADDRESS)).withMessage()
+            assertThat(repository.setTxInfo(id, TX_HASH, DEPLOYER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
@@ -536,7 +536,6 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 repository.setTxInfo(
                     id = id,
                     txHash = TransactionHash("different-tx-hash"),
-                    contractAddress = ContractAddress("dead"),
                     deployer = DEPLOYER_ADDRESS
                 )
             ).withMessage()
@@ -562,9 +561,130 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         arbitraryData = ARBITRARY_DATA,
                         screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
                         screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
-                        contractAddress = CONTRACT_ADDRESS,
+                        contractAddress = null,
                         deployerAddress = DEPLOYER_ADDRESS,
                         txHash = TX_HASH
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlySetContractAddressForContractDeploymentRequestWithNullContractAddress() {
+        val id = UUID.randomUUID()
+        val params = StoreContractDeploymentRequestParams(
+            id = id,
+            contractId = CONTRACT_ID,
+            contractData = CONTRACT_DATA,
+            contractTags = listOf(ContractTag("test-tag")),
+            contractImplements = listOf(ContractTrait("test-trait")),
+            deployerAddress = null,
+            initialEthAmount = INITIAL_ETH_AMOUNT,
+            chainId = CHAIN_ID,
+            redirectUrl = REDIRECT_URL,
+            projectId = PROJECT_ID_1,
+            createdAt = TestData.TIMESTAMP,
+            arbitraryData = ARBITRARY_DATA,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
+            )
+        )
+
+        suppose("contract deployment request is stored in database") {
+            repository.store(params)
+        }
+
+        verify("setting contract address will succeed") {
+            assertThat(repository.setContractAddress(id, CONTRACT_ADDRESS)).withMessage()
+                .isTrue()
+        }
+
+        verify("contract address is correctly set in database") {
+            val result = repository.getById(id)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    ContractDeploymentRequest(
+                        id = id,
+                        contractId = CONTRACT_ID,
+                        contractData = CONTRACT_DATA,
+                        contractTags = listOf(ContractTag("test-tag")),
+                        contractImplements = listOf(ContractTrait("test-trait")),
+                        initialEthAmount = INITIAL_ETH_AMOUNT,
+                        chainId = CHAIN_ID,
+                        redirectUrl = REDIRECT_URL,
+                        projectId = PROJECT_ID_1,
+                        createdAt = TestData.TIMESTAMP,
+                        arbitraryData = ARBITRARY_DATA,
+                        screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                        screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
+                        contractAddress = CONTRACT_ADDRESS,
+                        deployerAddress = null,
+                        txHash = null
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustNotSetContractAddressForContractDeploymentRequestWhenContractAddressIsAlreadySet() {
+        val id = UUID.randomUUID()
+        val params = StoreContractDeploymentRequestParams(
+            id = id,
+            contractId = CONTRACT_ID,
+            contractData = CONTRACT_DATA,
+            contractTags = listOf(ContractTag("test-tag")),
+            contractImplements = listOf(ContractTrait("test-trait")),
+            initialEthAmount = INITIAL_ETH_AMOUNT,
+            deployerAddress = null,
+            chainId = CHAIN_ID,
+            redirectUrl = REDIRECT_URL,
+            projectId = PROJECT_ID_1,
+            createdAt = TestData.TIMESTAMP,
+            arbitraryData = ARBITRARY_DATA,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
+            )
+        )
+
+        suppose("contract deployment request is stored in database") {
+            repository.store(params)
+        }
+
+        verify("setting contract address will succeed") {
+            assertThat(repository.setContractAddress(id, CONTRACT_ADDRESS)).withMessage()
+                .isTrue()
+        }
+
+        verify("setting another contract address will not succeed") {
+            assertThat(repository.setContractAddress(id, ContractAddress("dead"))).withMessage()
+                .isFalse()
+        }
+
+        verify("first contract address remains in database") {
+            val result = repository.getById(id)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    ContractDeploymentRequest(
+                        id = id,
+                        contractId = CONTRACT_ID,
+                        contractData = CONTRACT_DATA,
+                        contractTags = listOf(ContractTag("test-tag")),
+                        contractImplements = listOf(ContractTrait("test-trait")),
+                        initialEthAmount = INITIAL_ETH_AMOUNT,
+                        chainId = CHAIN_ID,
+                        redirectUrl = REDIRECT_URL,
+                        projectId = PROJECT_ID_1,
+                        createdAt = TestData.TIMESTAMP,
+                        arbitraryData = ARBITRARY_DATA,
+                        screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                        screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
+                        contractAddress = CONTRACT_ADDRESS,
+                        deployerAddress = null,
+                        txHash = null
                     )
                 )
         }

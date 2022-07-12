@@ -77,33 +77,23 @@ class ContractDeploymentRequestServiceImpl(
         filters: ContractDeploymentRequestFilters
     ): List<WithTransactionData<ContractDeploymentRequest>> {
         logger.debug { "Fetching contract deployment requests for projectId: $projectId, filters: $filters" }
-        return projectRepository.getById(projectId)?.let {
+
+        val requests = projectRepository.getById(projectId)?.let {
             contractDeploymentRequestRepository.getAllByProjectId(projectId, filters)
                 .map { req -> req.appendTransactionData(it) }
         } ?: emptyList()
+
+        return if (filters.deployedOnly) {
+            requests.filter { it.status == Status.SUCCESS }
+        } else {
+            requests
+        }
     }
 
     override fun attachTxInfo(id: UUID, txHash: TransactionHash, deployer: WalletAddress) {
         logger.info { "Attach txInfo to contract deployment request, id: $id, txHash: $txHash, deployer: $deployer" }
 
-        val contractDeploymentRequest = ethCommonService.fetchResource(
-            contractDeploymentRequestRepository.getById(id),
-            "Contract deployment request not found for ID: $id"
-        )
-        val project = projectRepository.getById(contractDeploymentRequest.projectId)!!
-        val transactionInfo = ethCommonService.fetchTransactionInfo(
-            txHash = txHash,
-            chainId = contractDeploymentRequest.chainId,
-            customRpcUrl = project.customRpcUrl
-        ) ?: throw CannotAttachTxInfoException(
-            "Transaction not found for hash: ${txHash.value}; the contract must be deployed before attaching" +
-                " the transaction hash"
-        )
-        val contractAddress = transactionInfo.deployedContractAddress ?: throw CannotAttachTxInfoException(
-            "Transaction with hash: ${txHash.value} is missing deployed contract address"
-        )
-
-        val txInfoAttached = contractDeploymentRequestRepository.setTxInfo(id, txHash, contractAddress, deployer)
+        val txInfoAttached = contractDeploymentRequestRepository.setTxInfo(id, txHash, deployer)
 
         if (txInfoAttached.not()) {
             throw CannotAttachTxInfoException(
@@ -120,12 +110,25 @@ class ContractDeploymentRequestServiceImpl(
             chainId = chainId,
             customRpcUrl = project.customRpcUrl
         )
-        val status = determineStatus(transactionInfo)
 
-        return withTransactionData(
+        val request = setContractAddressIfNecessary(transactionInfo?.deployedContractAddress)
+        val status = request.determineStatus(transactionInfo)
+
+        return request.withTransactionData(
             status = status,
             transactionInfo = transactionInfo
         )
+    }
+
+    private fun ContractDeploymentRequest.setContractAddressIfNecessary(
+        deployedContractAddress: ContractAddress?
+    ): ContractDeploymentRequest {
+        return if (contractAddress == null && deployedContractAddress != null) {
+            contractDeploymentRequestRepository.setContractAddress(id, deployedContractAddress)
+            copy(contractAddress = deployedContractAddress)
+        } else {
+            this
+        }
     }
 
     private fun ContractDeploymentRequest.determineStatus(

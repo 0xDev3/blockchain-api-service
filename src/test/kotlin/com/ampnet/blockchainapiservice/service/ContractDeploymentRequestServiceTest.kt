@@ -677,6 +677,56 @@ class ContractDeploymentRequestServiceTest : TestBase() {
     }
 
     @Test
+    fun mustReturnContractDeploymentRequestWithSuccessfulStatusAndSetContractAddress() {
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("contract deployment request exists in database") {
+            given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST.copy(contractAddress = null))
+        }
+
+        suppose("setting contract address will succeed") {
+            given(contractDeploymentRequestRepository.setContractAddress(ID, CONTRACT_ADDRESS))
+                .willReturn(true)
+        }
+
+        val blockchainService = mock<BlockchainService>()
+
+        suppose("transaction is mined") {
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+                .willReturn(TRANSACTION_INFO)
+        }
+
+        val service = ContractDeploymentRequestServiceImpl(
+            functionEncoderService = mock(),
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractDecoratorRepository = mock(),
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = blockchainService
+            ),
+            projectRepository = projectRepositoryMock(PROJECT.id)
+        )
+
+        verify("contract deployment request with successful status is returned") {
+            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.SUCCESS,
+                        transactionInfo = TRANSACTION_INFO
+                    )
+                )
+
+            verify(contractDeploymentRequestRepository)
+                .getById(ID)
+            verify(contractDeploymentRequestRepository)
+                .setContractAddress(ID, CONTRACT_ADDRESS)
+            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+        }
+    }
+
+    @Test
     fun mustCorrectlyReturnListOfContractDeploymentRequestsByProjectId() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
         val filters = ContractDeploymentRequestFilters(
@@ -686,9 +736,73 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             deployedOnly = false
         )
 
+        val pendingRequest = STORED_REQUEST.copy(contractAddress = null, txHash = TransactionHash("other-tx-hash"))
+
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getAllByProjectId(PROJECT.id, filters))
-                .willReturn(listOf(STORED_REQUEST))
+                .willReturn(
+                    listOf(
+                        STORED_REQUEST,
+                        pendingRequest
+                    )
+                )
+        }
+
+        val blockchainService = mock<BlockchainService>()
+
+        suppose("transaction is mined") {
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+                .willReturn(TRANSACTION_INFO)
+        }
+
+        val service = ContractDeploymentRequestServiceImpl(
+            functionEncoderService = mock(),
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractDecoratorRepository = mock(),
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = blockchainService
+            ),
+            projectRepository = projectRepositoryMock(PROJECT.id)
+        )
+
+        verify("contract deployment request with successful status is returned") {
+            assertThat(service.getContractDeploymentRequestsByProjectIdAndFilters(PROJECT.id, filters))
+                .withMessage()
+                .isEqualTo(
+                    listOf(
+                        STORED_REQUEST.withTransactionData(
+                            status = Status.SUCCESS,
+                            transactionInfo = TRANSACTION_INFO
+                        ),
+                        pendingRequest.withTransactionData(
+                            status = Status.PENDING,
+                            transactionInfo = null
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReturnListOfContractDeploymentRequestsByProjectIdAndDeployedFilter() {
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+        val filters = ContractDeploymentRequestFilters(
+            contractIds = OrList(),
+            contractTags = OrList(),
+            contractImplements = OrList(),
+            deployedOnly = true
+        )
+
+        suppose("contract deployment request exists in database") {
+            given(contractDeploymentRequestRepository.getAllByProjectId(PROJECT.id, filters))
+                .willReturn(
+                    listOf(
+                        STORED_REQUEST,
+                        STORED_REQUEST.copy(contractAddress = null, txHash = TransactionHash("other-tx-hash"))
+                    )
+                )
         }
 
         val blockchainService = mock<BlockchainService>()
@@ -725,7 +839,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyReturnEmptyListOfErc20LockRequestsForNonExistentProject() {
+    fun mustCorrectlyReturnEmptyListOfContractDeploymentRequestsForNonExistentProject() {
         val projectId = UUID.randomUUID()
         val filters = ContractDeploymentRequestFilters(
             contractIds = OrList(),
@@ -756,57 +870,11 @@ class ContractDeploymentRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyAttachTxInfo() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-        val request = STORED_REQUEST.copy(txHash = null, contractAddress = null, deployerAddress = null)
-
-        suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(request)
-        }
-
-        val blockchainService = mock<BlockchainService>()
-
-        suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
-                .willReturn(TRANSACTION_INFO)
-        }
-
         val deployer = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("txInfo will be successfully attached to the request") {
-            given(contractDeploymentRequestRepository.setTxInfo(ID, TX_HASH, CONTRACT_ADDRESS, deployer))
+            given(contractDeploymentRequestRepository.setTxInfo(ID, TX_HASH, deployer))
                 .willReturn(true)
-        }
-
-        val service = ContractDeploymentRequestServiceImpl(
-            functionEncoderService = mock(),
-            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
-            contractDecoratorRepository = mock(),
-            ethCommonService = EthCommonServiceImpl(
-                uuidProvider = mock(),
-                utcDateTimeProvider = mock(),
-                blockchainService = blockchainService
-            ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
-        )
-
-        verify("txInfo was successfully attached") {
-            service.attachTxInfo(ID, TX_HASH, deployer)
-
-            verify(contractDeploymentRequestRepository)
-                .getById(ID)
-            verify(contractDeploymentRequestRepository)
-                .setTxInfo(ID, TX_HASH, CONTRACT_ADDRESS, deployer)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowResourceNotFoundExceptionForNonExistentContractDeploymentRequestWhenAttachingTxInfo() {
-        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-
-        suppose("contract deployment request does not exist in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(null)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
@@ -821,99 +889,11 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        val deployer = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
-
-        verify("CannotAttachTxInfoException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
-                service.attachTxInfo(ID, TX_HASH, deployer)
-            }
+        verify("txInfo was successfully attached") {
+            service.attachTxInfo(ID, TX_HASH, deployer)
 
             verify(contractDeploymentRequestRepository)
-                .getById(ID)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowCannotAttachTxInfoExceptionForNonMinedTransactionWhenAttachingTxInfo() {
-        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-        val request = STORED_REQUEST.copy(txHash = null, contractAddress = null, deployerAddress = null)
-
-        suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(request)
-        }
-
-        val blockchainService = mock<BlockchainService>()
-
-        suppose("transaction is not mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
-                .willReturn(null)
-        }
-
-        val service = ContractDeploymentRequestServiceImpl(
-            functionEncoderService = mock(),
-            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
-            contractDecoratorRepository = mock(),
-            ethCommonService = EthCommonServiceImpl(
-                uuidProvider = mock(),
-                utcDateTimeProvider = mock(),
-                blockchainService = blockchainService
-            ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
-        )
-
-        val deployer = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
-
-        verify("CannotAttachTxInfoException is thrown") {
-            assertThrows<CannotAttachTxInfoException>(message) {
-                service.attachTxInfo(ID, TX_HASH, deployer)
-            }
-
-            verify(contractDeploymentRequestRepository)
-                .getById(ID)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowCannotAttachTxInfoExceptionForNonContractDeploymentTransactionWhenAttachingTxInfo() {
-        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-        val request = STORED_REQUEST.copy(txHash = null, contractAddress = null, deployerAddress = null)
-
-        suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(request)
-        }
-
-        val blockchainService = mock<BlockchainService>()
-
-        suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
-                .willReturn(TRANSACTION_INFO.copy(deployedContractAddress = null))
-        }
-
-        val service = ContractDeploymentRequestServiceImpl(
-            functionEncoderService = mock(),
-            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
-            contractDecoratorRepository = mock(),
-            ethCommonService = EthCommonServiceImpl(
-                uuidProvider = mock(),
-                utcDateTimeProvider = mock(),
-                blockchainService = blockchainService
-            ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
-        )
-
-        val deployer = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
-
-        verify("CannotAttachTxInfoException is thrown") {
-            assertThrows<CannotAttachTxInfoException>(message) {
-                service.attachTxInfo(ID, TX_HASH, deployer)
-            }
-
-            verify(contractDeploymentRequestRepository)
-                .getById(ID)
+                .setTxInfo(ID, TX_HASH, deployer)
             verifyNoMoreInteractions(contractDeploymentRequestRepository)
         }
     }
@@ -921,24 +901,10 @@ class ContractDeploymentRequestServiceTest : TestBase() {
     @Test
     fun mustThrowCannotAttachTxInfoExceptionWhenAttachingTxInfoFails() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-        val request = STORED_REQUEST.copy(txHash = null, contractAddress = null, deployerAddress = null)
-
-        suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(request)
-        }
-
-        val blockchainService = mock<BlockchainService>()
-
-        suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
-                .willReturn(TRANSACTION_INFO)
-        }
-
         val deployer = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching txInfo will fail") {
-            given(contractDeploymentRequestRepository.setTxInfo(ID, TX_HASH, CONTRACT_ADDRESS, deployer))
+            given(contractDeploymentRequestRepository.setTxInfo(ID, TX_HASH, deployer))
                 .willReturn(false)
         }
 
@@ -949,7 +915,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
-                blockchainService = blockchainService
+                blockchainService = mock()
             ),
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
@@ -960,9 +926,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             }
 
             verify(contractDeploymentRequestRepository)
-                .getById(ID)
-            verify(contractDeploymentRequestRepository)
-                .setTxInfo(ID, TX_HASH, CONTRACT_ADDRESS, deployer)
+                .setTxInfo(ID, TX_HASH, deployer)
             verifyNoMoreInteractions(contractDeploymentRequestRepository)
         }
     }

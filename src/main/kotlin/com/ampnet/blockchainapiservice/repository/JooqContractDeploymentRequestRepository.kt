@@ -72,7 +72,7 @@ class JooqContractDeploymentRequestRepository(
             filters.contractTags.orAndCondition { it.contractTagsAndCondition() },
             filters.contractImplements.orAndCondition { it.contractTraitsAndCondition() },
             filters.deployedOnly.takeIf { it }?.let {
-                ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_ADDRESS.isNotNull()
+                ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.TX_HASH.isNotNull()
             }
         )
 
@@ -82,19 +82,10 @@ class JooqContractDeploymentRequestRepository(
             .fetch { it.toModel() }
     }
 
-    override fun setTxInfo(
-        id: UUID,
-        txHash: TransactionHash,
-        contractAddress: ContractAddress,
-        deployer: WalletAddress
-    ): Boolean {
-        logger.info {
-            "Set txInfo for contract deployment request, id: $id, txHash: $txHash," +
-                " contractAddress: $contractAddress, deployer: $deployer"
-        }
+    override fun setTxInfo(id: UUID, txHash: TransactionHash, deployer: WalletAddress): Boolean {
+        logger.info { "Set txInfo for contract deployment request, id: $id, txHash: $txHash, deployer: $deployer" }
         return dslContext.update(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
             .set(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.TX_HASH, txHash)
-            .set(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_ADDRESS, contractAddress)
             .set(
                 ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.DEPLOYER_ADDRESS,
                 coalesce(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.DEPLOYER_ADDRESS, deployer)
@@ -102,7 +93,21 @@ class JooqContractDeploymentRequestRepository(
             .where(
                 DSL.and(
                     ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.ID.eq(id),
-                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.TX_HASH.isNull(),
+                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.TX_HASH.isNull()
+                )
+            )
+            .execute() > 0
+    }
+
+    override fun setContractAddress(id: UUID, contractAddress: ContractAddress): Boolean {
+        logger.info {
+            "Set contract address for contract deployment request, id: $id, contractAddress: $contractAddress"
+        }
+        return dslContext.update(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
+            .set(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_ADDRESS, contractAddress)
+            .where(
+                DSL.and(
+                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.ID.eq(id),
                     ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_ADDRESS.isNull()
                 )
             )
