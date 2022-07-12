@@ -130,3 +130,25 @@ class BaseUrlConverter : Converter<String, BaseUrl> {
         private const val serialVersionUID: Long = -593346707327357156L
     }
 }
+
+class ContractIdConverter : Converter<String, ContractId> {
+    override fun from(value: String?): ContractId? = value?.let { ContractId(it) }
+    override fun to(value: ContractId?): String? = value?.value
+    override fun fromType(): Class<String> = String::class.java
+    override fun toType(): Class<ContractId> = ContractId::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = -3208788163001411967L
+    }
+}
+
+class ContractBinaryDataConverter : Converter<ByteArray, ContractBinaryData> {
+    override fun from(value: ByteArray?): ContractBinaryData? = value?.let { ContractBinaryData(it) }
+    override fun to(value: ContractBinaryData?): ByteArray? = value?.binary
+    override fun fromType(): Class<ByteArray> = ByteArray::class.java
+    override fun toType(): Class<ContractBinaryData> = ContractBinaryData::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = -1908613704199073695L
+    }
+}

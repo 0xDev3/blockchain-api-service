@@ -5,7 +5,7 @@ VALUES ('00000000-0000-0000-0000-000000000000', '0x00000000000000000000000000000
 -- dummy project needed for migrations
 INSERT INTO blockchain_api_service.project(id, owner_id, issuer_contract_address, redirect_url, chain_id, created_at)
 VALUES ('00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000000',
-        '00000000-0000-0000-0000-000000000000', '', 0, now());
+        '0x0000000000000000000000000000000000000000', '', 0, now());
 
 ALTER TABLE blockchain_api_service.erc20_send_request
     ADD COLUMN project_id UUID NOT NULL REFERENCES blockchain_api_service.project(id)
