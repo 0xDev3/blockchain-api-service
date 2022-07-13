@@ -8,8 +8,6 @@ import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.service.EthereumFunctionEncoderService
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
-import com.ampnet.blockchainapiservice.util.AbiList
-import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
@@ -17,6 +15,7 @@ import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
+import com.ampnet.blockchainapiservice.util.PrimitiveAbiType
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -26,6 +25,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import org.web3j.abi.datatypes.Address
+import org.web3j.abi.datatypes.DynamicArray
+import org.web3j.abi.datatypes.Uint
 import org.web3j.protocol.core.RemoteCall
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.exceptions.TransactionException
@@ -356,10 +358,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val expectedData = EthereumFunctionEncoderService().encode(
                 functionName = "transfer",
                 arguments = listOf(
-                    FunctionArgument(abiType = AbiType.Address, value = WalletAddress(accounts[1].address)),
-                    FunctionArgument(abiType = AbiType.Uint256, value = accountBalance.amount)
+                    FunctionArgument(WalletAddress(accounts[1].address)),
+                    FunctionArgument(accountBalance.amount)
                 ),
-                abiOutputTypes = listOf(AbiType.Bool)
+                abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
             )
 
             assertThat(transactionInfo.data).withMessage()
@@ -434,10 +436,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val expectedData = EthereumFunctionEncoderService().encode(
                 functionName = "transfer",
                 arguments = listOf(
-                    FunctionArgument(abiType = AbiType.Address, value = WalletAddress(accounts[1].address)),
-                    FunctionArgument(abiType = AbiType.Uint256, value = sendAmount)
+                    FunctionArgument(WalletAddress(accounts[1].address)),
+                    FunctionArgument(sendAmount)
                 ),
-                abiOutputTypes = listOf(AbiType.Bool)
+                abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
             )
 
             assertThat(transactionInfo.data).withMessage()
@@ -525,15 +527,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         val encodedConstructor = EthereumFunctionEncoderService().encodeConstructor(
             arguments = listOf(
-                FunctionArgument(
-                    abiType = AbiType.DynamicArray(AbiType.Address),
-                    value = AbiList(accountBalance.wallet)
-                ),
-                FunctionArgument(
-                    abiType = AbiType.DynamicArray(AbiType.Uint256),
-                    value = AbiList(accountBalance.amount)
-                ),
-                FunctionArgument(abiType = AbiType.Address, value = WalletAddress(mainAccount.address))
+                FunctionArgument(DynamicArray(Address::class.java, listOf(accountBalance.wallet.value))),
+                FunctionArgument(DynamicArray(Uint::class.java, listOf(accountBalance.amount.value))),
+                FunctionArgument(WalletAddress(mainAccount.address))
             )
         )
         val data = "0x" + SimpleERC20.BINARY + encodedConstructor.withoutPrefix

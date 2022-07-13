@@ -29,19 +29,9 @@ value class UtcDateTime private constructor(val value: OffsetDateTime) {
     fun isAfter(other: UtcDateTime): Boolean = value.isAfter(other.value)
 }
 
-sealed interface EthereumValue<T> {
-    val rawValue: T
-}
-
-@JvmInline
-value class EthereumString(val value: String) : EthereumValue<String> {
-    override val rawValue: String
-        get() = value
-}
-
-sealed interface EthereumAddress : EthereumValue<String> {
+sealed interface EthereumAddress {
     val value: Address
-    override val rawValue: String
+    val rawValue: String
         get() = value.value
 
     fun toWalletAddress() = WalletAddress(value)
@@ -70,9 +60,9 @@ value class ContractAddress private constructor(override val value: Address) : E
     constructor(value: String) : this(Address(value.lowercase()))
 }
 
-sealed interface EthereumUint : EthereumValue<BigInteger> {
+sealed interface EthereumUint {
     val value: Uint
-    override val rawValue: BigInteger
+    val rawValue: BigInteger
         get() = value.value
 }
 

@@ -1,10 +1,10 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
+import com.ampnet.blockchainapiservice.util.PrimitiveAbiType
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -22,10 +22,10 @@ class EthereumFunctionEncoderServiceTest : TestBase() {
             service.encode(
                 functionName = "transfer",
                 arguments = listOf(
-                    FunctionArgument(abiType = AbiType.Address, value = toAddress),
-                    FunctionArgument(abiType = AbiType.Uint256, value = amount),
+                    FunctionArgument(toAddress),
+                    FunctionArgument(amount),
                 ),
-                abiOutputTypes = listOf(AbiType.Bool)
+                abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
             )
         }
 
@@ -47,8 +47,8 @@ class EthereumFunctionEncoderServiceTest : TestBase() {
         val encodedData = suppose("some test data will be encoded") {
             service.encodeConstructor(
                 arguments = listOf(
-                    FunctionArgument(abiType = AbiType.Address, value = toAddress),
-                    FunctionArgument(abiType = AbiType.Uint256, value = amount),
+                    FunctionArgument(toAddress),
+                    FunctionArgument(amount),
                 )
             )
         }
