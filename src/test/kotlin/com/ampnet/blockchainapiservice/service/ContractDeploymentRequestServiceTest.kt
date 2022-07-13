@@ -18,7 +18,6 @@ import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
-import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -27,7 +26,6 @@ import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
 import com.ampnet.blockchainapiservice.util.ContractTrait
-import com.ampnet.blockchainapiservice.util.EthereumString
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -60,7 +58,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         private val CONTRACT_ID = ContractId("contract-id")
         private val CREATE_PARAMS = CreateContractDeploymentRequestParams(
             contractId = CONTRACT_ID,
-            constructorParams = listOf(FunctionArgument(AbiType.Utf8String, EthereumString("test"))),
+            constructorParams = listOf(FunctionArgument("test")),
             deployerAddress = WalletAddress("a"),
             initialEthAmount = Balance(BigInteger("10000")),
             redirectUrl = "redirect-url/\${id}",

@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode
 
 data class CreateContractDeploymentRequestParams(
     val contractId: ContractId,
-    val constructorParams: List<FunctionArgument<*, *>>,
+    val constructorParams: List<FunctionArgument>,
     val deployerAddress: WalletAddress?,
     val initialEthAmount: Balance,
     val redirectUrl: String?,

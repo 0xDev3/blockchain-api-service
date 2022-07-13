@@ -7,9 +7,9 @@ import com.ampnet.blockchainapiservice.util.FunctionData
 interface FunctionEncoderService {
     fun encode(
         functionName: String,
-        arguments: List<FunctionArgument<*, *>>,
-        abiOutputTypes: List<AbiType<*>>
+        arguments: List<FunctionArgument>,
+        abiOutputTypes: List<AbiType>
     ): FunctionData
 
-    fun encodeConstructor(arguments: List<FunctionArgument<*, *>>): FunctionData
+    fun encodeConstructor(arguments: List<FunctionArgument>): FunctionData
 }
