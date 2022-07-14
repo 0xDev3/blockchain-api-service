@@ -1,22 +1,22 @@
-=== Fetch ERC20 Balance Check Request by ID
-Fetches stored ERC20 balance check request with its current status. The request is considered successful if the attached
+=== Fetch Asset Balance Check Request by ID
+Fetches stored asset balance check request with its current status. The request is considered successful if the attached
 signed message is valid and was signed by `wallet_address`. If `wallet_address` was not specified when the request was
 created, then any valid signature will be accepted. For successful requests, `balance` field will contain info about
-requested ERC20 balance. For pending requests, `balance` and `signed_message` fields will always be `null`. If the
+requested asset balance. For pending requests, `balance` and `signed_message` fields will always be `null`. If the
 signed message is invalid or does not match specified `wallet_address`, request will be considered as failed. If
-`block_number` was specified during request creation, then ERC20 balance will be fetched only for that block number, and
-if `block_number` was not specified then the latest ERC20 balance will be fetched every time this resource is requested.
+`block_number` was specified during request creation, then asset balance will be fetched only for that block number, and
+if `block_number` was not specified then the latest asset balance will be fetched every time this resource is requested.
 
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequestForSomeToken/http-request.adoc[]
+include::{snippets}/AssetBalanceRequestControllerApiTest/mustCorrectlyFetchAssetBalanceRequestForSomeToken/http-request.adoc[]
 ====
 
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequestForSomeToken/http-response.adoc[]
+include::{snippets}/AssetBalanceRequestControllerApiTest/mustCorrectlyFetchAssetBalanceRequestForSomeToken/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse.adoc[]
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetBalanceRequestResponse.adoc[]

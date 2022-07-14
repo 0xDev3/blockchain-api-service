@@ -15,7 +15,7 @@ Source code is available on https://github.com/AMPnet/blockchain-api-service[Git
 
 include::src/docs/asciidoc/base-url.adoc[]
 
-== ERC20 Balance Checking API
+== Asset Balance Checking API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
 include::src/docs/asciidoc/balance/create.adoc[]
@@ -23,7 +23,7 @@ include::src/docs/asciidoc/balance/fetch.adoc[]
 include::src/docs/asciidoc/balance/fetch-by-project-id.adoc[]
 include::src/docs/asciidoc/balance/attach.adoc[]
 
-== ERC20 Send Request API
+== Asset Send Request API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
 include::src/docs/asciidoc/send/create.adoc[]
@@ -40,3 +40,14 @@ include::src/docs/asciidoc/lock/create.adoc[]
 include::src/docs/asciidoc/lock/fetch.adoc[]
 include::src/docs/asciidoc/lock/fetch-by-project-id.adoc[]
 include::src/docs/asciidoc/lock/attach.adoc[]
+
+== Contract Deployment Request API
+All endpoints are public and do not require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/deploy/create.adoc[]
+include::src/docs/asciidoc/deploy/fetch.adoc[]
+include::src/docs/asciidoc/deploy/fetch-by-project-id.adoc[]
+include::src/docs/asciidoc/deploy/attach.adoc[]
+
+== Available Function Argument Types
+include::src/docs/asciidoc/function-arg-types.adoc[]

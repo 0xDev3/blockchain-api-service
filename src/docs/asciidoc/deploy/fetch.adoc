@@ -1,5 +1,5 @@
-=== Fetch Asset Send Request by ID
-Fetches stored asset send request with its current status. The request is considered successful if the attached
+=== Fetch Contract Deployment Request by ID
+Fetches stored contract deployment request with its current status. The request is considered successful if the attached
 transaction is confirmed on blockchain and all its data matches specified request parameters (correct `to` and `from`
 addresses, `amount`, matching `data` and `txHash`). If there are any mismatches between specified request data and state
 on blockchain, the request will be marked as failed. If there is no attached transaction hash or if transaction for
@@ -8,13 +8,13 @@ attached hash is not yet mined on blockchain, request will be in pending state.
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSendRequestForSomeToken/http-request.adoc[]
+include::{snippets}/ContractDeploymentRequestControllerApiTest/mustCorrectlyFetchContractDeploymentRequest/http-request.adoc[]
 ====
 
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSendRequestForSomeToken/http-response.adoc[]
+include::{snippets}/ContractDeploymentRequestControllerApiTest/mustCorrectlyFetchContractDeploymentRequest/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetSendRequestResponse.adoc[]
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestResponse.adoc[]

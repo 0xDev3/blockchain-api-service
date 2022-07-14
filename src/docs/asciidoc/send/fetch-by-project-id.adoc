@@ -1,16 +1,16 @@
-=== Fetch ERC20 Send Requests by Project ID
-Fetches stored ERC20 send requests with their current status filtered by project ID.
+=== Fetch Asset Send Requests by Project ID
+Fetches stored asset send requests with their current status filtered by project ID.
 
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequestsByProjectId/http-request.adoc[]
+include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSendRequestsByProjectId/http-request.adoc[]
 ====
 
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequestsByProjectId/http-response.adoc[]
+include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSendRequestsByProjectId/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20SendRequestsResponse.adoc[]
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetSendRequestsResponse.adoc[]
