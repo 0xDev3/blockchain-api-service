@@ -47,7 +47,7 @@ data class ContractDeploymentRequest(
                 txHash = this.txHash,
                 fromAddress = transactionInfo?.from ?: this.deployerAddress,
                 toAddress = transactionInfo?.to ?: ZeroAddress,
-                data = FunctionData("0x" + contractData.value),
+                data = FunctionData(contractData.value),
                 value = transactionInfo?.value ?: initialEthAmount,
                 blockConfirmations = transactionInfo?.blockConfirmations,
                 timestamp = transactionInfo?.timestamp

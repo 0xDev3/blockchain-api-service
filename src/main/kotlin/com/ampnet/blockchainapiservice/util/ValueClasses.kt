@@ -102,7 +102,7 @@ enum class BlockName(private val web3BlockName: DefaultBlockParameterName) : Blo
 value class FunctionData private constructor(val value: String) {
     companion object {
         val EMPTY = FunctionData("0x")
-        operator fun invoke(value: String) = FunctionData(value.lowercase())
+        operator fun invoke(value: String) = FunctionData("0x" + value.removePrefix("0x").lowercase())
     }
 
     val withoutPrefix
@@ -142,7 +142,7 @@ value class ContractId private constructor(val value: String) {
 @JvmInline
 value class ContractBinaryData private constructor(val value: String) {
     companion object {
-        operator fun invoke(value: String) = ContractBinaryData(value.lowercase())
+        operator fun invoke(value: String) = ContractBinaryData(value.removePrefix("0x").lowercase())
     }
 
     constructor(binary: ByteArray) : this(binary.joinToString(separator = "") { "%02x".format(it) })
@@ -150,6 +150,9 @@ value class ContractBinaryData private constructor(val value: String) {
     @Suppress("MagicNumber")
     val binary: ByteArray
         get() = value.chunked(2).map { it.toByte(16) }.toByteArray()
+
+    val withPrefix: String
+        get() = "0x$value"
 }
 
 @JvmInline
