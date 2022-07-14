@@ -1,5 +1,5 @@
-=== Create ERC20 Balance Check Request
-Creates ERC20 balance request with specified parameters. Parameters `redirect_url`, `block_number`, `wallet_address`,
+=== Create Asset Balance Check Request
+Creates asset balance request with specified parameters. Parameters `redirect_url`, `block_number`, `wallet_address`,
 `arbitrary_data`, `screen_config` and all its child fields are optional. `arbitrary_data` field can contain any desired
 JSON value. Balance check request ID can be interpolated into the `redirect_url` by placing `${id}` placeholder in the
 place where request ID is desired in the URL. The placeholder must strictly have dollar sign and brackets to be
@@ -13,17 +13,17 @@ If `asset_type` is set to `NATIVE`, then chain-native currency balance will be c
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestForSomeTokenWithRedirectUrl/http-request.adoc[]
+include::{snippets}/AssetBalanceRequestControllerApiTest/mustCorrectlyCreateAssetBalanceRequestForSomeTokenWithRedirectUrl/http-request.adoc[]
 ====
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyCreateErc20BalanceRequestForSomeTokenWithRedirectUrl/http-response.adoc[]
+include::{snippets}/AssetBalanceRequestControllerApiTest/mustCorrectlyCreateAssetBalanceRequestForSomeTokenWithRedirectUrl/http-response.adoc[]
 ====
 
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateErc20BalanceRequest.adoc[]
+include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateAssetBalanceRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestResponse.adoc[]
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetBalanceRequestResponse.adoc[]

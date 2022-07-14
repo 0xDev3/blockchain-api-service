@@ -1,5 +1,5 @@
-=== Create ERC20 Send Request
-Creates ERC20 send request with specified parameters. Parameters `redirect_url`, `sender_address`, `arbitrary_data`,
+=== Create Asset Send Request
+Creates asset send request with specified parameters. Parameters `redirect_url`, `sender_address`, `arbitrary_data`,
 `screen_config` and all its child fields are optional. `arbitrary_data` field can contain any desired JSON value. Send
 request ID can be interpolated into the `redirect_url` by placing `${id}` placeholder in the place where request ID is
 desired in the URL. The placeholder must strictly have dollar sign and brackets to be interpolated, and only `id` field
@@ -13,17 +13,17 @@ not be present. If `asset_type` is set to `TOKEN`, then `token_address` must be 
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestForSomeTokenWithRedirectUrl/http-request.adoc[]
+include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyCreateAssetSendRequestForSomeTokenWithRedirectUrl/http-request.adoc[]
 ====
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyCreateErc20SendRequestForSomeTokenWithRedirectUrl/http-response.adoc[]
+include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyCreateAssetSendRequestForSomeTokenWithRedirectUrl/http-response.adoc[]
 ====
 
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateErc20SendRequest.adoc[]
+include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateAssetSendRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20SendRequestResponse.adoc[]
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetSendRequestResponse.adoc[]
