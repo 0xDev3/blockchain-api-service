@@ -70,8 +70,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             projectId = UUID.randomUUID(),
             createdAt = TestData.TIMESTAMP,
             arbitraryData = params.arbitraryData,
-            screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
-            screenAfterActionMessage = params.screenConfig.afterActionMessage,
+            screenConfig = params.screenConfig,
             contractAddress = ContractAddress("cafebabe"),
             deployerAddress = params.deployerAddress,
             txHash = null
@@ -161,8 +160,10 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 projectId = UUID.randomUUID(),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
-                screenBeforeActionMessage = "before-action-message",
-                screenAfterActionMessage = "after-action-message",
+                screenConfig = ScreenConfig(
+                    beforeActionMessage = "before-action-message",
+                    afterActionMessage = "after-action-message"
+                ),
                 contractAddress = ContractAddress("cafebabe"),
                 deployerAddress = WalletAddress("a"),
                 txHash = txHash
@@ -207,10 +208,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                             projectId = result.value.projectId,
                             createdAt = result.value.createdAt.value,
                             arbitraryData = result.value.arbitraryData,
-                            screenConfig = ScreenConfig(
-                                beforeActionMessage = result.value.screenBeforeActionMessage,
-                                afterActionMessage = result.value.screenAfterActionMessage
-                            ).orEmpty(),
+                            screenConfig = result.value.screenConfig.orEmpty(),
                             contractAddress = result.value.contractAddress?.rawValue,
                             deployerAddress = result.value.deployerAddress?.rawValue,
                             deployTx = TransactionResponse(
@@ -246,8 +244,10 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 projectId = UUID.randomUUID(),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
-                screenBeforeActionMessage = "before-action-message",
-                screenAfterActionMessage = "after-action-message",
+                screenConfig = ScreenConfig(
+                    beforeActionMessage = "before-action-message",
+                    afterActionMessage = "after-action-message"
+                ),
                 contractAddress = ContractAddress("cafebabe"),
                 deployerAddress = WalletAddress("a"),
                 txHash = txHash
@@ -307,10 +307,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                     projectId = result.value.projectId,
                                     createdAt = result.value.createdAt.value,
                                     arbitraryData = result.value.arbitraryData,
-                                    screenConfig = ScreenConfig(
-                                        beforeActionMessage = result.value.screenBeforeActionMessage,
-                                        afterActionMessage = result.value.screenAfterActionMessage
-                                    ).orEmpty(),
+                                    screenConfig = result.value.screenConfig.orEmpty(),
                                     contractAddress = result.value.contractAddress?.rawValue,
                                     deployerAddress = result.value.deployerAddress?.rawValue,
                                     deployTx = TransactionResponse(

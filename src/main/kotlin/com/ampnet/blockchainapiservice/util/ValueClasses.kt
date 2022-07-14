@@ -145,11 +145,11 @@ value class ContractBinaryData private constructor(val value: String) {
         operator fun invoke(value: String) = ContractBinaryData(value.removePrefix("0x").lowercase())
     }
 
-    constructor(binary: ByteArray) : this(binary.joinToString(separator = "") { "%02x".format(it) })
+    constructor(binary: ByteArray) : this(String(binary))
 
     @Suppress("MagicNumber")
     val binary: ByteArray
-        get() = value.chunked(2).map { it.toByte(16) }.toByteArray()
+        get() = value.toByteArray()
 
     val withPrefix: String
         get() = "0x$value"
