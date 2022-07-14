@@ -105,8 +105,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectId = PROJECT.id,
             createdAt = TestData.TIMESTAMP,
             arbitraryData = STORE_PARAMS.arbitraryData,
-            screenBeforeActionMessage = STORE_PARAMS.screenConfig.beforeActionMessage,
-            screenAfterActionMessage = STORE_PARAMS.screenConfig.afterActionMessage,
+            screenConfig = STORE_PARAMS.screenConfig,
             contractAddress = CONTRACT_ADDRESS,
             deployerAddress = STORE_PARAMS.deployerAddress,
             txHash = TX_HASH

@@ -363,8 +363,10 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             projectId = PROJECT_ID_1,
             createdAt = TestData.TIMESTAMP,
             arbitraryData = ARBITRARY_DATA,
-            screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
-            screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
+            ),
             contractAddress = null,
             deployerAddress = null,
             txHash = null
@@ -431,8 +433,10 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         projectId = PROJECT_ID_1,
                         createdAt = TestData.TIMESTAMP,
                         arbitraryData = ARBITRARY_DATA,
-                        screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
-                        screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
+                        ),
                         contractAddress = null,
                         deployerAddress = DEPLOYER_ADDRESS,
                         txHash = TX_HASH
@@ -490,8 +494,10 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         projectId = PROJECT_ID_1,
                         createdAt = TestData.TIMESTAMP,
                         arbitraryData = ARBITRARY_DATA,
-                        screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
-                        screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
+                        ),
                         contractAddress = null,
                         deployerAddress = DEPLOYER_ADDRESS,
                         txHash = TX_HASH
@@ -559,8 +565,10 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         projectId = PROJECT_ID_1,
                         createdAt = TestData.TIMESTAMP,
                         arbitraryData = ARBITRARY_DATA,
-                        screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
-                        screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
+                        ),
                         contractAddress = null,
                         deployerAddress = DEPLOYER_ADDRESS,
                         txHash = TX_HASH
@@ -617,8 +625,10 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         projectId = PROJECT_ID_1,
                         createdAt = TestData.TIMESTAMP,
                         arbitraryData = ARBITRARY_DATA,
-                        screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
-                        screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
+                        ),
                         contractAddress = CONTRACT_ADDRESS,
                         deployerAddress = null,
                         txHash = null
@@ -680,8 +690,10 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         projectId = PROJECT_ID_1,
                         createdAt = TestData.TIMESTAMP,
                         arbitraryData = ARBITRARY_DATA,
-                        screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
-                        screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
+                        ),
                         contractAddress = CONTRACT_ADDRESS,
                         deployerAddress = null,
                         txHash = null
@@ -731,8 +743,10 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             projectId = projectId!!,
             createdAt = createdAt!!,
             arbitraryData = arbitraryData,
-            screenBeforeActionMessage = screenBeforeActionMessage,
-            screenAfterActionMessage = screenAfterActionMessage,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
+            ),
             contractAddress = contractAddress,
             deployerAddress = deployerAddress,
             txHash = txHash

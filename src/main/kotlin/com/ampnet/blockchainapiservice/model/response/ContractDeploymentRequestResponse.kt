@@ -44,10 +44,7 @@ data class ContractDeploymentRequestResponse(
         projectId = contractDeploymentRequest.projectId,
         createdAt = contractDeploymentRequest.createdAt.value,
         arbitraryData = contractDeploymentRequest.arbitraryData,
-        screenConfig = ScreenConfig(
-            beforeActionMessage = contractDeploymentRequest.screenBeforeActionMessage,
-            afterActionMessage = contractDeploymentRequest.screenAfterActionMessage
-        ).orEmpty(),
+        screenConfig = contractDeploymentRequest.screenConfig.orEmpty(),
         contractAddress = contractDeploymentRequest.contractAddress?.rawValue,
         deployerAddress = contractDeploymentRequest.deployerAddress?.rawValue,
         deployTx = TransactionResponse(
@@ -74,10 +71,7 @@ data class ContractDeploymentRequestResponse(
         projectId = contractDeploymentRequest.value.projectId,
         createdAt = contractDeploymentRequest.value.createdAt.value,
         arbitraryData = contractDeploymentRequest.value.arbitraryData,
-        screenConfig = ScreenConfig(
-            beforeActionMessage = contractDeploymentRequest.value.screenBeforeActionMessage,
-            afterActionMessage = contractDeploymentRequest.value.screenAfterActionMessage
-        ).orEmpty(),
+        screenConfig = contractDeploymentRequest.value.screenConfig.orEmpty(),
         contractAddress = contractDeploymentRequest.value.contractAddress?.rawValue,
         deployerAddress = contractDeploymentRequest.value.deployerAddress?.rawValue,
         deployTx = TransactionResponse(
