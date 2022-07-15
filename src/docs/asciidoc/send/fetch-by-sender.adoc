@@ -1,18 +1,18 @@
-=== Fetch ERC20 Send Requests by Sender Address
-Fetches stored ERC20 send requests with their current status filtered by sender address *which was specified at the
+=== Fetch Asset Send Requests by Sender Address
+Fetches stored asset send requests with their current status filtered by sender address *which was specified at the
 moment of request creation (if specified) or attached via along with transaction info (if not specified during request
 creation)*.
 
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequestsBySenderAddress/http-request.adoc[]
+include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSendRequestsBySenderAddress/http-request.adoc[]
 ====
 
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyFetchErc20SendRequestsBySenderAddress/http-response.adoc[]
+include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSendRequestsBySenderAddress/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20SendRequestsResponse.adoc[]
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetSendRequestsResponse.adoc[]
