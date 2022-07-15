@@ -15,13 +15,11 @@ import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20LockRequestRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
-import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.DurationSeconds
-import com.ampnet.blockchainapiservice.util.EthereumString
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -93,11 +91,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(CREATE_PARAMS.tokenAddress),
+                        FunctionArgument(CREATE_PARAMS.tokenAmount),
+                        FunctionArgument(CREATE_PARAMS.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -228,11 +226,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -307,11 +305,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -397,11 +395,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -487,11 +485,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -577,11 +575,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -667,11 +665,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -757,11 +755,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -847,11 +845,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -937,11 +935,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )
@@ -1027,11 +1025,11 @@ class Erc20LockRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = lockRequest.tokenAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.tokenAmount),
-                        FunctionArgument(abiType = AbiType.Uint256, value = lockRequest.lockDuration),
-                        FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                        FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                        FunctionArgument(lockRequest.tokenAddress),
+                        FunctionArgument(lockRequest.tokenAmount),
+                        FunctionArgument(lockRequest.lockDuration),
+                        FunctionArgument(id.toString()),
+                        FunctionArgument(ZeroAddress)
                     ),
                     abiOutputTypes = emptyList()
                 )

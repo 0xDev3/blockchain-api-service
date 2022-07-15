@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.model.result
 
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -30,8 +31,7 @@ data class ContractDeploymentRequest(
     val projectId: UUID,
     val createdAt: UtcDateTime,
     val arbitraryData: JsonNode?,
-    val screenBeforeActionMessage: String?,
-    val screenAfterActionMessage: String?,
+    val screenConfig: ScreenConfig,
     val contractAddress: ContractAddress?,
     val deployerAddress: WalletAddress?,
     val txHash: TransactionHash?
@@ -47,7 +47,7 @@ data class ContractDeploymentRequest(
                 txHash = this.txHash,
                 fromAddress = transactionInfo?.from ?: this.deployerAddress,
                 toAddress = transactionInfo?.to ?: ZeroAddress,
-                data = FunctionData("0x" + contractData.value),
+                data = FunctionData(contractData.value),
                 value = transactionInfo?.value ?: initialEthAmount,
                 blockConfirmations = transactionInfo?.blockConfirmations,
                 timestamp = transactionInfo?.timestamp

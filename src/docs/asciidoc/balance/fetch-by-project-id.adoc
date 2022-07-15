@@ -1,16 +1,16 @@
-=== Fetch ERC20 Balance Check Requests by Project ID
-Fetches stored ERC20 balance check requests with their current status filtered by project ID.
+=== Fetch Asset Balance Check Requests by Project ID
+Fetches stored asset balance check requests with their current status filtered by project ID.
 
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequestsByProjectId/http-request.adoc[]
+include::{snippets}/AssetBalanceRequestControllerApiTest/mustCorrectlyFetchAssetBalanceRequestsByProjectId/http-request.adoc[]
 ====
 
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20BalanceRequestControllerApiTest/mustCorrectlyFetchErc20BalanceRequestsByProjectId/http-response.adoc[]
+include::{snippets}/AssetBalanceRequestControllerApiTest/mustCorrectlyFetchAssetBalanceRequestsByProjectId/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20BalanceRequestsResponse.adoc[]
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetBalanceRequestsResponse.adoc[]

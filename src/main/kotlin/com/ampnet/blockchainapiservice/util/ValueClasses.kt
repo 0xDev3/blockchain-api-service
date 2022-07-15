@@ -29,19 +29,9 @@ value class UtcDateTime private constructor(val value: OffsetDateTime) {
     fun isAfter(other: UtcDateTime): Boolean = value.isAfter(other.value)
 }
 
-sealed interface EthereumValue<T> {
-    val rawValue: T
-}
-
-@JvmInline
-value class EthereumString(val value: String) : EthereumValue<String> {
-    override val rawValue: String
-        get() = value
-}
-
-sealed interface EthereumAddress : EthereumValue<String> {
+sealed interface EthereumAddress {
     val value: Address
-    override val rawValue: String
+    val rawValue: String
         get() = value.value
 
     fun toWalletAddress() = WalletAddress(value)
@@ -70,9 +60,9 @@ value class ContractAddress private constructor(override val value: Address) : E
     constructor(value: String) : this(Address(value.lowercase()))
 }
 
-sealed interface EthereumUint : EthereumValue<BigInteger> {
+sealed interface EthereumUint {
     val value: Uint
-    override val rawValue: BigInteger
+    val rawValue: BigInteger
         get() = value.value
 }
 
@@ -112,7 +102,7 @@ enum class BlockName(private val web3BlockName: DefaultBlockParameterName) : Blo
 value class FunctionData private constructor(val value: String) {
     companion object {
         val EMPTY = FunctionData("0x")
-        operator fun invoke(value: String) = FunctionData(value.lowercase())
+        operator fun invoke(value: String) = FunctionData("0x" + value.removePrefix("0x").lowercase())
     }
 
     val withoutPrefix
@@ -152,14 +142,17 @@ value class ContractId private constructor(val value: String) {
 @JvmInline
 value class ContractBinaryData private constructor(val value: String) {
     companion object {
-        operator fun invoke(value: String) = ContractBinaryData(value.lowercase())
+        operator fun invoke(value: String) = ContractBinaryData(value.removePrefix("0x").lowercase())
     }
 
-    constructor(binary: ByteArray) : this(binary.joinToString(separator = "") { "%02x".format(it) })
+    constructor(binary: ByteArray) : this(String(binary))
 
     @Suppress("MagicNumber")
     val binary: ByteArray
-        get() = value.chunked(2).map { it.toByte(16) }.toByteArray()
+        get() = value.toByteArray()
+
+    val withPrefix: String
+        get() = "0x$value"
 }
 
 @JvmInline

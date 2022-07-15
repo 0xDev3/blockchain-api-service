@@ -8,11 +8,9 @@ import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.Erc20LockRequestRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
-import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.DurationSeconds
-import com.ampnet.blockchainapiservice.util.EthereumString
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -92,11 +90,11 @@ class Erc20LockRequestServiceImpl(
         functionEncoderService.encode(
             functionName = "lock",
             arguments = listOf(
-                FunctionArgument(abiType = AbiType.Address, value = tokenAddress),
-                FunctionArgument(abiType = AbiType.Uint256, value = tokenAmount),
-                FunctionArgument(abiType = AbiType.Uint256, value = lockDuration),
-                FunctionArgument(abiType = AbiType.Utf8String, value = EthereumString(id.toString())),
-                FunctionArgument(abiType = AbiType.Address, value = ZeroAddress)
+                FunctionArgument(tokenAddress),
+                FunctionArgument(tokenAmount),
+                FunctionArgument(lockDuration),
+                FunctionArgument(id.toString()),
+                FunctionArgument(ZeroAddress)
             ),
             abiOutputTypes = emptyList()
         )

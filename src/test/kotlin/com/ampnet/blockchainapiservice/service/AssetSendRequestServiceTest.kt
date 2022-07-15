@@ -15,13 +15,13 @@ import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.AssetSendRequestRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
-import com.ampnet.blockchainapiservice.util.AbiType.AbiType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
+import com.ampnet.blockchainapiservice.util.PrimitiveAbiType
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -89,10 +89,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = CREATE_PARAMS.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = CREATE_PARAMS.assetAmount)
+                        FunctionArgument(CREATE_PARAMS.assetRecipientAddress),
+                        FunctionArgument(CREATE_PARAMS.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -293,10 +293,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -369,10 +369,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -456,10 +456,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -543,10 +543,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -630,10 +630,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -717,10 +717,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -804,10 +804,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -1031,10 +1031,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -1118,10 +1118,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -1345,10 +1345,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -1458,10 +1458,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)
@@ -1548,10 +1548,10 @@ class AssetSendRequestServiceTest : TestBase() {
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
-                        FunctionArgument(abiType = AbiType.Address, value = sendRequest.assetRecipientAddress),
-                        FunctionArgument(abiType = AbiType.Uint256, value = sendRequest.assetAmount)
+                        FunctionArgument(sendRequest.assetRecipientAddress),
+                        FunctionArgument(sendRequest.assetAmount)
                     ),
-                    abiOutputTypes = listOf(AbiType.Bool)
+                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
                 )
             )
                 .willReturn(encodedData)

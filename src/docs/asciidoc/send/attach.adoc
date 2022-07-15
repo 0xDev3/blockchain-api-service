@@ -1,11 +1,11 @@
-=== Attach Transaction Info to ERC20 Send Request
-Attaches transaction hash and caller wallet address to existing ERC20 send request. Once the transaction hash is
+=== Attach Transaction Info to Asset Send Request
+Attaches transaction hash and caller wallet address to existing asset send request. Once the transaction hash is
 attached to the request, any subsequent attempts to attach a new transaction hash will fail.
 
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyAttachTransactionInfo/http-request.adoc[]
+include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyAttachTransactionInfo/http-request.adoc[]
 ====
 .Request Schema
 include::{snippets}/com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest.adoc[]
@@ -13,5 +13,5 @@ include::{snippets}/com.ampnet.blockchainapiservice.model.request.AttachTransact
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/Erc20SendRequestControllerApiTest/mustCorrectlyAttachTransactionInfo/http-response.adoc[]
+include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyAttachTransactionInfo/http-response.adoc[]
 ====

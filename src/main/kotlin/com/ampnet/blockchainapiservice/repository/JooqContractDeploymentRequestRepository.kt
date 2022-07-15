@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.repository
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IContractDeploymentRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
+import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.filters.AndList
 import com.ampnet.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import com.ampnet.blockchainapiservice.model.filters.OrList
@@ -127,8 +128,10 @@ class JooqContractDeploymentRequestRepository(
             projectId = projectId!!,
             createdAt = createdAt!!,
             arbitraryData = arbitraryData,
-            screenBeforeActionMessage = screenBeforeActionMessage,
-            screenAfterActionMessage = screenAfterActionMessage,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = screenBeforeActionMessage,
+                afterActionMessage = screenAfterActionMessage
+            ),
             contractAddress = contractAddress,
             deployerAddress = deployerAddress,
             txHash = txHash
