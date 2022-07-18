@@ -1,6 +1,6 @@
 {
-    "tags": ["tag.another"],
-    "implements": ["trait.another"],
+    "tags": ["tag.missing"],
+    "implements": ["trait.missing"],
     "eventDecorators": [
         {
             "signature": "ExampleEvent(address)",

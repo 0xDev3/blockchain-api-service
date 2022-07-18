@@ -1,6 +1,6 @@
 {
-    "tags": ["tag.another"],
-    "implements": ["trait.another"],
+    "tags": ["tag.unparsable"],
+    "implements": ["trait.unparsable"],
     "eventDecorators": [
         {
             "signature": "ExampleEvent(address)",

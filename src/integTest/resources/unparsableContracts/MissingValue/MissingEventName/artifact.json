@@ -1,8 +1,8 @@
 {
-    "contractName": "AnotherContract",
-    "sourceName": "AnotherContract.sol",
-    "bytecode": "0x2",
-    "deployedBytecode": "0x2",
+    "contractName": "MissingEventName",
+    "sourceName": "MissingEventName.sol",
+    "bytecode": "0xdead",
+    "deployedBytecode": "0xdead",
     "abi": [
         {
             "type": "constructor",
@@ -84,7 +84,6 @@
         },
         {
             "type": "event",
-            "name": "ExampleEvent",
             "inputs": [
                 {
                     "internalType": "address",

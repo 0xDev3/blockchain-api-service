@@ -20,6 +20,7 @@ import com.ampnet.blockchainapiservice.util.bind
 import com.ampnet.blockchainapiservice.util.shortCircuiting
 import mu.KLogging
 import org.springframework.stereotype.Service
+import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameter
 import org.web3j.protocol.core.RemoteFunctionCall
 import org.web3j.protocol.core.Request
@@ -44,10 +45,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
                 " blockParameter: $blockParameter"
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
-        val ethBlock = blockchainProperties.web3j.ethGetBlockByNumber(blockParameter.toWeb3Parameter(), false)
-            .sendWithGuarantee().block
-        val blockNumber = BlockNumber(ethBlock.number)
-        val timestamp = UtcDateTime.ofEpochSeconds(ethBlock.timestamp.longValueExact())
+        val (blockNumber, timestamp) = blockchainProperties.web3j.getBlockNumberAndTimestamp(blockParameter)
         val balance = blockchainProperties.web3j.ethGetBalance(walletAddress.rawValue, blockNumber.toWeb3Parameter())
             .sendSafely()?.balance?.let { Balance(it) }
             ?: throw BlockchainReadException("Unable to read balance of address: ${walletAddress.rawValue}")
@@ -66,10 +64,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
                 " walletAddress: $walletAddress, blockParameter: $blockParameter"
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
-        val ethBlock = blockchainProperties.web3j.ethGetBlockByNumber(blockParameter.toWeb3Parameter(), false)
-            .sendWithGuarantee().block
-        val blockNumber = BlockNumber(ethBlock.number)
-        val timestamp = UtcDateTime.ofEpochSeconds(ethBlock.timestamp.longValueExact())
+        val (blockNumber, timestamp) = blockchainProperties.web3j.getBlockNumberAndTimestamp(blockParameter)
 
         val contract = IERC20.load(
             contractAddress.rawValue,
@@ -118,18 +113,11 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
     }
 
     @Suppress("ReturnCount")
-    fun <S, T : Response<*>?> Request<S, T>.sendWithGuarantee(): T {
-        try {
-            val value = this.send()
-            if (value?.hasError() == true) {
-                logger.warn { "Web3j call errors: ${value.error.message}" }
-                throw TemporaryBlockchainReadException()
-            }
-            return value
-        } catch (ex: IOException) {
-            logger.warn("Failed blockchain call", ex)
-            throw TemporaryBlockchainReadException(ex)
-        }
+    fun Web3j.getBlockNumberAndTimestamp(blockParameter: BlockParameter): Pair<BlockNumber, UtcDateTime> {
+        val block = ethGetBlockByNumber(blockParameter.toWeb3Parameter(), false).sendSafely()?.block
+        val blockNumber = block?.number?.let { BlockNumber(it) }
+        val timestamp = block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }
+        return blockNumber?.let { b -> timestamp?.let { t -> Pair(b, t) } } ?: throw TemporaryBlockchainReadException()
     }
 
     @Suppress("ReturnCount")
