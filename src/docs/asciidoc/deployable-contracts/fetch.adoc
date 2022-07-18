@@ -1,0 +1,16 @@
+=== Fetch Deployable Contract by ID
+Fetches info about deployable contract by contract ID.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContractDecorator/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContractDecorator/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.ContractDecoratorResponse.adoc[]
