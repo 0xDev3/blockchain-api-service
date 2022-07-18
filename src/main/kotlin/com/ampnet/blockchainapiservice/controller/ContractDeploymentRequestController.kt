@@ -1,9 +1,9 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
-import com.ampnet.blockchainapiservice.model.filters.AndList
 import com.ampnet.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import com.ampnet.blockchainapiservice.model.filters.OrList
+import com.ampnet.blockchainapiservice.model.filters.parseOrListWithNestedAndLists
 import com.ampnet.blockchainapiservice.model.params.CreateContractDeploymentRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import com.ampnet.blockchainapiservice.model.request.CreateContractDeploymentRequest
@@ -62,8 +62,8 @@ class ContractDeploymentRequestController(
                 projectId = projectId,
                 filters = ContractDeploymentRequestFilters(
                     contractIds = OrList(contractIds.orEmpty().map { ContractId(it) }),
-                    contractTags = contractTags.toOrListWithNestedAndLists { ContractTag(it) },
-                    contractImplements = contractImplements.toOrListWithNestedAndLists { ContractTrait(it) },
+                    contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
+                    contractImplements = contractImplements.parseOrListWithNestedAndLists { ContractTrait(it) },
                     deployedOnly = deployedOnly
                 )
             )
@@ -83,7 +83,4 @@ class ContractDeploymentRequestController(
             deployer = WalletAddress(requestBody.callerAddress)
         )
     }
-
-    private fun <T> List<String>?.toOrListWithNestedAndLists(wrap: (String) -> T): OrList<AndList<T>> =
-        OrList(this.orEmpty().map { AndList(it.split(" AND ").map { wrap(it) }) })
 }
