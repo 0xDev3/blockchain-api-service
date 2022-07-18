@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.config
 
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
+import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
 import org.springframework.boot.devtools.filewatch.FileSystemWatcher
 import org.springframework.context.annotation.Bean
@@ -14,7 +15,8 @@ class ContractDecoratorFileWatcherConfig {
     @Bean
     fun setUpContractDecoratorFileWatcher(
         repository: ContractDecoratorRepository,
-        properties: ApplicationProperties
+        properties: ApplicationProperties,
+        objectMapper: ObjectMapper
     ): FileSystemWatcher? {
         val rootDir = properties.contractDecorators.rootDirectory
 
@@ -28,7 +30,8 @@ class ContractDecoratorFileWatcherConfig {
         val listener = ContractDecoratorFileChangeListener(
             repository = repository,
             rootDir = rootDir,
-            ignoredDirs = properties.contractDecorators.ignoredDirs
+            ignoredDirs = properties.contractDecorators.ignoredDirs,
+            objectMapper = objectMapper
         )
 
         return FileSystemWatcher(

@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.util.json
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.config.JsonConfig
 import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -680,7 +681,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWhenDeserializedValueIsNotAnObject() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenDeserializedValueIsNotAnObject() {
         val json = """{
             |  "args": [
             |    "invalid-arg"
@@ -688,14 +689,17 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |}""".trimMargin()
 
         verify("JsonMappingException is thrown") {
-            assertThrows<JsonMappingException>(message) {
+            val ex = assertThrows<JsonMappingException>(message) {
                 objectMapper.readValue(json, Result::class.java)
             }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
         }
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWhenTypeIsMissing() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenTypeIsMissing() {
         val json = """{
             |  "args": [
             |    {
@@ -705,14 +709,17 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |}""".trimMargin()
 
         verify("JsonMappingException is thrown") {
-            assertThrows<JsonMappingException>(message) {
+            val ex = assertThrows<JsonMappingException>(message) {
                 objectMapper.readValue(json, Result::class.java)
             }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
         }
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWhenValueIsMissing() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenValueIsMissing() {
         val json = """{
             |  "args": [
             |    {
@@ -722,14 +729,17 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |}""".trimMargin()
 
         verify("JsonMappingException is thrown") {
-            assertThrows<JsonMappingException>(message) {
+            val ex = assertThrows<JsonMappingException>(message) {
                 objectMapper.readValue(json, Result::class.java)
             }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
         }
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionForUnknownType() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForUnknownType() {
         val json = """{
             |  "args": [
             |    {
@@ -740,14 +750,17 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |}""".trimMargin()
 
         verify("JsonMappingException is thrown") {
-            assertThrows<JsonMappingException>(message) {
+            val ex = assertThrows<JsonMappingException>(message) {
                 objectMapper.readValue(json, Result::class.java)
             }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
         }
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWhenParsingTextFails() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTextFails() {
         val json = """{
             |  "args": [
             |    {
@@ -758,14 +771,17 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |}""".trimMargin()
 
         verify("JsonMappingException is thrown") {
-            assertThrows<JsonMappingException>(message) {
+            val ex = assertThrows<JsonMappingException>(message) {
                 objectMapper.readValue(json, Result::class.java)
             }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
         }
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWhenParsingBooleanFails() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingBooleanFails() {
         val json = """{
             |  "args": [
             |    {
@@ -776,14 +792,17 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |}""".trimMargin()
 
         verify("JsonMappingException is thrown") {
-            assertThrows<JsonMappingException>(message) {
+            val ex = assertThrows<JsonMappingException>(message) {
                 objectMapper.readValue(json, Result::class.java)
             }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
         }
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWhenParsingBigIntFails() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingBigIntFails() {
         val json = """{
             |  "args": [
             |    {
@@ -794,14 +813,17 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |}""".trimMargin()
 
         verify("JsonMappingException is thrown") {
-            assertThrows<JsonMappingException>(message) {
+            val ex = assertThrows<JsonMappingException>(message) {
                 objectMapper.readValue(json, Result::class.java)
             }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
         }
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWhenParsingBytesFails() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingBytesFails() {
         val json = """{
             |  "args": [
             |    {
@@ -812,14 +834,17 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |}""".trimMargin()
 
         verify("JsonMappingException is thrown") {
-            assertThrows<JsonMappingException>(message) {
+            val ex = assertThrows<JsonMappingException>(message) {
                 objectMapper.readValue(json, Result::class.java)
             }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
         }
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWhenParsingBytesHaveWrongLength() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingBytesHaveWrongLength() {
         val json = """{
             |  "args": [
             |    {
@@ -830,9 +855,12 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |}""".trimMargin()
 
         verify("JsonMappingException is thrown") {
-            assertThrows<JsonMappingException>(message) {
+            val ex = assertThrows<JsonMappingException>(message) {
                 objectMapper.readValue(json, Result::class.java)
             }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
         }
     }
 }

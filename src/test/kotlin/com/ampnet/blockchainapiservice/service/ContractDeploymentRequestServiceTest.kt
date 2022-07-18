@@ -72,7 +72,10 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             id = CONTRACT_ID,
             binary = ContractBinaryData("12"),
             tags = listOf(ContractTag("test-tag")),
-            implements = listOf(ContractTrait("test-trait"))
+            implements = listOf(ContractTrait("test-trait")),
+            constructors = emptyList(),
+            functions = emptyList(),
+            events = emptyList()
         )
         private val ID = UUID.randomUUID()
         private val ENCODED_CONSTRUCTOR = FunctionData("0x1234")

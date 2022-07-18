@@ -1,8 +1,8 @@
 {
-    "contractName": "AnotherContract",
-    "sourceName": "AnotherContract.sol",
-    "bytecode": "0x2",
-    "deployedBytecode": "0x2",
+    "contractName": "MissingFunctionOutputs",
+    "sourceName": "MissingFunctionOutputs.sol",
+    "bytecode": "0xdead",
+    "deployedBytecode": "0xdead",
     "abi": [
         {
             "type": "constructor",
@@ -35,13 +35,6 @@
                     "internalType": "address",
                     "type": "address",
                     "name": "arg"
-                }
-            ],
-            "outputs": [
-                {
-                    "internalType": "bool",
-                    "type": "bool",
-                    "name": ""
                 }
             ]
         },
