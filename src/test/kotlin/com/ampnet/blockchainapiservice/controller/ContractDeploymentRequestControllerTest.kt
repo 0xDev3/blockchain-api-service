@@ -47,6 +47,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
     @Test
     fun mustCorrectlyCreateContractDeploymentRequest() {
         val params = CreateContractDeploymentRequestParams(
+            alias = "alias",
             contractId = ContractId("contract-id"),
             constructorParams = listOf(FunctionArgument(WalletAddress("abc"))),
             deployerAddress = WalletAddress("a"),
@@ -60,6 +61,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         )
         val result = ContractDeploymentRequest(
             id = UUID.randomUUID(),
+            alias = params.alias,
             contractId = params.contractId,
             contractData = ContractBinaryData("00"),
             contractTags = listOf(ContractTag("contract-tag")),
@@ -95,6 +97,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
         verify("controller returns correct response") {
             val request = CreateContractDeploymentRequest(
+                alias = params.alias,
                 contractId = params.contractId.value,
                 constructorParams = params.constructorParams,
                 deployerAddress = params.deployerAddress?.rawValue,
@@ -113,6 +116,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                     ResponseEntity.ok(
                         ContractDeploymentRequestResponse(
                             id = result.id,
+                            alias = params.alias,
                             status = Status.PENDING,
                             contractId = result.contractId.value,
                             contractDeploymentData = result.contractData.withPrefix,
@@ -150,6 +154,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
                 id = UUID.randomUUID(),
+                alias = "alias",
                 contractId = ContractId("contract-id"),
                 contractData = ContractBinaryData("00"),
                 contractTags = listOf(ContractTag("contract-tag")),
@@ -197,6 +202,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                     ResponseEntity.ok(
                         ContractDeploymentRequestResponse(
                             id = result.value.id,
+                            alias = result.value.alias,
                             status = result.status,
                             contractId = result.value.contractId.value,
                             contractDeploymentData = result.value.contractData.withPrefix,
@@ -234,6 +240,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
                 id = UUID.randomUUID(),
+                alias = "alias",
                 contractId = ContractId("contract-id"),
                 contractData = ContractBinaryData("00"),
                 contractTags = listOf(ContractTag("contract-tag")),
@@ -296,6 +303,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                             listOf(
                                 ContractDeploymentRequestResponse(
                                     id = result.value.id,
+                                    alias = result.value.alias,
                                     status = result.status,
                                     contractId = result.value.contractId.value,
                                     contractDeploymentData = result.value.contractData.withPrefix,

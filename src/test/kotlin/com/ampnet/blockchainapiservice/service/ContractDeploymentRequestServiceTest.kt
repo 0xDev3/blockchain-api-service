@@ -57,6 +57,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
         private val CONTRACT_ID = ContractId("contract-id")
         private val CREATE_PARAMS = CreateContractDeploymentRequestParams(
+            alias = "alias",
             contractId = CONTRACT_ID,
             constructorParams = listOf(FunctionArgument("test")),
             deployerAddress = WalletAddress("a"),
@@ -81,6 +82,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         private val ENCODED_CONSTRUCTOR = FunctionData("0x1234")
         private val STORE_PARAMS = StoreContractDeploymentRequestParams(
             id = ID,
+            alias = CREATE_PARAMS.alias,
             contractId = CONTRACT_ID,
             contractData = ContractBinaryData(CONTRACT_DECORATOR.binary.value + ENCODED_CONSTRUCTOR.withoutPrefix),
             contractTags = CONTRACT_DECORATOR.tags,
@@ -98,6 +100,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         private val CONTRACT_ADDRESS = ContractAddress("cafebabe")
         private val STORED_REQUEST = ContractDeploymentRequest(
             id = ID,
+            alias = STORE_PARAMS.alias,
             contractId = CONTRACT_ID,
             contractData = STORE_PARAMS.contractData,
             contractTags = STORE_PARAMS.contractTags,
