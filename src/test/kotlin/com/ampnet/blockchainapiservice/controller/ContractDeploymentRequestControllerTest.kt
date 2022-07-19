@@ -180,7 +180,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             )
         )
 
-        suppose("some contract deployment will be fetched") {
+        suppose("some contract deployment request will be fetched") {
             given(service.getContractDeploymentRequest(id))
                 .willReturn(result)
         }

@@ -41,6 +41,12 @@ include::src/docs/asciidoc/lock/fetch.adoc[]
 include::src/docs/asciidoc/lock/fetch-by-project-id.adoc[]
 include::src/docs/asciidoc/lock/attach.adoc[]
 
+== Deployable Contracts API
+All endpoints are public and do not require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/deployable-contracts/fetch.adoc[]
+include::src/docs/asciidoc/deployable-contracts/fetch-all.adoc[]
+
 == Contract Deployment Request API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
