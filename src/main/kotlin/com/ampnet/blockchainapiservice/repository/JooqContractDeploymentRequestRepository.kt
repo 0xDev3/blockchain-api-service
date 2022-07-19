@@ -34,6 +34,7 @@ class JooqContractDeploymentRequestRepository(
         logger.info { "Store contract deployment request, params: $params" }
         val record = ContractDeploymentRequestRecord(
             id = params.id,
+            alias = params.alias,
             contractId = params.contractId,
             contractData = params.contractData,
             contractTags = params.contractTags.map { it.value }.toTypedArray(),
@@ -118,6 +119,7 @@ class JooqContractDeploymentRequestRepository(
     private fun IContractDeploymentRequestRecord.toModel(): ContractDeploymentRequest =
         ContractDeploymentRequest(
             id = id!!,
+            alias = alias!!,
             contractId = contractId!!,
             contractData = contractData!!,
             contractTags = contractTags!!.map { ContractTag(it!!) },

@@ -15,6 +15,7 @@ import java.util.UUID
 
 data class StoreContractDeploymentRequestParams(
     val id: UUID,
+    val alias: String,
     val contractId: ContractId,
     val contractData: ContractBinaryData,
     val contractTags: List<ContractTag>,
@@ -38,6 +39,7 @@ data class StoreContractDeploymentRequestParams(
             createdAt: UtcDateTime
         ) = StoreContractDeploymentRequestParams(
             id = id,
+            alias = params.createParams.alias,
             contractId = params.createParams.contractId,
             contractData = ContractBinaryData(
                 params.contractDecorator.binary.value + params.encodedConstructor.withoutPrefix

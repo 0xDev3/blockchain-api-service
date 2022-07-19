@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import java.math.BigInteger
 
 data class CreateContractDeploymentRequest(
+    val alias: String,
     val contractId: String,
     val constructorParams: List<FunctionArgument>,
     val deployerAddress: String?,

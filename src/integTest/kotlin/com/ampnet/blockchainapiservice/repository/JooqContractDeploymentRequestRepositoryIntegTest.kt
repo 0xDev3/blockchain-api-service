@@ -46,6 +46,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         private val PROJECT_ID_1 = UUID.randomUUID()
         private val PROJECT_ID_2 = UUID.randomUUID()
         private val OWNER_ID = UUID.randomUUID()
+        private val ALIAS = "alias"
         private val CONTRACT_ID = ContractId("contract-id")
         private val CONTRACT_DATA = ContractBinaryData("00")
         private val INITIAL_ETH_AMOUNT = Balance(BigInteger("10000"))
@@ -330,6 +331,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
+            alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
@@ -353,6 +355,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
         val expectedContractDeploymentRequest = ContractDeploymentRequest(
             id = id,
+            alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
@@ -390,6 +393,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
+            alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
@@ -423,6 +427,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,
+                        alias = ALIAS,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         contractTags = listOf(ContractTag("test-tag")),
@@ -450,6 +455,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
+            alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
@@ -484,6 +490,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,
+                        alias = ALIAS,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         contractTags = listOf(ContractTag("test-tag")),
@@ -511,6 +518,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
+            alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
@@ -555,6 +563,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,
+                        alias = ALIAS,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         contractTags = listOf(ContractTag("test-tag")),
@@ -582,6 +591,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
+            alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
@@ -615,6 +625,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,
+                        alias = ALIAS,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         contractTags = listOf(ContractTag("test-tag")),
@@ -642,6 +653,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
+            alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
             contractTags = listOf(ContractTag("test-tag")),
@@ -680,6 +692,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,
+                        alias = ALIAS,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         contractTags = listOf(ContractTag("test-tag")),
@@ -713,6 +726,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         txHash: TransactionHash? = TX_HASH
     ) = ContractDeploymentRequestRecord(
         id = id,
+        alias = UUID.randomUUID().toString(),
         contractId = contractId,
         contractData = CONTRACT_DATA,
         contractTags = contractTags.toTypedArray(),
@@ -733,6 +747,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     private fun ContractDeploymentRequestRecord.toModel() =
         ContractDeploymentRequest(
             id = id!!,
+            alias = alias!!,
             contractId = contractId!!,
             contractData = contractData!!,
             contractTags = contractTags!!.map { ContractTag(it!!) },
