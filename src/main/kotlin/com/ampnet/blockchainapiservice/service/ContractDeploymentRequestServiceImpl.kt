@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxInfoException
+import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import com.ampnet.blockchainapiservice.model.params.CreateContractDeploymentRequestParams
 import com.ampnet.blockchainapiservice.model.params.PreStoreContractDeploymentRequestParams
@@ -10,6 +11,7 @@ import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
+import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -27,6 +29,7 @@ import java.util.UUID
 class ContractDeploymentRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,
+    private val contractMetadataRepository: ContractMetadataRepository,
     private val contractDecoratorRepository: ContractDecoratorRepository,
     private val ethCommonService: EthCommonService,
     private val projectRepository: ProjectRepository
@@ -40,10 +43,16 @@ class ContractDeploymentRequestServiceImpl(
     ): ContractDeploymentRequest {
         logger.info { "Creating contract deployment request, params: $params, project: $project" }
 
+        val decoratorNotFoundMessage = "Contract decorator not found for contract ID: ${params.contractId.value}"
         val contractDecorator = ethCommonService.fetchResource(
             contractDecoratorRepository.getById(params.contractId),
-            "Contract decorator not found for contract ID: ${params.contractId.value}"
+            decoratorNotFoundMessage
         )
+
+        if (!contractMetadataRepository.exists(params.contractId)) {
+            throw ResourceNotFoundException(decoratorNotFoundMessage)
+        }
+
         // TODO check if constructor exists (out of MVP scope)
         val encodedConstructor = functionEncoderService.encodeConstructor(params.constructorParams)
         val preStoreParams = PreStoreContractDeploymentRequestParams(

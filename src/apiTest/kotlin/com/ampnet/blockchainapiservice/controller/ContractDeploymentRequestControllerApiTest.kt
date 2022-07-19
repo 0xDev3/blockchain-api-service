@@ -9,9 +9,11 @@ import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
@@ -124,9 +126,19 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     @BeforeEach
     fun beforeEach() {
         dslContext.deleteFrom(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST).execute()
+        dslContext.deleteFrom(ContractMetadataTable.CONTRACT_METADATA).execute()
         dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
         dslContext.deleteFrom(ProjectTable.PROJECT).execute()
         dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+
+        dslContext.executeInsert(
+            ContractMetadataRecord(
+                id = UUID.randomUUID(),
+                contractId = CONTRACT_DECORATOR.id,
+                contractTags = CONTRACT_DECORATOR.tags.map { it.value }.toTypedArray(),
+                contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray()
+            )
+        )
 
         dslContext.executeInsert(
             UserIdentifierRecord(
@@ -160,6 +172,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyCreateContractDeploymentRequest() {
+        val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val deployerAddress = WalletAddress("b")
         val initialEthAmount = Balance(BigInteger.ZERO)
@@ -176,6 +189,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
+                                "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
                                 "constructor_params": [
                                     {
@@ -207,6 +221,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
+                        alias = alias,
                         status = Status.PENDING,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = response.contractDeploymentData,
@@ -247,6 +262,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
+                        alias = alias,
                         contractId = CONTRACT_DECORATOR.id,
                         contractData = ContractBinaryData(response.contractDeploymentData),
                         contractTags = CONTRACT_DECORATOR.tags,
@@ -274,6 +290,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyCreateContractDeploymentRequestWithRedirectUrl() {
+        val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val deployerAddress = WalletAddress("b")
         val initialEthAmount = Balance(BigInteger.ZERO)
@@ -291,6 +308,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
+                                "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
                                 "constructor_params": [
                                     {
@@ -323,6 +341,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
+                        alias = alias,
                         status = Status.PENDING,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = response.contractDeploymentData,
@@ -363,6 +382,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
+                        alias = alias,
                         contractId = CONTRACT_DECORATOR.id,
                         contractData = ContractBinaryData(response.contractDeploymentData),
                         contractTags = CONTRACT_DECORATOR.tags,
@@ -390,6 +410,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustReturn404NotFoundWhenCreatingContractDeploymentRequestForNonExistentContractDecorator() {
+        val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val deployerAddress = WalletAddress("b")
         val initialEthAmount = Balance(BigInteger.ZERO)
@@ -402,6 +423,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
+                                "alias": "$alias",
                                 "contract_id": "non-existent-contract-id",
                                 "constructor_params": [
                                     {
@@ -431,6 +453,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustReturn401UnauthorizedWhenCreatingContractDeploymentRequestWithInvalidApiKey() {
+        val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val deployerAddress = WalletAddress("b")
         val initialEthAmount = Balance(BigInteger.ZERO)
@@ -443,6 +466,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
+                                "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
                                 "constructor_params": [
                                     {
@@ -472,6 +496,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequest() {
+        val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
         val deployerAddress = WalletAddress(mainAccount.address)
@@ -489,6 +514,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
+                                "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
                                 "constructor_params": [
                                     {
@@ -555,6 +581,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = createResponse.id,
+                        alias = alias,
                         status = Status.SUCCESS,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = createResponse.contractDeploymentData,
@@ -595,6 +622,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestWhenCustomRpcUrlIsSpecified() {
+        val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
         val deployerAddress = WalletAddress(mainAccount.address)
@@ -616,6 +644,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
+                                "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
                                 "constructor_params": [
                                     {
@@ -682,6 +711,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = createResponse.id,
+                        alias = alias,
                         status = Status.SUCCESS,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = createResponse.contractDeploymentData,
@@ -735,6 +765,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestsByProjectIdAndFilters() {
+        val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
         val deployerAddress = WalletAddress(mainAccount.address)
@@ -752,6 +783,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
+                                "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
                                 "constructor_params": [
                                     {
@@ -825,6 +857,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             ContractDeploymentRequestResponse(
                                 id = createResponse.id,
+                                alias = alias,
                                 status = Status.SUCCESS,
                                 contractId = CONTRACT_DECORATOR.id.value,
                                 contractDeploymentData = createResponse.contractDeploymentData,
@@ -868,6 +901,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestByProjectIdAndFiltersWhenCustomRpcUrlIsSpecified() {
+        val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
         val deployerAddress = WalletAddress(mainAccount.address)
@@ -889,6 +923,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
+                                "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
                                 "constructor_params": [
                                     {
@@ -962,6 +997,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         listOf(
                             ContractDeploymentRequestResponse(
                                 id = createResponse.id,
+                                alias = alias,
                                 status = Status.SUCCESS,
                                 contractId = CONTRACT_DECORATOR.id.value,
                                 contractDeploymentData = createResponse.contractDeploymentData,
@@ -1006,16 +1042,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     @Test
     fun mustCorrectlyAttachTransactionInfo() {
         val id = UUID.randomUUID()
+        val alias = "alias"
         val deployerAddress = WalletAddress("b")
 
         suppose("some contract deployment request without transaction info exists in database") {
             contractDeploymentRequestRepository.store(
                 StoreContractDeploymentRequestParams(
                     id = id,
+                    alias = alias,
                     contractId = CONTRACT_DECORATOR.id,
                     contractData = CONTRACT_DECORATOR.binary,
-                    contractTags = CONTRACT_DECORATOR.tags,
-                    contractImplements = CONTRACT_DECORATOR.implements,
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
                     chainId = Chain.HARDHAT_TESTNET.id,
@@ -1061,6 +1097,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     @Test
     fun mustReturn400BadRequestWhenTransactionInfoIsNotAttached() {
         val id = UUID.randomUUID()
+        val alias = "alias"
         val txHash = TransactionHash("tx-hash")
         val deployerAddress = WalletAddress("b")
 
@@ -1068,10 +1105,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             contractDeploymentRequestRepository.store(
                 StoreContractDeploymentRequestParams(
                     id = id,
+                    alias = alias,
                     contractId = CONTRACT_DECORATOR.id,
                     contractData = CONTRACT_DECORATOR.binary,
-                    contractTags = CONTRACT_DECORATOR.tags,
-                    contractImplements = CONTRACT_DECORATOR.implements,
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
                     chainId = Chain.HARDHAT_TESTNET.id,
