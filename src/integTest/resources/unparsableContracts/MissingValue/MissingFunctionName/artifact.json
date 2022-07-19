@@ -1,8 +1,8 @@
 {
-    "contractName": "AnotherContract",
-    "sourceName": "AnotherContract.sol",
-    "bytecode": "0x2",
-    "deployedBytecode": "0x2",
+    "contractName": "MissingFunctionName",
+    "sourceName": "MissingFunctionName.sol",
+    "bytecode": "0xdead",
+    "deployedBytecode": "0xdead",
     "abi": [
         {
             "type": "constructor",
@@ -29,7 +29,6 @@
         {
             "type": "function",
             "stateMutability": "view",
-            "name": "viewFn",
             "inputs": [
                 {
                     "internalType": "address",

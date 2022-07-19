@@ -1,29 +1,47 @@
 package com.ampnet.blockchainapiservice.config
 
+import com.ampnet.blockchainapiservice.model.json.AbiInputOutput
+import com.ampnet.blockchainapiservice.model.json.AbiObject
+import com.ampnet.blockchainapiservice.model.json.ArtifactJson
+import com.ampnet.blockchainapiservice.model.json.ManifestJson
+import com.ampnet.blockchainapiservice.model.json.TypeDecorator
+import com.ampnet.blockchainapiservice.model.result.ContractConstructor
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
+import com.ampnet.blockchainapiservice.model.result.ContractEvent
+import com.ampnet.blockchainapiservice.model.result.ContractFunction
+import com.ampnet.blockchainapiservice.model.result.ContractParameter
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
 import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.fasterxml.jackson.databind.DatabindException
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
 import org.springframework.boot.devtools.filewatch.ChangedFiles
 import org.springframework.boot.devtools.filewatch.FileChangeListener
+import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
+import kotlin.reflect.KClass
 
+@Suppress("TooManyFunctions")
 class ContractDecoratorFileChangeListener(
     val repository: ContractDecoratorRepository,
     val rootDir: Path,
-    val ignoredDirs: List<String>
+    val ignoredDirs: List<String>,
+    val objectMapper: ObjectMapper
 ) : FileChangeListener {
 
-    companion object : KLogging()
-
-    private val objectMapper = ObjectMapper()
+    companion object : KLogging() {
+        private class ContractDecoratorException(override val message: String) : RuntimeException() {
+            companion object {
+                private const val serialVersionUID: Long = -4648452291836117997L
+            }
+        }
+    }
 
     init {
         rootDir.listDirectoryEntries()
@@ -59,43 +77,125 @@ class ContractDecoratorFileChangeListener(
 
     private fun Path.filterDirs(): Boolean = this.isDirectory() && !ignoredDirs.contains(this.name)
 
-    // TODO add nice error handling here, for now it's assumed repo will have correct directory and JSON structures...
     private fun processContractDecorator(contractDecoratorDir: Path, setName: String) {
         val id = ContractId("$setName/${contractDecoratorDir.name}")
         logger.info { "Processing contract decorator $id..." }
 
         val artifact = contractDecoratorDir.resolve("artifact.json").toFile()
         val manifest = contractDecoratorDir.resolve("manifest.json").toFile()
+        val artifactJson = objectMapper.tryParse(id, artifact, ArtifactJson::class)
+        val manifestJson = objectMapper.tryParse(id, manifest, ManifestJson::class)
 
-        if (artifact.isFile && manifest.isFile) {
-            val binary = objectMapper.readTree(artifact)
-                .get("bytecode")
-                .asText()
-                .let { ContractBinaryData(it) }
-
-            val manifestJson = objectMapper.readTree(manifest)
-            val tags = manifestJson.get("tags")
-                .elements()
-                .asSequence()
-                .map { ContractTag(it.asText()) }
-                .toList()
-            val implements = manifestJson.get("implements")
-                .elements()
-                .asSequence()
-                .map { ContractTrait(it.asText()) }
-                .toList()
-
-            val decorator = ContractDecorator(
-                id = id,
-                binary = binary,
-                tags = tags,
-                implements = implements
-            )
-
-            repository.store(decorator)
+        if (artifactJson != null && manifestJson != null) {
+            try {
+                repository.store(
+                    contractDecorator(
+                        id = id,
+                        artifact = artifactJson,
+                        manifest = manifestJson
+                    )
+                )
+            } catch (e: ContractDecoratorException) {
+                logger.warn(e) { "${e.message} for contract decorator: $id, skipping..." }
+                repository.delete(id)
+            }
         } else {
-            logger.warn { "Contract decorator $id is missing either artifact.json or manifest.json, skipping..." }
             repository.delete(id)
         }
     }
+
+    private fun <T : Any> ObjectMapper.tryParse(id: ContractId, file: File, valueType: KClass<T>): T? =
+        if (file.isFile) {
+            try {
+                readValue(file, valueType.java)
+            } catch (e: DatabindException) {
+                logger.warn(e) { "Unable to parse ${file.name} for contract decorator: $id, skipping..." }
+                null
+            }
+        } else {
+            logger.warn { "${file.name} is missing for contract decorator: $id, skipping..." }
+            null
+        }
+
+    private fun contractDecorator(id: ContractId, artifact: ArtifactJson, manifest: ManifestJson) = ContractDecorator(
+        id = id,
+        binary = ContractBinaryData(artifact.bytecode),
+        tags = manifest.tags.map { ContractTag(it) },
+        implements = manifest.implements.map { ContractTrait(it) },
+        constructors = decorateConstructors(artifact, manifest),
+        functions = decorateFunctions(artifact, manifest),
+        events = decorateEvents(artifact, manifest)
+    )
+
+    private fun decorateConstructors(artifact: ArtifactJson, manifest: ManifestJson): List<ContractConstructor> {
+        val constructors = artifact.abi.filter { it.type == "constructor" }
+            .associateBy { "constructor(${it.inputs.toTypeList()})" }
+        return manifest.constructorDecorators.map {
+            val artifactConstructor = constructors.getAbiObjectBySignature(it.signature)
+
+            ContractConstructor(
+                inputs = it.parameterDecorators.toContractParameters(artifactConstructor.inputs),
+                description = it.description,
+                payable = artifactConstructor.stateMutability == "payable"
+            )
+        }
+    }
+
+    private fun decorateFunctions(artifact: ArtifactJson, manifest: ManifestJson): List<ContractFunction> {
+        val functions = artifact.abi.filter { it.type == "function" }
+            .associateBy { "${it.name}(${it.inputs.toTypeList()})" }
+        return manifest.functionDecorators.map {
+            val artifactFunction = functions.getAbiObjectBySignature(it.signature)
+
+            ContractFunction(
+                name = it.name,
+                description = it.description,
+                solidityName = artifactFunction.name ?: throw ContractDecoratorException(
+                    "Function ${it.signature} is missing function name in artifact.json"
+                ),
+                inputs = it.parameterDecorators.toContractParameters(artifactFunction.inputs),
+                outputs = it.returnDecorators.toContractParameters(
+                    artifactFunction.outputs ?: throw ContractDecoratorException(
+                        "Function ${it.signature} is missing is missing outputs in artifact.json"
+                    )
+                ),
+                emittableEvents = it.emittableEvents,
+                readOnly = artifactFunction.stateMutability == "view" || artifactFunction.stateMutability == "pure"
+            )
+        }
+    }
+
+    private fun decorateEvents(artifact: ArtifactJson, manifest: ManifestJson): List<ContractEvent> {
+        val events = artifact.abi.filter { it.type == "event" }
+            .associateBy { "${it.name}(${it.inputs.toTypeList()})" }
+        return manifest.eventDecorators.map {
+            val artifactEvent = events.getAbiObjectBySignature(it.signature)
+
+            ContractEvent(
+                name = it.name,
+                description = it.description,
+                solidityName = artifactEvent.name ?: throw ContractDecoratorException(
+                    "Event ${it.signature} is missing event name in artifact.json"
+                ),
+                inputs = it.parameterDecorators.toContractParameters(artifactEvent.inputs)
+            )
+        }
+    }
+
+    private fun Map<String, AbiObject>.getAbiObjectBySignature(signature: String): AbiObject =
+        this[signature] ?: throw ContractDecoratorException("Decorator signature $signature not found in artifact.json")
+
+    private fun List<AbiInputOutput>.toTypeList(): String =
+        map { it.type }.joinToString(separator = ",")
+
+    private fun List<TypeDecorator>.toContractParameters(abi: List<AbiInputOutput>): List<ContractParameter> =
+        zip(abi).map {
+            ContractParameter(
+                name = it.first.name,
+                description = it.first.description,
+                solidityName = it.second.name,
+                solidityType = it.second.type,
+                recommendedTypes = it.first.recommendedTypes
+            )
+        }
 }

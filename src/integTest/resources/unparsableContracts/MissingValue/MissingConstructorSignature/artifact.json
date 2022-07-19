@@ -1,20 +1,9 @@
 {
-    "contractName": "AnotherContract",
-    "sourceName": "AnotherContract.sol",
-    "bytecode": "0x2",
-    "deployedBytecode": "0x2",
+    "contractName": "MissingConstructorSignature",
+    "sourceName": "MissingConstructorSignature.sol",
+    "bytecode": "0xdead",
+    "deployedBytecode": "0xdead",
     "abi": [
-        {
-            "type": "constructor",
-            "stateMutability": "nonpayable",
-            "inputs": [
-                {
-                    "internalType": "address",
-                    "type": "address",
-                    "name": "arg"
-                }
-            ]
-        },
         {
             "type": "constructor",
             "stateMutability": "payable",
