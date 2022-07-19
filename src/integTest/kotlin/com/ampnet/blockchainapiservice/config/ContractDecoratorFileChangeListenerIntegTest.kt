@@ -1,22 +1,36 @@
 package com.ampnet.blockchainapiservice.config
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.model.result.ContractConstructor
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractEvent
 import com.ampnet.blockchainapiservice.model.result.ContractFunction
 import com.ampnet.blockchainapiservice.model.result.ContractParameter
+import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.InMemoryContractDecoratorRepository
+import com.ampnet.blockchainapiservice.repository.JooqContractMetadataRepository
+import com.ampnet.blockchainapiservice.service.RandomUuidProvider
+import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
 import com.ampnet.blockchainapiservice.util.ContractTrait
 import org.assertj.core.api.Assertions.assertThat
+import org.jooq.DSLContext
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.devtools.filewatch.ChangedFile
 import org.springframework.boot.devtools.filewatch.ChangedFiles
+import org.springframework.boot.test.autoconfigure.jooq.JooqTest
+import org.springframework.context.annotation.Import
 import java.nio.file.Paths
 
+@JooqTest
+@Import(JooqContractMetadataRepository::class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
 
     companion object {
@@ -147,23 +161,44 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
     private val unparsableRootDir = Paths.get(javaClass.classLoader.getResource("unparsableContracts")!!.path)
     private val ignoredDirs = listOf("IgnoredContract")
 
+    @Suppress("unused")
+    private val postgresContainer = PostgresTestContainer()
+
+    @Autowired
+    private lateinit var contractMetadataRepository: ContractMetadataRepository
+
+    @Autowired
+    private lateinit var dslContext: DSLContext
+
+    @BeforeEach
+    fun beforeEach() {
+        dslContext.delete(ContractMetadataTable.CONTRACT_METADATA).execute()
+    }
+
     @Test
     fun mustCorrectlyLoadInitialContractDecorators() {
-        val repository = InMemoryContractDecoratorRepository()
+        val contractDecoratorRepository = InMemoryContractDecoratorRepository()
 
         suppose("initial contract decorators will be loaded from file system") {
             ContractDecoratorFileChangeListener(
-                repository = repository,
+                uuidProvider = RandomUuidProvider(),
+                contractDecoratorRepository = contractDecoratorRepository,
+                contractMetadataRepository = contractMetadataRepository,
+                objectMapper = JsonConfig().objectMapper(),
                 rootDir = parsableRootDir,
-                ignoredDirs = ignoredDirs,
-                objectMapper = JsonConfig().objectMapper()
+                ignoredDirs = ignoredDirs
             )
         }
 
-        verify("correct contract decorators have been loaded") {
-            val dummyContractId = ContractId("DummyContractSet/DummyContract")
+        val dummyContractId = ContractId("DummyContractSet/DummyContract")
+        val anotherContractId = ContractId("AnotherContractSet/AnotherContract")
+        val contractWithoutArtifactId = ContractId("DummyContractSet/ContractWithoutArtifact")
+        val contractWithoutManifestId = ContractId("DummyContractSet/ContractWithoutManifest")
+        val ignoredContractId = ContractId("AnotherContractSet/IgnoredContract")
 
-            assertThat(repository.getById(dummyContractId)).withMessage()
+        verify("correct contract decorators have been loaded") {
+
+            assertThat(contractDecoratorRepository.getById(dummyContractId)).withMessage()
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
@@ -176,14 +211,12 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     )
                 )
 
-            assertThat(repository.getById(ContractId("DummyContractSet/ContractWithoutArtifact"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(contractWithoutArtifactId)).withMessage()
                 .isNull()
-            assertThat(repository.getById(ContractId("DummyContractSet/ContractWithoutManifest"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(contractWithoutManifestId)).withMessage()
                 .isNull()
 
-            val anotherContractId = ContractId("AnotherContractSet/AnotherContract")
-
-            assertThat(repository.getById(anotherContractId)).withMessage()
+            assertThat(contractDecoratorRepository.getById(anotherContractId)).withMessage()
                 .isEqualTo(
                     ContractDecorator(
                         id = anotherContractId,
@@ -196,21 +229,37 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     )
                 )
 
-            assertThat(repository.getById(ContractId("AnotherContractSet/IgnoredContract"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(ignoredContractId)).withMessage()
                 .isNull()
+        }
+
+        verify("correct contract metadata exists in the database") {
+            assertThat(contractMetadataRepository.exists(dummyContractId)).withMessage()
+                .isTrue()
+            assertThat(contractMetadataRepository.exists(anotherContractId)).withMessage()
+                .isTrue()
+
+            assertThat(contractMetadataRepository.exists(contractWithoutArtifactId)).withMessage()
+                .isFalse()
+            assertThat(contractMetadataRepository.exists(contractWithoutManifestId)).withMessage()
+                .isFalse()
+            assertThat(contractMetadataRepository.exists(ignoredContractId)).withMessage()
+                .isFalse()
         }
     }
 
     @Test
     fun mustCorrectlyReloadContractsAfterSomeFileChangesHaveBeenDetected() {
-        val repository = InMemoryContractDecoratorRepository()
+        val contractDecoratorRepository = InMemoryContractDecoratorRepository()
 
         val listener = suppose("initial contract decorators will be loaded from file system") {
             ContractDecoratorFileChangeListener(
-                repository = repository,
+                uuidProvider = RandomUuidProvider(),
+                contractDecoratorRepository = contractDecoratorRepository,
+                contractMetadataRepository = contractMetadataRepository,
+                objectMapper = JsonConfig().objectMapper(),
                 rootDir = parsableRootDir,
-                ignoredDirs = ignoredDirs,
-                objectMapper = JsonConfig().objectMapper()
+                ignoredDirs = ignoredDirs
             )
         }
 
@@ -218,8 +267,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val anotherContractId = ContractId("AnotherContractSet/AnotherContract")
 
         suppose("existing contracts will be removed from repository") {
-            repository.delete(dummyContractId)
-            repository.delete(anotherContractId)
+            contractDecoratorRepository.delete(dummyContractId)
+            contractDecoratorRepository.delete(anotherContractId)
         }
 
         val contractWithoutArtifactId = ContractId("DummyContractSet/ContractWithoutArtifact")
@@ -236,7 +285,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         )
 
         suppose("contract which needs to be deleted is in repository") {
-            repository.store(
+            contractDecoratorRepository.store(
                 ContractDecorator(
                     id = contractWithoutArtifactId,
                     binary = ContractBinaryData("0x4"),
@@ -247,7 +296,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     events = EVENTS
                 )
             )
-            repository.store(withoutManifestDecorator)
+            contractDecoratorRepository.store(withoutManifestDecorator)
         }
 
         suppose("listener will get some file changes") {
@@ -273,8 +322,10 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             )
         }
 
+        val ignoredContractId = ContractId("AnotherContractSet/IgnoredContract")
+
         verify("correct contract decorators have been updated in database") {
-            assertThat(repository.getById(dummyContractId)).withMessage()
+            assertThat(contractDecoratorRepository.getById(dummyContractId)).withMessage()
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
@@ -287,44 +338,82 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     )
                 )
 
-            assertThat(repository.getById(contractWithoutArtifactId)).withMessage()
+            assertThat(contractDecoratorRepository.getById(contractWithoutArtifactId)).withMessage()
                 .isNull()
-            assertThat(repository.getById(contractWithoutManifestId)).withMessage()
+            assertThat(contractDecoratorRepository.getById(contractWithoutManifestId)).withMessage()
                 .isEqualTo(withoutManifestDecorator)
 
-            assertThat(repository.getById(anotherContractId)).withMessage()
+            assertThat(contractDecoratorRepository.getById(anotherContractId)).withMessage()
                 .isNull()
-            assertThat(repository.getById(ContractId("AnotherContractSet/IgnoredContract"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(ignoredContractId)).withMessage()
                 .isNull()
+        }
+
+        verify("correct contract metadata exists in the database") {
+            assertThat(contractMetadataRepository.exists(dummyContractId)).withMessage()
+                .isTrue()
+            assertThat(contractMetadataRepository.exists(anotherContractId)).withMessage()
+                .isTrue()
+
+            assertThat(contractMetadataRepository.exists(contractWithoutArtifactId)).withMessage()
+                .isFalse()
+            assertThat(contractMetadataRepository.exists(contractWithoutManifestId)).withMessage()
+                .isFalse()
+            assertThat(contractMetadataRepository.exists(ignoredContractId)).withMessage()
+                .isFalse()
         }
     }
 
     @Test
     fun mustSkipUnparsableContractDecorators() {
-        val repository = InMemoryContractDecoratorRepository()
+        val contractDecoratorRepository = InMemoryContractDecoratorRepository()
 
         suppose("initial contract decorators will be loaded from file system") {
             ContractDecoratorFileChangeListener(
-                repository = repository,
+                uuidProvider = RandomUuidProvider(),
+                contractDecoratorRepository = contractDecoratorRepository,
+                contractMetadataRepository = contractMetadataRepository,
+                objectMapper = JsonConfig().objectMapper(),
                 rootDir = unparsableRootDir,
-                ignoredDirs = ignoredDirs,
-                objectMapper = JsonConfig().objectMapper()
+                ignoredDirs = ignoredDirs
             )
         }
 
+        val unparsableArtifactContractId = ContractId("InvalidJson/UnparsableArtifact")
+        val unparsableManifestContractId = ContractId("InvalidJson/UnparsableManifest")
+        val missingConstructorSignatureContractId = ContractId("MissingValue/MissingConstructorSignature")
+        val missingEventNameContractId = ContractId("MissingValue/MissingEventName")
+        val missingFunctionNameContractId = ContractId("MissingValue/MissingFunctionName")
+        val missingFunctionOutputsContractId = ContractId("MissingValue/MissingFunctionOutputs")
+
         verify("no contract decorators have been loaded") {
-            assertThat(repository.getById(ContractId("InvalidJson/UnparsableArtifact"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(unparsableArtifactContractId)).withMessage()
                 .isNull()
-            assertThat(repository.getById(ContractId("InvalidJson/UnparsableManifest"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(unparsableManifestContractId)).withMessage()
                 .isNull()
-            assertThat(repository.getById(ContractId("MissingValue/MissingConstructorSignature"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(missingConstructorSignatureContractId)).withMessage()
                 .isNull()
-            assertThat(repository.getById(ContractId("MissingValue/MissingEventName"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(missingEventNameContractId)).withMessage()
                 .isNull()
-            assertThat(repository.getById(ContractId("MissingValue/MissingFunctionName"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(missingFunctionNameContractId)).withMessage()
                 .isNull()
-            assertThat(repository.getById(ContractId("MissingValue/MissingFunctionOutputs"))).withMessage()
+            assertThat(contractDecoratorRepository.getById(missingFunctionOutputsContractId)).withMessage()
                 .isNull()
+        }
+
+        verify("correct contract metadata exists in the database") {
+            assertThat(contractMetadataRepository.exists(unparsableArtifactContractId)).withMessage()
+                .isFalse()
+            assertThat(contractMetadataRepository.exists(unparsableManifestContractId)).withMessage()
+                .isFalse()
+            assertThat(contractMetadataRepository.exists(missingConstructorSignatureContractId)).withMessage()
+                .isFalse()
+            assertThat(contractMetadataRepository.exists(missingEventNameContractId)).withMessage()
+                .isFalse()
+            assertThat(contractMetadataRepository.exists(missingFunctionNameContractId)).withMessage()
+                .isFalse()
+            assertThat(contractMetadataRepository.exists(missingFunctionOutputsContractId)).withMessage()
+                .isFalse()
         }
     }
 }

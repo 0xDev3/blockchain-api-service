@@ -9,9 +9,11 @@ import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
@@ -124,9 +126,19 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     @BeforeEach
     fun beforeEach() {
         dslContext.deleteFrom(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST).execute()
+        dslContext.deleteFrom(ContractMetadataTable.CONTRACT_METADATA).execute()
         dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
         dslContext.deleteFrom(ProjectTable.PROJECT).execute()
         dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+
+        dslContext.executeInsert(
+            ContractMetadataRecord(
+                id = UUID.randomUUID(),
+                contractId = CONTRACT_DECORATOR.id,
+                contractTags = CONTRACT_DECORATOR.tags.map { it.value }.toTypedArray(),
+                contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray()
+            )
+        )
 
         dslContext.executeInsert(
             UserIdentifierRecord(
@@ -1040,8 +1052,6 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     alias = alias,
                     contractId = CONTRACT_DECORATOR.id,
                     contractData = CONTRACT_DECORATOR.binary,
-                    contractTags = CONTRACT_DECORATOR.tags,
-                    contractImplements = CONTRACT_DECORATOR.implements,
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
                     chainId = Chain.HARDHAT_TESTNET.id,
@@ -1098,8 +1108,6 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     alias = alias,
                     contractId = CONTRACT_DECORATOR.id,
                     contractData = CONTRACT_DECORATOR.binary,
-                    contractTags = CONTRACT_DECORATOR.tags,
-                    contractImplements = CONTRACT_DECORATOR.implements,
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
                     chainId = Chain.HARDHAT_TESTNET.id,

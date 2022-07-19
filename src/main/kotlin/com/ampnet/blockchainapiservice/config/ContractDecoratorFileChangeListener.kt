@@ -11,6 +11,8 @@ import com.ampnet.blockchainapiservice.model.result.ContractEvent
 import com.ampnet.blockchainapiservice.model.result.ContractFunction
 import com.ampnet.blockchainapiservice.model.result.ContractParameter
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
+import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
+import com.ampnet.blockchainapiservice.service.UuidProvider
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
@@ -29,10 +31,12 @@ import kotlin.reflect.KClass
 
 @Suppress("TooManyFunctions")
 class ContractDecoratorFileChangeListener(
-    val repository: ContractDecoratorRepository,
-    val rootDir: Path,
-    val ignoredDirs: List<String>,
-    val objectMapper: ObjectMapper
+    private val uuidProvider: UuidProvider,
+    private val contractDecoratorRepository: ContractDecoratorRepository,
+    private val contractMetadataRepository: ContractMetadataRepository,
+    private val objectMapper: ObjectMapper,
+    private val rootDir: Path,
+    private val ignoredDirs: List<String>
 ) : FileChangeListener {
 
     companion object : KLogging() {
@@ -88,19 +92,24 @@ class ContractDecoratorFileChangeListener(
 
         if (artifactJson != null && manifestJson != null) {
             try {
-                repository.store(
-                    contractDecorator(
-                        id = id,
-                        artifact = artifactJson,
-                        manifest = manifestJson
-                    )
+                val decorator = contractDecorator(
+                    id = id,
+                    artifact = artifactJson,
+                    manifest = manifestJson
+                )
+                contractDecoratorRepository.store(decorator)
+                contractMetadataRepository.createOrUpdate(
+                    id = uuidProvider.getUuid(),
+                    contractId = decorator.id,
+                    contractTags = decorator.tags,
+                    contractImplements = decorator.implements
                 )
             } catch (e: ContractDecoratorException) {
                 logger.warn(e) { "${e.message} for contract decorator: $id, skipping..." }
-                repository.delete(id)
+                contractDecoratorRepository.delete(id)
             }
         } else {
-            repository.delete(id)
+            contractDecoratorRepository.delete(id)
         }
     }
 
