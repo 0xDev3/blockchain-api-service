@@ -17,6 +17,7 @@ import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
+import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
@@ -57,6 +58,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
         private val CONTRACT_ID = ContractId("contract-id")
         private val CREATE_PARAMS = CreateContractDeploymentRequestParams(
+            alias = "alias",
             contractId = CONTRACT_ID,
             constructorParams = listOf(FunctionArgument("test")),
             deployerAddress = WalletAddress("a"),
@@ -81,10 +83,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         private val ENCODED_CONSTRUCTOR = FunctionData("0x1234")
         private val STORE_PARAMS = StoreContractDeploymentRequestParams(
             id = ID,
+            alias = CREATE_PARAMS.alias,
             contractId = CONTRACT_ID,
             contractData = ContractBinaryData(CONTRACT_DECORATOR.binary.value + ENCODED_CONSTRUCTOR.withoutPrefix),
-            contractTags = CONTRACT_DECORATOR.tags,
-            contractImplements = CONTRACT_DECORATOR.implements,
             deployerAddress = CREATE_PARAMS.deployerAddress,
             initialEthAmount = CREATE_PARAMS.initialEthAmount,
             chainId = PROJECT.chainId,
@@ -98,10 +99,11 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         private val CONTRACT_ADDRESS = ContractAddress("cafebabe")
         private val STORED_REQUEST = ContractDeploymentRequest(
             id = ID,
+            alias = STORE_PARAMS.alias,
             contractId = CONTRACT_ID,
             contractData = STORE_PARAMS.contractData,
-            contractTags = STORE_PARAMS.contractTags,
-            contractImplements = STORE_PARAMS.contractImplements,
+            contractTags = CONTRACT_DECORATOR.tags,
+            contractImplements = CONTRACT_DECORATOR.implements,
             initialEthAmount = STORE_PARAMS.initialEthAmount,
             chainId = STORE_PARAMS.chainId,
             redirectUrl = STORE_PARAMS.redirectUrl,
@@ -167,6 +169,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = contractDecoratorRepository,
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = uuidProvider,
@@ -199,6 +202,36 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = contractDecoratorRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = mock()
+            ),
+            projectRepository = mock()
+        )
+
+        verify("ResourceNotFoundException is thrown") {
+            assertThrows<ResourceNotFoundException>(message) {
+                service.createContractDeploymentRequest(CREATE_PARAMS, PROJECT)
+            }
+        }
+    }
+
+    @Test
+    fun mustThrowResourceNotFoundExceptionForNonExistentContractMetadata() {
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("some contract decorator will be returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
+        }
+
+        val service = ContractDeploymentRequestServiceImpl(
+            functionEncoderService = mock(),
+            contractDeploymentRequestRepository = mock(),
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = false),
+            contractDecoratorRepository = contractDecoratorRepository,
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -226,6 +259,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -258,6 +292,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -297,6 +332,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -337,6 +373,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -377,6 +414,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -417,6 +455,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -457,6 +496,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -497,6 +537,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -537,6 +578,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -577,6 +619,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -617,6 +660,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -656,6 +700,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -700,6 +745,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -758,6 +804,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -815,6 +862,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -850,6 +898,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -880,6 +929,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -911,6 +961,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
@@ -948,5 +999,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             )
 
         return projectRepository
+    }
+
+    private fun contractMetadataRepositoryMock(exists: Boolean): ContractMetadataRepository {
+        val contractMetadataRepository = mock<ContractMetadataRepository>()
+
+        given(contractMetadataRepository.exists(CONTRACT_ID))
+            .willReturn(exists)
+
+        return contractMetadataRepository
     }
 }

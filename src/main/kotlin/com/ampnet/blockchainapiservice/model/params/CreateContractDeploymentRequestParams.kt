@@ -9,6 +9,7 @@ import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
 
 data class CreateContractDeploymentRequestParams(
+    val alias: String,
     val contractId: ContractId,
     val constructorParams: List<FunctionArgument>,
     val deployerAddress: WalletAddress?,
@@ -18,6 +19,7 @@ data class CreateContractDeploymentRequestParams(
     val screenConfig: ScreenConfig
 ) {
     constructor(requestBody: CreateContractDeploymentRequest) : this(
+        alias = requestBody.alias,
         contractId = ContractId(requestBody.contractId),
         constructorParams = requestBody.constructorParams,
         deployerAddress = requestBody.deployerAddress?.let { WalletAddress(it) },

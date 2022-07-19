@@ -1,7 +1,7 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IContractDeploymentRequestRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.filters.AndList
@@ -18,11 +18,13 @@ import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.jooq.Condition
 import org.jooq.DSLContext
+import org.jooq.Record
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.coalesce
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
+@Suppress("TooManyFunctions")
 @Repository
 class JooqContractDeploymentRequestRepository(
     private val dslContext: DSLContext
@@ -34,10 +36,9 @@ class JooqContractDeploymentRequestRepository(
         logger.info { "Store contract deployment request, params: $params" }
         val record = ContractDeploymentRequestRecord(
             id = params.id,
-            contractId = params.contractId,
+            alias = params.alias,
+            contractMetadataId = null,
             contractData = params.contractData,
-            contractTags = params.contractTags.map { it.value }.toTypedArray(),
-            contractImplements = params.contractImplements.map { it.value }.toTypedArray(),
             initialEthAmount = params.initialEthAmount,
             chainId = params.chainId,
             redirectUrl = params.redirectUrl,
@@ -50,13 +51,23 @@ class JooqContractDeploymentRequestRepository(
             deployerAddress = params.deployerAddress,
             txHash = null
         )
-        dslContext.executeInsert(record)
-        return record.toModel()
+        val selectContractMetadataId = DSL.select(ContractMetadataTable.CONTRACT_METADATA.ID)
+            .from(ContractMetadataTable.CONTRACT_METADATA)
+            .where(ContractMetadataTable.CONTRACT_METADATA.CONTRACT_ID.eq(params.contractId))
+
+        dslContext.insertInto(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
+            .set(record)
+            .set(
+                ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_METADATA_ID,
+                selectContractMetadataId
+            ).execute()
+
+        return getById(params.id)!!
     }
 
     override fun getById(id: UUID): ContractDeploymentRequest? {
         logger.debug { "Get contract deployment request by id: $id" }
-        return dslContext.selectFrom(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
+        return dslContext.selectWithJoin()
             .where(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.ID.eq(id))
             .fetchOne { it.toModel() }
     }
@@ -77,7 +88,7 @@ class JooqContractDeploymentRequestRepository(
             }
         )
 
-        return dslContext.selectFrom(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
+        return dslContext.selectWithJoin()
             .where(conditions)
             .orderBy(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CREATED_AT.asc())
             .fetch { it.toModel() }
@@ -115,43 +126,56 @@ class JooqContractDeploymentRequestRepository(
             .execute() > 0
     }
 
-    private fun IContractDeploymentRequestRecord.toModel(): ContractDeploymentRequest =
-        ContractDeploymentRequest(
-            id = id!!,
-            contractId = contractId!!,
-            contractData = contractData!!,
-            contractTags = contractTags!!.map { ContractTag(it!!) },
-            contractImplements = contractImplements!!.map { ContractTrait(it!!) },
-            initialEthAmount = initialEthAmount!!,
-            chainId = chainId!!,
-            redirectUrl = redirectUrl!!,
-            projectId = projectId!!,
-            createdAt = createdAt!!,
-            arbitraryData = arbitraryData,
+    private fun Record.toModel(): ContractDeploymentRequest {
+        val requestRecord = this.into(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
+        val metadataRecord = this.into(ContractMetadataTable.CONTRACT_METADATA)
+
+        return ContractDeploymentRequest(
+            id = requestRecord.id!!,
+            alias = requestRecord.alias!!,
+            contractId = metadataRecord.contractId!!,
+            contractData = requestRecord.contractData!!,
+            contractTags = metadataRecord.contractTags!!.map { ContractTag(it!!) },
+            contractImplements = metadataRecord.contractImplements!!.map { ContractTrait(it!!) },
+            initialEthAmount = requestRecord.initialEthAmount!!,
+            chainId = requestRecord.chainId!!,
+            redirectUrl = requestRecord.redirectUrl!!,
+            projectId = requestRecord.projectId!!,
+            createdAt = requestRecord.createdAt!!,
+            arbitraryData = requestRecord.arbitraryData,
             screenConfig = ScreenConfig(
-                beforeActionMessage = screenBeforeActionMessage,
-                afterActionMessage = screenAfterActionMessage
+                beforeActionMessage = requestRecord.screenBeforeActionMessage,
+                afterActionMessage = requestRecord.screenAfterActionMessage
             ),
-            contractAddress = contractAddress,
-            deployerAddress = deployerAddress,
-            txHash = txHash
+            contractAddress = requestRecord.contractAddress,
+            deployerAddress = requestRecord.deployerAddress,
+            txHash = requestRecord.txHash
+        )
+    }
+
+    private fun DSLContext.selectWithJoin() = select()
+        .from(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
+        .join(ContractMetadataTable.CONTRACT_METADATA)
+        .on(
+            ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_METADATA_ID
+                .eq(ContractMetadataTable.CONTRACT_METADATA.ID)
         )
 
     private fun OrList<ContractId>.orCondition(): Condition? =
         takeIf { list.isNotEmpty() }?.let {
-            ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_ID.`in`(it.list)
+            ContractMetadataTable.CONTRACT_METADATA.CONTRACT_ID.`in`(it.list)
         }
 
     private fun AndList<ContractTag>.contractTagsAndCondition(): Condition? =
         takeIf { list.isNotEmpty() }?.let {
-            ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_TAGS.contains(
+            ContractMetadataTable.CONTRACT_METADATA.CONTRACT_TAGS.contains(
                 it.list.map { v -> v.value }.toTypedArray()
             )
         }
 
     private fun AndList<ContractTrait>.contractTraitsAndCondition(): Condition? =
         takeIf { list.isNotEmpty() }?.let {
-            ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_IMPLEMENTS.contains(
+            ContractMetadataTable.CONTRACT_METADATA.CONTRACT_IMPLEMENTS.contains(
                 it.list.map { v -> v.value }.toTypedArray()
             )
         }
