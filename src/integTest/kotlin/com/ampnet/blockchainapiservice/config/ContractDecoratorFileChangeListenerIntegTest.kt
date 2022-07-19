@@ -1,7 +1,11 @@
 package com.ampnet.blockchainapiservice.config
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.model.result.ContractConstructor
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
+import com.ampnet.blockchainapiservice.model.result.ContractEvent
+import com.ampnet.blockchainapiservice.model.result.ContractFunction
+import com.ampnet.blockchainapiservice.model.result.ContractParameter
 import com.ampnet.blockchainapiservice.repository.InMemoryContractDecoratorRepository
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
@@ -15,7 +19,132 @@ import java.nio.file.Paths
 
 class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
 
-    private val rootDir = Paths.get(javaClass.classLoader.getResource("dummyContracts")!!.path)
+    companion object {
+        private val CONSTRUCTORS = listOf(
+            ContractConstructor(
+                inputs = listOf(
+                    ContractParameter(
+                        name = "Arg",
+                        description = "Arg description",
+                        solidityName = "arg",
+                        solidityType = "address",
+                        recommendedTypes = listOf("example")
+                    )
+                ),
+                description = "Constructor description",
+                payable = false
+            ),
+            ContractConstructor(
+                inputs = listOf(
+                    ContractParameter(
+                        name = "Arg",
+                        description = "Arg description",
+                        solidityName = "arg",
+                        solidityType = "string",
+                        recommendedTypes = listOf("example")
+                    )
+                ),
+                description = "Payable constructor description",
+                payable = true
+            )
+        )
+        private val FUNCTIONS = listOf(
+            ContractFunction(
+                name = "View function",
+                description = "View function description",
+                solidityName = "viewFn",
+                inputs = listOf(
+                    ContractParameter(
+                        name = "Arg",
+                        description = "Arg description",
+                        solidityName = "arg",
+                        solidityType = "address",
+                        recommendedTypes = listOf("example")
+                    )
+                ),
+                outputs = listOf(
+                    ContractParameter(
+                        name = "Return value",
+                        description = "Return value description",
+                        solidityName = "",
+                        solidityType = "bool",
+                        recommendedTypes = listOf("example")
+                    )
+                ),
+                emittableEvents = listOf("ExampleEvent(address)"),
+                readOnly = true
+            ),
+            ContractFunction(
+                name = "Pure function",
+                description = "Pure function description",
+                solidityName = "pureFn",
+                inputs = listOf(
+                    ContractParameter(
+                        name = "Arg",
+                        description = "Arg description",
+                        solidityName = "arg",
+                        solidityType = "address",
+                        recommendedTypes = listOf("example")
+                    )
+                ),
+                outputs = listOf(
+                    ContractParameter(
+                        name = "Return value",
+                        description = "Return value description",
+                        solidityName = "",
+                        solidityType = "bool",
+                        recommendedTypes = listOf("example")
+                    )
+                ),
+                emittableEvents = listOf("ExampleEvent(address)"),
+                readOnly = true
+            ),
+            ContractFunction(
+                name = "Modifying function",
+                description = "Modifying function description",
+                solidityName = "modifyingFn",
+                inputs = listOf(
+                    ContractParameter(
+                        name = "Arg",
+                        description = "Arg description",
+                        solidityName = "arg",
+                        solidityType = "address",
+                        recommendedTypes = listOf("example")
+                    )
+                ),
+                outputs = listOf(
+                    ContractParameter(
+                        name = "Return value",
+                        description = "Return value description",
+                        solidityName = "",
+                        solidityType = "bool",
+                        recommendedTypes = listOf("example")
+                    )
+                ),
+                emittableEvents = listOf("ExampleEvent(address)"),
+                readOnly = false
+            )
+        )
+        private val EVENTS = listOf(
+            ContractEvent(
+                name = "Example Event",
+                description = "Example Event description",
+                solidityName = "ExampleEvent",
+                inputs = listOf(
+                    ContractParameter(
+                        name = "Arg",
+                        description = "Arg description",
+                        solidityName = "arg",
+                        solidityType = "address",
+                        recommendedTypes = listOf("example")
+                    )
+                )
+            )
+        )
+    }
+
+    private val parsableRootDir = Paths.get(javaClass.classLoader.getResource("dummyContracts")!!.path)
+    private val unparsableRootDir = Paths.get(javaClass.classLoader.getResource("unparsableContracts")!!.path)
     private val ignoredDirs = listOf("IgnoredContract")
 
     @Test
@@ -25,8 +154,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         suppose("initial contract decorators will be loaded from file system") {
             ContractDecoratorFileChangeListener(
                 repository = repository,
-                rootDir = rootDir,
-                ignoredDirs = ignoredDirs
+                rootDir = parsableRootDir,
+                ignoredDirs = ignoredDirs,
+                objectMapper = JsonConfig().objectMapper()
             )
         }
 
@@ -39,7 +169,10 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         id = dummyContractId,
                         binary = ContractBinaryData("0x0"),
                         tags = listOf(ContractTag("tag.example")),
-                        implements = listOf(ContractTrait("trait.example"))
+                        implements = listOf(ContractTrait("trait.example")),
+                        constructors = CONSTRUCTORS,
+                        functions = FUNCTIONS,
+                        events = EVENTS
                     )
                 )
 
@@ -56,7 +189,10 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         id = anotherContractId,
                         binary = ContractBinaryData("0x2"),
                         tags = listOf(ContractTag("tag.another")),
-                        implements = listOf(ContractTrait("trait.another"))
+                        implements = listOf(ContractTrait("trait.another")),
+                        constructors = CONSTRUCTORS,
+                        functions = FUNCTIONS,
+                        events = EVENTS
                     )
                 )
 
@@ -72,8 +208,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val listener = suppose("initial contract decorators will be loaded from file system") {
             ContractDecoratorFileChangeListener(
                 repository = repository,
-                rootDir = rootDir,
-                ignoredDirs = ignoredDirs
+                rootDir = parsableRootDir,
+                ignoredDirs = ignoredDirs,
+                objectMapper = JsonConfig().objectMapper()
             )
         }
 
@@ -92,7 +229,10 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             id = contractWithoutManifestId,
             binary = ContractBinaryData("0x1"),
             tags = listOf(ContractTag("tag.no.manifest")),
-            implements = listOf(ContractTrait("trait.no.manifest"))
+            implements = listOf(ContractTrait("trait.no.manifest")),
+            constructors = CONSTRUCTORS,
+            functions = FUNCTIONS,
+            events = EVENTS
         )
 
         suppose("contract which needs to be deleted is in repository") {
@@ -101,7 +241,10 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     id = contractWithoutArtifactId,
                     binary = ContractBinaryData("0x4"),
                     tags = listOf(ContractTag("tag.no.artifact")),
-                    implements = listOf(ContractTrait("trait.no.artifact"))
+                    implements = listOf(ContractTrait("trait.no.artifact")),
+                    constructors = CONSTRUCTORS,
+                    functions = FUNCTIONS,
+                    events = EVENTS
                 )
             )
             repository.store(withoutManifestDecorator)
@@ -111,16 +254,17 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             listener.onChange(
                 setOf(
                     ChangedFiles(
-                        rootDir.toFile(),
+                        parsableRootDir.toFile(),
                         setOf(
                             ChangedFile(
-                                rootDir.toFile(),
-                                rootDir.resolve("DummyContractSet/DummyContract/artifact.json").toFile(),
+                                parsableRootDir.toFile(),
+                                parsableRootDir.resolve("DummyContractSet/DummyContract/artifact.json").toFile(),
                                 ChangedFile.Type.ADD
                             ),
                             ChangedFile(
-                                rootDir.toFile(),
-                                rootDir.resolve("DummyContractSet/ContractWithoutArtifact/artifact.json").toFile(),
+                                parsableRootDir.toFile(),
+                                parsableRootDir.resolve("DummyContractSet/ContractWithoutArtifact/artifact.json")
+                                    .toFile(),
                                 ChangedFile.Type.DELETE
                             )
                         )
@@ -136,7 +280,10 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         id = dummyContractId,
                         binary = ContractBinaryData("0x0"),
                         tags = listOf(ContractTag("tag.example")),
-                        implements = listOf(ContractTrait("trait.example"))
+                        implements = listOf(ContractTrait("trait.example")),
+                        constructors = CONSTRUCTORS,
+                        functions = FUNCTIONS,
+                        events = EVENTS
                     )
                 )
 
@@ -148,6 +295,35 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             assertThat(repository.getById(anotherContractId)).withMessage()
                 .isNull()
             assertThat(repository.getById(ContractId("AnotherContractSet/IgnoredContract"))).withMessage()
+                .isNull()
+        }
+    }
+
+    @Test
+    fun mustSkipUnparsableContractDecorators() {
+        val repository = InMemoryContractDecoratorRepository()
+
+        suppose("initial contract decorators will be loaded from file system") {
+            ContractDecoratorFileChangeListener(
+                repository = repository,
+                rootDir = unparsableRootDir,
+                ignoredDirs = ignoredDirs,
+                objectMapper = JsonConfig().objectMapper()
+            )
+        }
+
+        verify("no contract decorators have been loaded") {
+            assertThat(repository.getById(ContractId("InvalidJson/UnparsableArtifact"))).withMessage()
+                .isNull()
+            assertThat(repository.getById(ContractId("InvalidJson/UnparsableManifest"))).withMessage()
+                .isNull()
+            assertThat(repository.getById(ContractId("MissingValue/MissingConstructorSignature"))).withMessage()
+                .isNull()
+            assertThat(repository.getById(ContractId("MissingValue/MissingEventName"))).withMessage()
+                .isNull()
+            assertThat(repository.getById(ContractId("MissingValue/MissingFunctionName"))).withMessage()
+                .isNull()
+            assertThat(repository.getById(ContractId("MissingValue/MissingFunctionOutputs"))).withMessage()
                 .isNull()
         }
     }

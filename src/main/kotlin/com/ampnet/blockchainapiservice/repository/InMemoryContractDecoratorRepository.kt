@@ -1,5 +1,8 @@
 package com.ampnet.blockchainapiservice.repository
 
+import com.ampnet.blockchainapiservice.model.filters.AndList
+import com.ampnet.blockchainapiservice.model.filters.ContractDecoratorFilters
+import com.ampnet.blockchainapiservice.model.filters.OrList
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.util.ContractId
 import mu.KLogging
@@ -25,6 +28,31 @@ class InMemoryContractDecoratorRepository : ContractDecoratorRepository {
     }
 
     override fun getById(id: ContractId): ContractDecorator? {
+        logger.debug { "Get contract decorator by ID: $id" }
         return storage[id]
+    }
+
+    override fun getAll(filters: ContractDecoratorFilters): List<ContractDecorator> {
+        logger.debug { "Get all contract decorators, filters: $filters" }
+        return storage.values
+            .filterBy(filters.contractTags) { it.tags }
+            .filterBy(filters.contractImplements) { it.implements }
+            .toList()
+    }
+
+    private fun <T> Collection<ContractDecorator>.filterBy(
+        orList: OrList<AndList<T>>,
+        values: (ContractDecorator) -> List<T>
+    ): Collection<ContractDecorator> {
+        val conditions = orList.list.map { it.list }
+
+        return if (conditions.isEmpty()) {
+            this
+        } else {
+            filter { decorator ->
+                val decoratorValues = values(decorator)
+                conditions.map { condition -> decoratorValues.containsAll(condition) }.contains(true)
+            }
+        }
     }
 }

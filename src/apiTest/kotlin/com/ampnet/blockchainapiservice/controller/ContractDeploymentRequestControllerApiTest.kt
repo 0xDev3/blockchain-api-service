@@ -19,8 +19,11 @@ import com.ampnet.blockchainapiservice.model.params.StoreContractDeploymentReque
 import com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestsResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
+import com.ampnet.blockchainapiservice.model.result.ContractConstructor
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
+import com.ampnet.blockchainapiservice.model.result.ContractFunction
+import com.ampnet.blockchainapiservice.model.result.ContractParameter
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
@@ -65,10 +68,45 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         )
         private const val API_KEY = "api-key"
         private val CONTRACT_DECORATOR = ContractDecorator(
-            id = ContractId("examples/exampleContract"),
+            id = ContractId("examples.exampleContract"),
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
-            implements = listOf(ContractTrait("traits/example"), ContractTrait("traits/exampleOwnable"))
+            implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
+            constructors = listOf(
+                ContractConstructor(
+                    inputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "owner",
+                            solidityType = "address",
+                            recommendedTypes = listOf()
+                        )
+                    ),
+                    description = "Main constructor",
+                    payable = true
+                )
+            ),
+            functions = listOf(
+                ContractFunction(
+                    name = "Get contract owner",
+                    description = "Fetches contract owner",
+                    solidityName = "getOWner",
+                    inputs = listOf(),
+                    outputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "",
+                            solidityType = "address",
+                            recommendedTypes = listOf()
+                        )
+                    ),
+                    emittableEvents = emptyList(),
+                    readOnly = true
+                )
+            ),
+            events = listOf()
         )
     }
 
