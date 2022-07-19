@@ -4,9 +4,12 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
@@ -71,6 +74,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @BeforeEach
     fun beforeEach() {
+        dslContext.delete(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST).execute()
+        dslContext.delete(ContractMetadataTable.CONTRACT_METADATA).execute()
         dslContext.delete(ApiKeyTable.API_KEY).execute()
         dslContext.delete(ProjectTable.PROJECT).execute()
         dslContext.delete(UserIdentifierTable.USER_IDENTIFIER).execute()
@@ -111,9 +116,11 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestById() {
         val id = UUID.randomUUID()
-        val record = createRecord(id)
+        val metadata = createMetadataRecord()
+        val record = createRecord(id, metadata)
 
         suppose("some contract deployment request exists in database") {
+            dslContext.executeInsert(metadata)
             dslContext.executeInsert(record)
         }
 
@@ -121,7 +128,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
-                .isEqualTo(record.toModel())
+                .isEqualTo(record.toModel(metadata))
         }
     }
 
@@ -137,93 +144,136 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestsByProjectIdAndFilters() {
+        val cid1Metadata = createMetadataRecord(contractId = ContractId("cid-1"))
+        val cid2Metadata = createMetadataRecord(contractId = ContractId("cid-2"))
+        val cid3Metadata = createMetadataRecord(contractId = ContractId("cid-3"))
+        val ignoredCidMetadata = createMetadataRecord(contractId = ContractId("ignored-cid"))
+        val tag1Metadata = createMetadataRecord(contractId = ContractId("cid-tag-1"), tags = listOf("tag-1"))
+        val tag2Metadata = createMetadataRecord(contractId = ContractId("cid-tag-2"), tags = listOf("tag-2"))
+        val tag2AndIgnoredTagMetadata = createMetadataRecord(
+            contractId = ContractId("cid-tag-2-ignored"),
+            tags = listOf("tag-2", "ignored-tag")
+        )
+        val ignoredTagMetadata = createMetadataRecord(
+            contractId = ContractId("cid-ignored-tag"),
+            tags = listOf("ignored-tag")
+        )
+        val trait1Metadata = createMetadataRecord(contractId = ContractId("cid-trait-1"), traits = listOf("trait-1"))
+        val trait2Metadata = createMetadataRecord(contractId = ContractId("cid-trait-2"), traits = listOf("trait-2"))
+        val trait2AndIgnoredTraitMetadata = createMetadataRecord(
+            contractId = ContractId("cid-trait-2-ignored"),
+            traits = listOf("trait-2", "ignored-trait")
+        )
+        val ignoredTraitMetadata = createMetadataRecord(
+            contractId = ContractId("cid-ignored-trait"),
+            traits = listOf("ignored-trait")
+        )
+        val project2Metadata1 = createMetadataRecord(
+            contractId = ContractId("cid-1-project-2"),
+            tags = listOf("tag-1", "tag-2"),
+            traits = listOf("trait-1", "trait-2")
+        )
+        val project2Metadata2 = createMetadataRecord(
+            contractId = ContractId("cid-2-project-2"),
+            tags = listOf("tag-1", "tag-2"),
+            traits = listOf("trait-1", "trait-2")
+        )
+        val project2Metadata3 = createMetadataRecord(
+            contractId = ContractId("cid-3-project-2"),
+            tags = listOf("ignored-tag", "tag-3"),
+            traits = listOf("ignored-trait", "trait-3")
+        )
+        val project2NonMatchingMetadata1 = createMetadataRecord(
+            contractId = ContractId("cid-1-project-2-no-tx-hash"),
+            tags = listOf("tag-1", "tag-2"),
+            traits = listOf("trait-1", "trait-2")
+        )
+        val project2NonMatchingMetadata2 = createMetadataRecord(
+            contractId = ContractId("cid-2-project-2-ignored"),
+            tags = listOf("tag-1", "tag-2"),
+            traits = listOf("trait-1", "trait-2")
+        )
+        val project2NonMatchingMetadata3 = createMetadataRecord(
+            contractId = ContractId("cid-3-project-2-missing-tag"),
+            tags = listOf("tag-1"),
+            traits = listOf("ignored-trait", "trait-1", "trait-2")
+        )
+        val project2NonMatchingMetadata4 = createMetadataRecord(
+            contractId = ContractId("cid-4-project-2-missing-trait"),
+            tags = listOf("ignored-tag", "tag-1", "tag-2"),
+            traits = listOf("trait-1")
+        )
+        val metadataById = listOf(
+            cid1Metadata,
+            cid2Metadata,
+            cid3Metadata,
+            ignoredCidMetadata,
+            tag1Metadata,
+            tag2Metadata,
+            tag2AndIgnoredTagMetadata,
+            ignoredTagMetadata,
+            trait1Metadata,
+            trait2Metadata,
+            trait2AndIgnoredTraitMetadata,
+            ignoredTraitMetadata,
+            project2Metadata1,
+            project2Metadata2,
+            project2Metadata3,
+            project2NonMatchingMetadata1,
+            project2NonMatchingMetadata2,
+            project2NonMatchingMetadata3,
+            project2NonMatchingMetadata4
+        ).associateBy { it.id }
+
+        suppose("metadata records are inserted into the database") {
+            dslContext.batchInsert(metadataById.values).execute()
+        }
+
         fun uuid() = UUID.randomUUID()
+
         val project1ContractsWithMatchingCid = listOf(
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-1")),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-2")),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-3"))
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = cid1Metadata),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = cid2Metadata),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = cid3Metadata)
         )
         val project1NonDeployedContractsWithMatchingCid = listOf(
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-1"), txHash = null),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-2"), txHash = null),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("cid-3"), txHash = null)
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = cid1Metadata, txHash = null),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = cid2Metadata, txHash = null),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = cid3Metadata, txHash = null)
         )
         val project1ContractsWithNonMatchingCid = listOf(
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("ignored-cid")),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, ContractId("ignored-cid"))
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = ignoredCidMetadata),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = ignoredCidMetadata)
         )
         val project1ContractsWithMatchingTags = listOf(
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractTags = listOf("tag-1")),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractTags = listOf("tag-2")),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractTags = listOf("ignored-tag", "tag-2"))
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = tag1Metadata),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = tag2Metadata),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = tag2AndIgnoredTagMetadata)
         )
         val project1ContractsWithNonMatchingTags = listOf(
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractTags = listOf("ignored-tag")),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractTags = listOf("ignored-tag"))
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = ignoredTagMetadata),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = ignoredTagMetadata)
         )
         val project1ContractsWithMatchingTraits = listOf(
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractImplements = listOf("trait-1")),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractImplements = listOf("trait-2")),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractImplements = listOf("ignored-trait", "trait-2"))
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = trait1Metadata),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = trait2Metadata),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = trait2AndIgnoredTraitMetadata)
         )
         val project1ContractsWithNonMatchingTraits = listOf(
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractImplements = listOf("ignored-trait")),
-            createRecord(id = uuid(), projectId = PROJECT_ID_1, contractImplements = listOf("ignored-trait"))
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = ignoredTraitMetadata),
+            createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = ignoredTraitMetadata)
         )
 
         val project2MatchingContracts = listOf(
-            createRecord(
-                id = uuid(),
-                projectId = PROJECT_ID_2,
-                ContractId("cid-1"),
-                contractTags = listOf("tag-1", "tag-2"),
-                contractImplements = listOf("trait-1", "trait-2")
-            ),
-            createRecord(
-                id = uuid(),
-                projectId = PROJECT_ID_2,
-                ContractId("cid-2"),
-                contractTags = listOf("tag-1", "tag-2"),
-                contractImplements = listOf("trait-1", "trait-2")
-            ),
-            createRecord(
-                id = uuid(),
-                projectId = PROJECT_ID_2,
-                ContractId("cid-3"),
-                contractTags = listOf("ignored-tag", "tag-3"),
-                contractImplements = listOf("ignored-trait", "trait-3")
-            )
+            createRecord(id = uuid(), projectId = PROJECT_ID_2, metadata = project2Metadata1),
+            createRecord(id = uuid(), projectId = PROJECT_ID_2, metadata = project2Metadata2),
+            createRecord(id = uuid(), projectId = PROJECT_ID_2, metadata = project2Metadata3)
         )
         val project2NonMatchingContracts = listOf(
-            createRecord(
-                id = uuid(),
-                projectId = PROJECT_ID_2,
-                ContractId("cid-1"),
-                contractTags = listOf("tag-1", "tag-2"),
-                contractImplements = listOf("trait-1", "trait-2"),
-                txHash = null
-            ),
-            createRecord(
-                id = uuid(),
-                projectId = PROJECT_ID_2,
-                ContractId("ignored-cid"),
-                contractTags = listOf("tag-1", "tag-2"),
-                contractImplements = listOf("trait-1", "trait-2")
-            ),
-            createRecord(
-                id = uuid(),
-                projectId = PROJECT_ID_2,
-                ContractId("cid-3"),
-                contractTags = listOf("tag-1"),
-                contractImplements = listOf("ignored-trait", "trait-1", "trait-2")
-            ),
-            createRecord(
-                id = uuid(),
-                projectId = PROJECT_ID_2,
-                ContractId("cid-3"),
-                contractTags = listOf("ignored-tag", "tag-1", "tag-2"),
-                contractImplements = listOf("trait-1")
-            )
+            createRecord(id = uuid(), projectId = PROJECT_ID_2, metadata = project2NonMatchingMetadata1, txHash = null),
+            createRecord(id = uuid(), projectId = PROJECT_ID_2, metadata = project2NonMatchingMetadata2),
+            createRecord(id = uuid(), projectId = PROJECT_ID_2, metadata = project2NonMatchingMetadata3),
+            createRecord(id = uuid(), projectId = PROJECT_ID_2, metadata = project2NonMatchingMetadata4)
         )
 
         suppose("some contract deployment requests exist in database") {
@@ -249,7 +299,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             ).withMessage()
                 .containsExactlyInAnyOrderElementsOf(
                     (project1ContractsWithMatchingCid + project1NonDeployedContractsWithMatchingCid)
-                        .map { it.toModel() }
+                        .map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
                 )
         }
 
@@ -265,7 +315,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                     )
                 )
             ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(project1ContractsWithMatchingCid.map { it.toModel() })
+                .containsExactlyInAnyOrderElementsOf(
+                    project1ContractsWithMatchingCid.map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
+                )
         }
 
         verify("must correctly fetch project 1 contracts with matching tags") {
@@ -283,7 +335,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                     )
                 )
             ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(project1ContractsWithMatchingTags.map { it.toModel() })
+                .containsExactlyInAnyOrderElementsOf(
+                    project1ContractsWithMatchingTags.map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
+                )
         }
 
         verify("must correctly fetch project 1 contracts with matching traits") {
@@ -301,7 +355,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                     )
                 )
             ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(project1ContractsWithMatchingTraits.map { it.toModel() })
+                .containsExactlyInAnyOrderElementsOf(
+                    project1ContractsWithMatchingTraits.map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
+                )
         }
 
         verify("must correctly fetch project 2 contracts which match given filters") {
@@ -309,7 +365,14 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_2,
                     filters = ContractDeploymentRequestFilters(
-                        contractIds = OrList(ContractId("cid-1"), ContractId("cid-2"), ContractId("cid-3")),
+                        contractIds = OrList(
+                            ContractId("cid-1-project-2"),
+                            ContractId("cid-2-project-2"),
+                            ContractId("cid-3-project-2"),
+                            ContractId("cid-1-project-2-no-tx-hash"),
+                            ContractId("cid-3-project-2-missing-tag"),
+                            ContractId("cid-4-project-2-missing-trait")
+                        ),
                         contractTags = OrList(
                             AndList(ContractTag("tag-1"), ContractTag("tag-2")),
                             AndList(ContractTag("tag-3"))
@@ -322,20 +385,29 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                     )
                 )
             ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(project2MatchingContracts.map { it.toModel() })
+                .containsExactlyInAnyOrderElementsOf(
+                    project2MatchingContracts.map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
+                )
         }
     }
 
     @Test
     fun mustCorrectlyStoreContractDeploymentRequest() {
+        suppose("some contract metadata is in database") {
+            dslContext.executeInsert(
+                createMetadataRecord(
+                    tags = listOf("test-tag"),
+                    traits = listOf("test-trait"),
+                )
+            )
+        }
+
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
-            contractTags = listOf(ContractTag("test-tag")),
-            contractImplements = listOf(ContractTrait("test-trait")),
             deployerAddress = null,
             initialEthAmount = INITIAL_ETH_AMOUNT,
             chainId = CHAIN_ID,
@@ -390,14 +462,21 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetTxInfoForContractDeploymentRequestWithNullTxHash() {
+        suppose("some contract metadata is in database") {
+            dslContext.executeInsert(
+                createMetadataRecord(
+                    tags = listOf("test-tag"),
+                    traits = listOf("test-trait"),
+                )
+            )
+        }
+
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
-            contractTags = listOf(ContractTag("test-tag")),
-            contractImplements = listOf(ContractTrait("test-trait")),
             deployerAddress = null,
             initialEthAmount = INITIAL_ETH_AMOUNT,
             chainId = CHAIN_ID,
@@ -452,14 +531,21 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotUpdateDeployerAddressForContractDeploymentRequestWhenDeployerIsAlreadySet() {
+        suppose("some contract metadata is in database") {
+            dslContext.executeInsert(
+                createMetadataRecord(
+                    tags = listOf("test-tag"),
+                    traits = listOf("test-trait"),
+                )
+            )
+        }
+
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
-            contractTags = listOf(ContractTag("test-tag")),
-            contractImplements = listOf(ContractTrait("test-trait")),
             initialEthAmount = INITIAL_ETH_AMOUNT,
             deployerAddress = DEPLOYER_ADDRESS,
             chainId = CHAIN_ID,
@@ -515,14 +601,21 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetTxInfoForContractDeploymentRequestWhenTxHashIsAlreadySet() {
+        suppose("some contract metadata is in database") {
+            dslContext.executeInsert(
+                createMetadataRecord(
+                    tags = listOf("test-tag"),
+                    traits = listOf("test-trait"),
+                )
+            )
+        }
+
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
-            contractTags = listOf(ContractTag("test-tag")),
-            contractImplements = listOf(ContractTrait("test-trait")),
             initialEthAmount = INITIAL_ETH_AMOUNT,
             deployerAddress = null,
             chainId = CHAIN_ID,
@@ -588,14 +681,21 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetContractAddressForContractDeploymentRequestWithNullContractAddress() {
+        suppose("some contract metadata is in database") {
+            dslContext.executeInsert(
+                createMetadataRecord(
+                    tags = listOf("test-tag"),
+                    traits = listOf("test-trait"),
+                )
+            )
+        }
+
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
-            contractTags = listOf(ContractTag("test-tag")),
-            contractImplements = listOf(ContractTrait("test-trait")),
             deployerAddress = null,
             initialEthAmount = INITIAL_ETH_AMOUNT,
             chainId = CHAIN_ID,
@@ -650,14 +750,21 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetContractAddressForContractDeploymentRequestWhenContractAddressIsAlreadySet() {
+        suppose("some contract metadata is in database") {
+            dslContext.executeInsert(
+                createMetadataRecord(
+                    tags = listOf("test-tag"),
+                    traits = listOf("test-trait"),
+                )
+            )
+        }
+
         val id = UUID.randomUUID()
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
-            contractTags = listOf(ContractTag("test-tag")),
-            contractImplements = listOf(ContractTrait("test-trait")),
             initialEthAmount = INITIAL_ETH_AMOUNT,
             deployerAddress = null,
             chainId = CHAIN_ID,
@@ -715,22 +822,29 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
     }
 
+    private fun createMetadataRecord(
+        contractId: ContractId = CONTRACT_ID,
+        tags: List<String> = emptyList(),
+        traits: List<String> = emptyList(),
+    ) = ContractMetadataRecord(
+        id = UUID.randomUUID(),
+        contractId = contractId,
+        contractTags = tags.toTypedArray(),
+        contractImplements = traits.toTypedArray(),
+    )
+
     private fun createRecord(
         id: UUID,
+        metadata: ContractMetadataRecord,
         projectId: UUID = PROJECT_ID_1,
-        contractId: ContractId = CONTRACT_ID,
-        contractTags: List<String> = emptyList(),
-        contractImplements: List<String> = emptyList(),
         contractAddress: ContractAddress? = CONTRACT_ADDRESS,
         deployerAddress: WalletAddress? = DEPLOYER_ADDRESS,
         txHash: TransactionHash? = TX_HASH
     ) = ContractDeploymentRequestRecord(
         id = id,
         alias = UUID.randomUUID().toString(),
-        contractId = contractId,
+        contractMetadataId = metadata.id,
         contractData = CONTRACT_DATA,
-        contractTags = contractTags.toTypedArray(),
-        contractImplements = contractImplements.toTypedArray(),
         initialEthAmount = INITIAL_ETH_AMOUNT,
         chainId = CHAIN_ID,
         redirectUrl = REDIRECT_URL,
@@ -744,14 +858,14 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         txHash = txHash
     )
 
-    private fun ContractDeploymentRequestRecord.toModel() =
+    private fun ContractDeploymentRequestRecord.toModel(metadata: ContractMetadataRecord) =
         ContractDeploymentRequest(
             id = id!!,
             alias = alias!!,
-            contractId = contractId!!,
+            contractId = metadata.contractId!!,
             contractData = contractData!!,
-            contractTags = contractTags!!.map { ContractTag(it!!) },
-            contractImplements = contractImplements!!.map { ContractTrait(it!!) },
+            contractTags = metadata.contractTags!!.map { ContractTag(it!!) },
+            contractImplements = metadata.contractImplements!!.map { ContractTrait(it!!) },
             initialEthAmount = INITIAL_ETH_AMOUNT,
             chainId = chainId!!,
             redirectUrl = redirectUrl!!,

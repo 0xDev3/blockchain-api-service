@@ -6,8 +6,6 @@ import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
@@ -18,8 +16,6 @@ data class StoreContractDeploymentRequestParams(
     val alias: String,
     val contractId: ContractId,
     val contractData: ContractBinaryData,
-    val contractTags: List<ContractTag>,
-    val contractImplements: List<ContractTrait>,
     val deployerAddress: WalletAddress?,
     val initialEthAmount: Balance,
     val chainId: ChainId,
@@ -44,8 +40,6 @@ data class StoreContractDeploymentRequestParams(
             contractData = ContractBinaryData(
                 params.contractDecorator.binary.value + params.encodedConstructor.withoutPrefix
             ),
-            contractTags = params.contractDecorator.tags,
-            contractImplements = params.contractDecorator.implements,
             deployerAddress = params.createParams.deployerAddress,
             initialEthAmount = params.createParams.initialEthAmount,
             chainId = project.chainId,
