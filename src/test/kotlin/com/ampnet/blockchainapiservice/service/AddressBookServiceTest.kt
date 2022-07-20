@@ -230,6 +230,11 @@ class AddressBookServiceTest : TestBase() {
     fun mustSuccessfullyDeleteAddressBookEntry() {
         val addressBookRepository = mock<AddressBookRepository>()
 
+        suppose("address book entry is fetched by id") {
+            given(addressBookRepository.getById(ENTRY.id))
+                .willReturn(ENTRY)
+        }
+
         suppose("address book entry is deleted by id") {
             given(addressBookRepository.delete(ENTRY.id))
                 .willReturn(true)
@@ -242,10 +247,69 @@ class AddressBookServiceTest : TestBase() {
         )
 
         verify("address book entry is correctly deleted by id") {
-            service.deleteAddressBookEntryById(ENTRY.id)
+            service.deleteAddressBookEntryById(ENTRY.id, PROJECT)
 
             verifyMock(addressBookRepository)
+                .getById(ENTRY.id)
+            verifyMock(addressBookRepository)
                 .delete(ENTRY.id)
+            verifyNoMoreInteractions(addressBookRepository)
+        }
+    }
+
+    @Test
+    fun mustThrowResourceNotFoundExceptionWhenDeletingNonOwnedAddressBookEntry() {
+        val addressBookRepository = mock<AddressBookRepository>()
+
+        suppose("non-owned address book entry is fetched by id") {
+            given(addressBookRepository.getById(ENTRY.id))
+                .willReturn(ENTRY.copy(projectId = UUID.randomUUID()))
+        }
+
+        suppose("address book entry is deleted by id") {
+            given(addressBookRepository.delete(ENTRY.id))
+                .willReturn(true)
+        }
+
+        val service = AddressBookServiceImpl(
+            addressBookRepository = addressBookRepository,
+            uuidProvider = mock(),
+            utcDateTimeProvider = mock()
+        )
+
+        verify("ResourceNotFoundException is thrown") {
+            assertThrows<ResourceNotFoundException>(message) {
+                service.deleteAddressBookEntryById(ENTRY.id, PROJECT)
+            }
+
+            verifyMock(addressBookRepository)
+                .getById(ENTRY.id)
+            verifyNoMoreInteractions(addressBookRepository)
+        }
+    }
+
+    @Test
+    fun mustThrowResourceNotFoundExceptionWhenDeletingNonExistentAddressBookEntry() {
+        val addressBookRepository = mock<AddressBookRepository>()
+
+        suppose("null is returned when fetching address book entry by id") {
+            given(addressBookRepository.getById(ENTRY.id))
+                .willReturn(null)
+        }
+
+        val service = AddressBookServiceImpl(
+            addressBookRepository = addressBookRepository,
+            uuidProvider = mock(),
+            utcDateTimeProvider = mock()
+        )
+
+        verify("ResourceNotFoundException is thrown") {
+            assertThrows<ResourceNotFoundException>(message) {
+                service.deleteAddressBookEntryById(ENTRY.id, PROJECT)
+            }
+
+            verifyMock(addressBookRepository)
+                .getById(ENTRY.id)
             verifyNoMoreInteractions(addressBookRepository)
         }
     }

@@ -1,0 +1,18 @@
+=== Fetch Address Book Entry by ID
+Fetches stored address book entry by ID.
+
+*This request requires and API key present in the `X-API-KEY` header.*
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyFetchAddressBookEntryById/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyFetchAddressBookEntryById/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse.adoc[]

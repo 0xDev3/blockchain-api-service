@@ -52,9 +52,9 @@ class AddressBookServiceImpl(
         ) ?: throw ResourceNotFoundException("Address book entry not found for ID: $addressBookEntryId")
     }
 
-    override fun deleteAddressBookEntryById(id: UUID) {
+    override fun deleteAddressBookEntryById(id: UUID, project: Project) {
         logger.info { "Delete address book entry by id: $id" }
-        addressBookRepository.delete(id)
+        addressBookRepository.delete(getAddressBookEntryById(id, project).id)
     }
 
     override fun getAddressBookEntryById(id: UUID, project: Project): AddressBookEntry {

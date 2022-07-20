@@ -13,7 +13,7 @@ interface AddressBookService {
         project: Project
     ): AddressBookEntry
 
-    fun deleteAddressBookEntryById(id: UUID)
+    fun deleteAddressBookEntryById(id: UUID, project: Project)
     fun getAddressBookEntryById(id: UUID, project: Project): AddressBookEntry
     fun getAddressBookEntryByAlias(alias: String, project: Project): AddressBookEntry
     fun getAddressBookEntriesByProjectId(projectId: UUID): List<AddressBookEntry>

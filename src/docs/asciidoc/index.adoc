@@ -55,5 +55,15 @@ include::src/docs/asciidoc/deploy/fetch.adoc[]
 include::src/docs/asciidoc/deploy/fetch-by-project-id.adoc[]
 include::src/docs/asciidoc/deploy/attach.adoc[]
 
+== Address Book API
+All endpoints are public and do not require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/address-book/create.adoc[]
+include::src/docs/asciidoc/address-book/update.adoc[]
+include::src/docs/asciidoc/address-book/delete.adoc[]
+include::src/docs/asciidoc/address-book/fetch-by-id.adoc[]
+include::src/docs/asciidoc/address-book/fetch-by-alias.adoc[]
+include::src/docs/asciidoc/address-book/fetch-by-project.adoc[]
+
 == Available Function Argument Types
 include::src/docs/asciidoc/function-arg-types.adoc[]
