@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
+import com.ampnet.blockchainapiservice.exception.AliasAlreadyInUseException
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
@@ -21,6 +22,7 @@ import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.coalesce
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
@@ -55,12 +57,16 @@ class JooqContractDeploymentRequestRepository(
             .from(ContractMetadataTable.CONTRACT_METADATA)
             .where(ContractMetadataTable.CONTRACT_METADATA.CONTRACT_ID.eq(params.contractId))
 
-        dslContext.insertInto(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
-            .set(record)
-            .set(
-                ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_METADATA_ID,
-                selectContractMetadataId
-            ).execute()
+        try {
+            dslContext.insertInto(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
+                .set(record)
+                .set(
+                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_METADATA_ID,
+                    selectContractMetadataId
+                ).execute()
+        } catch (e: DuplicateKeyException) {
+            throw AliasAlreadyInUseException(params.alias)
+        }
 
         return getById(params.id)!!
     }

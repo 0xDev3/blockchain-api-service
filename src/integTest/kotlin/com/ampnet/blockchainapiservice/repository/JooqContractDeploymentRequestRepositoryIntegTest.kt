@@ -2,6 +2,7 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
+import com.ampnet.blockchainapiservice.exception.AliasAlreadyInUseException
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
@@ -34,6 +35,7 @@ import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
@@ -457,6 +459,12 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
             assertThat(result).withMessage()
                 .isEqualTo(expectedContractDeploymentRequest)
+        }
+
+        verify("storing contract deployment request with conflicting alias throws AliasAlreadyInUseException") {
+            assertThrows<AliasAlreadyInUseException>(message) {
+                repository.store(params.copy(id = UUID.randomUUID()))
+            }
         }
     }
 
