@@ -136,3 +136,13 @@ class DuplicateIssuerContractAddressException(issuer: ContractAddress, chainId: 
         private const val serialVersionUID: Long = -344230356993636309L
     }
 }
+
+class AliasAlreadyInUseException(alias: String) : ServiceException(
+    errorCode = ErrorCode.ALIAS_ALREADY_IN_USE,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Alias '$alias' is already in use"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -3390991241297115163L
+    }
+}
