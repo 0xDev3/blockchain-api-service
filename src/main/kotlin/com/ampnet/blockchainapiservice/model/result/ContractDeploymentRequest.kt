@@ -24,6 +24,7 @@ data class ContractDeploymentRequest(
     val alias: String,
     val contractId: ContractId,
     val contractData: ContractBinaryData,
+    val constructorParams: JsonNode,
     val contractTags: List<ContractTag>,
     val contractImplements: List<ContractTrait>,
     val initialEthAmount: Balance,

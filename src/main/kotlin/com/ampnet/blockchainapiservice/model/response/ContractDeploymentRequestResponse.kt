@@ -2,9 +2,13 @@ package com.ampnet.blockchainapiservice.model.response
 
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
+import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WithTransactionData
 import com.ampnet.blockchainapiservice.util.ZeroAddress
+import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
+import com.ampnet.blockchainapiservice.util.annotation.SchemaName
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
@@ -18,6 +22,8 @@ data class ContractDeploymentRequestResponse(
     val status: Status,
     val contractId: String,
     val contractDeploymentData: String,
+    @SchemaIgnore
+    val constructorParams: JsonNode,
     val contractTags: List<String>,
     val contractImplements: List<String>,
     @JsonSerialize(using = ToStringSerializer::class)
@@ -38,6 +44,7 @@ data class ContractDeploymentRequestResponse(
         status = Status.PENDING,
         contractId = contractDeploymentRequest.contractId.value,
         contractDeploymentData = contractDeploymentRequest.contractData.withPrefix,
+        constructorParams = contractDeploymentRequest.constructorParams,
         contractTags = contractDeploymentRequest.contractTags.map { it.value },
         contractImplements = contractDeploymentRequest.contractImplements.map { it.value },
         initialEthAmount = contractDeploymentRequest.initialEthAmount.rawValue,
@@ -66,6 +73,7 @@ data class ContractDeploymentRequestResponse(
         status = contractDeploymentRequest.status,
         contractId = contractDeploymentRequest.value.contractId.value,
         contractDeploymentData = contractDeploymentRequest.value.contractData.withPrefix,
+        constructorParams = contractDeploymentRequest.value.constructorParams,
         contractTags = contractDeploymentRequest.value.contractTags.map { it.value },
         contractImplements = contractDeploymentRequest.value.contractImplements.map { it.value },
         initialEthAmount = contractDeploymentRequest.value.initialEthAmount.rawValue,
@@ -87,4 +95,9 @@ data class ContractDeploymentRequestResponse(
             timestamp = contractDeploymentRequest.transactionData.timestamp?.value
         )
     )
+
+    @Suppress("unused") // used for JSON schema generation
+    @JsonIgnore
+    @SchemaName("constructor_params")
+    private val schemaConstructorParams: List<FunctionArgument> = emptyList()
 }
