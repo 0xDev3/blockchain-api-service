@@ -1,6 +1,8 @@
 package com.ampnet.blockchainapiservice
 
 import com.ampnet.blockchainapiservice.config.JsonConfig
+import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
+import com.ampnet.blockchainapiservice.util.annotation.SchemaName
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.github.victools.jsonschema.generator.Option
 import com.github.victools.jsonschema.generator.OptionPreset
@@ -21,11 +23,15 @@ object JsonSchemaDocumentation {
     ).apply {
         forFields().apply {
             withPropertyNameOverrideResolver { field ->
-                PropertyNamingStrategies.SnakeCaseStrategy().translate(field.name)
+                val nameOverride = field.getAnnotation(SchemaName::class.java)?.name
+                nameOverride ?: PropertyNamingStrategies.SnakeCaseStrategy().translate(field.name)
             }
             withNullableCheck { field ->
                 Class.forName(field.declaringType.typeName)
                     .kotlin.members.find { it.name == field.declaredName }?.returnType?.isMarkedNullable ?: false
+            }
+            withIgnoreCheck { field ->
+                field.getAnnotation(SchemaIgnore::class.java) != null
             }
         }
         with(

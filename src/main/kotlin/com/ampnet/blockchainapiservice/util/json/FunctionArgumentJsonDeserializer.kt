@@ -3,7 +3,6 @@ package com.ampnet.blockchainapiservice.util.json
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonParser
-import com.fasterxml.jackson.core.TreeNode
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
@@ -13,7 +12,7 @@ import org.web3j.abi.datatypes.Type
 class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
 
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): FunctionArgument {
-        val jsonTree = p.readValueAsTree<TreeNode>()
+        val jsonTree = p.readValueAsTree<JsonNode>()
 
         if (jsonTree !is ObjectNode) {
             throw JsonParseException(p, "object expected")
@@ -22,7 +21,7 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
         val argumentType = jsonTree["type"]?.asText() ?: throw JsonParseException(p, "missing type")
         val argumentValue = jsonTree["value"] ?: throw JsonParseException(p, "missing value")
 
-        return FunctionArgument(deserializeType(p, argumentType, argumentValue))
+        return FunctionArgument(deserializeType(p, argumentType, argumentValue), jsonTree)
     }
 
     private fun deserializeType(p: JsonParser, argumentType: String, argumentValue: JsonNode): Type<*> {
