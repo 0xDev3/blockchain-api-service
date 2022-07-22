@@ -110,125 +110,140 @@ import kotlin.Int
 import org.web3j.abi.datatypes.Int as Web3Int
 import org.web3j.abi.datatypes.primitive.Byte as Web3Byte
 
+private typealias ParseFn = (JsonNode, JsonParser, Boolean) -> Type<*>
+
 object Web3TypeMappings {
 
     private const val VALUE_ERROR = "invalid value type"
-    private val TYPE_MAPPINGS = mapOf<String, (JsonNode, JsonParser) -> Type<*>>(
-        "address" to { v: JsonNode, p: JsonParser -> Address(v.parseText(p)) },
-        "bool" to { v: JsonNode, p: JsonParser -> Bool(v.parseBoolean(p)) },
-        "string" to { v: JsonNode, p: JsonParser -> Utf8String(v.parseText(p)) },
-        "bytes" to { v: JsonNode, p: JsonParser -> DynamicBytes(v.parseBytes(p)) },
-        "byte" to { v: JsonNode, p: JsonParser -> Web3Byte(v.parseBigInt(p).toByte()) },
-        "uint" to { v: JsonNode, p: JsonParser -> Uint(v.parseBigInt(p)) },
-        "uint8" to { v: JsonNode, p: JsonParser -> Uint8(v.parseBigInt(p)) },
-        "uint16" to { v: JsonNode, p: JsonParser -> Uint16(v.parseBigInt(p)) },
-        "uint24" to { v: JsonNode, p: JsonParser -> Uint24(v.parseBigInt(p)) },
-        "uint32" to { v: JsonNode, p: JsonParser -> Uint32(v.parseBigInt(p)) },
-        "uint40" to { v: JsonNode, p: JsonParser -> Uint40(v.parseBigInt(p)) },
-        "uint48" to { v: JsonNode, p: JsonParser -> Uint48(v.parseBigInt(p)) },
-        "uint56" to { v: JsonNode, p: JsonParser -> Uint56(v.parseBigInt(p)) },
-        "uint64" to { v: JsonNode, p: JsonParser -> Uint64(v.parseBigInt(p)) },
-        "uint72" to { v: JsonNode, p: JsonParser -> Uint72(v.parseBigInt(p)) },
-        "uint80" to { v: JsonNode, p: JsonParser -> Uint80(v.parseBigInt(p)) },
-        "uint88" to { v: JsonNode, p: JsonParser -> Uint88(v.parseBigInt(p)) },
-        "uint96" to { v: JsonNode, p: JsonParser -> Uint96(v.parseBigInt(p)) },
-        "uint104" to { v: JsonNode, p: JsonParser -> Uint104(v.parseBigInt(p)) },
-        "uint112" to { v: JsonNode, p: JsonParser -> Uint112(v.parseBigInt(p)) },
-        "uint120" to { v: JsonNode, p: JsonParser -> Uint120(v.parseBigInt(p)) },
-        "uint128" to { v: JsonNode, p: JsonParser -> Uint128(v.parseBigInt(p)) },
-        "uint136" to { v: JsonNode, p: JsonParser -> Uint136(v.parseBigInt(p)) },
-        "uint144" to { v: JsonNode, p: JsonParser -> Uint144(v.parseBigInt(p)) },
-        "uint152" to { v: JsonNode, p: JsonParser -> Uint152(v.parseBigInt(p)) },
-        "uint160" to { v: JsonNode, p: JsonParser -> Uint160(v.parseBigInt(p)) },
-        "uint168" to { v: JsonNode, p: JsonParser -> Uint168(v.parseBigInt(p)) },
-        "uint176" to { v: JsonNode, p: JsonParser -> Uint176(v.parseBigInt(p)) },
-        "uint184" to { v: JsonNode, p: JsonParser -> Uint184(v.parseBigInt(p)) },
-        "uint192" to { v: JsonNode, p: JsonParser -> Uint192(v.parseBigInt(p)) },
-        "uint200" to { v: JsonNode, p: JsonParser -> Uint200(v.parseBigInt(p)) },
-        "uint208" to { v: JsonNode, p: JsonParser -> Uint208(v.parseBigInt(p)) },
-        "uint216" to { v: JsonNode, p: JsonParser -> Uint216(v.parseBigInt(p)) },
-        "uint224" to { v: JsonNode, p: JsonParser -> Uint224(v.parseBigInt(p)) },
-        "uint232" to { v: JsonNode, p: JsonParser -> Uint232(v.parseBigInt(p)) },
-        "uint240" to { v: JsonNode, p: JsonParser -> Uint240(v.parseBigInt(p)) },
-        "uint248" to { v: JsonNode, p: JsonParser -> Uint248(v.parseBigInt(p)) },
-        "uint256" to { v: JsonNode, p: JsonParser -> Uint256(v.parseBigInt(p)) },
-        "int" to { v: JsonNode, p: JsonParser -> Web3Int(v.parseBigInt(p)) },
-        "int8" to { v: JsonNode, p: JsonParser -> Int8(v.parseBigInt(p)) },
-        "int16" to { v: JsonNode, p: JsonParser -> Int16(v.parseBigInt(p)) },
-        "int24" to { v: JsonNode, p: JsonParser -> Int24(v.parseBigInt(p)) },
-        "int32" to { v: JsonNode, p: JsonParser -> Int32(v.parseBigInt(p)) },
-        "int40" to { v: JsonNode, p: JsonParser -> Int40(v.parseBigInt(p)) },
-        "int48" to { v: JsonNode, p: JsonParser -> Int48(v.parseBigInt(p)) },
-        "int56" to { v: JsonNode, p: JsonParser -> Int56(v.parseBigInt(p)) },
-        "int64" to { v: JsonNode, p: JsonParser -> Int64(v.parseBigInt(p)) },
-        "int72" to { v: JsonNode, p: JsonParser -> Int72(v.parseBigInt(p)) },
-        "int80" to { v: JsonNode, p: JsonParser -> Int80(v.parseBigInt(p)) },
-        "int88" to { v: JsonNode, p: JsonParser -> Int88(v.parseBigInt(p)) },
-        "int96" to { v: JsonNode, p: JsonParser -> Int96(v.parseBigInt(p)) },
-        "int104" to { v: JsonNode, p: JsonParser -> Int104(v.parseBigInt(p)) },
-        "int112" to { v: JsonNode, p: JsonParser -> Int112(v.parseBigInt(p)) },
-        "int120" to { v: JsonNode, p: JsonParser -> Int120(v.parseBigInt(p)) },
-        "int128" to { v: JsonNode, p: JsonParser -> Int128(v.parseBigInt(p)) },
-        "int136" to { v: JsonNode, p: JsonParser -> Int136(v.parseBigInt(p)) },
-        "int144" to { v: JsonNode, p: JsonParser -> Int144(v.parseBigInt(p)) },
-        "int152" to { v: JsonNode, p: JsonParser -> Int152(v.parseBigInt(p)) },
-        "int160" to { v: JsonNode, p: JsonParser -> Int160(v.parseBigInt(p)) },
-        "int168" to { v: JsonNode, p: JsonParser -> Int168(v.parseBigInt(p)) },
-        "int176" to { v: JsonNode, p: JsonParser -> Int176(v.parseBigInt(p)) },
-        "int184" to { v: JsonNode, p: JsonParser -> Int184(v.parseBigInt(p)) },
-        "int192" to { v: JsonNode, p: JsonParser -> Int192(v.parseBigInt(p)) },
-        "int200" to { v: JsonNode, p: JsonParser -> Int200(v.parseBigInt(p)) },
-        "int208" to { v: JsonNode, p: JsonParser -> Int208(v.parseBigInt(p)) },
-        "int216" to { v: JsonNode, p: JsonParser -> Int216(v.parseBigInt(p)) },
-        "int224" to { v: JsonNode, p: JsonParser -> Int224(v.parseBigInt(p)) },
-        "int232" to { v: JsonNode, p: JsonParser -> Int232(v.parseBigInt(p)) },
-        "int240" to { v: JsonNode, p: JsonParser -> Int240(v.parseBigInt(p)) },
-        "int248" to { v: JsonNode, p: JsonParser -> Int248(v.parseBigInt(p)) },
-        "int256" to { v: JsonNode, p: JsonParser -> Int256(v.parseBigInt(p)) },
-        "bytes1" to { v: JsonNode, p: JsonParser -> Bytes1(v.parseBytes(p, length = 1)) },
-        "bytes2" to { v: JsonNode, p: JsonParser -> Bytes2(v.parseBytes(p, length = 2)) },
-        "bytes3" to { v: JsonNode, p: JsonParser -> Bytes3(v.parseBytes(p, length = 3)) },
-        "bytes4" to { v: JsonNode, p: JsonParser -> Bytes4(v.parseBytes(p, length = 4)) },
-        "bytes5" to { v: JsonNode, p: JsonParser -> Bytes5(v.parseBytes(p, length = 5)) },
-        "bytes6" to { v: JsonNode, p: JsonParser -> Bytes6(v.parseBytes(p, length = 6)) },
-        "bytes7" to { v: JsonNode, p: JsonParser -> Bytes7(v.parseBytes(p, length = 7)) },
-        "bytes8" to { v: JsonNode, p: JsonParser -> Bytes8(v.parseBytes(p, length = 8)) },
-        "bytes9" to { v: JsonNode, p: JsonParser -> Bytes9(v.parseBytes(p, length = 9)) },
-        "bytes10" to { v: JsonNode, p: JsonParser -> Bytes10(v.parseBytes(p, length = 10)) },
-        "bytes11" to { v: JsonNode, p: JsonParser -> Bytes11(v.parseBytes(p, length = 11)) },
-        "bytes12" to { v: JsonNode, p: JsonParser -> Bytes12(v.parseBytes(p, length = 12)) },
-        "bytes13" to { v: JsonNode, p: JsonParser -> Bytes13(v.parseBytes(p, length = 13)) },
-        "bytes14" to { v: JsonNode, p: JsonParser -> Bytes14(v.parseBytes(p, length = 14)) },
-        "bytes15" to { v: JsonNode, p: JsonParser -> Bytes15(v.parseBytes(p, length = 15)) },
-        "bytes16" to { v: JsonNode, p: JsonParser -> Bytes16(v.parseBytes(p, length = 16)) },
-        "bytes17" to { v: JsonNode, p: JsonParser -> Bytes17(v.parseBytes(p, length = 17)) },
-        "bytes18" to { v: JsonNode, p: JsonParser -> Bytes18(v.parseBytes(p, length = 18)) },
-        "bytes19" to { v: JsonNode, p: JsonParser -> Bytes19(v.parseBytes(p, length = 19)) },
-        "bytes20" to { v: JsonNode, p: JsonParser -> Bytes20(v.parseBytes(p, length = 20)) },
-        "bytes21" to { v: JsonNode, p: JsonParser -> Bytes21(v.parseBytes(p, length = 21)) },
-        "bytes22" to { v: JsonNode, p: JsonParser -> Bytes22(v.parseBytes(p, length = 22)) },
-        "bytes23" to { v: JsonNode, p: JsonParser -> Bytes23(v.parseBytes(p, length = 23)) },
-        "bytes24" to { v: JsonNode, p: JsonParser -> Bytes24(v.parseBytes(p, length = 24)) },
-        "bytes25" to { v: JsonNode, p: JsonParser -> Bytes25(v.parseBytes(p, length = 25)) },
-        "bytes26" to { v: JsonNode, p: JsonParser -> Bytes26(v.parseBytes(p, length = 26)) },
-        "bytes27" to { v: JsonNode, p: JsonParser -> Bytes27(v.parseBytes(p, length = 27)) },
-        "bytes28" to { v: JsonNode, p: JsonParser -> Bytes28(v.parseBytes(p, length = 28)) },
-        "bytes29" to { v: JsonNode, p: JsonParser -> Bytes29(v.parseBytes(p, length = 29)) },
-        "bytes30" to { v: JsonNode, p: JsonParser -> Bytes30(v.parseBytes(p, length = 30)) },
-        "bytes31" to { v: JsonNode, p: JsonParser -> Bytes31(v.parseBytes(p, length = 31)) },
-        "bytes32" to { v: JsonNode, p: JsonParser -> Bytes32(v.parseBytes(p, length = 32)) }
+    private val SIMPLE_TYPE_MAPPINGS = mapOf<String, ParseFn>(
+        "address" to { v: JsonNode, p: JsonParser, t: Boolean -> Address(v.parseText(p, t)) },
+        "bool" to { v: JsonNode, p: JsonParser, t: Boolean -> Bool(v.parseBoolean(p, t)) },
+        "string" to { v: JsonNode, p: JsonParser, t: Boolean -> Utf8String(v.parseText(p, t)) },
+        "bytes" to { v: JsonNode, p: JsonParser, t: Boolean -> DynamicBytes(v.parseBytes(p, null, t)) },
+        "byte" to { v: JsonNode, p: JsonParser, t: Boolean -> Web3Byte(v.parseBigInt(p, t).toByte()) }
     )
+    private val UINT_TYPE_MAPPINGS = mapOf<String, ParseFn>(
+        "uint" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint(v.parseBigInt(p, t)) },
+        "uint8" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint8(v.parseBigInt(p, t)) },
+        "uint16" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint16(v.parseBigInt(p, t)) },
+        "uint24" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint24(v.parseBigInt(p, t)) },
+        "uint32" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint32(v.parseBigInt(p, t)) },
+        "uint40" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint40(v.parseBigInt(p, t)) },
+        "uint48" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint48(v.parseBigInt(p, t)) },
+        "uint56" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint56(v.parseBigInt(p, t)) },
+        "uint64" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint64(v.parseBigInt(p, t)) },
+        "uint72" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint72(v.parseBigInt(p, t)) },
+        "uint80" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint80(v.parseBigInt(p, t)) },
+        "uint88" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint88(v.parseBigInt(p, t)) },
+        "uint96" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint96(v.parseBigInt(p, t)) },
+        "uint104" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint104(v.parseBigInt(p, t)) },
+        "uint112" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint112(v.parseBigInt(p, t)) },
+        "uint120" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint120(v.parseBigInt(p, t)) },
+        "uint128" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint128(v.parseBigInt(p, t)) },
+        "uint136" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint136(v.parseBigInt(p, t)) },
+        "uint144" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint144(v.parseBigInt(p, t)) },
+        "uint152" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint152(v.parseBigInt(p, t)) },
+        "uint160" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint160(v.parseBigInt(p, t)) },
+        "uint168" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint168(v.parseBigInt(p, t)) },
+        "uint176" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint176(v.parseBigInt(p, t)) },
+        "uint184" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint184(v.parseBigInt(p, t)) },
+        "uint192" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint192(v.parseBigInt(p, t)) },
+        "uint200" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint200(v.parseBigInt(p, t)) },
+        "uint208" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint208(v.parseBigInt(p, t)) },
+        "uint216" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint216(v.parseBigInt(p, t)) },
+        "uint224" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint224(v.parseBigInt(p, t)) },
+        "uint232" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint232(v.parseBigInt(p, t)) },
+        "uint240" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint240(v.parseBigInt(p, t)) },
+        "uint248" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint248(v.parseBigInt(p, t)) },
+        "uint256" to { v: JsonNode, p: JsonParser, t: Boolean -> Uint256(v.parseBigInt(p, t)) }
+    )
+    private val INT_TYPE_MAPPINGS = mapOf<String, ParseFn>(
+        "int" to { v: JsonNode, p: JsonParser, t: Boolean -> Web3Int(v.parseBigInt(p, t)) },
+        "int8" to { v: JsonNode, p: JsonParser, t: Boolean -> Int8(v.parseBigInt(p, t)) },
+        "int16" to { v: JsonNode, p: JsonParser, t: Boolean -> Int16(v.parseBigInt(p, t)) },
+        "int24" to { v: JsonNode, p: JsonParser, t: Boolean -> Int24(v.parseBigInt(p, t)) },
+        "int32" to { v: JsonNode, p: JsonParser, t: Boolean -> Int32(v.parseBigInt(p, t)) },
+        "int40" to { v: JsonNode, p: JsonParser, t: Boolean -> Int40(v.parseBigInt(p, t)) },
+        "int48" to { v: JsonNode, p: JsonParser, t: Boolean -> Int48(v.parseBigInt(p, t)) },
+        "int56" to { v: JsonNode, p: JsonParser, t: Boolean -> Int56(v.parseBigInt(p, t)) },
+        "int64" to { v: JsonNode, p: JsonParser, t: Boolean -> Int64(v.parseBigInt(p, t)) },
+        "int72" to { v: JsonNode, p: JsonParser, t: Boolean -> Int72(v.parseBigInt(p, t)) },
+        "int80" to { v: JsonNode, p: JsonParser, t: Boolean -> Int80(v.parseBigInt(p, t)) },
+        "int88" to { v: JsonNode, p: JsonParser, t: Boolean -> Int88(v.parseBigInt(p, t)) },
+        "int96" to { v: JsonNode, p: JsonParser, t: Boolean -> Int96(v.parseBigInt(p, t)) },
+        "int104" to { v: JsonNode, p: JsonParser, t: Boolean -> Int104(v.parseBigInt(p, t)) },
+        "int112" to { v: JsonNode, p: JsonParser, t: Boolean -> Int112(v.parseBigInt(p, t)) },
+        "int120" to { v: JsonNode, p: JsonParser, t: Boolean -> Int120(v.parseBigInt(p, t)) },
+        "int128" to { v: JsonNode, p: JsonParser, t: Boolean -> Int128(v.parseBigInt(p, t)) },
+        "int136" to { v: JsonNode, p: JsonParser, t: Boolean -> Int136(v.parseBigInt(p, t)) },
+        "int144" to { v: JsonNode, p: JsonParser, t: Boolean -> Int144(v.parseBigInt(p, t)) },
+        "int152" to { v: JsonNode, p: JsonParser, t: Boolean -> Int152(v.parseBigInt(p, t)) },
+        "int160" to { v: JsonNode, p: JsonParser, t: Boolean -> Int160(v.parseBigInt(p, t)) },
+        "int168" to { v: JsonNode, p: JsonParser, t: Boolean -> Int168(v.parseBigInt(p, t)) },
+        "int176" to { v: JsonNode, p: JsonParser, t: Boolean -> Int176(v.parseBigInt(p, t)) },
+        "int184" to { v: JsonNode, p: JsonParser, t: Boolean -> Int184(v.parseBigInt(p, t)) },
+        "int192" to { v: JsonNode, p: JsonParser, t: Boolean -> Int192(v.parseBigInt(p, t)) },
+        "int200" to { v: JsonNode, p: JsonParser, t: Boolean -> Int200(v.parseBigInt(p, t)) },
+        "int208" to { v: JsonNode, p: JsonParser, t: Boolean -> Int208(v.parseBigInt(p, t)) },
+        "int216" to { v: JsonNode, p: JsonParser, t: Boolean -> Int216(v.parseBigInt(p, t)) },
+        "int224" to { v: JsonNode, p: JsonParser, t: Boolean -> Int224(v.parseBigInt(p, t)) },
+        "int232" to { v: JsonNode, p: JsonParser, t: Boolean -> Int232(v.parseBigInt(p, t)) },
+        "int240" to { v: JsonNode, p: JsonParser, t: Boolean -> Int240(v.parseBigInt(p, t)) },
+        "int248" to { v: JsonNode, p: JsonParser, t: Boolean -> Int248(v.parseBigInt(p, t)) },
+        "int256" to { v: JsonNode, p: JsonParser, t: Boolean -> Int256(v.parseBigInt(p, t)) }
+    )
+    private val BYTES_TYPE_MAPPINGS = mapOf<String, ParseFn>(
+        "bytes1" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes1(v.parseBytes(p, length = 1, t)) },
+        "bytes2" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes2(v.parseBytes(p, length = 2, t)) },
+        "bytes3" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes3(v.parseBytes(p, length = 3, t)) },
+        "bytes4" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes4(v.parseBytes(p, length = 4, t)) },
+        "bytes5" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes5(v.parseBytes(p, length = 5, t)) },
+        "bytes6" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes6(v.parseBytes(p, length = 6, t)) },
+        "bytes7" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes7(v.parseBytes(p, length = 7, t)) },
+        "bytes8" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes8(v.parseBytes(p, length = 8, t)) },
+        "bytes9" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes9(v.parseBytes(p, length = 9, t)) },
+        "bytes10" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes10(v.parseBytes(p, length = 10, t)) },
+        "bytes11" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes11(v.parseBytes(p, length = 11, t)) },
+        "bytes12" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes12(v.parseBytes(p, length = 12, t)) },
+        "bytes13" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes13(v.parseBytes(p, length = 13, t)) },
+        "bytes14" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes14(v.parseBytes(p, length = 14, t)) },
+        "bytes15" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes15(v.parseBytes(p, length = 15, t)) },
+        "bytes16" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes16(v.parseBytes(p, length = 16, t)) },
+        "bytes17" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes17(v.parseBytes(p, length = 17, t)) },
+        "bytes18" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes18(v.parseBytes(p, length = 18, t)) },
+        "bytes19" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes19(v.parseBytes(p, length = 19, t)) },
+        "bytes20" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes20(v.parseBytes(p, length = 20, t)) },
+        "bytes21" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes21(v.parseBytes(p, length = 21, t)) },
+        "bytes22" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes22(v.parseBytes(p, length = 22, t)) },
+        "bytes23" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes23(v.parseBytes(p, length = 23, t)) },
+        "bytes24" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes24(v.parseBytes(p, length = 24, t)) },
+        "bytes25" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes25(v.parseBytes(p, length = 25, t)) },
+        "bytes26" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes26(v.parseBytes(p, length = 26, t)) },
+        "bytes27" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes27(v.parseBytes(p, length = 27, t)) },
+        "bytes28" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes28(v.parseBytes(p, length = 28, t)) },
+        "bytes29" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes29(v.parseBytes(p, length = 29, t)) },
+        "bytes30" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes30(v.parseBytes(p, length = 30, t)) },
+        "bytes31" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes31(v.parseBytes(p, length = 31, t)) },
+        "bytes32" to { v: JsonNode, p: JsonParser, t: Boolean -> Bytes32(v.parseBytes(p, length = 32, t)) }
+    )
+    private val TYPE_MAPPINGS = SIMPLE_TYPE_MAPPINGS + UINT_TYPE_MAPPINGS + INT_TYPE_MAPPINGS + BYTES_TYPE_MAPPINGS
 
-    operator fun get(argumentType: String): ((JsonNode, JsonParser) -> Type<*>)? = TYPE_MAPPINGS[argumentType]
+    operator fun get(argumentType: String): ((JsonNode, JsonParser) -> Type<*>)? =
+        TYPE_MAPPINGS[argumentType]?.let { { v: JsonNode, p: JsonParser -> it.invoke(v, p, false) } }
 
-    private fun JsonNode.parseText(p: JsonParser): String =
-        if (this.isTextual) this.asText() else throw JsonParseException(p, VALUE_ERROR)
+    fun getWeb3Type(p: JsonParser, value: JsonNode, argumentType: String): Class<Type<*>>? =
+        TYPE_MAPPINGS[argumentType]?.invoke(value, p, true)?.javaClass
 
-    private fun JsonNode.parseBoolean(p: JsonParser): Boolean =
-        if (this.isBoolean) this.asBoolean() else throw JsonParseException(p, VALUE_ERROR)
+    private fun JsonNode.parseText(p: JsonParser, getDefault: Boolean): String =
+        if (getDefault) "0x0" else if (this.isTextual) this.asText() else throw JsonParseException(p, VALUE_ERROR)
 
-    private fun JsonNode.parseBigInt(p: JsonParser): BigInteger =
-        if (this.isNumber) {
+    private fun JsonNode.parseBoolean(p: JsonParser, getDefault: Boolean): Boolean =
+        if (getDefault) false else if (this.isBoolean) this.asBoolean() else throw JsonParseException(p, VALUE_ERROR)
+
+    private fun JsonNode.parseBigInt(p: JsonParser, getDefault: Boolean): BigInteger =
+        if (getDefault) {
+            BigInteger.ZERO
+        } else if (this.isNumber) {
             this.bigIntegerValue()
         } else if (this.isTextual) {
             BigInteger(this.asText())
@@ -236,9 +251,11 @@ object Web3TypeMappings {
             throw JsonParseException(p, VALUE_ERROR)
         }
 
-    private fun JsonNode.parseBytes(p: JsonParser, length: Int? = null): ByteArray =
-        if (this.isArray) {
-            this.elements().asSequence().map { it.parseBigInt(p).toByte() }.toList().toByteArray().takeIf {
+    private fun JsonNode.parseBytes(p: JsonParser, length: Int?, getDefault: Boolean): ByteArray =
+        if (getDefault) {
+            ByteArray(length ?: 0)
+        } else if (this.isArray) {
+            this.elements().asSequence().map { it.parseBigInt(p, false).toByte() }.toList().toByteArray().takeIf {
                 length == null || it.size == length
             } ?: throw JsonParseException(p, "invalid byte array length")
         } else {
