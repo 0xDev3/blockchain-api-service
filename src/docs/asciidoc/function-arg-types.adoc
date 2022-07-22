@@ -1,9 +1,40 @@
-Below table contains the list of all supported function argument types. Array types and structures are currently not
-supported.
+Below table contains the list of all supported function argument types. Any type can be made into an array by appending
+square brackets to the end of the type (`[]`). Fixed-size arrays are also supported by inserting a number inside the
+square brackets to indicate the array size (e.g. `string[1]` is an array of exactly one `string` element).
+Multi-dimensional arrays can be made by appending multiple square brackets. All array elements must be of the same type
+- this means that all `struct` arrays must have `struct` elements with matching field element types in the correct
+order.
+
+.Array Examples
+[%collapsible]
+====
+[cols="1,1"]
+|===
+| Array type |JSON value example
+
+| `string[]`
+| `["a", "b"]`
+
+| `int[1][2]`
+| `[[1], [2]]`
+
+|`struct[]`
+|`[ [{type: "string", "value": "a"}], [{"type": "string", "value": "b"}] ]`
+
+|===
+====
 
 [cols="1,1,1,1"]
 |===
 | Type name |JSON value type |Example value |Description
+
+|`struct`
+|`{"type": string, "value": any}[]`
+|`[{"type": "string", "value": "example struct"}, {"type": "bool", "value": true}]`
+|Array of objects which must contain `type` and `name` elements. The `type` value must be one of the supported function
+argument types from this table and the `value` must match the type's accepted format. Order of structure elements is
+important and must be in the order in which the structure elements are declared. Structure nesting is supported to any
+arbitrary depth - simply use the `struct` type and provide a valid structure array for the `value` field.
 
 |`address`
 |`string`

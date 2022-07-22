@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.util.json
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.config.JsonConfig
 import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.SizedStaticArray
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import org.assertj.core.api.Assertions.assertThat
@@ -10,7 +11,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Bool
+import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.DynamicBytes
+import org.web3j.abi.datatypes.DynamicStruct
 import org.web3j.abi.datatypes.Uint
 import org.web3j.abi.datatypes.Utf8String
 import org.web3j.abi.datatypes.generated.Bytes1
@@ -681,6 +684,786 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyDeserializeEmptyArrayType() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "bytes[]",
+            |      "value": []
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse empty dynamic array type") {
+            val (componentType, result) = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as DynamicArray<DynamicBytes>
+                }
+                .map { Pair(it.componentType, it.value.map { bytes -> bytes.value }) }[0]
+
+            assertThat(componentType).withMessage()
+                .isEqualTo(DynamicBytes::class.java)
+            assertThat(result).withMessage()
+                .isEmpty()
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeserializeDynamicArrayType() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "string[]",
+            |      "value": ["a", "b"]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse dynamic array type") {
+            val (componentType, result) = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as DynamicArray<Utf8String>
+                }
+                .map { Pair(it.componentType, it.value.map { utf8string -> utf8string.value }) }[0]
+
+            assertThat(componentType).withMessage()
+                .isEqualTo(Utf8String::class.java)
+            assertThat(result).withMessage()
+                .isEqualTo(listOf("a", "b"))
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeserializeZeroSizedArrayType() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "uint[0]",
+            |      "value": []
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse zero-sized array type") {
+            val (componentType, result) = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as SizedStaticArray<Uint>
+                }
+                .map { Pair(it.componentType, it.value.map { uint -> uint.value }) }[0]
+
+            assertThat(componentType).withMessage()
+                .isEqualTo(Uint::class.java)
+            assertThat(result).withMessage()
+                .isEmpty()
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeserializeSizedArrayType() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "bool[2]",
+            |      "value": [true, false]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse sized array type") {
+            val (componentType, result) = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as SizedStaticArray<Bool>
+                }
+                .map { Pair(it.componentType, it.value.map { bool -> bool.value }) }[0]
+
+            assertThat(componentType).withMessage()
+                .isEqualTo(Bool::class.java)
+            assertThat(result).withMessage()
+                .isEqualTo(listOf(true, false))
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeserializeNestedArrayType() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "uint[][2][3]",
+            |      "value": [
+            |        [
+            |          [], [1]
+            |        ],
+            |        [
+            |          [2, 3],
+            |          [4, 5, 6]
+            |        ],
+            |        [
+            |          [7, 8, 9, 10],
+            |          [11, 12, 13, 14, 15]
+            |        ]
+            |      ]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse sized array type") {
+            val readValue = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as SizedStaticArray<SizedStaticArray<DynamicArray<Uint>>>
+                }
+            val result = readValue.map {
+                it.value.map { i ->
+                    i.value.map { j ->
+                        j.value.map { k ->
+                            k.value.intValueExact()
+                        }
+                    }
+                }
+            }[0]
+            val componentTypes = readValue.flatMap {
+                val innerArray1 = it.value[0]
+                val innerArray2 = innerArray1.value[0]
+                listOf(it.componentType, innerArray1.componentType, innerArray2.componentType)
+            }
+
+            assertThat(componentTypes).withMessage()
+                .isEqualTo(listOf(SizedStaticArray::class.java, DynamicArray::class.java, Uint::class.java))
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    listOf(
+                        listOf(
+                            emptyList(),
+                            listOf(1)
+                        ),
+                        listOf(
+                            listOf(2, 3),
+                            listOf(4, 5, 6)
+                        ),
+                        listOf(
+                            listOf(7, 8, 9, 10),
+                            listOf(11, 12, 13, 14, 15)
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeserializeStruct() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct",
+            |      "value": [
+            |        {
+            |          "type": "string",
+            |          "value": "test"
+            |        },
+            |        {
+            |          "type": "uint",
+            |          "value": 1
+            |        }
+            |      ]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse struct") {
+            val result = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as DynamicStruct
+                }
+                .map { it.value.map { type -> type.value } }[0]
+
+            assertThat(result).withMessage()
+                .isEqualTo(listOf("test", BigInteger.ONE))
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeserializeNestedStruct() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct",
+            |      "value": [
+            |        {
+            |          "type": "string",
+            |          "value": "test"
+            |        },
+            |        {
+            |          "type": "struct",
+            |          "value": [
+            |            {
+            |              "type": "string",
+            |              "value": "nested1"
+            |            },
+            |            {
+            |              "type": "struct",
+            |              "value": [
+            |                {
+            |                  "type": "string",
+            |                  "value": "nested2"
+            |                },
+            |                {
+            |                  "type": "bool",
+            |                  "value": true
+            |                }
+            |              ]
+            |            },
+            |            {
+            |              "type": "uint",
+            |              "value": 0
+            |            }
+            |          ]
+            |        },
+            |        {
+            |          "type": "uint",
+            |          "value": 1
+            |        }
+            |      ]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse nested struct") {
+            val result = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as DynamicStruct
+                }
+                .map {
+                    it.value.map { type ->
+                        if (type is DynamicStruct) {
+                            type.value.map { innerValue ->
+                                if (innerValue is DynamicStruct) {
+                                    innerValue.value.map { v -> v.value }
+                                } else {
+                                    innerValue.value
+                                }
+                            }
+                        } else {
+                            type.value
+                        }
+                    }
+                }[0]
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    listOf(
+                        "test",
+                        listOf(
+                            "nested1",
+                            listOf("nested2", true),
+                            BigInteger.ZERO
+                        ),
+                        BigInteger.ONE
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeserializeStructWithArrayElements() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct",
+            |      "value": [
+            |        {
+            |          "type": "string[]",
+            |          "value": ["test", "another"]
+            |        },
+            |        {
+            |          "type": "uint[]",
+            |          "value": [0, 1, 2]
+            |        }
+            |      ]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse struct with array elements") {
+            val result = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as DynamicStruct
+                }
+                .map {
+                    it.value.map { type ->
+                        @Suppress("UNCHECKED_CAST")
+                        (type as DynamicArray<*>).value.map { s -> s.value }
+                    }
+                }[0]
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    listOf(
+                        listOf("test", "another"),
+                        listOf(BigInteger.ZERO, BigInteger.ONE, BigInteger.TWO)
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeserializeStructArray() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct[]",
+            |      "value": [
+            |        [
+            |          {
+            |            "type": "string",
+            |            "value": "struct1"
+            |          },
+            |          {
+            |            "type": "uint",
+            |            "value": 0
+            |          }
+            |        ],
+            |        [
+            |          {
+            |            "type": "string",
+            |            "value": "struct2"
+            |          },
+            |          {
+            |            "type": "uint",
+            |            "value": 1
+            |          }
+            |        ]
+            |      ]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse struct array") {
+            val result = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as DynamicArray<DynamicStruct>
+                }
+                .map {
+                    it.value.map { struct -> struct.value.map { elem -> elem.value } }
+                }[0]
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    listOf(
+                        listOf("struct1", BigInteger.ZERO),
+                        listOf("struct2", BigInteger.ONE)
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeserializeArrayOfNestedStructsWithArrays() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct[]",
+            |      "value": [
+            |        [
+            |          {
+            |            "type": "string[][1]",
+            |            "value": [["test1"]]
+            |          },
+            |          {
+            |            "type": "struct[]",
+            |            "value": [
+            |              [
+            |                {
+            |                  "type": "address[]",
+            |                  "value": ["0x0"]
+            |                },
+            |                {
+            |                  "type": "struct",
+            |                  "value": [
+            |                    {
+            |                      "type": "int",
+            |                      "value": 2
+            |                    }
+            |                  ]
+            |                },
+            |                {
+            |                  "type": "bool",
+            |                  "value": true
+            |                },
+            |                {
+            |                  "type": "struct[]",
+            |                  "value": []
+            |                }
+            |              ]
+            |            ]
+            |          },
+            |          {
+            |            "type": "uint",
+            |            "value": 1
+            |          }
+            |        ],
+            |        [
+            |          {
+            |            "type": "string[][1]",
+            |            "value": [["test2"]]
+            |          },
+            |          {
+            |            "type": "struct[]",
+            |            "value": [
+            |              [
+            |                {
+            |                  "type": "address[]",
+            |                  "value": ["0x1"]
+            |                },
+            |                {
+            |                  "type": "struct",
+            |                  "value": [
+            |                    {
+            |                      "type": "int",
+            |                      "value": 0
+            |                    }
+            |                  ]
+            |                },
+            |                {
+            |                  "type": "bool",
+            |                  "value": false
+            |                },
+            |                {
+            |                  "type": "struct[]",
+            |                  "value": []
+            |                }
+            |              ]
+            |            ]
+            |          },
+            |          {
+            |            "type": "uint",
+            |            "value": 10
+            |          }
+            |        ]
+            |      ]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("must correctly parse array of nested structs with arrays") {
+            val result = objectMapper.readValue(json, Result::class.java).args
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    it.value as DynamicArray<DynamicStruct>
+                }
+                .map {
+                    it.value.map { struct ->
+                        struct.value.map { structElem ->
+                            if (structElem is DynamicArray<*>) {
+                                @Suppress("UNCHECKED_CAST")
+                                val innerStructArray = structElem as DynamicArray<DynamicStruct>
+
+                                innerStructArray.value.map { innerStruct ->
+                                    innerStruct.value.map { innerStructElem ->
+                                        if (innerStructElem is DynamicStruct) {
+                                            innerStructElem.value.map { v -> v.value }
+                                        } else {
+                                            innerStructElem.value
+                                        }
+                                    }
+                                }
+                            } else if (structElem is SizedStaticArray<*>) {
+                                structElem.value.map { e ->
+                                    @Suppress("UNCHECKED_CAST")
+                                    (e as DynamicArray<Utf8String>).value.map { s -> s.value }
+                                }
+                            } else {
+                                structElem.value
+                            }
+                        }
+                    }
+                }[0]
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    listOf( // struct array
+                        listOf( // struct 1
+                            listOf(listOf("test1")),
+                            listOf( // inner struct array 1
+                                listOf( // inner struct 1
+                                    listOf(Address("0x0")),
+                                    listOf( // innermost struct 1
+                                        BigInteger.TWO
+                                    ),
+                                    true,
+                                    emptyList<Nothing>() // empty struct array
+                                )
+                            ),
+                            BigInteger.ONE
+                        ),
+                        listOf( // struct 2
+                            listOf(listOf("test2")),
+                            listOf( // inner struct array 2
+                                listOf( // inner struct 2
+                                    listOf(Address("0x1")),
+                                    listOf( // innermost struct 2
+                                        BigInteger.ZERO
+                                    ),
+                                    false,
+                                    emptyList<Nothing>() // empty struct array
+                                )
+                            ),
+                            BigInteger.TEN
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyGetTypeHierarchy() {
+        val deserializer = FunctionArgumentJsonDeserializer()
+        val simpleJson = """{
+            |  "type": "string",
+            |  "value": "test"
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for simple JSON") {
+            val tree = objectMapper.readTree(simpleJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("string")
+        }
+
+        val arrayJson = """{
+            |  "type": "string[]",
+            |  "value": ["test"]
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for array JSON") {
+            val tree = objectMapper.readTree(arrayJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("string[]")
+        }
+
+        val emptyArrayJson = """{
+            |  "type": "string[0]",
+            |  "value": []
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for array JSON") {
+            val tree = objectMapper.readTree(emptyArrayJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("string[0]")
+        }
+
+        val nestedArrayJson = """{
+            |  "type": "string[1][1][]",
+            |  "value": [[["test"]]]
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for nested array JSON") {
+            val tree = objectMapper.readTree(nestedArrayJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("string[1][1][]")
+        }
+
+        val structJson = """{
+            |  "type": "struct",
+            |  "value": [
+            |    {
+            |      "type": "string",
+            |      "value": "test"
+            |    },
+            |    {
+            |      "type": "uint",
+            |      "value": 1
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for struct JSON") {
+            val tree = objectMapper.readTree(structJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("struct(string,uint)")
+        }
+
+        val nestedStructJson = """{
+            |  "type": "struct",
+            |  "value": [
+            |    {
+            |      "type": "string",
+            |      "value": "test"
+            |    },
+            |    {
+            |      "type": "struct",
+            |      "value": [
+            |        {
+            |          "type": "address",
+            |          "value": "0x0"
+            |        },
+            |        {
+            |          "type": "struct",
+            |          "value": [
+            |            {
+            |              "type": "int",
+            |              "value": 2
+            |            }
+            |          ]
+            |        },
+            |        {
+            |          "type": "bool",
+            |          "value": true
+            |        }
+            |      ]
+            |    },
+            |    {
+            |      "type": "uint",
+            |      "value": 1
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for struct JSON") {
+            val tree = objectMapper.readTree(nestedStructJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("struct(string,struct(address,struct(int),bool),uint)")
+        }
+
+        val emptyStructArrayJson = """{
+            |  "type": "struct[]",
+            |  "value": []
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for empty struct array JSON") {
+            val tree = objectMapper.readTree(emptyStructArrayJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("struct(*)[]")
+        }
+
+        val emptyNestedStructArrayJson = """{
+            |  "type": "struct[][0][]",
+            |  "value": [[[]]]
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for nested empty struct array JSON") {
+            val tree = objectMapper.readTree(emptyNestedStructArrayJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("struct(*)[][0][]")
+        }
+
+        val structArrayJson = """{
+            |  "type": "struct[]",
+            |  "value": [
+            |    [
+            |      {
+            |        "type": "string",
+            |        "value": "test"
+            |      },
+            |      {
+            |        "type": "uint",
+            |        "value": 1
+            |      }
+            |    ]
+            |  ]
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for struct array JSON") {
+            val tree = objectMapper.readTree(structArrayJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("struct(string,uint)[]")
+        }
+
+        val nestedStructArrayJson = """{
+            |  "type": "struct[1][1][]",
+            |  "value": [
+            |    [
+            |      [
+            |        [
+            |          {
+            |            "type": "string",
+            |            "value": "test"
+            |          },
+            |          {
+            |            "type": "uint",
+            |            "value": 1
+            |          }
+            |        ]
+            |      ]
+            |    ]
+            |  ]
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for nested struct array JSON") {
+            val tree = objectMapper.readTree(nestedStructArrayJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("struct(string,uint)[1][1][]")
+        }
+
+        val nestedStructWithArraysJson = """{
+            |  "type": "struct[]",
+            |  "value": [
+            |    [
+            |      {
+            |        "type": "string[][1]",
+            |        "value": [["test"]]
+            |      },
+            |      {
+            |        "type": "struct[]",
+            |        "value": [
+            |          [
+            |            {
+            |              "type": "address[]",
+            |              "value": ["0x0"]
+            |            },
+            |            {
+            |              "type": "struct",
+            |              "value": [
+            |                {
+            |                  "type": "int",
+            |                  "value": 2
+            |                }
+            |              ]
+            |            },
+            |            {
+            |              "type": "bool",
+            |              "value": true
+            |            },
+            |            {
+            |              "type": "struct[]",
+            |              "value": []
+            |            }
+            |          ]
+            |        ]
+            |      },
+            |      {
+            |        "type": "uint",
+            |        "value": 1
+            |      }
+            |    ]
+            |  ]
+            |}""".trimMargin()
+
+        verify("correct type hierarchy is returned for struct with arrays JSON") {
+            val tree = objectMapper.readTree(nestedStructWithArraysJson)
+
+            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+                .isEqualTo("struct(string[][1],struct(address[],struct(int),bool,struct(*)[])[],uint)[]")
+        }
+    }
+
+    @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenDeserializedValueIsNotAnObject() {
         val json = """{
             |  "args": [
@@ -850,6 +1633,325 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |    {
             |       "type": "bytes1",
             |       "value": [1, 2]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForUnknownArrayType() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "dummy-type[]",
+            |      "value": []
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenArrayValueIsNotAnArray() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "uint[]",
+            |      "value": false
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenArrayHasInconsistentElements() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "uint[]",
+            |      "value": [1, false]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenSizedArrayHasInvalidNumberOfElements() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "uint[2]",
+            |      "value": [1]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingEmptyStruct() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct",
+            |      "value": []
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructWithNonArrayValue() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct",
+            |      "value": "non-an-array"
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructWithMissingElementType() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct",
+            |      "value": [
+            |        {
+            |          "value": "missing-type"
+            |        }
+            |      ]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructWithMissingElementValue() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct",
+            |      "value": [
+            |        {
+            |          "type": "missing-value"
+            |        }
+            |      ]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructArrayWithMismatchingStructs() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct[]",
+            |      "value": [
+            |        [
+            |          {
+            |            "type": "string",
+            |            "value": "struct1"
+            |          },
+            |          {
+            |            "type": "uint",
+            |            "value": 0
+            |          }
+            |        ],
+            |        [
+            |          {
+            |            "type": "string",
+            |            "value": "struct2"
+            |          }
+            |        ]
+            |      ]
+            |    }
+            |  ]
+            |}""".trimMargin()
+
+        verify("JsonMappingException is thrown") {
+            val ex = assertThrows<JsonMappingException>(message) {
+                objectMapper.readValue(json, Result::class.java)
+            }
+
+            assertThat(ex.cause).withMessage()
+                .isInstanceOf(JsonParseException::class.java)
+        }
+    }
+
+    @Test
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructArrayWithMismatchingNestedStructs() {
+        val json = """{
+            |  "args": [
+            |    {
+            |      "type": "struct[]",
+            |      "value": [
+            |        [
+            |          {
+            |            "type": "string[][1]",
+            |            "value": [["test1"]]
+            |          },
+            |          {
+            |            "type": "struct[]",
+            |            "value": [
+            |              [
+            |                {
+            |                  "type": "address[]",
+            |                  "value": ["0x0"]
+            |                },
+            |                {
+            |                  "type": "struct",
+            |                  "value": [
+            |                    {
+            |                      "type": "int",
+            |                      "value": 2
+            |                    }
+            |                  ]
+            |                },
+            |                {
+            |                  "type": "bool",
+            |                  "value": true
+            |                },
+            |                {
+            |                  "type": "struct[]",
+            |                  "value": []
+            |                }
+            |              ]
+            |            ]
+            |          },
+            |          {
+            |            "type": "uint",
+            |            "value": 1
+            |          }
+            |        ],
+            |        [
+            |          {
+            |            "type": "string[][1]",
+            |            "value": [["test2"]]
+            |          },
+            |          {
+            |            "type": "struct[]",
+            |            "value": [
+            |              [
+            |                {
+            |                  "type": "address[]",
+            |                  "value": ["0x1"]
+            |                },
+            |                {
+            |                  "type": "struct",
+            |                  "value": [
+            |                    {
+            |                      "type": "int",
+            |                      "value": 0
+            |                    }
+            |                  ]
+            |                },
+            |                {
+            |                  "type": "bool",
+            |                  "value": false
+            |                },
+            |                {
+            |                  "type": "struct[]",
+            |                  "value": [
+            |                    [
+            |                      {
+            |                        "type": "string",
+            |                        "value": "non-matching"
+            |                      }
+            |                    ]
+            |                  ]
+            |                }
+            |              ]
+            |            ]
+            |          },
+            |          {
+            |            "type": "uint",
+            |            "value": 10
+            |          }
+            |        ]
+            |      ]
             |    }
             |  ]
             |}""".trimMargin()
