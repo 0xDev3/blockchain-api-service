@@ -235,7 +235,7 @@ jooq {
                             ForcedType().apply {
                                 userType = "com.ampnet.blockchainapiservice.util.ContractBinaryData"
                                 converter = "com.ampnet.blockchainapiservice.util.ContractBinaryDataConverter"
-                                includeExpression = "contract_data|call_data"
+                                includeExpression = "contract_data"
                                 includeTypes = "BYTEA"
                             }
                         )

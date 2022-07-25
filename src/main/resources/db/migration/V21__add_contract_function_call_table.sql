@@ -4,7 +4,6 @@ CREATE TABLE blockchain_api_service.contract_function_call_request (
                                  REFERENCES blockchain_api_service.contract_deployment_request(id),
     contract_address             VARCHAR                  NOT NULL,
     function_signature           VARCHAR                  NOT NULL,
-    call_data                    BYTEA                    NOT NULL,
     function_params              JSON                     NOT NULL,
     eth_amount                   NUMERIC(78)              NOT NULL,
     chain_id                     BIGINT                   NOT NULL,

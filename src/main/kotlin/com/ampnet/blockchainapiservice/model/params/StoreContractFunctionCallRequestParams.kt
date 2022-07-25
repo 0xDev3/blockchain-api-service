@@ -4,7 +4,6 @@ import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
@@ -15,7 +14,6 @@ data class StoreContractFunctionCallRequestParams(
     val deployedContractId: UUID?,
     val contractAddress: ContractAddress,
     val functionSignature: String,
-    val callData: ContractBinaryData,
     val functionParams: JsonNode,
     val ethAmount: Balance,
     val chainId: ChainId,
