@@ -14,7 +14,7 @@ data class ContractFunctionCallRequest(
     val id: UUID,
     val deployedContractId: UUID?,
     val contractAddress: ContractAddress,
-    val functionSignature: String,
+    val functionName: String,
     val functionParams: JsonNode,
     val ethAmount: Balance,
     val chainId: ChainId,
