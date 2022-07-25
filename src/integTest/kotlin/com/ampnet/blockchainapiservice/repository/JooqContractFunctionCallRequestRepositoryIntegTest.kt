@@ -51,7 +51,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
         private val DEPLOYED_CONTRACT_ID = UUID.randomUUID()
         private val CONTRACT_ADDRESS = ContractAddress("1337")
         private const val FUNCTION_SIGNATURE = "balanceOf(address)"
-        private val CALL_DATA = ContractBinaryData("00")
         private val ETH_AMOUNT = Balance(BigInteger("10000"))
         private val CHAIN_ID = ChainId(1337L)
         private const val REDIRECT_URL = "redirect-url"
@@ -357,7 +356,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
             deployedContractId = DEPLOYED_CONTRACT_ID,
             contractAddress = CONTRACT_ADDRESS,
             functionSignature = FUNCTION_SIGNATURE,
-            callData = CALL_DATA,
             functionParams = TestData.EMPTY_JSON_ARRAY,
             ethAmount = ETH_AMOUNT,
             chainId = CHAIN_ID,
@@ -381,7 +379,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
             deployedContractId = DEPLOYED_CONTRACT_ID,
             contractAddress = CONTRACT_ADDRESS,
             functionSignature = FUNCTION_SIGNATURE,
-            callData = CALL_DATA,
             functionParams = TestData.EMPTY_JSON_ARRAY,
             ethAmount = ETH_AMOUNT,
             chainId = CHAIN_ID,
@@ -418,7 +415,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
             deployedContractId = DEPLOYED_CONTRACT_ID,
             contractAddress = CONTRACT_ADDRESS,
             functionSignature = FUNCTION_SIGNATURE,
-            callData = CALL_DATA,
             functionParams = TestData.EMPTY_JSON_ARRAY,
             ethAmount = ETH_AMOUNT,
             chainId = CHAIN_ID,
@@ -452,7 +448,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         deployedContractId = DEPLOYED_CONTRACT_ID,
                         contractAddress = CONTRACT_ADDRESS,
                         functionSignature = FUNCTION_SIGNATURE,
-                        callData = CALL_DATA,
                         functionParams = TestData.EMPTY_JSON_ARRAY,
                         ethAmount = ETH_AMOUNT,
                         chainId = CHAIN_ID,
@@ -479,7 +474,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
             deployedContractId = DEPLOYED_CONTRACT_ID,
             contractAddress = CONTRACT_ADDRESS,
             functionSignature = FUNCTION_SIGNATURE,
-            callData = CALL_DATA,
             functionParams = TestData.EMPTY_JSON_ARRAY,
             ethAmount = ETH_AMOUNT,
             chainId = CHAIN_ID,
@@ -514,7 +508,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         deployedContractId = DEPLOYED_CONTRACT_ID,
                         contractAddress = CONTRACT_ADDRESS,
                         functionSignature = FUNCTION_SIGNATURE,
-                        callData = CALL_DATA,
                         functionParams = TestData.EMPTY_JSON_ARRAY,
                         ethAmount = ETH_AMOUNT,
                         chainId = CHAIN_ID,
@@ -541,7 +534,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
             deployedContractId = DEPLOYED_CONTRACT_ID,
             contractAddress = CONTRACT_ADDRESS,
             functionSignature = FUNCTION_SIGNATURE,
-            callData = CALL_DATA,
             functionParams = TestData.EMPTY_JSON_ARRAY,
             ethAmount = ETH_AMOUNT,
             chainId = CHAIN_ID,
@@ -586,7 +578,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         deployedContractId = DEPLOYED_CONTRACT_ID,
                         contractAddress = CONTRACT_ADDRESS,
                         functionSignature = FUNCTION_SIGNATURE,
-                        callData = CALL_DATA,
                         functionParams = TestData.EMPTY_JSON_ARRAY,
                         ethAmount = ETH_AMOUNT,
                         chainId = CHAIN_ID,
@@ -615,7 +606,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
         deployedContractId = deployedContractId,
         contractAddress = contractAddress,
         functionSignature = FUNCTION_SIGNATURE,
-        callData = CALL_DATA,
         functionParams = TestData.EMPTY_JSON_ARRAY,
         ethAmount = ETH_AMOUNT,
         chainId = CHAIN_ID,
@@ -635,7 +625,6 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
             deployedContractId = deployedContractId,
             contractAddress = contractAddress!!,
             functionSignature = functionSignature!!,
-            callData = callData!!,
             functionParams = functionParams!!,
             ethAmount = ethAmount!!,
             chainId = chainId!!,
