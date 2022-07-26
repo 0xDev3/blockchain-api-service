@@ -79,6 +79,18 @@ class JooqContractDeploymentRequestRepository(
             .fetchOne { it.toModel() }
     }
 
+    override fun getByAliasAndProjectId(alias: String, projectId: UUID): ContractDeploymentRequest? {
+        logger.debug { "Get contract deployment request by alias and project ID, alias: $alias, projectId: $projectId" }
+        return dslContext.selectWithJoin()
+            .where(
+                DSL.and(
+                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.ALIAS.eq(alias),
+                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.PROJECT_ID.eq(projectId)
+                )
+            )
+            .fetchOne { it.toModel() }
+    }
+
     override fun getAllByProjectId(
         projectId: UUID,
         filters: ContractDeploymentRequestFilters
