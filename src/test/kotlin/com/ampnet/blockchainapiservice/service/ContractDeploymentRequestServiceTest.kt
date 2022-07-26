@@ -39,10 +39,10 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
+import org.mockito.kotlin.verify as verifyMock
 
 class ContractDeploymentRequestServiceTest : TestBase() {
 
@@ -185,7 +185,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             assertThat(service.createContractDeploymentRequest(CREATE_PARAMS, PROJECT)).withMessage()
                 .isEqualTo(STORED_REQUEST)
 
-            verify(contractDeploymentRequestRepository)
+            verifyMock(contractDeploymentRequestRepository)
                 .store(STORE_PARAMS)
             verifyNoMoreInteractions(contractDeploymentRequestRepository)
         }
@@ -766,9 +766,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
                     )
                 )
 
-            verify(contractDeploymentRequestRepository)
+            verifyMock(contractDeploymentRequestRepository)
                 .getById(ID)
-            verify(contractDeploymentRequestRepository)
+            verifyMock(contractDeploymentRequestRepository)
                 .setContractAddress(ID, CONTRACT_ADDRESS)
             verifyNoMoreInteractions(contractDeploymentRequestRepository)
         }
@@ -944,7 +944,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         verify("txInfo was successfully attached") {
             service.attachTxInfo(ID, TX_HASH, deployer)
 
-            verify(contractDeploymentRequestRepository)
+            verifyMock(contractDeploymentRequestRepository)
                 .setTxInfo(ID, TX_HASH, deployer)
             verifyNoMoreInteractions(contractDeploymentRequestRepository)
         }
@@ -978,7 +978,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
                 service.attachTxInfo(ID, TX_HASH, deployer)
             }
 
-            verify(contractDeploymentRequestRepository)
+            verifyMock(contractDeploymentRequestRepository)
                 .setTxInfo(ID, TX_HASH, deployer)
             verifyNoMoreInteractions(contractDeploymentRequestRepository)
         }
