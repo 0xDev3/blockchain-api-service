@@ -181,6 +181,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
         }
 
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
         val response = suppose("request to create contract deployment request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
@@ -191,12 +201,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             {
                                 "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
-                                "constructor_params": [
-                                    {
-                                        "type": "address",
-                                        "value": "${ownerAddress.rawValue}"
-                                    }
-                                ],
+                                "constructor_params": $paramsJson,
                                 "deployer_address": "${deployerAddress.rawValue}",
                                 "initial_eth_amount": "${initialEthAmount.rawValue}",
                                 "arbitrary_data": {
@@ -225,6 +230,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         status = Status.PENDING,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = response.contractDeploymentData,
+                        constructorParams = objectMapper.readTree(paramsJson),
                         contractTags = CONTRACT_DECORATOR.tags.map { it.value },
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
@@ -265,6 +271,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         alias = alias,
                         contractId = CONTRACT_DECORATOR.id,
                         contractData = ContractBinaryData(response.contractDeploymentData),
+                        constructorParams = objectMapper.readTree(paramsJson),
                         contractTags = CONTRACT_DECORATOR.tags,
                         contractImplements = CONTRACT_DECORATOR.implements,
                         initialEthAmount = initialEthAmount,
@@ -300,6 +307,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
         }
 
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
         val response = suppose("request to create contract deployment request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
@@ -310,12 +327,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             {
                                 "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
-                                "constructor_params": [
-                                    {
-                                        "type": "address",
-                                        "value": "${ownerAddress.rawValue}"
-                                    }
-                                ],
+                                "constructor_params": $paramsJson,
                                 "deployer_address": "${deployerAddress.rawValue}",
                                 "initial_eth_amount": "${initialEthAmount.rawValue}",
                                 "redirect_url": "$redirectUrl",
@@ -345,6 +357,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         status = Status.PENDING,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = response.contractDeploymentData,
+                        constructorParams = objectMapper.readTree(paramsJson),
                         contractTags = CONTRACT_DECORATOR.tags.map { it.value },
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
@@ -385,6 +398,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         alias = alias,
                         contractId = CONTRACT_DECORATOR.id,
                         contractData = ContractBinaryData(response.contractDeploymentData),
+                        constructorParams = objectMapper.readTree(paramsJson),
                         contractTags = CONTRACT_DECORATOR.tags,
                         contractImplements = CONTRACT_DECORATOR.implements,
                         initialEthAmount = initialEthAmount,
@@ -473,7 +487,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                         "type": "address",
                                         "value": "${ownerAddress.rawValue}"
                                     }
-                                ]
+                                ],
                                 "deployer_address": "${deployerAddress.rawValue}"
                                 "initial_eth_amount": "${initialEthAmount.rawValue}",
                                 "arbitrary_data": {
@@ -506,6 +520,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
         }
 
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
@@ -516,12 +540,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             {
                                 "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
-                                "constructor_params": [
-                                    {
-                                        "type": "address",
-                                        "value": "${ownerAddress.rawValue}"
-                                    }
-                                ],
+                                "constructor_params": $paramsJson,
                                 "deployer_address": "${deployerAddress.rawValue}",
                                 "initial_eth_amount": "${initialEthAmount.rawValue}",
                                 "arbitrary_data": {
@@ -585,6 +604,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         status = Status.SUCCESS,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = createResponse.contractDeploymentData,
+                        constructorParams = objectMapper.readTree(paramsJson),
                         contractTags = CONTRACT_DECORATOR.tags.map { it.value },
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
@@ -636,6 +656,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             insertProjectWithCustomRpcUrl()
         }
 
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
@@ -646,12 +676,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             {
                                 "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
-                                "constructor_params": [
-                                    {
-                                        "type": "address",
-                                        "value": "${ownerAddress.rawValue}"
-                                    }
-                                ],
+                                "constructor_params": $paramsJson,
                                 "deployer_address": "${deployerAddress.rawValue}",
                                 "initial_eth_amount": "${initialEthAmount.rawValue}",
                                 "arbitrary_data": {
@@ -715,6 +740,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         status = Status.SUCCESS,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = createResponse.contractDeploymentData,
+                        constructorParams = objectMapper.readTree(paramsJson),
                         contractTags = CONTRACT_DECORATOR.tags.map { it.value },
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
@@ -775,6 +801,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
         }
 
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
@@ -785,12 +821,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             {
                                 "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
-                                "constructor_params": [
-                                    {
-                                        "type": "address",
-                                        "value": "${ownerAddress.rawValue}"
-                                    }
-                                ],
+                                "constructor_params": $paramsJson,
                                 "deployer_address": "${deployerAddress.rawValue}",
                                 "initial_eth_amount": "${initialEthAmount.rawValue}",
                                 "arbitrary_data": {
@@ -861,6 +892,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                 status = Status.SUCCESS,
                                 contractId = CONTRACT_DECORATOR.id.value,
                                 contractDeploymentData = createResponse.contractDeploymentData,
+                                constructorParams = objectMapper.readTree(paramsJson),
                                 contractTags = CONTRACT_DECORATOR.tags.map { it.value },
                                 contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                                 initialEthAmount = initialEthAmount.rawValue,
@@ -915,6 +947,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             insertProjectWithCustomRpcUrl()
         }
 
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
@@ -925,12 +967,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             {
                                 "alias": "$alias",
                                 "contract_id": "${CONTRACT_DECORATOR.id.value}",
-                                "constructor_params": [
-                                    {
-                                        "type": "address",
-                                        "value": "${ownerAddress.rawValue}"
-                                    }
-                                ],
+                                "constructor_params": $paramsJson,
                                 "deployer_address": "${deployerAddress.rawValue}",
                                 "initial_eth_amount": "${initialEthAmount.rawValue}",
                                 "arbitrary_data": {
@@ -1001,6 +1038,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                 status = Status.SUCCESS,
                                 contractId = CONTRACT_DECORATOR.id.value,
                                 contractDeploymentData = createResponse.contractDeploymentData,
+                                constructorParams = objectMapper.readTree(paramsJson),
                                 contractTags = CONTRACT_DECORATOR.tags.map { it.value },
                                 contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                                 initialEthAmount = initialEthAmount.rawValue,
@@ -1052,6 +1090,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     alias = alias,
                     contractId = CONTRACT_DECORATOR.id,
                     contractData = CONTRACT_DECORATOR.binary,
+                    constructorParams = TestData.EMPTY_JSON_ARRAY,
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
                     chainId = Chain.HARDHAT_TESTNET.id,
@@ -1108,6 +1147,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     alias = alias,
                     contractId = CONTRACT_DECORATOR.id,
                     contractData = CONTRACT_DECORATOR.binary,
+                    constructorParams = TestData.EMPTY_JSON_ARRAY,
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
                     chainId = Chain.HARDHAT_TESTNET.id,

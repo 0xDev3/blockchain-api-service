@@ -9,6 +9,7 @@ import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.UUID
 
 data class StoreContractDeploymentRequestParams(
@@ -16,6 +17,7 @@ data class StoreContractDeploymentRequestParams(
     val alias: String,
     val contractId: ContractId,
     val contractData: ContractBinaryData,
+    val constructorParams: JsonNode,
     val deployerAddress: WalletAddress?,
     val initialEthAmount: Balance,
     val chainId: ChainId,
@@ -27,6 +29,7 @@ data class StoreContractDeploymentRequestParams(
 ) {
     companion object : ParamsFactory<PreStoreContractDeploymentRequestParams, StoreContractDeploymentRequestParams> {
         private const val PATH = "/request-deploy/\${id}/action"
+        private val objectMapper = ObjectMapper()
 
         override fun fromCreateParams(
             id: UUID,
@@ -39,6 +42,9 @@ data class StoreContractDeploymentRequestParams(
             contractId = params.createParams.contractId,
             contractData = ContractBinaryData(
                 params.contractDecorator.binary.value + params.encodedConstructor.withoutPrefix
+            ),
+            constructorParams = objectMapper.createArrayNode().addAll(
+                params.createParams.constructorParams.mapNotNull { it.rawJson }
             ),
             deployerAddress = params.createParams.deployerAddress,
             initialEthAmount = params.createParams.initialEthAmount,

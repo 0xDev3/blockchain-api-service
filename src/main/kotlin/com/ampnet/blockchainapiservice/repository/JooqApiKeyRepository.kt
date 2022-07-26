@@ -27,21 +27,21 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
     }
 
     override fun getById(id: UUID): ApiKey? {
-        logger.info { "Get API key by id: $id" }
+        logger.debug { "Get API key by id: $id" }
         return dslContext.selectFrom(ApiKeyTable.API_KEY)
             .where(ApiKeyTable.API_KEY.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun getByValue(value: String): ApiKey? {
-        logger.info { "Get API key by value: $value" }
+        logger.debug { "Get API key by value: $value" }
         return dslContext.selectFrom(ApiKeyTable.API_KEY)
             .where(ApiKeyTable.API_KEY.API_KEY_.eq(value))
             .fetchOne { it.toModel() }
     }
 
     override fun getAllByProjectId(projectId: UUID): List<ApiKey> {
-        logger.info { "Get API keys by projectId: $projectId" }
+        logger.debug { "Get API keys by projectId: $projectId" }
         return dslContext.selectFrom(ApiKeyTable.API_KEY)
             .where(ApiKeyTable.API_KEY.PROJECT_ID.eq(projectId))
             .orderBy(ApiKeyTable.API_KEY.CREATED_AT.asc())
@@ -49,7 +49,7 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
     }
 
     override fun exists(apiKey: String): Boolean {
-        logger.info { "Check if API key exists: $apiKey" }
+        logger.debug { "Check if API key exists: $apiKey" }
         return dslContext.fetchExists(
             ApiKeyTable.API_KEY,
             ApiKeyTable.API_KEY.API_KEY_.eq(apiKey)

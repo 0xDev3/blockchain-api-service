@@ -1,0 +1,16 @@
+=== Delete Address Book Entry
+Deletes stored address book entry.
+
+*This request requires and API key present in the `X-API-KEY` header.*
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyDeleteAddressBookEntry/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyDeleteAddressBookEntry/http-response.adoc[]
+====

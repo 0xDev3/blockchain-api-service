@@ -1,0 +1,22 @@
+=== Create Address Book Entry
+Creates address book entry with specified parameters. Parameters `phone_number` and `email` are optional.
+
+*This request requires and API key present in the `X-API-KEY` header.*
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyCreateAddressBookEntry/http-request.adoc[]
+====
+.Response Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyCreateAddressBookEntry/http-response.adoc[]
+====
+
+Schemas:
+
+.Request Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest.adoc[]
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse.adoc[]
