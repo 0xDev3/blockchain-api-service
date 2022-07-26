@@ -146,3 +146,13 @@ class AliasAlreadyInUseException(alias: String) : ServiceException(
         private const val serialVersionUID: Long = -3390991241297115163L
     }
 }
+
+class ContractNotYetDeployedException(id: UUID, alias: String) : ServiceException(
+    errorCode = ErrorCode.CONTRACT_NOT_DEPLOYED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Contract with ID: $id and alias: $alias is not yet deployed"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 4421635315803726161L
+    }
+}

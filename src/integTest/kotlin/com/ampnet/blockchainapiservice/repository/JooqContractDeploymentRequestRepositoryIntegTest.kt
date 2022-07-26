@@ -136,8 +136,36 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustReturnNullWhenFetchingNonExistentContractDeploymentRequestById() {
-        verify("null is returned when fetching non-existent contract deployment request") {
+        verify("null is returned when fetching non-existent contract deployment request by id") {
             val result = repository.getById(UUID.randomUUID())
+
+            assertThat(result).withMessage()
+                .isNull()
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractDeploymentRequestByAliasAndProjectId() {
+        val metadata = createMetadataRecord()
+        val record = createRecord(UUID.randomUUID(), metadata)
+
+        suppose("some contract deployment request exists in database") {
+            dslContext.executeInsert(metadata)
+            dslContext.executeInsert(record)
+        }
+
+        verify("contract deployment request is correctly fetched by alias") {
+            val result = repository.getByAliasAndProjectId(record.alias!!, record.projectId!!)
+
+            assertThat(result).withMessage()
+                .isEqualTo(record.toModel(metadata))
+        }
+    }
+
+    @Test
+    fun mustReturnNullWhenFetchingNonExistentContractDeploymentRequestByAliasAndProjectId() {
+        verify("null is returned when fetching non-existent contract deployment request by alias and project id") {
+            val result = repository.getByAliasAndProjectId("non-existent-alias", UUID.randomUUID())
 
             assertThat(result).withMessage()
                 .isNull()
