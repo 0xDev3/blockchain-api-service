@@ -16,6 +16,7 @@ CREATE TABLE blockchain_api_service.contract_deployment_request (
     contract_metadata_id         UUID                     NOT NULL
                                  REFERENCES blockchain_api_service.contract_metadata(id),
     contract_data                BYTEA                    NOT NULL,
+    constructor_params           JSON                     NOT NULL,
     initial_eth_amount           NUMERIC(78)              NOT NULL,
     chain_id                     BIGINT                   NOT NULL,
     redirect_url                 VARCHAR                  NOT NULL,

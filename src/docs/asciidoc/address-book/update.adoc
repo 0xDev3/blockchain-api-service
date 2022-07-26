@@ -1,0 +1,23 @@
+=== Update Address Book Entry
+Updates address book entry with specified parameters. Parameters `phone_number` and `email` are optional. *Note: all
+non-optional parameters must be set. If optional parameters are set to `null`, then their values will be set to `null`.*
+
+*This request requires and API key present in the `X-API-KEY` header.*
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyUpdateAddressBookEntry/http-request.adoc[]
+====
+.Response Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyUpdateAddressBookEntry/http-response.adoc[]
+====
+
+Schemas:
+
+.Request Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest.adoc[]
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse.adoc[]

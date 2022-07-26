@@ -1,0 +1,18 @@
+=== Fetch Address Book Entry by Alias
+Fetches stored address book entry by alias.
+
+*This request requires and API key present in the `X-API-KEY` header.*
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyFetchAddressBookEntryByAlias/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/AddressBookControllerApiTest/mustCorrectlyFetchAddressBookEntryByAlias/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse.adoc[]
