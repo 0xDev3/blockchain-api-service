@@ -10,7 +10,7 @@ import com.ampnet.blockchainapiservice.util.TransactionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.ampnet.blockchainapiservice.util.WithTransactionData
+import com.ampnet.blockchainapiservice.util.WithTransactionAndFunctionData
 import com.fasterxml.jackson.databind.JsonNode
 import java.util.UUID
 
@@ -30,13 +30,14 @@ data class ContractFunctionCallRequest(
     val callerAddress: WalletAddress?,
     val txHash: TransactionHash?
 ) {
-    fun withTransactionData(
+    fun withTransactionAndFunctionData(
         status: Status,
         data: FunctionData,
         transactionInfo: BlockchainTransactionInfo?
-    ): WithTransactionData<ContractFunctionCallRequest> =
-        WithTransactionData(
+    ): WithTransactionAndFunctionData<ContractFunctionCallRequest> =
+        WithTransactionAndFunctionData(
             value = this,
+            functionData = data,
             status = status,
             transactionData = TransactionData(
                 txHash = this.txHash,

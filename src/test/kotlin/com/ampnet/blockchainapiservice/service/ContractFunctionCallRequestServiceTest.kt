@@ -534,7 +534,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with pending status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.PENDING,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = null
@@ -589,7 +589,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with pending status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.PENDING,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = null
@@ -645,7 +645,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with failed status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.FAILED,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = transactionInfo
@@ -701,7 +701,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with failed status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.FAILED,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = transactionInfo
@@ -757,7 +757,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with failed status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.FAILED,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = transactionInfo
@@ -813,7 +813,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with failed status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.FAILED,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = transactionInfo
@@ -869,7 +869,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with failed status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.FAILED,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = transactionInfo
@@ -925,7 +925,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with failed status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.FAILED,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = transactionInfo
@@ -981,7 +981,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with successful status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.SUCCESS,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = transactionInfo
@@ -1037,7 +1037,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("contract function call request with successful status is returned") {
             assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
                 .isEqualTo(
-                    request.withTransactionData(
+                    request.withTransactionAndFunctionData(
                         status = Status.SUCCESS,
                         data = ENCODED_FUNCTION_DATA,
                         transactionInfo = transactionInfo
@@ -1091,7 +1091,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             assertThat(service.getContractFunctionCallRequestsByProjectIdAndFilters(PROJECT.id, filters)).withMessage()
                 .isEqualTo(
                     listOf(
-                        request.withTransactionData(
+                        request.withTransactionAndFunctionData(
                             status = Status.PENDING,
                             data = ENCODED_FUNCTION_DATA,
                             transactionInfo = null
