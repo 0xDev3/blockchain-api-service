@@ -7,7 +7,7 @@ import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithFunctionData
-import com.ampnet.blockchainapiservice.util.WithTransactionData
+import com.ampnet.blockchainapiservice.util.WithTransactionAndFunctionData
 import java.util.UUID
 
 interface ContractFunctionCallRequestService {
@@ -16,11 +16,11 @@ interface ContractFunctionCallRequestService {
         project: Project
     ): WithFunctionData<ContractFunctionCallRequest>
 
-    fun getContractFunctionCallRequest(id: UUID): WithTransactionData<ContractFunctionCallRequest>
+    fun getContractFunctionCallRequest(id: UUID): WithTransactionAndFunctionData<ContractFunctionCallRequest>
     fun getContractFunctionCallRequestsByProjectIdAndFilters(
         projectId: UUID,
         filters: ContractFunctionCallRequestFilters
-    ): List<WithTransactionData<ContractFunctionCallRequest>>
+    ): List<WithTransactionAndFunctionData<ContractFunctionCallRequest>>
 
     fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress)
 }

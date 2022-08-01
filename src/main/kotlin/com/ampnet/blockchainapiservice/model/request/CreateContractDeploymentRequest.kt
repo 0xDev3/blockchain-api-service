@@ -13,5 +13,5 @@ data class CreateContractDeploymentRequest(
     val initialEthAmount: BigInteger,
     val redirectUrl: String?,
     val arbitraryData: JsonNode?,
-    val screenConfig: ScreenConfig
+    val screenConfig: ScreenConfig?
 )
