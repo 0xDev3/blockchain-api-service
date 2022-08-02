@@ -1,7 +1,7 @@
 === Create Address Book Entry
 Creates address book entry with specified parameters. Parameters `phone_number` and `email` are optional.
 
-*This request requires and API key present in the `X-API-KEY` header.*
+*This request requires an API key present in the `X-API-KEY` header.*
 
 .Request Example
 [%collapsible]
