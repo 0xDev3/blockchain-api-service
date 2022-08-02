@@ -182,7 +182,7 @@ class ContractFunctionCallRequestServiceImpl(
         callerAddress == null || from == callerAddress
 
     private fun BlockchainTransactionInfo.contractAddressMatches(contractAddress: ContractAddress?): Boolean =
-        to == contractAddress
+        to.toContractAddress() == contractAddress
 
     private fun BlockchainTransactionInfo.dataMatches(expectedData: FunctionData): Boolean =
         data == expectedData
