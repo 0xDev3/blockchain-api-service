@@ -9,6 +9,10 @@ contract ExampleContract {
         _owner = owner;
     }
 
+    function setOwner(address owner) public {
+        _owner = owner;
+    }
+
     function getOwner() public view returns (address) {
         return _owner;
     }
