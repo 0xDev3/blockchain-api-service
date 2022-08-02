@@ -2,7 +2,7 @@
 Updates address book entry with specified parameters. Parameters `phone_number` and `email` are optional. *Note: all
 non-optional parameters must be set. If optional parameters are set to `null`, then their values will be set to `null`.*
 
-*This request requires and API key present in the `X-API-KEY` header.*
+*This request requires an API key present in the `X-API-KEY` header.*
 
 .Request Example
 [%collapsible]

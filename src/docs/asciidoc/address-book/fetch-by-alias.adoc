@@ -1,7 +1,7 @@
 === Fetch Address Book Entry by Alias
 Fetches stored address book entry by alias.
 
-*This request requires and API key present in the `X-API-KEY` header.*
+*This request requires an API key present in the `X-API-KEY` header.*
 
 .Request Example
 [%collapsible]

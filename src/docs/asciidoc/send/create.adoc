@@ -8,7 +8,7 @@ can be interpolated.
 If `asset_type` is set to `NATIVE`, then chain-native currency will be send (i.e. Ether) and then `token_address` must
 not be present. If `asset_type` is set to `TOKEN`, then `token_address` must be present.
 
-*This request requires and API key present in the `X-API-KEY` header.*
+*This request requires an API key present in the `X-API-KEY` header.*
 
 .Request Example
 [%collapsible]

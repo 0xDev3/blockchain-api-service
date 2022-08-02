@@ -1,7 +1,7 @@
 === Fetch Address Book Entries
 Fetches stored address book entries for the project associated with provided API key.
 
-*This request requires and API key present in the `X-API-KEY` header.*
+*This request requires an API key present in the `X-API-KEY` header.*
 
 .Request Example
 [%collapsible]
