@@ -143,7 +143,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
         // TODO test with various return values to make sure everything works as intended...
         @Suppress("UNCHECKED_CAST") val returnValues = FunctionReturnDecoder.decode(
             functionCallResponse,
-            params.outputParameters.map { it.typeReference } as List<TypeReference<Type<*>>>
+            params.outputParams.map { it.typeReference } as List<TypeReference<Type<*>>>
         )
             .map { it.value }
 

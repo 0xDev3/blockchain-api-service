@@ -10,7 +10,7 @@ data class CreateReadonlyFunctionCallParams(
     val blockNumber: BlockNumber?,
     val functionName: String,
     val functionParams: List<FunctionArgument>,
-    val outputParameters: List<String>, // TODO use more specific type
+    val outputParams: List<String>, // TODO use more specific type
     val callerAddress: WalletAddress
 ) {
     constructor(requestBody: ReadonlyFunctionCallRequest) : this(
@@ -18,7 +18,7 @@ data class CreateReadonlyFunctionCallParams(
         blockNumber = requestBody.blockNumber?.let { BlockNumber(it) },
         functionName = requestBody.functionName,
         functionParams = requestBody.functionParams,
-        outputParameters = requestBody.outputParameters,
+        outputParams = requestBody.outputParams,
         callerAddress = WalletAddress(requestBody.callerAddress)
     )
 }

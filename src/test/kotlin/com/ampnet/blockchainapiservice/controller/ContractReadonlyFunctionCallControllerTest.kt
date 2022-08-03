@@ -34,7 +34,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
             blockNumber = BlockNumber(BigInteger.TEN),
             functionName = "example",
             functionParams = emptyList(),
-            outputParameters = listOf("string", "uint256", "bool"),
+            outputParams = listOf("string", "uint256", "bool"),
             callerAddress = WalletAddress("a")
         )
         val result = WithDeployedContractIdAndAddress(
@@ -72,7 +72,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
                 blockNumber = params.blockNumber?.value,
                 functionName = params.functionName,
                 functionParams = params.functionParams,
-                outputParameters = params.outputParameters,
+                outputParams = params.outputParams,
                 callerAddress = params.callerAddress.rawValue
             )
             val response = controller.callReadonlyContractFunction(project, request)

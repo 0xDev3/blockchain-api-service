@@ -61,7 +61,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
             blockNumber = null,
             functionName = "example",
             functionParams = listOf(FunctionArgument(Uint256(BigInteger.TEN))),
-            outputParameters = listOf("uint256"),
+            outputParams = listOf("uint256"),
             callerAddress = CALLER_ADDRESS
         )
         private val ENCODED_FUNCTION_DATA = FunctionData("0x1234")
@@ -125,7 +125,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
                         callerAddress = CALLER_ADDRESS,
                         functionName = createParams.functionName,
                         functionData = ENCODED_FUNCTION_DATA,
-                        outputParameters = listOf(
+                        outputParams = listOf(
                             OutputParameter("uint256", TypeReference.makeTypeReference("uint256"))
                         )
                     ),
@@ -238,7 +238,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
                         callerAddress = CALLER_ADDRESS,
                         functionName = createParams.functionName,
                         functionData = ENCODED_FUNCTION_DATA,
-                        outputParameters = listOf(
+                        outputParams = listOf(
                             OutputParameter("uint256", TypeReference.makeTypeReference("uint256"))
                         )
                     ),
@@ -344,7 +344,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
                         callerAddress = CALLER_ADDRESS,
                         functionName = createParams.functionName,
                         functionData = ENCODED_FUNCTION_DATA,
-                        outputParameters = listOf(
+                        outputParams = listOf(
                             OutputParameter("uint256", TypeReference.makeTypeReference("uint256"))
                         )
                     ),
