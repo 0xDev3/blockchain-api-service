@@ -1,7 +1,9 @@
 package com.ampnet.blockchainapiservice.blockchain
 
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
+import com.ampnet.blockchainapiservice.model.params.ReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
+import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.BlockName
 import com.ampnet.blockchainapiservice.util.BlockParameter
@@ -24,4 +26,10 @@ interface BlockchainService {
     ): AccountBalance
 
     fun fetchTransactionInfo(chainSpec: ChainSpec, txHash: TransactionHash): BlockchainTransactionInfo?
+
+    fun callReadonlyFunction(
+        chainSpec: ChainSpec,
+        params: ReadonlyFunctionCallParams,
+        blockParameter: BlockParameter = BlockName.LATEST
+    ): ReadonlyFunctionCallResult
 }
