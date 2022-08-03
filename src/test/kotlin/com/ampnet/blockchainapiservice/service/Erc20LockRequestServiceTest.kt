@@ -96,8 +96,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(CREATE_PARAMS.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -231,8 +230,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -310,8 +308,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -400,8 +397,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -490,8 +486,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -580,8 +575,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -670,8 +664,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -760,8 +753,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -850,8 +842,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -940,8 +931,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -1030,8 +1020,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.lockDuration),
                         FunctionArgument(id.toString()),
                         FunctionArgument(ZeroAddress)
-                    ),
-                    abiOutputTypes = emptyList()
+                    )
                 )
             )
                 .willReturn(encodedData)

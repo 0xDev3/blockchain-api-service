@@ -5,7 +5,7 @@ import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.exception.TemporaryBlockchainReadException
-import com.ampnet.blockchainapiservice.model.params.ReadonlyFunctionCallParams
+import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.util.AccountBalance
@@ -121,9 +121,12 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
 
     override fun callReadonlyFunction(
         chainSpec: ChainSpec,
-        params: ReadonlyFunctionCallParams,
+        params: ExecuteReadonlyFunctionCallParams,
         blockParameter: BlockParameter
     ): ReadonlyFunctionCallResult {
+        logger.debug {
+            "Executing read-only function call, chainSpec: $chainSpec, params: $params, blockParameter: $blockParameter"
+        }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
         val (blockNumber, timestamp) = blockchainProperties.web3j.getBlockNumberAndTimestamp(blockParameter)
         val functionCallResponse = blockchainProperties.web3j.ethCall(
@@ -140,7 +143,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
         // TODO test with various return values to make sure everything works as intended...
         @Suppress("UNCHECKED_CAST") val returnValues = FunctionReturnDecoder.decode(
             functionCallResponse,
-            params.outputParameters as List<TypeReference<Type<*>>>
+            params.outputParameters.map { it.typeReference } as List<TypeReference<Type<*>>>
         )
             .map { it.value }
 

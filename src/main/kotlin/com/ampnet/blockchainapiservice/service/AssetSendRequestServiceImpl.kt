@@ -12,7 +12,6 @@ import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.PrimitiveAbiType
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -102,8 +101,7 @@ class AssetSendRequestServiceImpl(
             arguments = listOf(
                 FunctionArgument(tokenRecipientAddress),
                 FunctionArgument(tokenAmount)
-            ),
-            abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+            )
         )
 
     private fun AssetSendRequest.appendTransactionData(project: Project): WithTransactionData<AssetSendRequest> {
