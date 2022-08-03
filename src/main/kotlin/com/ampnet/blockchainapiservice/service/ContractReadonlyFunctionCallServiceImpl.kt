@@ -9,8 +9,10 @@ import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.util.BlockName
 import mu.KLogging
+import org.springframework.stereotype.Service
 import org.web3j.abi.TypeReference
 
+@Service
 class ContractReadonlyFunctionCallServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val deployedContractIdentifierResolverService: DeployedContractIdentifierResolverService,
