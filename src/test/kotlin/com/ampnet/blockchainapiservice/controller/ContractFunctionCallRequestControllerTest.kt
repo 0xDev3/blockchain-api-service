@@ -3,12 +3,9 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.exception.InvalidRequestBodyException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import com.ampnet.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
-import com.ampnet.blockchainapiservice.model.params.DeployedContractAddressIdentifier
-import com.ampnet.blockchainapiservice.model.params.DeployedContractAliasIdentifier
 import com.ampnet.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import com.ampnet.blockchainapiservice.model.request.CreateContractFunctionCallRequest
@@ -31,7 +28,6 @@ import com.ampnet.blockchainapiservice.util.WithFunctionData
 import com.ampnet.blockchainapiservice.util.WithTransactionAndFunctionData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -43,7 +39,7 @@ import org.mockito.kotlin.verify as verifyMock
 class ContractFunctionCallRequestControllerTest : TestBase() {
 
     @Test
-    fun mustCorrectlyCreateContractFunctionCallRequestFromContractId() {
+    fun mustCorrectlyCreateContractFunctionCallRequest() {
         val deployedContractId = UUID.randomUUID()
         val params = CreateContractFunctionCallRequestParams(
             identifier = DeployedContractIdIdentifier(deployedContractId),
@@ -59,8 +55,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
             callerAddress = WalletAddress("a")
         )
         val result = WithFunctionData(
-            value =
-            ContractFunctionCallRequest(
+            value = ContractFunctionCallRequest(
                 id = UUID.randomUUID(),
                 deployedContractId = deployedContractId,
                 chainId = ChainId(1337),
@@ -148,292 +143,6 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                         )
                     )
                 )
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCreateContractFunctionCallRequestFromContractAlias() {
-        val deployedContractAlias = "alias"
-        val params = CreateContractFunctionCallRequestParams(
-            identifier = DeployedContractAliasIdentifier(deployedContractAlias),
-            functionName = "test",
-            functionParams = emptyList(),
-            ethAmount = Balance(BigInteger.TEN),
-            redirectUrl = "redirect-url",
-            arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = ScreenConfig(
-                beforeActionMessage = "before-action-message",
-                afterActionMessage = "after-action-message"
-            ),
-            callerAddress = WalletAddress("a")
-        )
-        val result = WithFunctionData(
-            value =
-            ContractFunctionCallRequest(
-                id = UUID.randomUUID(),
-                deployedContractId = UUID.randomUUID(),
-                chainId = ChainId(1337),
-                redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
-                createdAt = TestData.TIMESTAMP,
-                arbitraryData = TestData.EMPTY_JSON_OBJECT,
-                screenConfig = ScreenConfig(
-                    beforeActionMessage = "before-action-message",
-                    afterActionMessage = "after-action-message"
-                ),
-                contractAddress = ContractAddress("cafebabe"),
-                txHash = TransactionHash("tx-hash"),
-                functionName = "test",
-                functionParams = TestData.EMPTY_JSON_ARRAY,
-                ethAmount = Balance(BigInteger.TEN),
-                callerAddress = WalletAddress("a")
-            ),
-            data = FunctionData("00")
-        )
-        val project = Project(
-            id = result.value.projectId,
-            ownerId = UUID.randomUUID(),
-            issuerContractAddress = ContractAddress("b"),
-            baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = result.value.chainId,
-            customRpcUrl = "custom-rpc-url",
-            createdAt = TestData.TIMESTAMP
-        )
-        val service = mock<ContractFunctionCallRequestService>()
-
-        suppose("contract function call request will be created") {
-            given(service.createContractFunctionCallRequest(params, project))
-                .willReturn(result)
-        }
-
-        val controller = ContractFunctionCallRequestController(service)
-
-        verify("controller returns correct response") {
-            val request = CreateContractFunctionCallRequest(
-                deployedContractId = null,
-                deployedContractAlias = deployedContractAlias,
-                contractAddress = null,
-                functionName = params.functionName,
-                functionParams = params.functionParams,
-                ethAmount = params.ethAmount.rawValue,
-                redirectUrl = params.redirectUrl,
-                arbitraryData = params.arbitraryData,
-                screenConfig = params.screenConfig,
-                callerAddress = params.callerAddress?.rawValue
-            )
-            val response = controller.createContractFunctionCallRequest(project, request)
-
-            JsonSchemaDocumentation.createSchema(request.javaClass)
-            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
-
-            assertThat(response).withMessage()
-                .isEqualTo(
-                    ResponseEntity.ok(
-                        ContractFunctionCallRequestResponse(
-                            id = result.value.id,
-                            status = Status.PENDING,
-                            chainId = result.value.chainId.value,
-                            redirectUrl = result.value.redirectUrl,
-                            projectId = result.value.projectId,
-                            createdAt = result.value.createdAt.value,
-                            arbitraryData = result.value.arbitraryData,
-                            screenConfig = result.value.screenConfig.orEmpty(),
-                            contractAddress = result.value.contractAddress.rawValue,
-                            deployedContractId = result.value.deployedContractId,
-                            functionName = result.value.functionName,
-                            functionParams = TestData.EMPTY_JSON_ARRAY,
-                            functionCallData = result.data.value,
-                            ethAmount = result.value.ethAmount.rawValue,
-                            callerAddress = result.value.callerAddress?.rawValue,
-                            functionCallTx = TransactionResponse(
-                                txHash = null,
-                                from = result.value.callerAddress?.rawValue,
-                                to = result.value.contractAddress.rawValue,
-                                data = result.data.value,
-                                value = result.value.ethAmount.rawValue,
-                                blockConfirmations = null,
-                                timestamp = null
-                            )
-                        )
-                    )
-                )
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCreateContractFunctionCallRequestFromContractAddress() {
-        val deployedContractAddress = ContractAddress("cafebabe")
-        val params = CreateContractFunctionCallRequestParams(
-            identifier = DeployedContractAddressIdentifier(deployedContractAddress),
-            functionName = "test",
-            functionParams = emptyList(),
-            ethAmount = Balance(BigInteger.TEN),
-            redirectUrl = "redirect-url",
-            arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = ScreenConfig(
-                beforeActionMessage = "before-action-message",
-                afterActionMessage = "after-action-message"
-            ),
-            callerAddress = WalletAddress("a")
-        )
-        val result = WithFunctionData(
-            value =
-            ContractFunctionCallRequest(
-                id = UUID.randomUUID(),
-                deployedContractId = UUID.randomUUID(),
-                chainId = ChainId(1337),
-                redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
-                createdAt = TestData.TIMESTAMP,
-                arbitraryData = TestData.EMPTY_JSON_OBJECT,
-                screenConfig = ScreenConfig(
-                    beforeActionMessage = "before-action-message",
-                    afterActionMessage = "after-action-message"
-                ),
-                contractAddress = deployedContractAddress,
-                txHash = TransactionHash("tx-hash"),
-                functionName = "test",
-                functionParams = TestData.EMPTY_JSON_ARRAY,
-                ethAmount = Balance(BigInteger.TEN),
-                callerAddress = WalletAddress("a")
-            ),
-            data = FunctionData("00")
-        )
-        val project = Project(
-            id = result.value.projectId,
-            ownerId = UUID.randomUUID(),
-            issuerContractAddress = ContractAddress("b"),
-            baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = result.value.chainId,
-            customRpcUrl = "custom-rpc-url",
-            createdAt = TestData.TIMESTAMP
-        )
-        val service = mock<ContractFunctionCallRequestService>()
-
-        suppose("contract function call request will be created") {
-            given(service.createContractFunctionCallRequest(params, project))
-                .willReturn(result)
-        }
-
-        val controller = ContractFunctionCallRequestController(service)
-
-        verify("controller returns correct response") {
-            val request = CreateContractFunctionCallRequest(
-                deployedContractId = null,
-                deployedContractAlias = null,
-                contractAddress = deployedContractAddress.rawValue,
-                functionName = params.functionName,
-                functionParams = params.functionParams,
-                ethAmount = params.ethAmount.rawValue,
-                redirectUrl = params.redirectUrl,
-                arbitraryData = params.arbitraryData,
-                screenConfig = params.screenConfig,
-                callerAddress = params.callerAddress?.rawValue
-            )
-            val response = controller.createContractFunctionCallRequest(project, request)
-
-            JsonSchemaDocumentation.createSchema(request.javaClass)
-            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
-
-            assertThat(response).withMessage()
-                .isEqualTo(
-                    ResponseEntity.ok(
-                        ContractFunctionCallRequestResponse(
-                            id = result.value.id,
-                            status = Status.PENDING,
-                            chainId = result.value.chainId.value,
-                            redirectUrl = result.value.redirectUrl,
-                            projectId = result.value.projectId,
-                            createdAt = result.value.createdAt.value,
-                            arbitraryData = result.value.arbitraryData,
-                            screenConfig = result.value.screenConfig.orEmpty(),
-                            contractAddress = result.value.contractAddress.rawValue,
-                            deployedContractId = result.value.deployedContractId,
-                            functionName = result.value.functionName,
-                            functionParams = TestData.EMPTY_JSON_ARRAY,
-                            functionCallData = result.data.value,
-                            ethAmount = result.value.ethAmount.rawValue,
-                            callerAddress = result.value.callerAddress?.rawValue,
-                            functionCallTx = TransactionResponse(
-                                txHash = null,
-                                from = result.value.callerAddress?.rawValue,
-                                to = result.value.contractAddress.rawValue,
-                                data = result.data.value,
-                                value = result.value.ethAmount.rawValue,
-                                blockConfirmations = null,
-                                timestamp = null
-                            )
-                        )
-                    )
-                )
-        }
-    }
-
-    @Test
-    fun mustThrowInvalidRequestBodyExceptionWhenAllContractIdentifiersArePresent() {
-        val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
-            issuerContractAddress = ContractAddress("b"),
-            baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = ChainId(1337L),
-            customRpcUrl = "custom-rpc-url",
-            createdAt = TestData.TIMESTAMP
-        )
-
-        val controller = ContractFunctionCallRequestController(mock())
-
-        verify("InvalidRequestBodyException is thrown") {
-            val request = CreateContractFunctionCallRequest(
-                deployedContractId = UUID.randomUUID(),
-                deployedContractAlias = "alias",
-                contractAddress = ContractAddress("cafebabe").rawValue,
-                functionName = "test",
-                functionParams = emptyList(),
-                ethAmount = BigInteger.ZERO,
-                redirectUrl = "redirect-url",
-                arbitraryData = TestData.EMPTY_JSON_OBJECT,
-                screenConfig = null,
-                callerAddress = null
-            )
-
-            assertThrows<InvalidRequestBodyException>(message) {
-                controller.createContractFunctionCallRequest(project, request)
-            }
-        }
-    }
-
-    @Test
-    fun mustThrowInvalidRequestBodyExceptionWhenNoContractIdentifiersArePresent() {
-        val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
-            issuerContractAddress = ContractAddress("b"),
-            baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = ChainId(1337L),
-            customRpcUrl = "custom-rpc-url",
-            createdAt = TestData.TIMESTAMP
-        )
-
-        val controller = ContractFunctionCallRequestController(mock())
-
-        verify("InvalidRequestBodyException is thrown") {
-            val request = CreateContractFunctionCallRequest(
-                deployedContractId = null,
-                deployedContractAlias = null,
-                contractAddress = null,
-                functionName = "test",
-                functionParams = emptyList(),
-                ethAmount = BigInteger.ZERO,
-                redirectUrl = "redirect-url",
-                arbitraryData = TestData.EMPTY_JSON_OBJECT,
-                screenConfig = null,
-                callerAddress = null
-            )
-
-            assertThrows<InvalidRequestBodyException>(message) {
-                controller.createContractFunctionCallRequest(project, request)
-            }
         }
     }
 
