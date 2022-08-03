@@ -46,7 +46,7 @@ class ContractReadonlyFunctionCallServiceImpl(
                 functionName = params.functionName,
                 functionData = data,
                 // TODO do this when decoding from JSON
-                outputParameters = params.outputParameters.map {
+                outputParams = params.outputParams.map {
                     OutputParameter(
                         solidityType = it,
                         typeReference = TypeReference.makeTypeReference(it)

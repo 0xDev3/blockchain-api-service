@@ -12,6 +12,6 @@ data class ReadonlyFunctionCallRequest(
     val blockNumber: BigInteger?,
     val functionName: String,
     val functionParams: List<FunctionArgument>,
-    val outputParameters: List<String>, // TODO use more specific type
+    val outputParams: List<String>, // TODO use more specific type
     val callerAddress: String
 ) : DeployedContractIdentifierRequestBody
