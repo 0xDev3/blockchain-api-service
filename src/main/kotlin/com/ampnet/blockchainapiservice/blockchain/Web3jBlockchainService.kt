@@ -5,7 +5,9 @@ import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.exception.TemporaryBlockchainReadException
+import com.ampnet.blockchainapiservice.model.params.ReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
+import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
@@ -20,11 +22,15 @@ import com.ampnet.blockchainapiservice.util.bind
 import com.ampnet.blockchainapiservice.util.shortCircuiting
 import mu.KLogging
 import org.springframework.stereotype.Service
+import org.web3j.abi.FunctionReturnDecoder
+import org.web3j.abi.TypeReference
+import org.web3j.abi.datatypes.Type
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameter
 import org.web3j.protocol.core.RemoteFunctionCall
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
+import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.tx.ReadonlyTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import java.io.IOException
@@ -35,6 +41,7 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
     companion object : KLogging()
 
     private val chainHandler = ChainPropertiesHandler(applicationProperties)
+
     override fun fetchAccountBalance(
         chainSpec: ChainSpec,
         walletAddress: WalletAddress,
@@ -110,6 +117,38 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
                 success = receipt.isStatusOK
             )
         }
+    }
+
+    override fun callReadonlyFunction(
+        chainSpec: ChainSpec,
+        params: ReadonlyFunctionCallParams,
+        blockParameter: BlockParameter
+    ): ReadonlyFunctionCallResult {
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
+        val (blockNumber, timestamp) = blockchainProperties.web3j.getBlockNumberAndTimestamp(blockParameter)
+        val functionCallResponse = blockchainProperties.web3j.ethCall(
+            Transaction.createEthCallTransaction(
+                params.callerAddress.rawValue,
+                params.contractAddress.rawValue,
+                params.functionData.value
+            ),
+            blockNumber.toWeb3Parameter()
+        ).sendSafely()?.value?.takeIf { it != "0x" }
+            ?: throw BlockchainReadException(
+                "Unable to call function ${params.functionName} on contract with address: ${params.contractAddress}"
+            )
+        // TODO test with various return values to make sure everything works as intended...
+        @Suppress("UNCHECKED_CAST") val returnValues = FunctionReturnDecoder.decode(
+            functionCallResponse,
+            params.outputParameters as List<TypeReference<Type<*>>>
+        )
+            .map { it.value }
+
+        return ReadonlyFunctionCallResult(
+            blockNumber = blockNumber,
+            timestamp = timestamp,
+            returnValues = returnValues
+        )
     }
 
     @Suppress("ReturnCount")
