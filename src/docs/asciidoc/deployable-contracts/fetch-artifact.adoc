@@ -1,0 +1,16 @@
+=== Fetch Deployable Contract `artifact.json` by ID
+Fetches `artifact.json` file for deployable contract by contract ID.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContractArtifactJson/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContractArtifactJson/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.json.ArtifactJson.adoc[]
