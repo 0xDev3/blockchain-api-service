@@ -95,8 +95,7 @@ class Erc20LockRequestServiceImpl(
                 FunctionArgument(lockDuration),
                 FunctionArgument(id.toString()),
                 FunctionArgument(ZeroAddress)
-            ),
-            abiOutputTypes = emptyList()
+            )
         )
 
     private fun Erc20LockRequest.appendTransactionData(project: Project): WithTransactionData<Erc20LockRequest> {

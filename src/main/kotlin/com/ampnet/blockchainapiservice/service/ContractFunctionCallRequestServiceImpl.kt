@@ -1,21 +1,13 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxInfoException
-import com.ampnet.blockchainapiservice.exception.ContractNotYetDeployedException
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import com.ampnet.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
-import com.ampnet.blockchainapiservice.model.params.DeployedContractAddressIdentifier
-import com.ampnet.blockchainapiservice.model.params.DeployedContractAliasIdentifier
-import com.ampnet.blockchainapiservice.model.params.DeployedContractIdIdentifier
-import com.ampnet.blockchainapiservice.model.params.DeployedContractIdentifier
 import com.ampnet.blockchainapiservice.model.params.PreStoreContractFunctionCallRequestParams
 import com.ampnet.blockchainapiservice.model.params.StoreContractFunctionCallRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
-import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
 import com.ampnet.blockchainapiservice.model.result.ContractFunctionCallRequest
 import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ContractFunctionCallRequestRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.Balance
@@ -37,7 +29,7 @@ import java.util.UUID
 class ContractFunctionCallRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val contractFunctionCallRequestRepository: ContractFunctionCallRequestRepository,
-    private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,
+    private val deployedContractIdentifierResolverService: DeployedContractIdentifierResolverService,
     private val ethCommonService: EthCommonService,
     private val projectRepository: ProjectRepository,
     private val objectMapper: ObjectMapper
@@ -51,11 +43,11 @@ class ContractFunctionCallRequestServiceImpl(
     ): WithFunctionData<ContractFunctionCallRequest> {
         logger.info { "Creating contract function call request, params: $params, project: $project" }
 
-        val (deployedContractId, contractAddress) = params.identifier.deployedContractIdAndAddress(project.id)
+        val (deployedContractId, contractAddress) = deployedContractIdentifierResolverService
+            .resolveContractIdAndAddress(params.identifier, project.id)
         val data = functionEncoderService.encode(
             functionName = params.functionName,
-            arguments = params.functionParams,
-            abiOutputTypes = emptyList()
+            arguments = params.functionParams
         )
         val databaseParams = ethCommonService.createDatabaseParams(
             factory = StoreContractFunctionCallRequestParams,
@@ -107,29 +99,6 @@ class ContractFunctionCallRequestServiceImpl(
         }
     }
 
-    private fun ContractDeploymentRequest.deployedContractIdAndAddress(): Pair<UUID?, ContractAddress> =
-        Pair(id, contractAddress ?: throw ContractNotYetDeployedException(id, alias))
-
-    private fun DeployedContractIdentifier.deployedContractIdAndAddress(projectId: UUID): Pair<UUID?, ContractAddress> =
-        when (this) {
-            is DeployedContractIdIdentifier -> {
-                logger.info { "Fetching deployed contract by id: $id" }
-                contractDeploymentRequestRepository.getById(id)
-                    ?.deployedContractIdAndAddress()
-                    ?: throw ResourceNotFoundException("Deployed contract not found for ID: $id")
-            }
-            is DeployedContractAliasIdentifier -> {
-                logger.info { "Fetching deployed contract by id: $alias, projectId: $projectId" }
-                contractDeploymentRequestRepository.getByAliasAndProjectId(alias, projectId)
-                    ?.deployedContractIdAndAddress()
-                    ?: throw ResourceNotFoundException("Deployed contract not found for alias: $alias")
-            }
-            is DeployedContractAddressIdentifier -> {
-                logger.info { "Using contract address for function call: $contractAddress" }
-                Pair<UUID?, ContractAddress>(null, contractAddress)
-            }
-        }
-
     private fun ContractFunctionCallRequest.appendTransactionData(
         project: Project
     ): WithTransactionAndFunctionData<ContractFunctionCallRequest> {
@@ -140,8 +109,7 @@ class ContractFunctionCallRequestServiceImpl(
         )
         val data = functionEncoderService.encode(
             functionName = functionName,
-            arguments = objectMapper.treeToValue(functionParams, Array<FunctionArgument>::class.java).toList(),
-            abiOutputTypes = emptyList()
+            arguments = objectMapper.treeToValue(functionParams, Array<FunctionArgument>::class.java).toList()
         )
         val status = determineStatus(transactionInfo, data)
 

@@ -8,7 +8,6 @@ import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
-import java.util.UUID
 
 data class CreateContractFunctionCallRequestParams(
     val identifier: DeployedContractIdentifier,
@@ -47,9 +46,3 @@ data class CreateContractFunctionCallRequestParams(
         }
     }
 }
-
-sealed interface DeployedContractIdentifier
-
-data class DeployedContractIdIdentifier(val id: UUID) : DeployedContractIdentifier
-data class DeployedContractAliasIdentifier(val alias: String) : DeployedContractIdentifier
-data class DeployedContractAddressIdentifier(val contractAddress: ContractAddress) : DeployedContractIdentifier
