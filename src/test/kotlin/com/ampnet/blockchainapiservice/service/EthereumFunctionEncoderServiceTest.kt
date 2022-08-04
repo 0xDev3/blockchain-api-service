@@ -4,7 +4,6 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.PrimitiveAbiType
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -24,8 +23,7 @@ class EthereumFunctionEncoderServiceTest : TestBase() {
                 arguments = listOf(
                     FunctionArgument(toAddress),
                     FunctionArgument(amount),
-                ),
-                abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                )
             )
         }
 

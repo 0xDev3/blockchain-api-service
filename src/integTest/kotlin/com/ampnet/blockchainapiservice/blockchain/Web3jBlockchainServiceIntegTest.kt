@@ -5,7 +5,10 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.config.ApplicationProperties
 import com.ampnet.blockchainapiservice.exception.BlockchainReadException
+import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
+import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
+import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.service.EthereumFunctionEncoderService
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.AccountBalance
@@ -15,7 +18,6 @@ import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.PrimitiveAbiType
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -25,9 +27,11 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
+import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.Uint
+import org.web3j.abi.datatypes.generated.Uint256
 import org.web3j.protocol.core.RemoteCall
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.exceptions.TransactionException
@@ -360,8 +364,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 arguments = listOf(
                     FunctionArgument(WalletAddress(accounts[1].address)),
                     FunctionArgument(accountBalance.amount)
-                ),
-                abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                )
             )
 
             assertThat(transactionInfo.data).withMessage()
@@ -438,8 +441,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 arguments = listOf(
                     FunctionArgument(WalletAddress(accounts[1].address)),
                     FunctionArgument(sendAmount)
-                ),
-                abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                )
             )
 
             assertThat(transactionInfo.data).withMessage()
@@ -575,6 +577,80 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
             assertThat(transactionInfo).withMessage()
                 .isNull()
+        }
+    }
+
+    @Test
+    fun mustCorrectlyCallReadonlyFunction() {
+        val mainAccount = accounts[0]
+
+        val contract = suppose("readonly function calls contract is deployed") {
+            ReadonlyFunctionCallsContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider()
+            ).sendAndMine()
+        }
+
+        val functionName = "returningUint"
+        val uintValue = Uint256(BigInteger.TEN)
+        val functionData = EthereumFunctionEncoderService().encode(
+            functionName = functionName,
+            arguments = listOf(FunctionArgument(uintValue))
+        )
+
+        verify("correct value is returned for latest block") {
+            val service = Web3jBlockchainService(hardhatProperties())
+            val result = service.callReadonlyFunction(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                params = ExecuteReadonlyFunctionCallParams(
+                    contractAddress = ContractAddress(contract.contractAddress),
+                    callerAddress = WalletAddress("a"),
+                    functionName = functionName,
+                    functionData = functionData,
+                    outputParameters = listOf(OutputParameter("uint256", TypeReference.create(Uint256::class.java)))
+                )
+            )
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    ReadonlyFunctionCallResult(
+                        blockNumber = result.blockNumber,
+                        timestamp = result.timestamp,
+                        returnValues = listOf(uintValue.value)
+                    )
+                )
+            assertThat(result.blockNumber.value)
+                .isPositive()
+            assertThat(result.timestamp.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    fun mustThrowBlockchainReadExceptionWhenCallingReadonlyFunctionOnInvalidContractAddress() {
+        val functionName = "returningUint"
+        val uintValue = Uint256(BigInteger.TEN)
+        val functionData = EthereumFunctionEncoderService().encode(
+            functionName = functionName,
+            arguments = listOf(FunctionArgument(uintValue))
+        )
+
+        verify("BlockchainReadException is thrown when calling readonly function on invalid contract address") {
+            val service = Web3jBlockchainService(hardhatProperties())
+
+            assertThrows<BlockchainReadException>(message) {
+                service.callReadonlyFunction(
+                    chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                    params = ExecuteReadonlyFunctionCallParams(
+                        contractAddress = ContractAddress("dead"),
+                        callerAddress = WalletAddress("a"),
+                        functionName = functionName,
+                        functionData = functionData,
+                        outputParameters = listOf(OutputParameter("uint256", TypeReference.create(Uint256::class.java)))
+                    )
+                )
+            }
         }
     }
 

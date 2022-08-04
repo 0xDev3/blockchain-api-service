@@ -119,8 +119,8 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             callerAddress = STORE_PARAMS.callerAddress,
             txHash = TX_HASH
         )
-        val CHAIN_SPEC = ChainSpec(STORED_REQUEST.chainId, null)
-        val TRANSACTION_INFO = BlockchainTransactionInfo(
+        private val CHAIN_SPEC = ChainSpec(STORED_REQUEST.chainId, null)
+        private val TRANSACTION_INFO = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = STORED_REQUEST.callerAddress!!,
             to = CONTRACT_ADDRESS,
@@ -175,8 +175,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = createParams.functionName,
-                    arguments = createParams.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = createParams.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -199,7 +198,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
@@ -232,7 +231,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = mock(),
-            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -262,7 +261,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = mock(),
-            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -302,8 +301,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = createParams.functionName,
-                    arguments = createParams.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = createParams.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -326,7 +324,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
@@ -359,7 +357,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = mock(),
-            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -389,7 +387,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = mock(),
-            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -429,8 +427,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = createParams.functionName,
-                    arguments = createParams.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = createParams.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -446,7 +443,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
@@ -478,7 +475,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -511,8 +508,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -521,7 +517,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -566,8 +562,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -576,7 +571,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -622,8 +617,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -632,7 +626,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -678,8 +672,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -688,7 +681,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -734,8 +727,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -744,7 +736,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -790,8 +782,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -800,7 +791,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -846,8 +837,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -856,7 +846,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -902,8 +892,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -912,7 +901,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -958,8 +947,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -968,7 +956,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -1014,8 +1002,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -1024,7 +1011,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -1067,8 +1054,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             given(
                 functionEncoderService.encode(
                     functionName = request.functionName,
-                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams,
-                    abiOutputTypes = emptyList()
+                    arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -1077,7 +1063,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -1112,7 +1098,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = mock(),
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -1141,7 +1127,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -1173,7 +1159,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            contractDeploymentRequestRepository = mock(),
+            deployedContractIdentifierResolverService = service(mock()),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -1212,4 +1198,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
 
         return projectRepository
     }
+
+    private fun service(repository: ContractDeploymentRequestRepository) =
+        DeployedContractIdentifierResolverServiceImpl(repository)
 }

@@ -21,7 +21,6 @@ import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.PrimitiveAbiType
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -91,8 +90,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(CREATE_PARAMS.assetRecipientAddress),
                         FunctionArgument(CREATE_PARAMS.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -295,8 +293,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -371,8 +368,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -458,8 +454,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -545,8 +540,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -632,8 +626,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -719,8 +712,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -806,8 +798,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -1033,8 +1024,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -1120,8 +1110,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -1347,8 +1336,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -1460,8 +1448,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
@@ -1550,8 +1537,7 @@ class AssetSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(sendRequest.assetRecipientAddress),
                         FunctionArgument(sendRequest.assetAmount)
-                    ),
-                    abiOutputTypes = listOf(PrimitiveAbiType.BOOL)
+                    )
                 )
             )
                 .willReturn(encodedData)
