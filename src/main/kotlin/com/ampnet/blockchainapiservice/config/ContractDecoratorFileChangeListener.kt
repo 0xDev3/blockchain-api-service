@@ -98,6 +98,8 @@ class ContractDecoratorFileChangeListener(
                     manifest = manifestJson
                 )
                 contractDecoratorRepository.store(decorator)
+                contractDecoratorRepository.store(decorator.id, manifestJson)
+                contractDecoratorRepository.store(decorator.id, artifactJson)
                 contractMetadataRepository.createOrUpdate(
                     id = uuidProvider.getUuid(),
                     contractId = decorator.id,

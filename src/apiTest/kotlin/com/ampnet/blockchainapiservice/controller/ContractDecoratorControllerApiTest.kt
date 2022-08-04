@@ -5,8 +5,15 @@ import com.ampnet.blockchainapiservice.blockchain.ExampleContract
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.model.filters.ContractDecoratorFilters
 import com.ampnet.blockchainapiservice.model.filters.OrList
+import com.ampnet.blockchainapiservice.model.json.ArtifactJson
+import com.ampnet.blockchainapiservice.model.json.ConstructorDecorator
+import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
+import com.ampnet.blockchainapiservice.model.json.ManifestJson
+import com.ampnet.blockchainapiservice.model.json.TypeDecorator
+import com.ampnet.blockchainapiservice.model.response.ArtifactJsonsResponse
 import com.ampnet.blockchainapiservice.model.response.ContractDecoratorResponse
 import com.ampnet.blockchainapiservice.model.response.ContractDecoratorsResponse
+import com.ampnet.blockchainapiservice.model.response.ManifestJsonsResponse
 import com.ampnet.blockchainapiservice.model.result.ContractConstructor
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractFunction
@@ -40,7 +47,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                             description = "Contract owner address",
                             solidityName = "owner",
                             solidityType = "address",
-                            recommendedTypes = listOf()
+                            recommendedTypes = emptyList()
                         )
                     ),
                     description = "Main constructor",
@@ -51,22 +58,65 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                 ContractFunction(
                     name = "Get contract owner",
                     description = "Fetches contract owner",
-                    solidityName = "getOWner",
-                    inputs = listOf(),
+                    solidityName = "getOwner",
+                    inputs = emptyList(),
                     outputs = listOf(
                         ContractParameter(
                             name = "Owner address",
                             description = "Contract owner address",
                             solidityName = "",
                             solidityType = "address",
-                            recommendedTypes = listOf()
+                            recommendedTypes = emptyList()
                         )
                     ),
                     emittableEvents = emptyList(),
                     readOnly = true
                 )
             ),
-            events = listOf()
+            events = emptyList()
+        )
+        private val MANIFEST_JSON = ManifestJson(
+            tags = listOf("example", "simple"),
+            implements = listOf("traits.example", "traits.exampleOwnable"),
+            eventDecorators = emptyList(),
+            constructorDecorators = listOf(
+                ConstructorDecorator(
+                    signature = "constructor(address)",
+                    description = "Main constructor",
+                    parameterDecorators = listOf(
+                        TypeDecorator(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            recommendedTypes = emptyList()
+                        )
+                    )
+                )
+            ),
+            functionDecorators = listOf(
+                FunctionDecorator(
+                    signature = "getOwner()",
+                    name = "Get contract owner",
+                    description = "Fetches contract owner",
+                    parameterDecorators = emptyList(),
+                    returnDecorators = listOf(
+                        TypeDecorator(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            recommendedTypes = emptyList()
+                        )
+                    ),
+                    emittableEvents = emptyList()
+                )
+            )
+        )
+        private val ARTIFACT_JSON = ArtifactJson(
+            contractName = "ExampleContract",
+            sourceName = "ExampleContract.sol",
+            abi = listOf(),
+            bytecode = "0x0",
+            deployedBytecode = "0x0",
+            linkReferences = null,
+            deployedLinkReferences = null
         )
     }
 
@@ -77,6 +127,103 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
     fun beforeEach() {
         contractDecoratorRepository.getAll(ContractDecoratorFilters(OrList(), OrList())).forEach {
             contractDecoratorRepository.delete(it.id)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractDecoratorsWithFilters() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val response = suppose("request to fetch contract decorators is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get(
+                    "/v1/deployable-contracts/?tags=example AND simple,other" +
+                        "&implements=traits/example AND traits/exampleOwnable,traits/other"
+                )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDecoratorsResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ContractDecoratorsResponse(
+                        listOf(
+                            ContractDecoratorResponse(
+                                id = CONTRACT_DECORATOR.id.value,
+                                binary = CONTRACT_DECORATOR.binary.value,
+                                tags = CONTRACT_DECORATOR.tags.map { it.value },
+                                implements = CONTRACT_DECORATOR.implements.map { it.value },
+                                constructors = CONTRACT_DECORATOR.constructors,
+                                functions = CONTRACT_DECORATOR.functions,
+                                events = CONTRACT_DECORATOR.events
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractManifestsWithFilters() {
+        suppose("some contract manifest.json exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+            contractDecoratorRepository.store(CONTRACT_DECORATOR.id, MANIFEST_JSON)
+        }
+
+        val response = suppose("request to fetch contract manifest.json files is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get(
+                    "/v1/deployable-contracts/manifest.json?tags=example AND simple,other" +
+                        "&implements=traits/example AND traits/exampleOwnable,traits/other"
+                )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ManifestJsonsResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(response).withMessage()
+                .isEqualTo(ManifestJsonsResponse(listOf(MANIFEST_JSON)))
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractArtifactsWithFilters() {
+        suppose("some contract artifact.json exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+            contractDecoratorRepository.store(CONTRACT_DECORATOR.id, ARTIFACT_JSON)
+        }
+
+        val response = suppose("request to fetch contract artifact.json files is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get(
+                    "/v1/deployable-contracts/artifact.json?tags=example AND simple,other" +
+                        "&implements=traits/example AND traits/exampleOwnable,traits/other"
+                )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ArtifactJsonsResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(
+                response.copy(
+                    artifacts = response.artifacts.map {
+                        it.copy(linkReferences = null, deployedLinkReferences = null)
+                    }
+                )
+            ).withMessage()
+                .isEqualTo(ArtifactJsonsResponse(listOf(ARTIFACT_JSON)))
         }
     }
 
@@ -126,41 +273,74 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchContractDecoratorsWithFilters() {
-        suppose("some contract decorator exists in the database") {
+    fun mustCorrectlyFetchContractManifestJson() {
+        suppose("some contract manifest.json exists in the database") {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
+            contractDecoratorRepository.store(CONTRACT_DECORATOR.id, MANIFEST_JSON)
         }
 
-        val response = suppose("request to fetch contract decorators is made") {
+        val response = suppose("request to fetch contract manifest.json is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get(
-                    "/v1/deployable-contracts/?tags=example AND simple,other" +
-                        "&implements=traits/example AND traits/exampleOwnable,traits/other"
-                )
+                MockMvcRequestBuilders.get("/v1/deployable-contracts/${CONTRACT_DECORATOR.id.value}/manifest.json")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(response.response.contentAsString, ContractDecoratorsResponse::class.java)
+            objectMapper.readValue(response.response.contentAsString, ManifestJson::class.java)
         }
 
         verify("correct response is returned") {
             assertThat(response).withMessage()
-                .isEqualTo(
-                    ContractDecoratorsResponse(
-                        listOf(
-                            ContractDecoratorResponse(
-                                id = CONTRACT_DECORATOR.id.value,
-                                binary = CONTRACT_DECORATOR.binary.value,
-                                tags = CONTRACT_DECORATOR.tags.map { it.value },
-                                implements = CONTRACT_DECORATOR.implements.map { it.value },
-                                constructors = CONTRACT_DECORATOR.constructors,
-                                functions = CONTRACT_DECORATOR.functions,
-                                events = CONTRACT_DECORATOR.events
-                            )
-                        )
-                    )
-                )
+                .isEqualTo(MANIFEST_JSON)
+        }
+    }
+
+    @Test
+    fun mustReturn404NotFoundForNonExistentContractManifestJson() {
+        verify("404 is returned for non-existent contract deployment request") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/deployable-contracts/${UUID.randomUUID()}/manifest.json")
+            )
+                .andExpect(MockMvcResultMatchers.status().isNotFound)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractArtifactJson() {
+        suppose("some contract manifest.json exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+            contractDecoratorRepository.store(CONTRACT_DECORATOR.id, ARTIFACT_JSON)
+        }
+
+        val response = suppose("request to fetch contract manifest.json is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/deployable-contracts/${CONTRACT_DECORATOR.id.value}/artifact.json")
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ArtifactJson::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(response.copy(linkReferences = null, deployedLinkReferences = null)).withMessage()
+                .isEqualTo(ARTIFACT_JSON)
+        }
+    }
+
+    @Test
+    fun mustReturn404NotFoundForNonExistentContractArtifactJson() {
+        verify("404 is returned for non-existent contract deployment request") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/deployable-contracts/${UUID.randomUUID()}/artifact.json")
+            )
+                .andExpect(MockMvcResultMatchers.status().isNotFound)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 }
