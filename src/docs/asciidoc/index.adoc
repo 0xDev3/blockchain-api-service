@@ -58,6 +58,7 @@ include::src/docs/asciidoc/deploy/attach.adoc[]
 == Contract Function Call Request API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
+include::src/docs/asciidoc/function-call/readonly.adoc[]
 include::src/docs/asciidoc/function-call/create.adoc[]
 include::src/docs/asciidoc/function-call/fetch.adoc[]
 include::src/docs/asciidoc/function-call/fetch-by-project-id.adoc[]

@@ -608,7 +608,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     callerAddress = WalletAddress("a"),
                     functionName = functionName,
                     functionData = functionData,
-                    outputParameters = listOf(OutputParameter("uint256", TypeReference.create(Uint256::class.java)))
+                    outputParams = listOf(OutputParameter("uint256", TypeReference.create(Uint256::class.java)))
                 )
             )
 
@@ -647,7 +647,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         callerAddress = WalletAddress("a"),
                         functionName = functionName,
                         functionData = functionData,
-                        outputParameters = listOf(OutputParameter("uint256", TypeReference.create(Uint256::class.java)))
+                        outputParams = listOf(OutputParameter("uint256", TypeReference.create(Uint256::class.java)))
                     )
                 )
             }

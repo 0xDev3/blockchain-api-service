@@ -29,6 +29,7 @@ import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
+import com.ampnet.blockchainapiservice.util.WithDeployedContractIdAndAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -60,7 +61,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
             blockNumber = null,
             functionName = "example",
             functionParams = listOf(FunctionArgument(Uint256(BigInteger.TEN))),
-            outputParameters = listOf("uint256"),
+            outputParams = listOf("uint256"),
             callerAddress = CALLER_ADDRESS
         )
         private val ENCODED_FUNCTION_DATA = FunctionData("0x1234")
@@ -124,7 +125,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
                         callerAddress = CALLER_ADDRESS,
                         functionName = createParams.functionName,
                         functionData = ENCODED_FUNCTION_DATA,
-                        outputParameters = listOf(
+                        outputParams = listOf(
                             OutputParameter("uint256", TypeReference.makeTypeReference("uint256"))
                         )
                     ),
@@ -143,7 +144,13 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
             assertThat(
                 service.callReadonlyContractFunction(createParams, PROJECT)
             ).withMessage()
-                .isEqualTo(readonlyFunctionCallResult)
+                .isEqualTo(
+                    WithDeployedContractIdAndAddress(
+                        value = readonlyFunctionCallResult,
+                        deployedContractId = DEPLOYED_CONTRACT_ID,
+                        contractAddress = CONTRACT_ADDRESS
+                    )
+                )
         }
     }
 
@@ -231,7 +238,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
                         callerAddress = CALLER_ADDRESS,
                         functionName = createParams.functionName,
                         functionData = ENCODED_FUNCTION_DATA,
-                        outputParameters = listOf(
+                        outputParams = listOf(
                             OutputParameter("uint256", TypeReference.makeTypeReference("uint256"))
                         )
                     ),
@@ -250,7 +257,13 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
             assertThat(
                 service.callReadonlyContractFunction(createParams, PROJECT)
             ).withMessage()
-                .isEqualTo(readonlyFunctionCallResult)
+                .isEqualTo(
+                    WithDeployedContractIdAndAddress(
+                        value = readonlyFunctionCallResult,
+                        deployedContractId = DEPLOYED_CONTRACT_ID,
+                        contractAddress = CONTRACT_ADDRESS
+                    )
+                )
         }
     }
 
@@ -331,7 +344,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
                         callerAddress = CALLER_ADDRESS,
                         functionName = createParams.functionName,
                         functionData = ENCODED_FUNCTION_DATA,
-                        outputParameters = listOf(
+                        outputParams = listOf(
                             OutputParameter("uint256", TypeReference.makeTypeReference("uint256"))
                         )
                     ),
@@ -350,7 +363,13 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
             assertThat(
                 service.callReadonlyContractFunction(createParams, PROJECT)
             ).withMessage()
-                .isEqualTo(readonlyFunctionCallResult)
+                .isEqualTo(
+                    WithDeployedContractIdAndAddress(
+                        value = readonlyFunctionCallResult,
+                        deployedContractId = null,
+                        contractAddress = CONTRACT_ADDRESS
+                    )
+                )
         }
     }
 
