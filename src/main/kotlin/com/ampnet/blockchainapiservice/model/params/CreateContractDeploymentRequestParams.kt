@@ -26,6 +26,6 @@ data class CreateContractDeploymentRequestParams(
         initialEthAmount = Balance(requestBody.initialEthAmount),
         redirectUrl = requestBody.redirectUrl,
         arbitraryData = requestBody.arbitraryData,
-        screenConfig = requestBody.screenConfig
+        screenConfig = requestBody.screenConfig ?: ScreenConfig.EMPTY
     )
 }

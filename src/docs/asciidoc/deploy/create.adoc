@@ -8,7 +8,7 @@ interpolated, and only `id` field can be interpolated.
 The `constructorParams` field is an array of objects which must have `type` and `value` according to the table in
 section <<Available Function Argument Types>>.
 
-*This request requires and API key present in the `X-API-KEY` header.*
+*This request requires an API key present in the `X-API-KEY` header.*
 
 .Request Example
 [%collapsible]

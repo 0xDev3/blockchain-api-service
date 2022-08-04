@@ -156,3 +156,13 @@ class ContractNotYetDeployedException(id: UUID, alias: String) : ServiceExceptio
         private const val serialVersionUID: Long = 4421635315803726161L
     }
 }
+
+class InvalidRequestBodyException(message: String) : ServiceException(
+    errorCode = ErrorCode.INVALID_REQUEST_BODY,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = message
+) {
+    companion object {
+        private const val serialVersionUID: Long = -3878710530557672092L
+    }
+}
