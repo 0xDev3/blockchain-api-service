@@ -8,6 +8,7 @@ import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.util.BlockName
+import com.ampnet.blockchainapiservice.util.WithDeployedContractIdAndAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 import org.web3j.abi.TypeReference
@@ -24,17 +25,17 @@ class ContractReadonlyFunctionCallServiceImpl(
     override fun callReadonlyContractFunction(
         params: CreateReadonlyFunctionCallParams,
         project: Project
-    ): ReadonlyFunctionCallResult {
+    ): WithDeployedContractIdAndAddress<ReadonlyFunctionCallResult> {
         logger.info { "Calling contract read-only function, params: $params, project: $project" }
 
-        val (_, contractAddress) = deployedContractIdentifierResolverService
+        val (deployedContractId, contractAddress) = deployedContractIdentifierResolverService
             .resolveContractIdAndAddress(params.identifier, project.id)
         val data = functionEncoderService.encode(
             functionName = params.functionName,
             arguments = params.functionParams
         )
 
-        return blockchainService.callReadonlyFunction(
+        val value = blockchainService.callReadonlyFunction(
             chainSpec = ChainSpec(
                 chainId = project.chainId,
                 customRpcUrl = project.customRpcUrl
@@ -45,7 +46,7 @@ class ContractReadonlyFunctionCallServiceImpl(
                 functionName = params.functionName,
                 functionData = data,
                 // TODO do this when decoding from JSON
-                outputParameters = params.outputParameters.map {
+                outputParams = params.outputParams.map {
                     OutputParameter(
                         solidityType = it,
                         typeReference = TypeReference.makeTypeReference(it)
@@ -53,6 +54,12 @@ class ContractReadonlyFunctionCallServiceImpl(
                 }
             ),
             blockParameter = params.blockNumber ?: BlockName.LATEST
+        )
+
+        return WithDeployedContractIdAndAddress(
+            value = value,
+            deployedContractId = deployedContractId,
+            contractAddress = contractAddress
         )
     }
 }

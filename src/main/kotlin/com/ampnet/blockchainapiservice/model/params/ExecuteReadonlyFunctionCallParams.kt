@@ -12,7 +12,7 @@ data class ExecuteReadonlyFunctionCallParams(
     val functionName: String,
     val functionData: FunctionData,
     // TODO write extensive tests for parsing this
-    val outputParameters: List<OutputParameter>
+    val outputParams: List<OutputParameter>
 )
 
 class OutputParameter(
