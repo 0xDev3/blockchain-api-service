@@ -26,7 +26,7 @@ import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithFunctionData
-import com.ampnet.blockchainapiservice.util.WithTransactionData
+import com.ampnet.blockchainapiservice.util.WithTransactionAndFunctionData
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -72,7 +72,7 @@ class ContractFunctionCallRequestServiceImpl(
         return WithFunctionData(contractFunctionCallRequest, data)
     }
 
-    override fun getContractFunctionCallRequest(id: UUID): WithTransactionData<ContractFunctionCallRequest> {
+    override fun getContractFunctionCallRequest(id: UUID): WithTransactionAndFunctionData<ContractFunctionCallRequest> {
         logger.debug { "Fetching contract function call request, id: $id" }
 
         val contractFunctionCallRequest = ethCommonService.fetchResource(
@@ -87,7 +87,7 @@ class ContractFunctionCallRequestServiceImpl(
     override fun getContractFunctionCallRequestsByProjectIdAndFilters(
         projectId: UUID,
         filters: ContractFunctionCallRequestFilters
-    ): List<WithTransactionData<ContractFunctionCallRequest>> {
+    ): List<WithTransactionAndFunctionData<ContractFunctionCallRequest>> {
         logger.debug { "Fetching contract function call requests for projectId: $projectId, filters: $filters" }
         return projectRepository.getById(projectId)?.let {
             contractFunctionCallRequestRepository.getAllByProjectId(projectId, filters)
@@ -132,7 +132,7 @@ class ContractFunctionCallRequestServiceImpl(
 
     private fun ContractFunctionCallRequest.appendTransactionData(
         project: Project
-    ): WithTransactionData<ContractFunctionCallRequest> {
+    ): WithTransactionAndFunctionData<ContractFunctionCallRequest> {
         val transactionInfo = ethCommonService.fetchTransactionInfo(
             txHash = txHash,
             chainId = chainId,
@@ -145,7 +145,7 @@ class ContractFunctionCallRequestServiceImpl(
         )
         val status = determineStatus(transactionInfo, data)
 
-        return withTransactionData(
+        return withTransactionAndFunctionData(
             status = status,
             data = data,
             transactionInfo = transactionInfo
@@ -182,7 +182,7 @@ class ContractFunctionCallRequestServiceImpl(
         callerAddress == null || from == callerAddress
 
     private fun BlockchainTransactionInfo.contractAddressMatches(contractAddress: ContractAddress?): Boolean =
-        to == contractAddress
+        to.toContractAddress() == contractAddress
 
     private fun BlockchainTransactionInfo.dataMatches(expectedData: FunctionData): Boolean =
         data == expectedData

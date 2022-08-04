@@ -932,7 +932,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchContractDeploymentRequestByProjectIdAndFiltersWhenCustomRpcUrlIsSpecified() {
+    fun mustCorrectlyFetchContractDeploymentRequestsByProjectIdAndFiltersWhenCustomRpcUrlIsSpecified() {
         val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
