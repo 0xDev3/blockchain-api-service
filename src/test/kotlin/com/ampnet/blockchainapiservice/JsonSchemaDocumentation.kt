@@ -4,6 +4,9 @@ import com.ampnet.blockchainapiservice.config.JsonConfig
 import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
 import com.ampnet.blockchainapiservice.util.annotation.SchemaName
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.PropertyNamingStrategies.NamingBase
+import com.fasterxml.jackson.databind.annotation.JsonNaming
+import com.github.victools.jsonschema.generator.FieldScope
 import com.github.victools.jsonschema.generator.Option
 import com.github.victools.jsonschema.generator.OptionPreset
 import com.github.victools.jsonschema.generator.SchemaGenerator
@@ -24,7 +27,8 @@ object JsonSchemaDocumentation {
         forFields().apply {
             withPropertyNameOverrideResolver { field ->
                 val nameOverride = field.getAnnotation(SchemaName::class.java)?.name
-                nameOverride ?: PropertyNamingStrategies.SnakeCaseStrategy().translate(field.name)
+                val namingStrategy = field.getNamingStrategy()
+                nameOverride ?: namingStrategy.translate(field.name)
             }
             withNullableCheck { field ->
                 Class.forName(field.declaringType.typeName)
@@ -39,6 +43,11 @@ object JsonSchemaDocumentation {
             Option.EXTRA_OPEN_API_FORMAT_VALUES
         )
     }.let { SchemaGenerator(it.build()) }
+
+    private fun FieldScope.getNamingStrategy(): NamingBase =
+        Class.forName(declaringType.typeName).getAnnotation(JsonNaming::class.java)
+            ?.value?.constructors?.toList()?.getOrNull(0)?.call() as? NamingBase
+            ?: PropertyNamingStrategies.SnakeCaseStrategy()
 
     fun createSchema(type: Type) {
         Files.createDirectories(Paths.get("build/generated-snippets"))
