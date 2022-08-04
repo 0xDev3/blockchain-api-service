@@ -1,0 +1,16 @@
+=== Fetch Deployable Contract `manifest.json` by ID
+Fetches `manifest.json` file for deployable contract by contract ID.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContractManifestJson/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContractManifestJson/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.json.ManifestJson.adoc[]

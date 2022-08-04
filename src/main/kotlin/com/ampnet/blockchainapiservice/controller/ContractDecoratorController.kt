@@ -1,12 +1,14 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.filters.AndList
 import com.ampnet.blockchainapiservice.model.filters.ContractDecoratorFilters
-import com.ampnet.blockchainapiservice.model.filters.OrList
 import com.ampnet.blockchainapiservice.model.filters.parseOrListWithNestedAndLists
+import com.ampnet.blockchainapiservice.model.json.ArtifactJson
+import com.ampnet.blockchainapiservice.model.json.ManifestJson
+import com.ampnet.blockchainapiservice.model.response.ArtifactJsonsResponse
 import com.ampnet.blockchainapiservice.model.response.ContractDecoratorResponse
 import com.ampnet.blockchainapiservice.model.response.ContractDecoratorsResponse
+import com.ampnet.blockchainapiservice.model.response.ManifestJsonsResponse
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
@@ -19,16 +21,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class ContractDecoratorController(private val contractDecoratorRepository: ContractDecoratorRepository) {
-
-    @GetMapping("/v1/deployable-contracts/{id}")
-    fun getContractDecorator(
-        @PathVariable("id") id: String
-    ): ResponseEntity<ContractDecoratorResponse> {
-        val contractDecorator = contractDecoratorRepository.getById(ContractId(id)) ?: throw ResourceNotFoundException(
-            "Contract decorator not found for contract ID: $id"
-        )
-        return ResponseEntity.ok(ContractDecoratorResponse(contractDecorator))
-    }
 
     @GetMapping("/v1/deployable-contracts")
     fun getContractDecorators(
@@ -44,6 +36,59 @@ class ContractDecoratorController(private val contractDecoratorRepository: Contr
         return ResponseEntity.ok(ContractDecoratorsResponse(contractDecorators.map { ContractDecoratorResponse(it) }))
     }
 
-    private fun <T> List<String>?.toOrListWithNestedAndLists(wrap: (String) -> T): OrList<AndList<T>> =
-        OrList(this.orEmpty().map { AndList(it.split(" AND ").map { wrap(it) }) })
+    @GetMapping("/v1/deployable-contracts/manifest.json")
+    fun getContractManifestJsonFiles(
+        @RequestParam("tags", required = false) contractTags: List<String>?,
+        @RequestParam("implements", required = false) contractImplements: List<String>?
+    ): ResponseEntity<ManifestJsonsResponse> {
+        val contractManifests = contractDecoratorRepository.getAllManifestJsonFiles(
+            ContractDecoratorFilters(
+                contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
+                contractImplements = contractImplements.parseOrListWithNestedAndLists { ContractTrait(it) }
+            )
+        )
+        return ResponseEntity.ok(ManifestJsonsResponse(contractManifests))
+    }
+
+    @GetMapping("/v1/deployable-contracts/artifact.json")
+    fun getContractArtifactJsonFiles(
+        @RequestParam("tags", required = false) contractTags: List<String>?,
+        @RequestParam("implements", required = false) contractImplements: List<String>?
+    ): ResponseEntity<ArtifactJsonsResponse> {
+        val contractArtifacts = contractDecoratorRepository.getAllArtifactJsonFiles(
+            ContractDecoratorFilters(
+                contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
+                contractImplements = contractImplements.parseOrListWithNestedAndLists { ContractTrait(it) }
+            )
+        )
+        return ResponseEntity.ok(ArtifactJsonsResponse(contractArtifacts))
+    }
+
+    @GetMapping("/v1/deployable-contracts/{id}")
+    fun getContractDecorator(
+        @PathVariable("id") id: String
+    ): ResponseEntity<ContractDecoratorResponse> {
+        val contractDecorator = contractDecoratorRepository.getById(ContractId(id)) ?: throw ResourceNotFoundException(
+            "Contract decorator not found for contract ID: $id"
+        )
+        return ResponseEntity.ok(ContractDecoratorResponse(contractDecorator))
+    }
+
+    @GetMapping("/v1/deployable-contracts/{id}/manifest.json")
+    fun getContractManifestJson(
+        @PathVariable("id") id: String
+    ): ResponseEntity<ManifestJson> {
+        val manifestJson = contractDecoratorRepository.getManifestJsonById(ContractId(id))
+            ?: throw ResourceNotFoundException("Contract manifest.json not found for contract ID: $id")
+        return ResponseEntity.ok(manifestJson)
+    }
+
+    @GetMapping("/v1/deployable-contracts/{id}/artifact.json")
+    fun getContractArtifactJson(
+        @PathVariable("id") id: String
+    ): ResponseEntity<ArtifactJson> {
+        val artifactJson = contractDecoratorRepository.getArtifactJsonById(ContractId(id))
+            ?: throw ResourceNotFoundException("Contract artifact.json not found for contract ID: $id")
+        return ResponseEntity.ok(artifactJson)
+    }
 }
