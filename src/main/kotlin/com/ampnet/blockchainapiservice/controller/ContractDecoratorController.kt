@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.controller
 
+import com.ampnet.blockchainapiservice.config.validation.MaxStringSize
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.filters.ContractDecoratorFilters
 import com.ampnet.blockchainapiservice.model.filters.parseOrListWithNestedAndLists
@@ -14,18 +15,21 @@ import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
 import com.ampnet.blockchainapiservice.util.ContractTrait
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
+@Validated
 @RestController
 class ContractDecoratorController(private val contractDecoratorRepository: ContractDecoratorRepository) {
 
     @GetMapping("/v1/deployable-contracts")
     fun getContractDecorators(
-        @RequestParam("tags", required = false) contractTags: List<String>?,
-        @RequestParam("implements", required = false) contractImplements: List<String>?
+        @Valid @RequestParam("tags", required = false) contractTags: List<@MaxStringSize String>?,
+        @Valid @RequestParam("implements", required = false) contractImplements: List<@MaxStringSize String>?
     ): ResponseEntity<ContractDecoratorsResponse> {
         val contractDecorators = contractDecoratorRepository.getAll(
             ContractDecoratorFilters(
@@ -38,8 +42,8 @@ class ContractDecoratorController(private val contractDecoratorRepository: Contr
 
     @GetMapping("/v1/deployable-contracts/manifest.json")
     fun getContractManifestJsonFiles(
-        @RequestParam("tags", required = false) contractTags: List<String>?,
-        @RequestParam("implements", required = false) contractImplements: List<String>?
+        @Valid @RequestParam("tags", required = false) contractTags: List<@MaxStringSize String>?,
+        @Valid @RequestParam("implements", required = false) contractImplements: List<@MaxStringSize String>?
     ): ResponseEntity<ManifestJsonsResponse> {
         val contractManifests = contractDecoratorRepository.getAllManifestJsonFiles(
             ContractDecoratorFilters(
@@ -52,8 +56,8 @@ class ContractDecoratorController(private val contractDecoratorRepository: Contr
 
     @GetMapping("/v1/deployable-contracts/artifact.json")
     fun getContractArtifactJsonFiles(
-        @RequestParam("tags", required = false) contractTags: List<String>?,
-        @RequestParam("implements", required = false) contractImplements: List<String>?
+        @Valid @RequestParam("tags", required = false) contractTags: List<@MaxStringSize String>?,
+        @Valid @RequestParam("implements", required = false) contractImplements: List<@MaxStringSize String>?
     ): ResponseEntity<ArtifactJsonsResponse> {
         val contractArtifacts = contractDecoratorRepository.getAllArtifactJsonFiles(
             ContractDecoratorFilters(

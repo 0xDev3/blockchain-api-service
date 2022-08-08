@@ -1,7 +1,12 @@
 package com.ampnet.blockchainapiservice.model
 
+import com.ampnet.blockchainapiservice.config.validation.ValidationConstants
+import javax.validation.constraints.Size
+
 data class ScreenConfig(
+    @field:Size(max = ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH)
     val beforeActionMessage: String?,
+    @field:Size(max = ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH)
     val afterActionMessage: String?
 ) {
     companion object {

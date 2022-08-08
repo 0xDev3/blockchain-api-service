@@ -339,7 +339,7 @@ class AssetSendRequestControllerTest : TestBase() {
         val controller = AssetSendRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getAssetSendRequestsBySender(sender)
+            val response = controller.getAssetSendRequestsBySender(sender.rawValue)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -423,7 +423,7 @@ class AssetSendRequestControllerTest : TestBase() {
         val controller = AssetSendRequestController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getAssetSendRequestsByRecipient(recipient)
+            val response = controller.getAssetSendRequestsByRecipient(recipient.rawValue)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
