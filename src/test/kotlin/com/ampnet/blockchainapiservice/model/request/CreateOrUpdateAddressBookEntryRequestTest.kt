@@ -47,7 +47,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
             assertThat(violations[0].message).withMessage()
                 .isEqualTo(
                     "value must be between 3 and 256 characters long and contain only" +
-                        " letters, digits and characters '-', '_', '.'",
+                        " letters, digits and characters '-', '_', '.', '/'",
                 )
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("alias")
@@ -70,7 +70,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
             assertThat(violations[0].message).withMessage()
                 .isEqualTo(
                     "value must be between 3 and 256 characters long and contain only" +
-                        " letters, digits and characters '-', '_', '.'",
+                        " letters, digits and characters '-', '_', '.', '/'",
                 )
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("alias")
@@ -93,7 +93,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
             assertThat(violations[0].message).withMessage()
                 .isEqualTo(
                     "value must be between 3 and 256 characters long and contain only" +
-                        " letters, digits and characters '-', '_', '.'",
+                        " letters, digits and characters '-', '_', '.', '/'",
                 )
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("alias")
@@ -101,7 +101,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
 
         val requestWithValidAlias = suppose("request with valid alias is created") {
             CreateOrUpdateAddressBookEntryRequest(
-                alias = "a-b_3.1",
+                alias = "a-b_3.1/",
                 address = "",
                 phoneNumber = null,
                 email = null

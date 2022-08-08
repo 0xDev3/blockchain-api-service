@@ -1106,7 +1106,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             )
         }
 
-        val txHash = TransactionHash("tx-hash")
+        val txHash = TransactionHash("0x1")
 
         suppose("request to attach transaction info to contract deployment request is made") {
             mockMvc.perform(
@@ -1137,7 +1137,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     fun mustReturn400BadRequestWhenTransactionInfoIsNotAttached() {
         val id = UUID.randomUUID()
         val alias = "alias"
-        val txHash = TransactionHash("tx-hash")
+        val txHash = TransactionHash("0x1")
         val deployerAddress = WalletAddress("b")
 
         suppose("some contract deployment request with transaction info exists in database") {
@@ -1171,7 +1171,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "tx_hash": "different-tx-hash",
+                                "tx_hash": "0x2",
                                 "caller_address": "${deployerAddress.rawValue}"
                             }
                         """.trimIndent()

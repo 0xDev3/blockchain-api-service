@@ -7,6 +7,7 @@ import com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.AddressBookService
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
 
+@Validated
 @RestController
 class AddressBookController(private val addressBookService: AddressBookService) {
 

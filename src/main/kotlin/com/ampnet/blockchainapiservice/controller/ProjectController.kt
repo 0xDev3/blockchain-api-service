@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
+import com.ampnet.blockchainapiservice.config.validation.ValidEthAddress
 import com.ampnet.blockchainapiservice.exception.ApiKeyAlreadyExistsException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.params.CreateProjectParams
@@ -14,6 +15,7 @@ import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
 
+@Validated
 @RestController
 class ProjectController(private val projectService: ProjectService) {
 
@@ -55,7 +58,7 @@ class ProjectController(private val projectService: ProjectService) {
     fun getByIssuerAddress(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @PathVariable chainId: Long,
-        @PathVariable issuerAddress: String
+        @ValidEthAddress @PathVariable issuerAddress: String
     ): ResponseEntity<ProjectResponse> {
         val project = projectService.getProjectByIssuer(
             userIdentifier = userIdentifier,

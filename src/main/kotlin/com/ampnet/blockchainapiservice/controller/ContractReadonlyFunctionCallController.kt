@@ -7,11 +7,13 @@ import com.ampnet.blockchainapiservice.model.response.ReadonlyFunctionCallRespon
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.ContractReadonlyFunctionCallService
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import javax.validation.Valid
 
+@Validated
 @RestController
 class ContractReadonlyFunctionCallController(
     private val contractReadonlyFunctionCallService: ContractReadonlyFunctionCallService

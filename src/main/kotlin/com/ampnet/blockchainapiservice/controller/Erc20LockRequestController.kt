@@ -11,6 +11,7 @@ import com.ampnet.blockchainapiservice.service.Erc20LockRequestService
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
 
+@Validated
 @RestController
 class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockRequestService) {
 
