@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 
 @Pattern(regexp = "^(0x)?[A-Fa-f0-9]{1,40}$")
 @ReportAsSingleViolation
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.FIELD)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.FIELD, AnnotationTarget.VALUE_PARAMETER)
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [])
 annotation class ValidEthAddress(

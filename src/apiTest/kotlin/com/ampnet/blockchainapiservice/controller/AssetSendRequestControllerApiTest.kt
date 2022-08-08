@@ -1833,7 +1833,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
             )
         }
 
-        val txHash = TransactionHash("tx-hash")
+        val txHash = TransactionHash("0x1")
 
         suppose("request to attach transaction info to asset send request is made") {
             mockMvc.perform(
@@ -1863,7 +1863,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
     @Test
     fun mustReturn400BadRequestWhenTransactionInfoIsNotAttached() {
         val id = UUID.randomUUID()
-        val txHash = TransactionHash("tx-hash")
+        val txHash = TransactionHash("0x1")
         val tokenSender = WalletAddress("b")
 
         suppose("some asset send request with transaction info exists in database") {
@@ -1895,7 +1895,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "tx_hash": "different-tx-hash",
+                                "tx_hash": "0x2",
                                 "caller_address": "${tokenSender.rawValue}"
                             }
                         """.trimIndent()

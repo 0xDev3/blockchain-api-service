@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import com.ampnet.blockchainapiservice.config.validation.MaxStringSize
 import com.ampnet.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import com.ampnet.blockchainapiservice.model.filters.OrList
 import com.ampnet.blockchainapiservice.model.filters.parseOrListWithNestedAndLists
@@ -17,6 +18,7 @@ import com.ampnet.blockchainapiservice.util.ContractTrait
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -27,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
 
+@Validated
 @RestController
 class ContractDeploymentRequestController(
     private val contractDeploymentRequestService: ContractDeploymentRequestService
@@ -53,9 +56,9 @@ class ContractDeploymentRequestController(
     @GetMapping("/v1/deploy/by-project/{projectId}")
     fun getContractDeploymentRequestsByProjectIdAndFilters(
         @PathVariable("projectId") projectId: UUID,
-        @RequestParam("contractIds", required = false) contractIds: List<String>?,
-        @RequestParam("contractTags", required = false) contractTags: List<String>?,
-        @RequestParam("contractImplements", required = false) contractImplements: List<String>?,
+        @Valid @RequestParam("contractIds", required = false) contractIds: List<@MaxStringSize String>?,
+        @Valid @RequestParam("contractTags", required = false) contractTags: List<@MaxStringSize String>?,
+        @Valid @RequestParam("contractImplements", required = false) contractImplements: List<@MaxStringSize String>?,
         @RequestParam("deployedOnly", required = false, defaultValue = "false") deployedOnly: Boolean,
     ): ResponseEntity<ContractDeploymentRequestsResponse> {
         val contractDeploymentRequests = contractDeploymentRequestService

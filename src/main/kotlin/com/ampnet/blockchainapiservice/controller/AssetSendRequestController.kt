@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import com.ampnet.blockchainapiservice.config.validation.ValidEthAddress
 import com.ampnet.blockchainapiservice.model.params.CreateAssetSendRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import com.ampnet.blockchainapiservice.model.request.CreateAssetSendRequest
@@ -11,6 +12,7 @@ import com.ampnet.blockchainapiservice.service.AssetSendRequestService
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
 
+@Validated
 @RestController
 class AssetSendRequestController(private val assetSendRequestService: AssetSendRequestService) {
 
@@ -51,17 +54,17 @@ class AssetSendRequestController(private val assetSendRequestService: AssetSendR
 
     @GetMapping("/v1/send/by-sender/{sender}")
     fun getAssetSendRequestsBySender(
-        @PathVariable("sender") sender: WalletAddress
+        @ValidEthAddress @PathVariable("sender") sender: String
     ): ResponseEntity<AssetSendRequestsResponse> {
-        val sendRequests = assetSendRequestService.getAssetSendRequestsBySender(sender)
+        val sendRequests = assetSendRequestService.getAssetSendRequestsBySender(WalletAddress(sender))
         return ResponseEntity.ok(AssetSendRequestsResponse(sendRequests.map { AssetSendRequestResponse(it) }))
     }
 
     @GetMapping("/v1/send/by-recipient/{recipient}")
     fun getAssetSendRequestsByRecipient(
-        @PathVariable("recipient") recipient: WalletAddress
+        @ValidEthAddress @PathVariable("recipient") recipient: String
     ): ResponseEntity<AssetSendRequestsResponse> {
-        val sendRequests = assetSendRequestService.getAssetSendRequestsByRecipient(recipient)
+        val sendRequests = assetSendRequestService.getAssetSendRequestsByRecipient(WalletAddress(recipient))
         return ResponseEntity.ok(AssetSendRequestsResponse(sendRequests.map { AssetSendRequestResponse(it) }))
     }
 
