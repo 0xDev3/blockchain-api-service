@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 class ContractDeploymentRequestController(
@@ -34,7 +35,7 @@ class ContractDeploymentRequestController(
     @PostMapping("/v1/deploy")
     fun createContractDeploymentRequest(
         @ApiKeyBinding project: Project,
-        @RequestBody requestBody: CreateContractDeploymentRequest
+        @Valid @RequestBody requestBody: CreateContractDeploymentRequest
     ): ResponseEntity<ContractDeploymentRequestResponse> {
         val params = CreateContractDeploymentRequestParams(requestBody)
         val createdRequest = contractDeploymentRequestService.createContractDeploymentRequest(params, project)
@@ -75,7 +76,7 @@ class ContractDeploymentRequestController(
     @PutMapping("/v1/deploy/{id}")
     fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
-        @RequestBody requestBody: AttachTransactionInfoRequest
+        @Valid @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
         contractDeploymentRequestService.attachTxInfo(
             id = id,

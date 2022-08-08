@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 class AssetSendRequestController(private val assetSendRequestService: AssetSendRequestService) {
@@ -25,9 +26,9 @@ class AssetSendRequestController(private val assetSendRequestService: AssetSendR
     @PostMapping("/v1/send")
     fun createAssetSendRequest(
         @ApiKeyBinding project: Project,
-        @RequestBody requestBody: CreateAssetSendRequest
+        @Valid @RequestBody requestBody: CreateAssetSendRequest
     ): ResponseEntity<AssetSendRequestResponse> {
-        val params = CreateAssetSendRequestParams(requestBody.validate())
+        val params = CreateAssetSendRequestParams(requestBody)
         val createdRequest = assetSendRequestService.createAssetSendRequest(params, project)
         return ResponseEntity.ok(AssetSendRequestResponse(createdRequest))
     }
@@ -67,7 +68,7 @@ class AssetSendRequestController(private val assetSendRequestService: AssetSendR
     @PutMapping("/v1/send/{id}")
     fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
-        @RequestBody requestBody: AttachTransactionInfoRequest
+        @Valid @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
         assetSendRequestService.attachTxInfo(
             id,

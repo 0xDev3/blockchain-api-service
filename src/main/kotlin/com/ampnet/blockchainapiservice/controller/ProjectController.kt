@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 class ProjectController(private val projectService: ProjectService) {
@@ -27,7 +28,7 @@ class ProjectController(private val projectService: ProjectService) {
     @PostMapping("/v1/projects")
     fun createProject(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
-        @RequestBody requestBody: CreateProjectRequest
+        @Valid @RequestBody requestBody: CreateProjectRequest
     ): ResponseEntity<ProjectResponse> {
         val params = CreateProjectParams(
             issuerContractAddress = ContractAddress(requestBody.issuerContractAddress),

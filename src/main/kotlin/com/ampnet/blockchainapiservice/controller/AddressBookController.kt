@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 class AddressBookController(private val addressBookService: AddressBookService) {
@@ -22,7 +23,7 @@ class AddressBookController(private val addressBookService: AddressBookService) 
     @PostMapping("/v1/address-book")
     fun createAddressBookEntry(
         @ApiKeyBinding project: Project,
-        @RequestBody requestBody: CreateOrUpdateAddressBookEntryRequest
+        @Valid @RequestBody requestBody: CreateOrUpdateAddressBookEntryRequest
     ): ResponseEntity<AddressBookEntryResponse> {
         return ResponseEntity.ok(
             AddressBookEntryResponse(
@@ -38,7 +39,7 @@ class AddressBookController(private val addressBookService: AddressBookService) 
     fun updateAddressBookEntry(
         @PathVariable("id") id: UUID,
         @ApiKeyBinding project: Project,
-        @RequestBody requestBody: CreateOrUpdateAddressBookEntryRequest
+        @Valid @RequestBody requestBody: CreateOrUpdateAddressBookEntryRequest
     ): ResponseEntity<AddressBookEntryResponse> {
         return ResponseEntity.ok(
             AddressBookEntryResponse(
