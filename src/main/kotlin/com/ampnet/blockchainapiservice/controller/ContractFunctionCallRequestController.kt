@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import com.ampnet.blockchainapiservice.config.validation.ValidEthAddress
 import com.ampnet.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import com.ampnet.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
 import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
@@ -13,6 +14,7 @@ import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
+import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -21,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
+@Validated
 @RestController
 class ContractFunctionCallRequestController(
     private val contractFunctionCallRequestService: ContractFunctionCallRequestService
@@ -30,7 +34,7 @@ class ContractFunctionCallRequestController(
     @PostMapping("/v1/function-call")
     fun createContractFunctionCallRequest(
         @ApiKeyBinding project: Project,
-        @RequestBody requestBody: CreateContractFunctionCallRequest
+        @Valid @RequestBody requestBody: CreateContractFunctionCallRequest
     ): ResponseEntity<ContractFunctionCallRequestResponse> {
         val params = CreateContractFunctionCallRequestParams(requestBody)
         val createdRequest = contractFunctionCallRequestService.createContractFunctionCallRequest(params, project)
@@ -49,7 +53,7 @@ class ContractFunctionCallRequestController(
     fun getContractFunctionCallRequestsByProjectIdAndFilters(
         @PathVariable("projectId") projectId: UUID,
         @RequestParam("deployedContractId", required = false) deployedContractId: UUID?,
-        @RequestParam("contractAddress", required = false) contractAddress: String?
+        @ValidEthAddress @RequestParam("contractAddress", required = false) contractAddress: String?
     ): ResponseEntity<ContractFunctionCallRequestsResponse> {
         val contractFunctionCallRequests = contractFunctionCallRequestService
             .getContractFunctionCallRequestsByProjectIdAndFilters(
@@ -69,7 +73,7 @@ class ContractFunctionCallRequestController(
     @PutMapping("/v1/function-call/{id}")
     fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
-        @RequestBody requestBody: AttachTransactionInfoRequest
+        @Valid @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
         contractFunctionCallRequestService.attachTxInfo(
             id = id,
