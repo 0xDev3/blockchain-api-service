@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 class AssetBalanceRequestController(private val assetBalanceRequestService: AssetBalanceRequestService) {
@@ -25,9 +26,9 @@ class AssetBalanceRequestController(private val assetBalanceRequestService: Asse
     @PostMapping("/v1/balance")
     fun createAssetBalanceRequest(
         @ApiKeyBinding project: Project,
-        @RequestBody requestBody: CreateAssetBalanceRequest
+        @Valid @RequestBody requestBody: CreateAssetBalanceRequest
     ): ResponseEntity<AssetBalanceRequestResponse> {
-        val params = CreateAssetBalanceRequestParams(requestBody.validate())
+        val params = CreateAssetBalanceRequestParams(requestBody)
         val createdRequest = assetBalanceRequestService.createAssetBalanceRequest(params, project)
         return ResponseEntity.ok(AssetBalanceRequestResponse(createdRequest))
     }
@@ -51,7 +52,7 @@ class AssetBalanceRequestController(private val assetBalanceRequestService: Asse
     @PutMapping("/v1/balance/{id}")
     fun attachSignedMessage(
         @PathVariable("id") id: UUID,
-        @RequestBody requestBody: AttachSignedMessageRequest
+        @Valid @RequestBody requestBody: AttachSignedMessageRequest
     ) {
         assetBalanceRequestService.attachWalletAddressAndSignedMessage(
             id = id,

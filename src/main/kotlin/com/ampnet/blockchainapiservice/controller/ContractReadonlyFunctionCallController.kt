@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import javax.validation.Valid
 
 @RestController
 class ContractReadonlyFunctionCallController(
@@ -19,7 +20,7 @@ class ContractReadonlyFunctionCallController(
     @PostMapping("/v1/readonly-function-call")
     fun callReadonlyContractFunction(
         @ApiKeyBinding project: Project,
-        @RequestBody requestBody: ReadonlyFunctionCallRequest
+        @Valid @RequestBody requestBody: ReadonlyFunctionCallRequest
     ): ResponseEntity<ReadonlyFunctionCallResponse> {
         val params = CreateReadonlyFunctionCallParams(requestBody)
         val result = contractReadonlyFunctionCallService.callReadonlyContractFunction(params, project)

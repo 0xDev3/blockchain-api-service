@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.validation.Valid
 
 @RestController
 class ContractFunctionCallRequestController(
@@ -30,7 +31,7 @@ class ContractFunctionCallRequestController(
     @PostMapping("/v1/function-call")
     fun createContractFunctionCallRequest(
         @ApiKeyBinding project: Project,
-        @RequestBody requestBody: CreateContractFunctionCallRequest
+        @Valid @RequestBody requestBody: CreateContractFunctionCallRequest
     ): ResponseEntity<ContractFunctionCallRequestResponse> {
         val params = CreateContractFunctionCallRequestParams(requestBody)
         val createdRequest = contractFunctionCallRequestService.createContractFunctionCallRequest(params, project)
@@ -69,7 +70,7 @@ class ContractFunctionCallRequestController(
     @PutMapping("/v1/function-call/{id}")
     fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
-        @RequestBody requestBody: AttachTransactionInfoRequest
+        @Valid @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
         contractFunctionCallRequestService.attachTxInfo(
             id = id,
