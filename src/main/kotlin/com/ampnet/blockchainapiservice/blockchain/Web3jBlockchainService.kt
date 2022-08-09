@@ -24,6 +24,8 @@ import mu.KLogging
 import org.springframework.stereotype.Service
 import org.web3j.abi.FunctionReturnDecoder
 import org.web3j.abi.TypeReference
+import org.web3j.abi.datatypes.DynamicArray
+import org.web3j.abi.datatypes.StaticArray
 import org.web3j.abi.datatypes.Type
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameter
@@ -140,12 +142,12 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
             ?: throw BlockchainReadException(
                 "Unable to call function ${params.functionName} on contract with address: ${params.contractAddress}"
             )
-        // TODO test with various return values to make sure everything works as intended...
+        // TODO use custom type decoder here to add support for nested arrays and structs
         @Suppress("UNCHECKED_CAST") val returnValues = FunctionReturnDecoder.decode(
             functionCallResponse,
             params.outputParams.map { it.typeReference } as List<TypeReference<Type<*>>>
         )
-            .map { it.value }
+            .map { it.extractValue() }
 
         return ReadonlyFunctionCallResult(
             blockNumber = blockNumber,
@@ -184,5 +186,12 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
         } catch (ex: Exception) {
             logger.warn("Failed smart contract call", ex)
             null
+        }
+
+    private fun Type<*>.extractValue(): Any =
+        when (this) {
+            is StaticArray<*> -> value.map { it.extractValue() }
+            is DynamicArray<*> -> value.map { it.extractValue() }
+            else -> value
         }
 }

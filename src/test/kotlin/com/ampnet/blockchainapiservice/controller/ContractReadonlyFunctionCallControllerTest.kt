@@ -5,6 +5,7 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.params.DeployedContractIdIdentifier
+import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.model.request.ReadonlyFunctionCallRequest
 import com.ampnet.blockchainapiservice.model.response.ReadonlyFunctionCallResponse
 import com.ampnet.blockchainapiservice.model.result.Project
@@ -34,7 +35,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
             blockNumber = BlockNumber(BigInteger.TEN),
             functionName = "example",
             functionParams = emptyList(),
-            outputParams = listOf("string", "uint256", "bool"),
+            outputParams = listOf("string", "uint256", "bool").map { OutputParameter(it) },
             callerAddress = WalletAddress("a")
         )
         val result = WithDeployedContractIdAndAddress(

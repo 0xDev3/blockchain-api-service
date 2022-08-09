@@ -112,7 +112,7 @@ value class FunctionData private constructor(val value: String) {
 @JvmInline
 value class TransactionHash private constructor(val value: String) {
     companion object {
-        operator fun invoke(value: String) = TransactionHash(value.lowercase())
+        operator fun invoke(value: String) = TransactionHash("0x" + value.removePrefix("0x").lowercase())
     }
 }
 

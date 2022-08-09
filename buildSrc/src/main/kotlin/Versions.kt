@@ -2,7 +2,7 @@ import org.gradle.api.JavaVersion
 
 object Versions {
 
-    const val project = "0.23.0"
+    const val project = "0.24.0"
 
     object Compile {
         const val kotlin = "1.6.10"
@@ -30,7 +30,7 @@ object Versions {
     }
 
     object Dependencies {
-        const val web3j = "4.8.9"
+        const val web3j = "4.9.4"
         const val kethereum = "0.85.7"
         const val okHttp = "4.9.3"
         const val kotlinCoroutines = "1.6.0"
