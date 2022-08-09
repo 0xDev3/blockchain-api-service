@@ -6,13 +6,10 @@ import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.config.JsonConfig
 import com.ampnet.blockchainapiservice.exception.CannotAttachTxInfoException
-import com.ampnet.blockchainapiservice.exception.ContractNotYetDeployedException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import com.ampnet.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
-import com.ampnet.blockchainapiservice.model.params.DeployedContractAddressIdentifier
-import com.ampnet.blockchainapiservice.model.params.DeployedContractAliasIdentifier
 import com.ampnet.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import com.ampnet.blockchainapiservice.model.params.StoreContractFunctionCallRequestParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
@@ -77,14 +74,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
                 afterActionMessage = "after-action-message"
             )
         )
-        private const val DEPLOYED_CONTRACT_ALIAS = "contract-alias"
-        private val DEPLOYED_CONTRACT_ALIAS_CREATE_PARAMS = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.copy(
-            identifier = DeployedContractAliasIdentifier(DEPLOYED_CONTRACT_ALIAS)
-        )
         private val CONTRACT_ADDRESS = ContractAddress("abc123")
-        private val CONTRACT_ADDRESS_CREATE_PARAMS = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.copy(
-            identifier = DeployedContractAddressIdentifier(CONTRACT_ADDRESS)
-        )
         private val ID = UUID.randomUUID()
         private val ENCODED_FUNCTION_DATA = FunctionData("0x1234")
         private val STORE_PARAMS = StoreContractFunctionCallRequestParams(
@@ -133,7 +123,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
         private val DEPLOYED_CONTRACT = ContractDeploymentRequest(
             id = DEPLOYED_CONTRACT_ID,
-            alias = DEPLOYED_CONTRACT_ALIAS,
+            alias = "contract-alias",
             contractId = ContractId("cid"),
             contractData = ContractBinaryData("00"),
             constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -153,7 +143,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyCreateFunctionCallRequestFromDeployedContractId() {
+    fun mustCorrectlyCreateFunctionCallRequest() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
@@ -214,251 +204,6 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
 
             verifyMock(contractFunctionCallRequestRepository)
                 .store(STORE_PARAMS)
-            verifyNoMoreInteractions(contractFunctionCallRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowContractNotYetDeployedExceptionWhenCreatingFunctionCallRequestFromNonDeployedContractId() {
-        val createParams = DEPLOYED_CONTRACT_ID_CREATE_PARAMS
-        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-
-        suppose("deployed contract is returned from database without contract address") {
-            given(contractDeploymentRequestRepository.getById(DEPLOYED_CONTRACT_ID))
-                .willReturn(DEPLOYED_CONTRACT.copy(contractAddress = null))
-        }
-
-        val service = ContractFunctionCallRequestServiceImpl(
-            functionEncoderService = mock(),
-            contractFunctionCallRequestRepository = mock(),
-            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
-            ethCommonService = EthCommonServiceImpl(
-                uuidProvider = mock(),
-                utcDateTimeProvider = mock(),
-                blockchainService = mock()
-            ),
-            projectRepository = mock(),
-            objectMapper = JsonConfig().objectMapper()
-        )
-
-        verify("ContractNotYetDeployedException is thrown") {
-            assertThrows<ContractNotYetDeployedException>(message) {
-                service.createContractFunctionCallRequest(createParams, PROJECT)
-            }
-        }
-    }
-
-    @Test
-    fun mustThrowResourceNotFoundExceptionWhenCreatingFunctionCallRequestFromNonExistentContractId() {
-        val createParams = DEPLOYED_CONTRACT_ID_CREATE_PARAMS
-        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-
-        suppose("deployed contract is not found from database") {
-            given(contractDeploymentRequestRepository.getById(DEPLOYED_CONTRACT_ID))
-                .willReturn(null)
-        }
-
-        val service = ContractFunctionCallRequestServiceImpl(
-            functionEncoderService = mock(),
-            contractFunctionCallRequestRepository = mock(),
-            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
-            ethCommonService = EthCommonServiceImpl(
-                uuidProvider = mock(),
-                utcDateTimeProvider = mock(),
-                blockchainService = mock()
-            ),
-            projectRepository = mock(),
-            objectMapper = JsonConfig().objectMapper()
-        )
-
-        verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
-                service.createContractFunctionCallRequest(createParams, PROJECT)
-            }
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCreateFunctionCallRequestFromDeployedContractAlias() {
-        val uuidProvider = mock<UuidProvider>()
-
-        suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
-                .willReturn(ID)
-        }
-
-        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
-
-        suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
-                .willReturn(TestData.TIMESTAMP)
-        }
-
-        val functionEncoderService = mock<FunctionEncoderService>()
-        val createParams = DEPLOYED_CONTRACT_ALIAS_CREATE_PARAMS
-
-        suppose("function will be encoded") {
-            given(
-                functionEncoderService.encode(
-                    functionName = createParams.functionName,
-                    arguments = createParams.functionParams
-                )
-            )
-                .willReturn(ENCODED_FUNCTION_DATA)
-        }
-
-        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-
-        suppose("deployed contract is returned from database") {
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS, PROJECT.id))
-                .willReturn(DEPLOYED_CONTRACT)
-        }
-
-        val contractFunctionCallRequestRepository = mock<ContractFunctionCallRequestRepository>()
-
-        suppose("contract function call request is stored in database") {
-            given(contractFunctionCallRequestRepository.store(STORE_PARAMS))
-                .willReturn(STORED_REQUEST)
-        }
-
-        val service = ContractFunctionCallRequestServiceImpl(
-            functionEncoderService = functionEncoderService,
-            contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
-            ethCommonService = EthCommonServiceImpl(
-                uuidProvider = uuidProvider,
-                utcDateTimeProvider = utcDateTimeProvider,
-                blockchainService = mock()
-            ),
-            projectRepository = mock(),
-            objectMapper = JsonConfig().objectMapper()
-        )
-
-        verify("contract function call request is correctly created") {
-            assertThat(service.createContractFunctionCallRequest(createParams, PROJECT)).withMessage()
-                .isEqualTo(WithFunctionData(STORED_REQUEST, ENCODED_FUNCTION_DATA))
-
-            verifyMock(contractFunctionCallRequestRepository)
-                .store(STORE_PARAMS)
-            verifyNoMoreInteractions(contractFunctionCallRequestRepository)
-        }
-    }
-
-    @Test
-    fun mustThrowContractNotYetDeployedExceptionWhenCreatingFunctionCallRequestFromNonDeployedContractAlias() {
-        val createParams = DEPLOYED_CONTRACT_ALIAS_CREATE_PARAMS
-        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-
-        suppose("deployed contract is returned from database without contract address") {
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS, PROJECT.id))
-                .willReturn(DEPLOYED_CONTRACT.copy(contractAddress = null))
-        }
-
-        val service = ContractFunctionCallRequestServiceImpl(
-            functionEncoderService = mock(),
-            contractFunctionCallRequestRepository = mock(),
-            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
-            ethCommonService = EthCommonServiceImpl(
-                uuidProvider = mock(),
-                utcDateTimeProvider = mock(),
-                blockchainService = mock()
-            ),
-            projectRepository = mock(),
-            objectMapper = JsonConfig().objectMapper()
-        )
-
-        verify("ContractNotYetDeployedException is thrown") {
-            assertThrows<ContractNotYetDeployedException>(message) {
-                service.createContractFunctionCallRequest(createParams, PROJECT)
-            }
-        }
-    }
-
-    @Test
-    fun mustThrowResourceNotFoundExceptionWhenCreatingFunctionCallRequestFromNonExistentContractAlias() {
-        val createParams = DEPLOYED_CONTRACT_ALIAS_CREATE_PARAMS
-        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
-
-        suppose("deployed contract is not found from database") {
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS, PROJECT.id))
-                .willReturn(null)
-        }
-
-        val service = ContractFunctionCallRequestServiceImpl(
-            functionEncoderService = mock(),
-            contractFunctionCallRequestRepository = mock(),
-            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
-            ethCommonService = EthCommonServiceImpl(
-                uuidProvider = mock(),
-                utcDateTimeProvider = mock(),
-                blockchainService = mock()
-            ),
-            projectRepository = mock(),
-            objectMapper = JsonConfig().objectMapper()
-        )
-
-        verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
-                service.createContractFunctionCallRequest(createParams, PROJECT)
-            }
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCreateFunctionCallRequestFromDeployedContractAddress() {
-        val uuidProvider = mock<UuidProvider>()
-
-        suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
-                .willReturn(ID)
-        }
-
-        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
-
-        suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
-                .willReturn(TestData.TIMESTAMP)
-        }
-
-        val functionEncoderService = mock<FunctionEncoderService>()
-        val createParams = CONTRACT_ADDRESS_CREATE_PARAMS
-
-        suppose("function will be encoded") {
-            given(
-                functionEncoderService.encode(
-                    functionName = createParams.functionName,
-                    arguments = createParams.functionParams
-                )
-            )
-                .willReturn(ENCODED_FUNCTION_DATA)
-        }
-
-        val contractFunctionCallRequestRepository = mock<ContractFunctionCallRequestRepository>()
-
-        suppose("contract function call request is stored in database") {
-            given(contractFunctionCallRequestRepository.store(STORE_PARAMS.copy(deployedContractId = null)))
-                .willReturn(STORED_REQUEST)
-        }
-
-        val service = ContractFunctionCallRequestServiceImpl(
-            functionEncoderService = functionEncoderService,
-            contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
-            deployedContractIdentifierResolverService = service(mock()),
-            ethCommonService = EthCommonServiceImpl(
-                uuidProvider = uuidProvider,
-                utcDateTimeProvider = utcDateTimeProvider,
-                blockchainService = mock()
-            ),
-            projectRepository = mock(),
-            objectMapper = JsonConfig().objectMapper()
-        )
-
-        verify("contract function call request is correctly created") {
-            assertThat(service.createContractFunctionCallRequest(createParams, PROJECT)).withMessage()
-                .isEqualTo(WithFunctionData(STORED_REQUEST, ENCODED_FUNCTION_DATA))
-
-            verifyMock(contractFunctionCallRequestRepository)
-                .store(STORE_PARAMS.copy(deployedContractId = null))
             verifyNoMoreInteractions(contractFunctionCallRequestRepository)
         }
     }
