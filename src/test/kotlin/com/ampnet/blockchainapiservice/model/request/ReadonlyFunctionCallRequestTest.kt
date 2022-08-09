@@ -4,6 +4,7 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.config.validation.ValidationConstants
 import com.ampnet.blockchainapiservice.config.validation.ValidationConstants.FUNCTION_ARGUMENT_MAX_JSON_CHARS
+import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.JsonNodeConverter
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -390,38 +391,15 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "",
                 functionParams = emptyList(),
-                outputParams = MutableList(ValidationConstants.REQUEST_BODY_MAX_ARGS_LENGTH + 1) { "" },
+                outputParams = MutableList(ValidationConstants.REQUEST_BODY_MAX_ARGS_LENGTH + 1) {
+                    OutputParameter("uint256")
+                },
                 callerAddress = WalletAddress("0").rawValue
             )
         }
 
         verify("request with too long list of arguments is marked as invalid") {
             val violations = validator.validate(requestWithTooLongListOfArguments).toList()
-
-            assertThat(violations.size).withMessage()
-                .isOne()
-            assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 50")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
-                .isEqualTo("outputParams")
-        }
-
-        val tooLongArgument = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH + 1)
-        val requestWithTooLongArgumentJson = suppose("request with too long argument JSON is created") {
-            ReadonlyFunctionCallRequest(
-                deployedContractId = null,
-                deployedContractAlias = null,
-                contractAddress = null,
-                blockNumber = null,
-                functionName = "",
-                functionParams = emptyList(),
-                outputParams = MutableList(ValidationConstants.REQUEST_BODY_MAX_ARGS_LENGTH + 1) { tooLongArgument },
-                callerAddress = WalletAddress("0").rawValue
-            )
-        }
-
-        verify("request with too long argument JSON is marked as invalid") {
-            val violations = validator.validate(requestWithTooLongArgumentJson).toList()
 
             assertThat(violations.size).withMessage()
                 .isOne()
@@ -439,7 +417,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "",
                 functionParams = emptyList(),
-                outputParams = listOf("a"),
+                outputParams = listOf(OutputParameter("bool")),
                 callerAddress = WalletAddress("0").rawValue
             )
         }

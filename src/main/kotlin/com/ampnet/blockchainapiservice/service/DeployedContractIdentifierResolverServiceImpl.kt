@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-class DeployedContractIdentifierResolverServiceImpl( // TODO add tests specific to this service
+class DeployedContractIdentifierResolverServiceImpl(
     private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository
 ) : DeployedContractIdentifierResolverService {
 

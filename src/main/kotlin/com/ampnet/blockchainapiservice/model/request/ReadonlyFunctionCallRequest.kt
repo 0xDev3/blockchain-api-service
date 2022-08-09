@@ -5,7 +5,11 @@ import com.ampnet.blockchainapiservice.config.validation.MaxStringSize
 import com.ampnet.blockchainapiservice.config.validation.ValidEthAddress
 import com.ampnet.blockchainapiservice.config.validation.ValidUint256
 import com.ampnet.blockchainapiservice.model.params.DeployedContractIdentifierRequestBody
+import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
+import com.ampnet.blockchainapiservice.util.annotation.SchemaName
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.math.BigInteger
 import java.util.UUID
 import javax.validation.Valid
@@ -29,8 +33,14 @@ data class ReadonlyFunctionCallRequest(
     @field:Valid
     @field:NotNull
     @field:MaxArgsSize
-    val outputParams: List<@MaxStringSize String>, // TODO use more specific type
+    @field:SchemaIgnore
+    val outputParams: List<OutputParameter>,
     @field:NotNull
     @field:ValidEthAddress
     val callerAddress: String
-) : DeployedContractIdentifierRequestBody
+) : DeployedContractIdentifierRequestBody {
+    @Suppress("unused") // used for JSON schema generation
+    @JsonIgnore
+    @SchemaName("output_params")
+    private val schemaOutputParams: List<String> = emptyList()
+}
