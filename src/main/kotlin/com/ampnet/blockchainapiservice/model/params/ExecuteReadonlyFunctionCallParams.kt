@@ -11,17 +11,9 @@ data class ExecuteReadonlyFunctionCallParams(
     val callerAddress: WalletAddress,
     val functionName: String,
     val functionData: FunctionData,
-    // TODO write extensive tests for parsing this
     val outputParams: List<OutputParameter>
 )
 
-class OutputParameter(
-    val solidityType: String,
-    val typeReference: TypeReference<out Type<*>>
-) {
-    override fun equals(other: Any?): Boolean =
-        other != null && (other is OutputParameter) && other.solidityType == solidityType &&
-            other.typeReference.type.typeName == typeReference.type.typeName
-
-    override fun hashCode(): Int = solidityType.hashCode()
+data class OutputParameter(val solidityType: String) {
+    val typeReference: TypeReference<out Type<*>> = TypeReference.makeTypeReference(solidityType)
 }

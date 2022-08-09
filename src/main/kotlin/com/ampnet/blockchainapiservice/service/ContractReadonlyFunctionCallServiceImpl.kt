@@ -4,14 +4,12 @@ import com.ampnet.blockchainapiservice.blockchain.BlockchainService
 import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
 import com.ampnet.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
-import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.util.BlockName
 import com.ampnet.blockchainapiservice.util.WithDeployedContractIdAndAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
-import org.web3j.abi.TypeReference
 
 @Service
 class ContractReadonlyFunctionCallServiceImpl(
@@ -45,13 +43,7 @@ class ContractReadonlyFunctionCallServiceImpl(
                 callerAddress = params.callerAddress,
                 functionName = params.functionName,
                 functionData = data,
-                // TODO do this when decoding from JSON
-                outputParams = params.outputParams.map {
-                    OutputParameter(
-                        solidityType = it,
-                        typeReference = TypeReference.makeTypeReference(it)
-                    )
-                }
+                outputParams = params.outputParams
             ),
             blockParameter = params.blockNumber ?: BlockName.LATEST
         )

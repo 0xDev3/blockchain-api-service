@@ -6,10 +6,11 @@ import com.ampnet.blockchainapiservice.exception.UnsupportedChainIdException
 import com.ampnet.blockchainapiservice.util.ChainId
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
+import java.util.concurrent.ConcurrentHashMap
 
 class ChainPropertiesHandler(private val applicationProperties: ApplicationProperties) {
 
-    private val blockchainPropertiesMap = mutableMapOf<ChainId, ChainPropertiesWithServices>()
+    private val blockchainPropertiesMap = ConcurrentHashMap<ChainId, ChainPropertiesWithServices>()
 
     fun getBlockchainProperties(chainSpec: ChainSpec): ChainPropertiesWithServices {
         val chain = Chain.fromId(chainSpec.chainId)
