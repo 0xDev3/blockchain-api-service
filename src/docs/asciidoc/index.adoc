@@ -80,3 +80,6 @@ include::src/docs/asciidoc/address-book/fetch-by-project.adoc[]
 
 == Available Function Argument Types
 include::src/docs/asciidoc/function-arg-types.adoc[]
+
+== Error Response
+include::src/docs/asciidoc/error-response.adoc[]
