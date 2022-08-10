@@ -44,7 +44,7 @@ class ContractFunctionCallRequestServiceImpl(
         logger.info { "Creating contract function call request, params: $params, project: $project" }
 
         val (deployedContractId, contractAddress) = deployedContractIdentifierResolverService
-            .resolveContractIdAndAddress(params.identifier, project.id)
+            .resolveContractIdAndAddress(params.identifier, project)
         val data = functionEncoderService.encode(
             functionName = params.functionName,
             arguments = params.functionParams
