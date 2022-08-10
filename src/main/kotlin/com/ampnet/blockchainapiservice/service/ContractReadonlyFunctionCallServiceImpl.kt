@@ -27,7 +27,7 @@ class ContractReadonlyFunctionCallServiceImpl(
         logger.info { "Calling contract read-only function, params: $params, project: $project" }
 
         val (deployedContractId, contractAddress) = deployedContractIdentifierResolverService
-            .resolveContractIdAndAddress(params.identifier, project.id)
+            .resolveContractIdAndAddress(params.identifier, project)
         val data = functionEncoderService.encode(
             functionName = params.functionName,
             arguments = params.functionParams
