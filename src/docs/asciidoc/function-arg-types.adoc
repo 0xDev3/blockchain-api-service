@@ -10,13 +10,13 @@ order.
 ====
 [cols="1,1"]
 |===
-| Array type |JSON value example
+|Array type |JSON value example
 
-| `string[]`
-| `["a", "b"]`
+|`string[]`
+|`["a", "b"]`
 
-| `int[1][2]`
-| `[[1], [2]]`
+|`int[1][2]`
+|`[[1], [2]]`
 
 |`struct[]`
 |`[ [{type: "string", "value": "a"}], [{"type": "string", "value": "b"}] ]`

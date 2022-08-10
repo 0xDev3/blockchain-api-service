@@ -945,5 +945,5 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
     }
 
     private fun service(repository: ContractDeploymentRequestRepository) =
-        DeployedContractIdentifierResolverServiceImpl(repository)
+        DeployedContractIdentifierResolverServiceImpl(repository, mock())
 }
