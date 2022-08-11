@@ -1,0 +1,14 @@
+=== Fetch Deployable Contract `info.md` by ID
+Fetches `info.md` file for deployable contract by contract ID.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContractInfoMarkdown/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContractInfoMarkdown/http-response.adoc[]
+====

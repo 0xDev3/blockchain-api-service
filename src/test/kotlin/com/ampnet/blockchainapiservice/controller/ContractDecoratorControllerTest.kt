@@ -12,6 +12,7 @@ import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.response.ArtifactJsonsResponse
 import com.ampnet.blockchainapiservice.model.response.ContractDecoratorResponse
 import com.ampnet.blockchainapiservice.model.response.ContractDecoratorsResponse
+import com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse
 import com.ampnet.blockchainapiservice.model.response.ManifestJsonsResponse
 import com.ampnet.blockchainapiservice.model.result.ContractConstructor
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
@@ -22,7 +23,7 @@ import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
 import com.ampnet.blockchainapiservice.util.ContractTrait
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.given
@@ -96,7 +97,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            Assertions.assertThat(response).withMessage()
+            assertThat(response).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDecoratorsResponse(
@@ -148,7 +149,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            Assertions.assertThat(response).withMessage()
+            assertThat(response).withMessage()
                 .isEqualTo(ResponseEntity.ok(ManifestJsonsResponse(listOf(result))))
         }
     }
@@ -186,8 +187,38 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            Assertions.assertThat(response).withMessage()
+            assertThat(response).withMessage()
                 .isEqualTo(ResponseEntity.ok(ArtifactJsonsResponse(listOf(result))))
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractInfoMarkdownsWithFilters() {
+        val repository = mock<ContractDecoratorRepository>()
+        val result = "info-md"
+
+        val filters = ContractDecoratorFilters(
+            contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
+            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+        )
+
+        suppose("some contract info.md files will be fetched with filters") {
+            given(repository.getAllInfoMarkdownFiles(filters))
+                .willReturn(listOf(result))
+        }
+
+        val controller = ContractDecoratorController(repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractInfoMarkdownFiles(
+                contractTags = listOf("tag-1 AND tag-2"),
+                contractImplements = listOf("trait-1 AND trait-2")
+            )
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(ResponseEntity.ok(InfoMarkdownsResponse(listOf(result))))
         }
     }
 
@@ -249,7 +280,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            Assertions.assertThat(response).withMessage()
+            assertThat(response).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDecoratorResponse(
@@ -309,7 +340,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            Assertions.assertThat(response).withMessage()
+            assertThat(response).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(result)
                 )
@@ -361,7 +392,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            Assertions.assertThat(response).withMessage()
+            assertThat(response).withMessage()
                 .isEqualTo(
                     ResponseEntity.ok(result)
                 )
@@ -383,6 +414,48 @@ class ContractDecoratorControllerTest : TestBase() {
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
                 controller.getContractArtifactJson(id.value)
+            }
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractInfoMarkdown() {
+        val id = ContractId("example")
+        val repository = mock<ContractDecoratorRepository>()
+        val result = "info-md"
+
+        suppose("some contract info.md will be fetched") {
+            given(repository.getInfoMarkdownById(id))
+                .willReturn(result)
+        }
+
+        val controller = ContractDecoratorController(repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractInfoMarkdown(id.value)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(result)
+                )
+        }
+    }
+
+    @Test
+    fun mustThrowResourceNotFoundExceptionWhenContractInfoMarkdownIsNotFound() {
+        val repository = mock<ContractDecoratorRepository>()
+        val id = ContractId("example")
+
+        suppose("null will be returned from the repository") {
+            given(repository.getInfoMarkdownById(id))
+                .willReturn(null)
+        }
+
+        val controller = ContractDecoratorController(repository)
+
+        verify("ResourceNotFoundException is thrown") {
+            assertThrows<ResourceNotFoundException>(message) {
+                controller.getContractInfoMarkdown(id.value)
             }
         }
     }
