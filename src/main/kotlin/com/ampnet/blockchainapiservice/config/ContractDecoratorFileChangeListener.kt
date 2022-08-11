@@ -197,7 +197,9 @@ class ContractDecoratorFileChangeListener(
         this[signature] ?: throw ContractDecoratorException("Decorator signature $signature not found in artifact.json")
 
     private fun List<AbiInputOutput>.toTypeList(): String =
-        map { it.type }.joinToString(separator = ",")
+        joinToString(separator = ",") { if (it.type == "tuple") it.buildStructType() else it.type }
+
+    private fun AbiInputOutput.buildStructType(): String = "struct(${components.orEmpty().toTypeList()})"
 
     private fun List<TypeDecorator>.toContractParameters(abi: List<AbiInputOutput>): List<ContractParameter> =
         zip(abi).map {
