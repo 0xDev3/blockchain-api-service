@@ -10,8 +10,6 @@ import com.ampnet.blockchainapiservice.model.result.ContractFunctionCallRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ContractFunctionCallRequestRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -138,23 +136,9 @@ class ContractFunctionCallRequestServiceImpl(
     ): Boolean =
         transactionInfo.success &&
             transactionInfo.hashMatches(txHash) &&
-            transactionInfo.callerAddressMatches(callerAddress) &&
-            transactionInfo.contractAddressMatches(contractAddress) &&
+            transactionInfo.fromAddressOptionallyMatches(callerAddress) &&
+            transactionInfo.toAddressMatches(contractAddress) &&
+            transactionInfo.deployedContractAddressIsNull() &&
             transactionInfo.dataMatches(expectedData) &&
             transactionInfo.valueMatches(ethAmount)
-
-    private fun BlockchainTransactionInfo.hashMatches(expectedHash: TransactionHash?): Boolean =
-        hash == expectedHash
-
-    private fun BlockchainTransactionInfo.callerAddressMatches(callerAddress: WalletAddress?): Boolean =
-        callerAddress == null || from == callerAddress
-
-    private fun BlockchainTransactionInfo.contractAddressMatches(contractAddress: ContractAddress?): Boolean =
-        to.toContractAddress() == contractAddress
-
-    private fun BlockchainTransactionInfo.dataMatches(expectedData: FunctionData): Boolean =
-        data == expectedData
-
-    private fun BlockchainTransactionInfo.valueMatches(expectedValue: Balance): Boolean =
-        value == expectedValue
 }

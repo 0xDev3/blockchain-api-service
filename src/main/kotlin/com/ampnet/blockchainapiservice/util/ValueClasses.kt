@@ -68,6 +68,10 @@ sealed interface EthereumUint {
 
 @JvmInline
 value class Balance(override val value: Uint) : EthereumUint {
+    companion object {
+        val ZERO = Balance(BigInteger.ZERO)
+    }
+
     constructor(value: BigInteger) : this(Uint(value))
 }
 

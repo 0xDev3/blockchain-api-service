@@ -25,6 +25,7 @@ import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
 import com.ampnet.blockchainapiservice.util.ContractTrait
 import org.assertj.core.api.Assertions.assertThat
+import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -125,8 +126,13 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
     @Autowired
     private lateinit var contractDecoratorRepository: ContractDecoratorRepository
 
+    @Autowired
+    private lateinit var dslContext: DSLContext
+
     @BeforeEach
     fun beforeEach() {
+        postgresContainer.cleanAllDatabaseTables(dslContext)
+
         contractDecoratorRepository.getAll(ContractDecoratorFilters(OrList(), OrList())).forEach {
             contractDecoratorRepository.delete(it.id)
         }

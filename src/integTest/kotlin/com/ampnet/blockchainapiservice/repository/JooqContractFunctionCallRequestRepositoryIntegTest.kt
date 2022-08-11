@@ -3,12 +3,6 @@ package com.ampnet.blockchainapiservice.repository
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IContractFunctionCallRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractFunctionCallRequestRecord
@@ -19,7 +13,7 @@ import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import com.ampnet.blockchainapiservice.model.params.StoreContractFunctionCallRequestParams
 import com.ampnet.blockchainapiservice.model.result.ContractFunctionCallRequest
-import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
+import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -62,7 +56,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
     }
 
     @Suppress("unused")
-    private val postgresContainer = PostgresTestContainer()
+    private val postgresContainer = SharedTestContainers.postgresContainer
 
     @Autowired
     private lateinit var repository: JooqContractFunctionCallRequestRepository
@@ -72,12 +66,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.delete(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST).execute()
-        dslContext.delete(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST).execute()
-        dslContext.delete(ContractMetadataTable.CONTRACT_METADATA).execute()
-        dslContext.delete(ApiKeyTable.API_KEY).execute()
-        dslContext.delete(ProjectTable.PROJECT).execute()
-        dslContext.delete(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
 
         dslContext.executeInsert(
             UserIdentifierRecord(
@@ -129,7 +118,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                 contractMetadataId = metadataId,
                 contractData = ContractBinaryData("00"),
                 constructorParams = TestData.EMPTY_JSON_ARRAY,
-                initialEthAmount = Balance(BigInteger.ZERO),
+                initialEthAmount = Balance.ZERO,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 projectId = PROJECT_ID_1,

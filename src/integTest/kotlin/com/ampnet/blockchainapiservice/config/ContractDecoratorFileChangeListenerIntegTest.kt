@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.config
 
 import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.model.result.ContractConstructor
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractEvent
@@ -11,7 +10,7 @@ import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.InMemoryContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.JooqContractMetadataRepository
 import com.ampnet.blockchainapiservice.service.RandomUuidProvider
-import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
+import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
@@ -162,7 +161,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
     private val ignoredDirs = listOf("IgnoredContract")
 
     @Suppress("unused")
-    private val postgresContainer = PostgresTestContainer()
+    private val postgresContainer = SharedTestContainers.postgresContainer
 
     @Autowired
     private lateinit var contractMetadataRepository: ContractMetadataRepository
@@ -172,7 +171,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.delete(ContractMetadataTable.CONTRACT_METADATA).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
     }
 
     @Test

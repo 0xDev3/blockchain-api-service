@@ -52,14 +52,11 @@ data class ContractFunctionCallRequestResponse(
         arbitraryData = contractFunctionCallRequest.value.arbitraryData,
         screenConfig = contractFunctionCallRequest.value.screenConfig.orEmpty(),
         callerAddress = contractFunctionCallRequest.value.callerAddress?.rawValue,
-        functionCallTx = TransactionResponse(
-            txHash = null,
-            from = contractFunctionCallRequest.value.callerAddress?.rawValue,
-            to = contractFunctionCallRequest.value.contractAddress.rawValue,
-            data = contractFunctionCallRequest.data.value,
-            value = contractFunctionCallRequest.value.ethAmount.rawValue,
-            blockConfirmations = null,
-            timestamp = null
+        functionCallTx = TransactionResponse.unmined(
+            from = contractFunctionCallRequest.value.callerAddress,
+            to = contractFunctionCallRequest.value.contractAddress,
+            data = contractFunctionCallRequest.data,
+            value = contractFunctionCallRequest.value.ethAmount,
         )
     )
 
@@ -79,15 +76,7 @@ data class ContractFunctionCallRequestResponse(
         arbitraryData = contractFunctionCallRequest.value.arbitraryData,
         screenConfig = contractFunctionCallRequest.value.screenConfig.orEmpty(),
         callerAddress = contractFunctionCallRequest.value.callerAddress?.rawValue,
-        functionCallTx = TransactionResponse(
-            txHash = contractFunctionCallRequest.transactionData.txHash?.value,
-            from = contractFunctionCallRequest.transactionData.fromAddress?.rawValue,
-            to = contractFunctionCallRequest.transactionData.toAddress.rawValue,
-            data = contractFunctionCallRequest.transactionData.data?.value,
-            value = contractFunctionCallRequest.transactionData.value?.rawValue,
-            blockConfirmations = contractFunctionCallRequest.transactionData.blockConfirmations,
-            timestamp = contractFunctionCallRequest.transactionData.timestamp?.value
-        )
+        functionCallTx = TransactionResponse(contractFunctionCallRequest.transactionData)
     )
 
     @Suppress("unused") // used for JSON schema generation

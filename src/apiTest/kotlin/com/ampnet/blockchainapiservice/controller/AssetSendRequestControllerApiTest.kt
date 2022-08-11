@@ -7,10 +7,6 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -72,10 +68,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.deleteFrom(AssetSendRequestTable.ASSET_SEND_REQUEST).execute()
-        dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
-        dslContext.deleteFrom(ProjectTable.PROJECT).execute()
-        dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
 
         dslContext.executeInsert(
             UserIdentifierRecord(
@@ -168,7 +161,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.sendTx.data,
-                            value = null,
+                            value = BigInteger.ZERO,
                             blockConfirmations = null,
                             timestamp = null
                         ),
@@ -272,7 +265,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.sendTx.data,
-                            value = null,
+                            value = BigInteger.ZERO,
                             blockConfirmations = null,
                             timestamp = null
                         ),
@@ -638,7 +631,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 listOf(mainAccount.address),
                 listOf(BigInteger("10000")),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -677,12 +670,12 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some asset transfer transaction is made") {
-            contract.transferAndMine(recipientAddress, amount)
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.transfer(recipientAddress.rawValue, amount.rawValue).send()
+                ?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -723,7 +716,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = createResponse.sendTx.data,
-                            value = null,
+                            value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
                             timestamp = fetchResponse.sendTx.timestamp
                         ),
@@ -752,7 +745,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 listOf(mainAccount.address),
                 listOf(BigInteger("10000")),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -795,12 +788,12 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some asset transfer transaction is made") {
-            contract.transferAndMine(recipientAddress, amount)
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.transfer(recipientAddress.rawValue, amount.rawValue).send()
+                ?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -839,7 +832,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = createResponse.sendTx.data,
-                            value = null,
+                            value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
                             timestamp = fetchResponse.sendTx.timestamp
                         ),
@@ -899,11 +892,11 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 recipientAddress.rawValue,
                 amount.rawValue.toBigDecimal(),
                 Convert.Unit.WEI
-            ).sendAsync()?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            ).send()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -1008,11 +1001,11 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 recipientAddress.rawValue,
                 amount.rawValue.toBigDecimal(),
                 Convert.Unit.WEI
-            ).sendAsync()?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            ).send()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -1093,7 +1086,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 listOf(mainAccount.address),
                 listOf(BigInteger("10000")),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -1132,12 +1125,12 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some asset transfer transaction is made") {
-            contract.transferAndMine(recipientAddress, amount)
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.transfer(recipientAddress.rawValue, amount.rawValue).send()
+                ?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -1181,7 +1174,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     from = senderAddress.rawValue,
                                     to = tokenAddress.rawValue,
                                     data = createResponse.sendTx.data,
-                                    value = null,
+                                    value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
@@ -1212,7 +1205,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 listOf(mainAccount.address),
                 listOf(BigInteger("10000")),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val redirectUrl = "https://example.com/\${id}"
@@ -1257,12 +1250,12 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some asset transfer transaction is made") {
-            contract.transferAndMine(recipientAddress, amount)
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.transfer(recipientAddress.rawValue, amount.rawValue).send()
+                ?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -1303,7 +1296,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     from = senderAddress.rawValue,
                                     to = tokenAddress.rawValue,
                                     data = createResponse.sendTx.data,
-                                    value = null,
+                                    value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
@@ -1334,7 +1327,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 listOf(mainAccount.address),
                 listOf(BigInteger("10000")),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -1373,12 +1366,12 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some asset transfer transaction is made") {
-            contract.transferAndMine(recipientAddress, amount)
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.transfer(recipientAddress.rawValue, amount.rawValue).send()
+                ?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -1422,7 +1415,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     from = senderAddress.rawValue,
                                     to = tokenAddress.rawValue,
                                     data = createResponse.sendTx.data,
-                                    value = null,
+                                    value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
@@ -1453,7 +1446,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 listOf(mainAccount.address),
                 listOf(BigInteger("10000")),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val redirectUrl = "https://example.com/\${id}"
@@ -1498,12 +1491,12 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some asset transfer transaction is made") {
-            contract.transferAndMine(recipientAddress, amount)
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.transfer(recipientAddress.rawValue, amount.rawValue).send()
+                ?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -1546,7 +1539,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     from = senderAddress.rawValue,
                                     to = tokenAddress.rawValue,
                                     data = createResponse.sendTx.data,
-                                    value = null,
+                                    value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
@@ -1577,7 +1570,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 listOf(mainAccount.address),
                 listOf(BigInteger("10000")),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -1616,12 +1609,12 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some asset transfer transaction is made") {
-            contract.transferAndMine(recipientAddress, amount)
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.transfer(recipientAddress.rawValue, amount.rawValue).send()
+                ?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -1665,7 +1658,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     from = senderAddress.rawValue,
                                     to = tokenAddress.rawValue,
                                     data = createResponse.sendTx.data,
-                                    value = null,
+                                    value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
@@ -1696,7 +1689,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 listOf(mainAccount.address),
                 listOf(BigInteger("10000")),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -1739,12 +1732,12 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some asset transfer transaction is made") {
-            contract.transferAndMine(recipientAddress, amount)
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.transfer(recipientAddress.rawValue, amount.rawValue).send()
+                ?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to asset send request") {
@@ -1788,7 +1781,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     from = senderAddress.rawValue,
                                     to = tokenAddress.rawValue,
                                     data = createResponse.sendTx.data,
-                                    value = null,
+                                    value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
