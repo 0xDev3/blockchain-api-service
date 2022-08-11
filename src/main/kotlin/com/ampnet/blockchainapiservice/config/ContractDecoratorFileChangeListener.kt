@@ -87,8 +87,10 @@ class ContractDecoratorFileChangeListener(
 
         val artifact = contractDecoratorDir.resolve("artifact.json").toFile()
         val manifest = contractDecoratorDir.resolve("manifest.json").toFile()
+        val infoMd = contractDecoratorDir.resolve("info.md").toFile()
         val artifactJson = objectMapper.tryParse(id, artifact, ArtifactJson::class)
         val manifestJson = objectMapper.tryParse(id, manifest, ManifestJson::class)
+        val infoMarkdown = infoMd.takeIf { it.isFile }?.readText() ?: ""
 
         if (artifactJson != null && manifestJson != null) {
             try {
@@ -100,6 +102,7 @@ class ContractDecoratorFileChangeListener(
                 contractDecoratorRepository.store(decorator)
                 contractDecoratorRepository.store(decorator.id, manifestJson)
                 contractDecoratorRepository.store(decorator.id, artifactJson)
+                contractDecoratorRepository.store(decorator.id, infoMarkdown)
                 contractMetadataRepository.createOrUpdate(
                     id = uuidProvider.getUuid(),
                     contractId = decorator.id,
@@ -197,7 +200,9 @@ class ContractDecoratorFileChangeListener(
         this[signature] ?: throw ContractDecoratorException("Decorator signature $signature not found in artifact.json")
 
     private fun List<AbiInputOutput>.toTypeList(): String =
-        map { it.type }.joinToString(separator = ",")
+        joinToString(separator = ",") { if (it.type == "tuple") it.buildStructType() else it.type }
+
+    private fun AbiInputOutput.buildStructType(): String = "struct(${components.orEmpty().toTypeList()})"
 
     private fun List<TypeDecorator>.toContractParameters(abi: List<AbiInputOutput>): List<ContractParameter> =
         zip(abi).map {

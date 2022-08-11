@@ -9,11 +9,13 @@ import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.response.ArtifactJsonsResponse
 import com.ampnet.blockchainapiservice.model.response.ContractDecoratorResponse
 import com.ampnet.blockchainapiservice.model.response.ContractDecoratorsResponse
+import com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse
 import com.ampnet.blockchainapiservice.model.response.ManifestJsonsResponse
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
 import com.ampnet.blockchainapiservice.util.ContractTrait
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
@@ -68,6 +70,20 @@ class ContractDecoratorController(private val contractDecoratorRepository: Contr
         return ResponseEntity.ok(ArtifactJsonsResponse(contractArtifacts))
     }
 
+    @GetMapping("/v1/deployable-contracts/info.md")
+    fun getContractInfoMarkdownFiles(
+        @Valid @RequestParam("tags", required = false) contractTags: List<@MaxStringSize String>?,
+        @Valid @RequestParam("implements", required = false) contractImplements: List<@MaxStringSize String>?
+    ): ResponseEntity<InfoMarkdownsResponse> {
+        val contractInfoMarkdowns = contractDecoratorRepository.getAllInfoMarkdownFiles(
+            ContractDecoratorFilters(
+                contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
+                contractImplements = contractImplements.parseOrListWithNestedAndLists { ContractTrait(it) }
+            )
+        )
+        return ResponseEntity.ok(InfoMarkdownsResponse(contractInfoMarkdowns))
+    }
+
     @GetMapping("/v1/deployable-contracts/{id}")
     fun getContractDecorator(
         @PathVariable("id") id: String
@@ -94,5 +110,17 @@ class ContractDecoratorController(private val contractDecoratorRepository: Contr
         val artifactJson = contractDecoratorRepository.getArtifactJsonById(ContractId(id))
             ?: throw ResourceNotFoundException("Contract artifact.json not found for contract ID: $id")
         return ResponseEntity.ok(artifactJson)
+    }
+
+    @GetMapping(
+        path = ["/v1/deployable-contracts/{id}/info.md"],
+        produces = [MediaType.TEXT_MARKDOWN_VALUE]
+    )
+    fun getContractInfoMarkdown(
+        @PathVariable("id") id: String
+    ): ResponseEntity<String> {
+        val infoMarkdown = contractDecoratorRepository.getInfoMarkdownById(ContractId(id))
+            ?: throw ResourceNotFoundException("Contract info.md not found for contract ID: $id")
+        return ResponseEntity.ok(infoMarkdown)
     }
 }
