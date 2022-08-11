@@ -47,9 +47,11 @@ All endpoints are public and do not require `Authorization: Bearer JWT` header.
 include::src/docs/asciidoc/deployable-contracts/fetch.adoc[]
 include::src/docs/asciidoc/deployable-contracts/fetch-manifest.adoc[]
 include::src/docs/asciidoc/deployable-contracts/fetch-artifact.adoc[]
+include::src/docs/asciidoc/deployable-contracts/fetch-info-markdown.adoc[]
 include::src/docs/asciidoc/deployable-contracts/fetch-all.adoc[]
 include::src/docs/asciidoc/deployable-contracts/fetch-all-manifests.adoc[]
 include::src/docs/asciidoc/deployable-contracts/fetch-all-artifacts.adoc[]
+include::src/docs/asciidoc/deployable-contracts/fetch-all-info-markdowns.adoc[]
 
 == Contract Deployment Request API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
