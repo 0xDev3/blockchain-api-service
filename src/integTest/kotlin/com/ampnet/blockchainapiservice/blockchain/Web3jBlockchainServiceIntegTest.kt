@@ -11,6 +11,7 @@ import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.service.EthereumFunctionEncoderService
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
+import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
@@ -31,21 +32,17 @@ import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.Uint
 import org.web3j.abi.datatypes.generated.Uint256
-import org.web3j.protocol.core.RemoteCall
-import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.exceptions.TransactionException
 import org.web3j.tx.Transfer
 import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.utils.Convert
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutionException
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Web3jBlockchainServiceIntegTest : TestBase() {
 
-    private val hardhatContainer = HardhatTestContainer()
+    private val hardhatContainer = SharedTestContainers.hardhatContainer
     private val accounts = HardhatTestContainer.accounts
 
     @BeforeEach
@@ -71,11 +68,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 accountBalance.wallet.rawValue,
                 value,
                 Convert.Unit.WEI
-            ).sendAndMine()
+            ).send()
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         verify("correct account balance is fetched for latest block") {
@@ -117,7 +114,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 accountBalance.wallet.rawValue,
                 value,
                 Convert.Unit.WEI
-            ).sendAndMine()
+            ).send()
         }
 
         val blockNumberBeforeSendingBalance = hardhatContainer.blockNumber()
@@ -129,7 +126,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 accountBalance.wallet.rawValue,
                 value,
                 Convert.Unit.WEI
-            ).sendAndMine()
+            ).send()
         }
 
         val service = Web3jBlockchainService(hardhatProperties())
@@ -192,7 +189,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 listOf(accountBalance.wallet.rawValue),
                 listOf(accountBalance.amount.rawValue),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         verify("correct ERC20 balance is fetched for latest block") {
@@ -235,13 +232,13 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 listOf(accountBalance.wallet.rawValue),
                 listOf(accountBalance.amount.rawValue),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val blockNumberBeforeSendingBalance = hardhatContainer.blockNumber()
 
         suppose("some ERC20 transaction is made") {
-            contract.transferAndMine(accounts[1].address, accountBalance.amount.rawValue)
+            contract.transfer(accounts[1].address, accountBalance.amount.rawValue).send()
         }
 
         val service = Web3jBlockchainService(hardhatProperties())
@@ -278,7 +275,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             assertThat(fetchedAccountBalance).withMessage()
                 .isEqualTo(
                     accountBalance.copy(
-                        amount = Balance(BigInteger.ZERO),
+                        amount = Balance.ZERO,
                         blockNumber = blockNumberAfterSendingBalance,
                         timestamp = fetchedAccountBalance.timestamp
                     )
@@ -321,16 +318,16 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 listOf(accountBalance.wallet.rawValue),
                 listOf(accountBalance.amount.rawValue),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val txHash = suppose("some ERC20 transfer transaction is made") {
-            contract.transferAndMine(accounts[1].address, accountBalance.amount.rawValue)
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.transfer(accounts[1].address, accountBalance.amount.rawValue).send()
+                ?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         verify("correct transaction info is fetched") {
@@ -351,7 +348,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         to = WalletAddress(contract.contractAddress),
                         deployedContractAddress = null,
                         data = transactionInfo.data,
-                        value = Balance(BigInteger.ZERO),
+                        value = Balance.ZERO,
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
                         success = true
@@ -393,21 +390,22 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 listOf(accountBalance.wallet.rawValue),
                 listOf(accountBalance.amount.rawValue),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val txHash = suppose("some ERC20 transfer transaction is made") {
             try {
-                contract.transferAndMine(accounts[1].address, sendAmount.rawValue)
-                    ?.get()?.transactionHash?.let { TransactionHash(it) }!!
-            } catch (e: ExecutionException) {
-                (e.cause as? TransactionException)?.transactionReceipt
-                    ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+                contract.transfer(accounts[1].address, sendAmount.rawValue).send()
+                    ?.transactionHash?.let { TransactionHash(it) }!!
+            } catch (e: TransactionException) {
+                // web3j is really something...
+                e.message?.removePrefix("{\"txHash\":\"")?.removeSuffix("\"}")
+                    ?.let { TransactionHash(it) }!!
             }
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         verify("correct transaction info is fetched") {
@@ -428,7 +426,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         to = WalletAddress(contract.contractAddress),
                         deployedContractAddress = null,
                         data = transactionInfo.data,
-                        value = Balance(BigInteger.ZERO),
+                        value = Balance.ZERO,
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
                         success = false
@@ -462,11 +460,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 accounts[1].address,
                 value,
                 Convert.Unit.WEI
-            ).sendAsync()?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            ).send()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         verify("correct transaction info is fetched") {
@@ -517,13 +515,13 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 listOf(accountBalance.wallet.rawValue),
                 listOf(accountBalance.amount.rawValue),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         val encodedConstructor = EthereumFunctionEncoderService().encodeConstructor(
@@ -553,7 +551,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         to = ZeroAddress.toWalletAddress(),
                         deployedContractAddress = ContractAddress(contract.contractAddress),
                         data = FunctionData(data),
-                        value = Balance(BigInteger.ZERO),
+                        value = Balance.ZERO,
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
                         success = true
@@ -588,7 +586,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val functionName = "returningUint"
@@ -635,7 +633,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val functionName = "returningString"
@@ -681,7 +679,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val functionName = "returningUintArray"
@@ -734,7 +732,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val functionName = "returningUintArrayArray"
@@ -794,7 +792,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val functionName = "returningMultipleValues"
@@ -864,23 +862,6 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 )
             }
         }
-    }
-
-    private fun <T> RemoteCall<T>.sendAndMine(): T {
-        val future = sendAsync()
-        hardhatContainer.waitAndMine()
-        return future.get()
-    }
-
-    private fun SimpleERC20.transferAndMine(
-        address: String,
-        amount: BigInteger
-    ): CompletableFuture<TransactionReceipt?>? {
-        val txReceiptFuture = transfer(address, amount).sendAsync()
-        hardhatContainer.mineUntil {
-            balanceOf(address).send() == amount
-        }
-        return txReceiptFuture
     }
 
     private fun hardhatProperties() = ApplicationProperties().apply { infuraId = hardhatContainer.mappedPort }

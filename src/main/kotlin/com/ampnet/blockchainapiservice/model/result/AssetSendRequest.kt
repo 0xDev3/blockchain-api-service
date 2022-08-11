@@ -39,12 +39,11 @@ data class AssetSendRequest(
             status = status,
             transactionData = TransactionData(
                 txHash = this.txHash,
-                fromAddress = transactionInfo?.from ?: this.assetSenderAddress,
-                toAddress = transactionInfo?.to ?: this.tokenAddress ?: this.assetRecipientAddress,
+                transactionInfo = transactionInfo,
+                fromAddress = this.assetSenderAddress,
+                toAddress = this.tokenAddress ?: this.assetRecipientAddress,
                 data = data,
-                value = value,
-                blockConfirmations = transactionInfo?.blockConfirmations,
-                timestamp = transactionInfo?.timestamp
+                value = value
             )
         )
 }

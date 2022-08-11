@@ -41,12 +41,11 @@ data class ContractFunctionCallRequest(
             status = status,
             transactionData = TransactionData(
                 txHash = this.txHash,
-                fromAddress = transactionInfo?.from ?: this.callerAddress,
-                toAddress = transactionInfo?.to ?: this.contractAddress,
+                transactionInfo = transactionInfo,
+                fromAddress = this.callerAddress,
+                toAddress = this.contractAddress,
                 data = data,
-                value = transactionInfo?.value ?: ethAmount,
-                blockConfirmations = transactionInfo?.blockConfirmations,
-                timestamp = transactionInfo?.timestamp
+                value = ethAmount
             )
         )
 }

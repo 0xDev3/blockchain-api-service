@@ -19,4 +19,25 @@ data class BlockchainTransactionInfo(
     val blockConfirmations: BigInteger,
     val timestamp: UtcDateTime,
     val success: Boolean
-)
+) {
+    fun hashMatches(expectedHash: TransactionHash?): Boolean =
+        hash == expectedHash
+
+    fun fromAddressOptionallyMatches(optionalAddress: WalletAddress?): Boolean =
+        optionalAddress == null || from == optionalAddress
+
+    fun toAddressMatches(toAddress: EthereumAddress): Boolean =
+        to.toWalletAddress() == toAddress.toWalletAddress()
+
+    fun deployedContractAddressIsNull(): Boolean =
+        deployedContractAddress == null
+
+    fun deployedContractAddressMatches(contractAddress: ContractAddress?): Boolean =
+        deployedContractAddress != null && contractAddress == deployedContractAddress
+
+    fun dataMatches(expectedData: FunctionData): Boolean =
+        data == expectedData
+
+    fun valueMatches(expectedValue: Balance): Boolean =
+        value == expectedValue
+}

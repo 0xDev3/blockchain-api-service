@@ -3,9 +3,6 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.ControllerTestBase
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.exception.ErrorCode
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.model.response.ApiKeyResponse
 import com.ampnet.blockchainapiservice.model.response.ProjectResponse
 import com.ampnet.blockchainapiservice.model.response.ProjectsResponse
@@ -48,9 +45,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
-        dslContext.deleteFrom(ProjectTable.PROJECT).execute()
-        dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.model.response
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.result.AssetSendRequest
 import com.ampnet.blockchainapiservice.util.AssetType
+import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WithFunctionDataOrEthValue
 import com.ampnet.blockchainapiservice.util.WithTransactionData
@@ -43,14 +44,11 @@ data class AssetSendRequestResponse(
         arbitraryData = sendRequest.value.arbitraryData,
         screenConfig = sendRequest.value.screenConfig.orEmpty(),
         redirectUrl = sendRequest.value.redirectUrl,
-        sendTx = TransactionResponse(
-            txHash = null,
-            from = sendRequest.value.assetSenderAddress?.rawValue,
-            to = sendRequest.value.tokenAddress?.rawValue ?: sendRequest.value.assetRecipientAddress.rawValue,
-            data = sendRequest.data?.value,
-            value = sendRequest.ethValue?.rawValue,
-            blockConfirmations = null,
-            timestamp = null
+        sendTx = TransactionResponse.unmined(
+            from = sendRequest.value.assetSenderAddress,
+            to = sendRequest.value.tokenAddress ?: sendRequest.value.assetRecipientAddress,
+            data = sendRequest.data,
+            value = sendRequest.ethValue ?: Balance.ZERO
         ),
         createdAt = sendRequest.value.createdAt.value
     )
@@ -68,15 +66,7 @@ data class AssetSendRequestResponse(
         arbitraryData = sendRequest.value.arbitraryData,
         screenConfig = sendRequest.value.screenConfig.orEmpty(),
         redirectUrl = sendRequest.value.redirectUrl,
-        sendTx = TransactionResponse(
-            txHash = sendRequest.transactionData.txHash?.value,
-            from = sendRequest.transactionData.fromAddress?.rawValue,
-            to = sendRequest.transactionData.toAddress.rawValue,
-            data = sendRequest.transactionData.data?.value,
-            value = sendRequest.transactionData.value?.rawValue,
-            blockConfirmations = sendRequest.transactionData.blockConfirmations,
-            timestamp = sendRequest.transactionData.timestamp?.value
-        ),
+        sendTx = TransactionResponse(sendRequest.transactionData),
         createdAt = sendRequest.value.createdAt.value
     )
 }

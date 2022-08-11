@@ -129,7 +129,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             constructorParams = TestData.EMPTY_JSON_ARRAY,
             contractTags = emptyList(),
             contractImplements = emptyList(),
-            initialEthAmount = Balance(BigInteger.ZERO),
+            initialEthAmount = Balance.ZERO,
             chainId = CHAIN_SPEC.chainId,
             redirectUrl = "redirect-url",
             projectId = PROJECT.id,

@@ -44,7 +44,9 @@ class HardhatTestContainer : GenericContainer<HardhatTestContainer>("gluwa/hardh
     }
 
     private val web3jService: Web3jService
-    val web3j: Web3j
+    lateinit var web3j: Web3j
+        private set
+
     val mappedPort: String
 
     init {
@@ -57,32 +59,22 @@ class HardhatTestContainer : GenericContainer<HardhatTestContainer>("gluwa/hardh
         start()
 
         mappedPort = getMappedPort(hardhatPort).toString()
+        web3jService = HttpService("http://localhost:$mappedPort")
 
         System.setProperty("HARDHAT_PORT", mappedPort)
 
-        web3jService = HttpService("http://localhost:$mappedPort")
-        web3j = Web3j.build(web3jService)
+        reset()
     }
 
-    private fun mine() {
+    fun mine() {
         Request("evm_mine", emptyList<String>(), web3jService, VoidResponse::class.java).send()
     }
 
     fun reset() {
         Request("hardhat_reset", emptyList<String>(), web3jService, VoidResponse::class.java).send()
-    }
+        Request("evm_setAutomine", listOf(true), web3jService, VoidResponse::class.java).send()
 
-    fun waitAndMine() {
-        Thread.sleep(2500L)
-        mine()
-    }
-
-    fun mineUntil(maxAttempts: Int = 10, condition: () -> Boolean) {
-        var attempt = 0
-        while (attempt < maxAttempts && condition().not()) {
-            attempt += 1
-            mine()
-        }
+        web3j = Web3j.build(web3jService)
     }
 
     fun blockNumber(): BlockNumber = BlockNumber(web3j.ethBlockNumber().send().blockNumber)

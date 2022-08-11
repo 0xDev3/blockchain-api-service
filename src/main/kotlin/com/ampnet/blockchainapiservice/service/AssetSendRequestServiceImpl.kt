@@ -9,7 +9,6 @@ import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.AssetSendRequestRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -139,29 +138,9 @@ class AssetSendRequestServiceImpl(
     ): Boolean =
         transactionInfo.success &&
             transactionInfo.hashMatches(txHash) &&
-            transactionInfo.tokenAddressMatches(tokenAddress) &&
-            transactionInfo.recipientAddressMatches(tokenAddress, assetRecipientAddress) &&
-            transactionInfo.senderAddressMatches(assetSenderAddress) &&
-            transactionInfo.dataMatches(expectedData) &&
-            transactionInfo.valueMatches(if (tokenAddress == null) assetAmount else null)
-
-    private fun BlockchainTransactionInfo.tokenAddressMatches(tokenAddress: ContractAddress?): Boolean =
-        (tokenAddress != null && to.toContractAddress() == tokenAddress) || tokenAddress == null
-
-    private fun BlockchainTransactionInfo.recipientAddressMatches(
-        tokenAddress: ContractAddress?,
-        recipientAddress: WalletAddress
-    ): Boolean = (tokenAddress == null && to.toWalletAddress() == recipientAddress) || tokenAddress != null
-
-    private fun BlockchainTransactionInfo.hashMatches(expectedHash: TransactionHash?): Boolean =
-        hash == expectedHash
-
-    private fun BlockchainTransactionInfo.senderAddressMatches(senderAddress: WalletAddress?): Boolean =
-        senderAddress == null || from == senderAddress
-
-    private fun BlockchainTransactionInfo.dataMatches(expectedData: FunctionData?): Boolean =
-        expectedData == null || data == expectedData
-
-    private fun BlockchainTransactionInfo.valueMatches(expectedValue: Balance?): Boolean =
-        expectedValue == null || value == expectedValue
+            transactionInfo.fromAddressOptionallyMatches(assetSenderAddress) &&
+            transactionInfo.toAddressMatches(tokenAddress ?: assetRecipientAddress) &&
+            transactionInfo.deployedContractAddressIsNull() &&
+            transactionInfo.dataMatches(expectedData ?: FunctionData.EMPTY) &&
+            transactionInfo.valueMatches(if (tokenAddress == null) assetAmount else Balance.ZERO)
 }
