@@ -122,7 +122,7 @@ class EthCommonServiceTest : TestBase() {
             to = WalletAddress("b"),
             deployedContractAddress = null,
             data = FunctionData("data"),
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ZERO,
             timestamp = TestData.TIMESTAMP,
             success = true

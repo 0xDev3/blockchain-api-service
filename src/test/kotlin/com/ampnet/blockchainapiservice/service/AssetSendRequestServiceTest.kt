@@ -434,7 +434,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress!!,
             deployedContractAddress = null,
             data = encodedData,
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = false
@@ -520,7 +520,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = WalletAddress("dead"),
             deployedContractAddress = null,
             data = encodedData,
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -606,7 +606,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress!!,
             deployedContractAddress = null,
             data = encodedData,
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -692,7 +692,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress!!,
             deployedContractAddress = null,
             data = encodedData,
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -778,7 +778,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress!!,
             deployedContractAddress = null,
             data = FunctionData("wrong-data"),
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -1004,7 +1004,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress!!,
             deployedContractAddress = null,
             data = encodedData,
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -1090,7 +1090,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress!!,
             deployedContractAddress = null,
             data = encodedData,
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -1316,7 +1316,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress!!,
             deployedContractAddress = null,
             data = encodedData,
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -1428,7 +1428,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress!!,
             deployedContractAddress = null,
             data = encodedData,
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true
@@ -1517,7 +1517,7 @@ class AssetSendRequestServiceTest : TestBase() {
             to = sendRequest.tokenAddress!!,
             deployedContractAddress = null,
             data = encodedData,
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true

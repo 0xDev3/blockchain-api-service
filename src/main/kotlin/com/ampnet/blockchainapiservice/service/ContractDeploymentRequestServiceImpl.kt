@@ -13,13 +13,13 @@ import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
-import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithTransactionData
+import com.ampnet.blockchainapiservice.util.ZeroAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -156,23 +156,9 @@ class ContractDeploymentRequestServiceImpl(
     ): Boolean =
         transactionInfo.success &&
             transactionInfo.hashMatches(txHash) &&
-            transactionInfo.deployerAddressMatches(deployerAddress) &&
-            transactionInfo.contractAddressMatches(contractAddress) &&
+            transactionInfo.fromAddressOptionallyMatches(deployerAddress) &&
+            transactionInfo.toAddressMatches(ZeroAddress) &&
+            transactionInfo.deployedContractAddressMatches(contractAddress) &&
             transactionInfo.dataMatches(FunctionData(contractData.value)) &&
             transactionInfo.valueMatches(initialEthAmount)
-
-    private fun BlockchainTransactionInfo.hashMatches(expectedHash: TransactionHash?): Boolean =
-        hash == expectedHash
-
-    private fun BlockchainTransactionInfo.deployerAddressMatches(deployerAddress: WalletAddress?): Boolean =
-        deployerAddress == null || from == deployerAddress
-
-    private fun BlockchainTransactionInfo.contractAddressMatches(contractAddress: ContractAddress?): Boolean =
-        deployedContractAddress != null && contractAddress == deployedContractAddress
-
-    private fun BlockchainTransactionInfo.dataMatches(expectedData: FunctionData): Boolean =
-        data == expectedData
-
-    private fun BlockchainTransactionInfo.valueMatches(expectedValue: Balance): Boolean =
-        value == expectedValue
 }

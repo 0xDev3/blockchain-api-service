@@ -7,11 +7,6 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
@@ -125,11 +120,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.deleteFrom(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST).execute()
-        dslContext.deleteFrom(ContractMetadataTable.CONTRACT_METADATA).execute()
-        dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
-        dslContext.deleteFrom(ProjectTable.PROJECT).execute()
-        dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
 
         dslContext.executeInsert(
             ContractMetadataRecord(
@@ -175,7 +166,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val deployerAddress = WalletAddress("b")
-        val initialEthAmount = Balance(BigInteger.ZERO)
+        val initialEthAmount = Balance.ZERO
 
         suppose("some contract decorator exists in the database") {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
@@ -300,7 +291,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val deployerAddress = WalletAddress("b")
-        val initialEthAmount = Balance(BigInteger.ZERO)
+        val initialEthAmount = Balance.ZERO
         val redirectUrl = "https://custom-url/\${id}"
 
         suppose("some contract decorator exists in the database") {
@@ -427,7 +418,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val deployerAddress = WalletAddress("b")
-        val initialEthAmount = Balance(BigInteger.ZERO)
+        val initialEthAmount = Balance.ZERO
 
         verify("404 is returned for non-existent contract decorator") {
             val response = mockMvc.perform(
@@ -470,7 +461,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val deployerAddress = WalletAddress("b")
-        val initialEthAmount = Balance(BigInteger.ZERO)
+        val initialEthAmount = Balance.ZERO
 
         verify("401 is returned for invalid API key") {
             val response = mockMvc.perform(
@@ -514,7 +505,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
         val deployerAddress = WalletAddress(mainAccount.address)
-        val initialEthAmount = Balance(BigInteger.ZERO)
+        val initialEthAmount = Balance.ZERO
 
         suppose("some contract decorator exists in the database") {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
@@ -569,11 +560,11 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 ownerAddress.rawValue
-            ).sendAndMine()
+            ).send()
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
@@ -646,7 +637,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
         val deployerAddress = WalletAddress(mainAccount.address)
-        val initialEthAmount = Balance(BigInteger.ZERO)
+        val initialEthAmount = Balance.ZERO
 
         suppose("some contract decorator exists in the database") {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
@@ -705,11 +696,11 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 ownerAddress.rawValue
-            ).sendAndMine()
+            ).send()
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
@@ -795,7 +786,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
         val deployerAddress = WalletAddress(mainAccount.address)
-        val initialEthAmount = Balance(BigInteger.ZERO)
+        val initialEthAmount = Balance.ZERO
 
         suppose("some contract decorator exists in the database") {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
@@ -850,11 +841,11 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 ownerAddress.rawValue
-            ).sendAndMine()
+            ).send()
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
@@ -937,7 +928,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
         val deployerAddress = WalletAddress(mainAccount.address)
-        val initialEthAmount = Balance(BigInteger.ZERO)
+        val initialEthAmount = Balance.ZERO
 
         suppose("some contract decorator exists in the database") {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
@@ -996,11 +987,11 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 ownerAddress.rawValue
-            ).sendAndMine()
+            ).send()
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)

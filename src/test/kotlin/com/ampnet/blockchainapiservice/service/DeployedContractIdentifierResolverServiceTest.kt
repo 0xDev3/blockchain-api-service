@@ -55,7 +55,7 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
             constructorParams = TestData.EMPTY_JSON_ARRAY,
             contractTags = emptyList(),
             contractImplements = emptyList(),
-            initialEthAmount = Balance(BigInteger.ZERO),
+            initialEthAmount = Balance.ZERO,
             chainId = ChainId(1337L),
             redirectUrl = "redirect-url",
             projectId = PROJECT.id,

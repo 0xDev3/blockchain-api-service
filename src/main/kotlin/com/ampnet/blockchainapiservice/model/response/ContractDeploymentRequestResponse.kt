@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.model.response
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
 import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WithTransactionData
 import com.ampnet.blockchainapiservice.util.ZeroAddress
@@ -56,14 +57,11 @@ data class ContractDeploymentRequestResponse(
         screenConfig = contractDeploymentRequest.screenConfig.orEmpty(),
         contractAddress = contractDeploymentRequest.contractAddress?.rawValue,
         deployerAddress = contractDeploymentRequest.deployerAddress?.rawValue,
-        deployTx = TransactionResponse(
-            txHash = null,
-            from = contractDeploymentRequest.deployerAddress?.rawValue,
-            to = ZeroAddress.rawValue,
-            data = contractDeploymentRequest.contractData.withPrefix,
-            value = contractDeploymentRequest.initialEthAmount.rawValue,
-            blockConfirmations = null,
-            timestamp = null
+        deployTx = TransactionResponse.unmined(
+            from = contractDeploymentRequest.deployerAddress,
+            to = ZeroAddress,
+            data = FunctionData(contractDeploymentRequest.contractData.value),
+            value = contractDeploymentRequest.initialEthAmount
         )
     )
 
@@ -85,15 +83,7 @@ data class ContractDeploymentRequestResponse(
         screenConfig = contractDeploymentRequest.value.screenConfig.orEmpty(),
         contractAddress = contractDeploymentRequest.value.contractAddress?.rawValue,
         deployerAddress = contractDeploymentRequest.value.deployerAddress?.rawValue,
-        deployTx = TransactionResponse(
-            txHash = contractDeploymentRequest.transactionData.txHash?.value,
-            from = contractDeploymentRequest.transactionData.fromAddress?.rawValue,
-            to = contractDeploymentRequest.transactionData.toAddress.rawValue,
-            data = contractDeploymentRequest.transactionData.data?.value,
-            value = contractDeploymentRequest.transactionData.value?.rawValue,
-            blockConfirmations = contractDeploymentRequest.transactionData.blockConfirmations,
-            timestamp = contractDeploymentRequest.transactionData.timestamp?.value
-        )
+        deployTx = TransactionResponse(contractDeploymentRequest.transactionData)
     )
 
     @Suppress("unused") // used for JSON schema generation

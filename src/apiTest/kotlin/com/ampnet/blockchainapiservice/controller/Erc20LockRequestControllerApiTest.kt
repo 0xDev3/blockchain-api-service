@@ -7,10 +7,6 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20LockRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -28,6 +24,7 @@ import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.DurationSeconds
+import com.ampnet.blockchainapiservice.util.EthereumAddress
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -71,10 +68,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.deleteFrom(Erc20LockRequestTable.ERC20_LOCK_REQUEST).execute()
-        dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
-        dslContext.deleteFrom(ProjectTable.PROJECT).execute()
-        dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
 
         dslContext.executeInsert(
             UserIdentifierRecord(
@@ -169,7 +163,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.lockTx.data,
-                            value = null,
+                            value = BigInteger.ZERO,
                             blockConfirmations = null,
                             timestamp = null
                         ),
@@ -276,7 +270,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = tokenAddress.rawValue,
                             data = response.lockTx.data,
-                            value = null,
+                            value = BigInteger.ZERO,
                             blockConfirmations = null,
                             timestamp = null
                         ),
@@ -366,7 +360,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress("a")
@@ -406,18 +400,17 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some token lock transaction is made") {
-            lockContract.lockAndMine(
+            lockContract.lock(
                 tokenAddress = tokenAddress,
                 amount = amount,
                 lockDuration = lockDuration,
                 info = createResponse.id.toString(),
                 unlockPrivilegeWallet = ZeroAddress
-            )
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            )?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to ERC20 lock request") {
@@ -459,7 +452,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = lockContractAddress.rawValue,
                             data = createResponse.lockTx.data,
-                            value = null,
+                            value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
                             timestamp = fetchResponse.lockTx.timestamp
                         ),
@@ -485,7 +478,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress("a")
@@ -529,18 +522,17 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some token lock transaction is made") {
-            lockContract.lockAndMine(
+            lockContract.lock(
                 tokenAddress = tokenAddress,
                 amount = amount,
                 lockDuration = lockDuration,
                 info = createResponse.id.toString(),
                 unlockPrivilegeWallet = ZeroAddress
-            )
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            )?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to ERC20 lock request") {
@@ -581,7 +573,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             from = senderAddress.rawValue,
                             to = lockContractAddress.rawValue,
                             data = createResponse.lockTx.data,
-                            value = null,
+                            value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
                             timestamp = fetchResponse.lockTx.timestamp
                         ),
@@ -607,7 +599,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress("a")
@@ -647,18 +639,17 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some token lock transaction is made") {
-            lockContract.lockAndMine(
+            lockContract.lock(
                 tokenAddress = tokenAddress,
                 amount = amount,
                 lockDuration = lockDuration,
                 info = createResponse.id.toString(),
                 unlockPrivilegeWallet = ZeroAddress
-            )
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            )?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to ERC20 lock request") {
@@ -703,7 +694,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     from = senderAddress.rawValue,
                                     to = lockContractAddress.rawValue,
                                     data = createResponse.lockTx.data,
-                                    value = null,
+                                    value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].lockTx.timestamp
                                 ),
@@ -731,7 +722,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress("a")
@@ -775,18 +766,17 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("some token lock transaction is made") {
-            lockContract.lockAndMine(
+            lockContract.lock(
                 tokenAddress = tokenAddress,
                 amount = amount,
                 lockDuration = lockDuration,
                 info = createResponse.id.toString(),
                 unlockPrivilegeWallet = ZeroAddress
-            )
-                ?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            )?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to ERC20 lock request") {
@@ -829,7 +819,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     from = senderAddress.rawValue,
                                     to = lockContractAddress.rawValue,
                                     data = createResponse.lockTx.data,
-                                    value = null,
+                                    value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].lockTx.timestamp
                                 ),
@@ -1000,4 +990,12 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
 
         return Triple(projectId, chainId, apiKey)
     }
+
+    private fun SimpleLockManager.lock(
+        tokenAddress: ContractAddress,
+        amount: Balance,
+        lockDuration: DurationSeconds,
+        info: String,
+        unlockPrivilegeWallet: EthereumAddress
+    ) = lock(tokenAddress.rawValue, amount.rawValue, lockDuration.rawValue, info, unlockPrivilegeWallet.rawValue).send()
 }
