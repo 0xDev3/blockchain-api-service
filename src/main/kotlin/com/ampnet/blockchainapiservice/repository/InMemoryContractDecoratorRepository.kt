@@ -20,6 +20,7 @@ class InMemoryContractDecoratorRepository : ContractDecoratorRepository {
     private val storage = ConcurrentHashMap<ContractId, ContractDecorator>()
     private val manifestJsonStorage = ConcurrentHashMap<ContractId, ManifestJson>()
     private val artifactJsonStorage = ConcurrentHashMap<ContractId, ArtifactJson>()
+    private val infoMarkdownStorage = ConcurrentHashMap<ContractId, String>()
 
     override fun store(contractDecorator: ContractDecorator): ContractDecorator {
         logger.info { "Storing contract decorator with ID: ${contractDecorator.id}" }
@@ -39,10 +40,17 @@ class InMemoryContractDecoratorRepository : ContractDecoratorRepository {
         return artifactJson
     }
 
+    override fun store(id: ContractId, infoMd: String): String {
+        logger.info { "Storing contract info.md with ID: $id" }
+        infoMarkdownStorage[id] = infoMd
+        return infoMd
+    }
+
     override fun delete(id: ContractId): Boolean {
         logger.info { "Deleting contract decorator with ID: $id" }
         manifestJsonStorage.remove(id)
         artifactJsonStorage.remove(id)
+        infoMarkdownStorage.remove(id)
         return storage.remove(id) != null
     }
 
@@ -61,6 +69,11 @@ class InMemoryContractDecoratorRepository : ContractDecoratorRepository {
         return artifactJsonStorage[id]
     }
 
+    override fun getInfoMarkdownById(id: ContractId): String? {
+        logger.debug { "Get contract info.md by ID: $id" }
+        return infoMarkdownStorage[id]
+    }
+
     override fun getAll(filters: ContractDecoratorFilters): List<ContractDecorator> {
         logger.debug { "Get all contract decorators, filters: $filters" }
         return storage.values
@@ -77,6 +90,11 @@ class InMemoryContractDecoratorRepository : ContractDecoratorRepository {
     override fun getAllArtifactJsonFiles(filters: ContractDecoratorFilters): List<ArtifactJson> {
         logger.debug { "Get all contract artifact.json files, filters: $filters" }
         return getAll(filters).mapNotNull { artifactJsonStorage[it.id] }
+    }
+
+    override fun getAllInfoMarkdownFiles(filters: ContractDecoratorFilters): List<String> {
+        logger.debug { "Get all contract info.md files, filters: $filters" }
+        return getAll(filters).mapNotNull { infoMarkdownStorage[it.id] }
     }
 
     private fun <T> Collection<ContractDecorator>.filterBy(

@@ -93,6 +93,24 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyStoreAndThenGetContractInfoMarkdownById() {
+        val repository = InMemoryContractDecoratorRepository()
+        val infoMd = "info-md"
+        val id = ContractId("test")
+
+        val storedInfoMd = suppose("some contract info.md is stored") {
+            repository.store(id, infoMd)
+        }
+
+        verify("correct contract info.md is returned") {
+            assertThat(storedInfoMd).withMessage()
+                .isEqualTo(infoMd)
+            assertThat(repository.getInfoMarkdownById(id)).withMessage()
+                .isEqualTo(infoMd)
+        }
+    }
+
+    @Test
     fun mustCorrectlyDeleteContractDecoratorAndThenReturnNullWhenGettingById() {
         val repository = InMemoryContractDecoratorRepository()
         val decorator = ContractDecorator(
@@ -150,6 +168,17 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
                 .isEqualTo(artifactJson)
         }
 
+        val infoMd = "info-md"
+
+        suppose("some contract info.md is stored") {
+            repository.store(decorator.id, infoMd)
+        }
+
+        verify("correct contract info.md is returned") {
+            assertThat(repository.getInfoMarkdownById(decorator.id)).withMessage()
+                .isEqualTo(infoMd)
+        }
+
         suppose("contract decorator is deleted") {
             repository.delete(decorator.id)
         }
@@ -160,6 +189,8 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
             assertThat(repository.getManifestJsonById(decorator.id)).withMessage()
                 .isNull()
             assertThat(repository.getArtifactJsonById(decorator.id)).withMessage()
+                .isNull()
+            assertThat(repository.getInfoMarkdownById(decorator.id)).withMessage()
                 .isNull()
         }
     }
@@ -426,6 +457,96 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
     }
 
+    @Test
+    fun mustCorrectlyGetAllContractInfoMarkdownsWithSomeTagFilters() {
+        val matching = listOf(
+            decoratorAndInfoMd(tags = listOf(ContractTag("1"), ContractTag("2"))),
+            decoratorAndInfoMd(tags = listOf(ContractTag("3"))),
+            decoratorAndInfoMd(tags = listOf(ContractTag("1"), ContractTag("2"), ContractTag("3"))),
+            decoratorAndInfoMd(tags = listOf(ContractTag("1"), ContractTag("2"), ContractTag("extra"))),
+            decoratorAndInfoMd(tags = listOf(ContractTag("3"), ContractTag("extra"))),
+            decoratorAndInfoMd(
+                tags = listOf(ContractTag("1"), ContractTag("2"), ContractTag("3"), ContractTag("extra"))
+            )
+        )
+        val nonMatching = listOf(
+            decoratorAndInfoMd(tags = listOf(ContractTag("1"))),
+            decoratorAndInfoMd(tags = listOf(ContractTag("2"))),
+            decoratorAndInfoMd(tags = listOf(ContractTag("extra")))
+        )
+        val all = matching + nonMatching
+
+        val repository = InMemoryContractDecoratorRepository()
+
+        suppose("some contract decorators and info.md files are stored") {
+            all.forEach {
+                repository.store(it.first)
+                repository.store(it.first.id, it.second)
+            }
+        }
+
+        val filters = ContractDecoratorFilters(
+            contractTags = OrList(
+                AndList(ContractTag("1"), ContractTag("2")),
+                AndList(ContractTag("3"))
+            ),
+            contractImplements = OrList()
+        )
+
+        verify("correct contract info.md files are returned") {
+            assertThat(repository.getAllInfoMarkdownFiles(filters)).withMessage()
+                .containsExactlyInAnyOrderElementsOf(matching.map { it.second })
+            assertThat(repository.getAllInfoMarkdownFiles(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+                .containsExactlyInAnyOrderElementsOf(all.map { it.second })
+        }
+    }
+
+    @Test
+    fun mustCorrectlyGetAllContractInfoMarkdownsWithSomeImplementsFilters() {
+        val matching = listOf(
+            decoratorAndInfoMd(implements = listOf(ContractTrait("1"), ContractTrait("2"))),
+            decoratorAndInfoMd(implements = listOf(ContractTrait("3"))),
+            decoratorAndInfoMd(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("3"))),
+            decoratorAndInfoMd(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("extra"))),
+            decoratorAndInfoMd(implements = listOf(ContractTrait("3"), ContractTrait("tag"))),
+            decoratorAndInfoMd(
+                implements = listOf(
+                    ContractTrait("1"), ContractTrait("2"), ContractTrait("3"), ContractTrait("extra")
+                )
+            )
+        )
+        val nonMatching = listOf(
+            decoratorAndInfoMd(implements = listOf(ContractTrait("1"))),
+            decoratorAndInfoMd(implements = listOf(ContractTrait("2"))),
+            decoratorAndInfoMd(implements = listOf(ContractTrait("extra")))
+        )
+        val all = matching + nonMatching
+
+        val repository = InMemoryContractDecoratorRepository()
+
+        suppose("some contract info.md files are stored") {
+            all.forEach {
+                repository.store(it.first)
+                repository.store(it.first.id, it.second)
+            }
+        }
+
+        val filters = ContractDecoratorFilters(
+            contractTags = OrList(),
+            contractImplements = OrList(
+                AndList(ContractTrait("1"), ContractTrait("2")),
+                AndList(ContractTrait("3"))
+            )
+        )
+
+        verify("correct contract info.md files are returned") {
+            assertThat(repository.getAllInfoMarkdownFiles(filters)).withMessage()
+                .containsExactlyInAnyOrderElementsOf(matching.map { it.second })
+            assertThat(repository.getAllInfoMarkdownFiles(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+                .containsExactlyInAnyOrderElementsOf(all.map { it.second })
+        }
+    }
+
     private fun decorator(tags: List<ContractTag> = emptyList(), implements: List<ContractTrait> = emptyList()) =
         ContractDecorator(
             id = ContractId(UUID.randomUUID().toString()),
@@ -465,5 +586,13 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
             linkReferences = null,
             deployedLinkReferences = null
         )
+    )
+
+    private fun decoratorAndInfoMd(
+        tags: List<ContractTag> = emptyList(),
+        implements: List<ContractTrait> = emptyList()
+    ) = Pair(
+        decorator(tags, implements),
+        "info-md-${UUID.randomUUID()}"
     )
 }

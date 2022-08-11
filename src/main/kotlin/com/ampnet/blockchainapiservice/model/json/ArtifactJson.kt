@@ -27,6 +27,7 @@ data class AbiObject(
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class AbiInputOutput(
+    val components: List<AbiInputOutput>?,
     val internalType: String,
     val name: String,
     val type: String,
