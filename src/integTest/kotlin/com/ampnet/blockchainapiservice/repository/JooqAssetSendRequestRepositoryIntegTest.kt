@@ -3,16 +3,13 @@ package com.ampnet.blockchainapiservice.repository
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AssetSendRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreAssetSendRequestParams
 import com.ampnet.blockchainapiservice.model.result.AssetSendRequest
-import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
+import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -51,7 +48,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Suppress("unused")
-    private val postgresContainer = PostgresTestContainer()
+    private val postgresContainer = SharedTestContainers.postgresContainer
 
     @Autowired
     private lateinit var repository: JooqAssetSendRequestRepository
@@ -61,9 +58,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.delete(ApiKeyTable.API_KEY).execute()
-        dslContext.delete(ProjectTable.PROJECT).execute()
-        dslContext.delete(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
 
         dslContext.executeInsert(
             UserIdentifierRecord(

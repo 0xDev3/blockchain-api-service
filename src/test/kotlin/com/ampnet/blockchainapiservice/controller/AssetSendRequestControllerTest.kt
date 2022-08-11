@@ -121,7 +121,7 @@ class AssetSendRequestControllerTest : TestBase() {
                                 from = result.assetSenderAddress?.rawValue,
                                 to = result.tokenAddress!!.rawValue,
                                 data = data.value,
-                                value = null,
+                                value = BigInteger.ZERO,
                                 blockConfirmations = null,
                                 timestamp = null
                             ),
@@ -161,7 +161,7 @@ class AssetSendRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
-                value = null,
+                value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -200,7 +200,7 @@ class AssetSendRequestControllerTest : TestBase() {
                                 from = result.transactionData.fromAddress?.rawValue,
                                 to = result.transactionData.toAddress.rawValue,
                                 data = result.transactionData.data?.value,
-                                value = null,
+                                value = BigInteger.ZERO,
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = TestData.TIMESTAMP.value
                             ),
@@ -241,7 +241,7 @@ class AssetSendRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
-                value = null,
+                value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -282,7 +282,7 @@ class AssetSendRequestControllerTest : TestBase() {
                                         from = result.transactionData.fromAddress?.rawValue,
                                         to = result.transactionData.toAddress.rawValue,
                                         data = result.transactionData.data?.value,
-                                        value = null,
+                                        value = BigInteger.ZERO,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
@@ -325,7 +325,7 @@ class AssetSendRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
-                value = null,
+                value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -366,7 +366,7 @@ class AssetSendRequestControllerTest : TestBase() {
                                         from = result.transactionData.fromAddress?.rawValue,
                                         to = result.transactionData.toAddress.rawValue,
                                         data = result.transactionData.data?.value,
-                                        value = null,
+                                        value = BigInteger.ZERO,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
@@ -409,7 +409,7 @@ class AssetSendRequestControllerTest : TestBase() {
                 fromAddress = WalletAddress("b"),
                 toAddress = ContractAddress("a"),
                 data = FunctionData("data"),
-                value = null,
+                value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP
             )
@@ -450,7 +450,7 @@ class AssetSendRequestControllerTest : TestBase() {
                                         from = result.transactionData.fromAddress?.rawValue,
                                         to = result.transactionData.toAddress.rawValue,
                                         data = result.transactionData.data?.value,
-                                        value = null,
+                                        value = BigInteger.ZERO,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),

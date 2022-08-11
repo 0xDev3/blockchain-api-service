@@ -7,11 +7,6 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
@@ -63,7 +58,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
             contractId = CONTRACT_DECORATOR_ID,
             constructorParams = TestData.EMPTY_JSON_ARRAY,
             deployerAddress = null,
-            initialEthAmount = Balance(BigInteger.ZERO),
+            initialEthAmount = Balance.ZERO,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "redirect-url",
             projectId = PROJECT_ID,
@@ -83,11 +78,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.deleteFrom(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST).execute()
-        dslContext.deleteFrom(ContractMetadataTable.CONTRACT_METADATA).execute()
-        dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
-        dslContext.deleteFrom(ProjectTable.PROJECT).execute()
-        dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
 
         dslContext.executeInsert(
             ContractMetadataRecord(
@@ -137,7 +128,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val blockNumber = hardhatContainer.blockNumber()
@@ -214,7 +205,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val blockNumber = hardhatContainer.blockNumber()
@@ -291,7 +282,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 hardhatContainer.web3j,
                 mainAccount,
                 DefaultGasProvider()
-            ).sendAndMine()
+            ).send()
         }
 
         val blockNumber = hardhatContainer.blockNumber()

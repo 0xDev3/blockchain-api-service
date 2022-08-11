@@ -7,12 +7,6 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
@@ -72,7 +66,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             contractId = CONTRACT_DECORATOR_ID,
             constructorParams = TestData.EMPTY_JSON_ARRAY,
             deployerAddress = null,
-            initialEthAmount = Balance(BigInteger.ZERO),
+            initialEthAmount = Balance.ZERO,
             chainId = Chain.HARDHAT_TESTNET.id,
             redirectUrl = "redirect-url",
             projectId = PROJECT_ID,
@@ -95,12 +89,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.deleteFrom(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST).execute()
-        dslContext.deleteFrom(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST).execute()
-        dslContext.deleteFrom(ContractMetadataTable.CONTRACT_METADATA).execute()
-        dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
-        dslContext.deleteFrom(ProjectTable.PROJECT).execute()
-        dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
 
         dslContext.executeInsert(
             ContractMetadataRecord(
@@ -145,7 +134,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateContractFunctionCallRequestViaDeployedContractId() {
         val callerAddress = WalletAddress("b")
         val functionName = "setOwner"
-        val ethAmount = Balance(BigInteger.ZERO)
+        val ethAmount = Balance.ZERO
 
         val contractAddress = ContractAddress("cafebabe")
         val storedContract = suppose("some deployed contract exists in the database") {
@@ -267,7 +256,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateContractFunctionCallRequestViaDeployedContractAlias() {
         val callerAddress = WalletAddress("b")
         val functionName = "setOwner"
-        val ethAmount = Balance(BigInteger.ZERO)
+        val ethAmount = Balance.ZERO
 
         val contractAddress = ContractAddress("cafebabe")
         val storedContract = suppose("some deployed contract exists in the database") {
@@ -389,7 +378,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateContractFunctionCallRequestViaDeployedContractAddress() {
         val callerAddress = WalletAddress("b")
         val functionName = "setOwner"
-        val ethAmount = Balance(BigInteger.ZERO)
+        val ethAmount = Balance.ZERO
 
         val contractAddress = ContractAddress("cafebabe")
 
@@ -506,7 +495,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateContractFunctionCallRequestWithRedirectUrl() {
         val callerAddress = WalletAddress("b")
         val functionName = "setOwner"
-        val ethAmount = Balance(BigInteger.ZERO)
+        val ethAmount = Balance.ZERO
         val redirectUrl = "https://custom-url/\${id}"
 
         val contractAddress = ContractAddress("cafebabe")
@@ -901,13 +890,13 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 ownerAddress.rawValue
-            ).sendAndMine()
+            ).send()
         }
 
         val callerAddress = WalletAddress(mainAccount.address)
         val contractAddress = ContractAddress(contract.contractAddress)
         val functionName = "setOwner"
-        val ethAmount = Balance(BigInteger.ZERO)
+        val ethAmount = Balance.ZERO
 
         val paramsJson =
             """
@@ -953,11 +942,11 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("function is called") {
-            contract.setOwner(callerAddress.rawValue).sendAsync()?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.setOwner(callerAddress.rawValue).send()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to contract function call request") {
@@ -1032,13 +1021,13 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 ownerAddress.rawValue
-            ).sendAndMine()
+            ).send()
         }
 
         val callerAddress = WalletAddress(mainAccount.address)
         val contractAddress = ContractAddress(contract.contractAddress)
         val functionName = "setOwner"
-        val ethAmount = Balance(BigInteger.ZERO)
+        val ethAmount = Balance.ZERO
 
         val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
             insertProjectWithCustomRpcUrl()
@@ -1088,11 +1077,11 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("function is called") {
-            contract.setOwner(callerAddress.rawValue).sendAsync()?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.setOwner(callerAddress.rawValue).send()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to contract function call request") {
@@ -1180,13 +1169,13 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 ownerAddress.rawValue
-            ).sendAndMine()
+            ).send()
         }
 
         val callerAddress = WalletAddress(mainAccount.address)
         val contractAddress = ContractAddress(contract.contractAddress)
         val functionName = "setOwner"
-        val ethAmount = Balance(BigInteger.ZERO)
+        val ethAmount = Balance.ZERO
 
         val storedContract = suppose("some deployed contract exists in the database") {
             contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT).apply {
@@ -1238,11 +1227,11 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("function is called") {
-            contract.setOwner(callerAddress.rawValue).sendAsync()?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.setOwner(callerAddress.rawValue).send()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to contract function call request") {
@@ -1324,13 +1313,13 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 ownerAddress.rawValue
-            ).sendAndMine()
+            ).send()
         }
 
         val callerAddress = WalletAddress(mainAccount.address)
         val contractAddress = ContractAddress(contract.contractAddress)
         val functionName = "setOwner"
-        val ethAmount = Balance(BigInteger.ZERO)
+        val ethAmount = Balance.ZERO
 
         val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
             insertProjectWithCustomRpcUrl()
@@ -1386,11 +1375,11 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         val txHash = suppose("function is called") {
-            contract.setOwner(callerAddress.rawValue).sendAsync()?.get()?.transactionHash?.let { TransactionHash(it) }!!
+            contract.setOwner(callerAddress.rawValue).send()?.transactionHash?.let { TransactionHash(it) }!!
         }
 
         suppose("transaction will have at least one block confirmation") {
-            hardhatContainer.waitAndMine()
+            hardhatContainer.mine()
         }
 
         suppose("transaction info is attached to contract function call request") {

@@ -7,10 +7,7 @@ import com.ampnet.blockchainapiservice.blockchain.properties.Chain
 import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -73,10 +70,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.deleteFrom(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST).execute()
-        dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
-        dslContext.deleteFrom(ProjectTable.PROJECT).execute()
-        dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
 
         dslContext.executeInsert(
             UserIdentifierRecord(
@@ -493,7 +487,6 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "asset_type": "TOKEN",
                                 "asset_type" : "TOKEN",
                                 "block_number": "${blockNumber.value}",
                                 "wallet_address": "${walletAddress.rawValue}",
@@ -590,7 +583,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyFetchAssetBalanceRequestForSomeToken() {
         val mainAccount = accounts[0]
         val walletAddress = WalletAddress("0x865f603F42ca1231e5B5F90e15663b0FE19F0b21")
-        val assetbalance = Balance(BigInteger("10000"))
+        val assetBalance = Balance(BigInteger("10000"))
 
         val contract = suppose("simple asset contract is deployed") {
             SimpleERC20.deploy(
@@ -598,9 +591,9 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 listOf(walletAddress.rawValue),
-                listOf(assetbalance.rawValue),
+                listOf(assetBalance.rawValue),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -686,7 +679,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             wallet = walletAddress.rawValue,
                             blockNumber = blockNumber.value,
                             timestamp = fetchResponse.balance!!.timestamp,
-                            amount = assetbalance.rawValue
+                            amount = assetBalance.rawValue
                         ),
                         messageToSign = "Verification message ID to sign: $id",
                         signedMessage = signedMessage.value,
@@ -703,7 +696,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyFetchAssetBalanceRequestForSomeTokenWhenCustomRpcUrlIsSpecified() {
         val mainAccount = accounts[0]
         val walletAddress = WalletAddress("0x865f603F42ca1231e5B5F90e15663b0FE19F0b21")
-        val assetbalance = Balance(BigInteger("10000"))
+        val assetBalance = Balance(BigInteger("10000"))
 
         val contract = suppose("simple asset contract is deployed") {
             SimpleERC20.deploy(
@@ -711,9 +704,9 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 listOf(walletAddress.rawValue),
-                listOf(assetbalance.rawValue),
+                listOf(assetBalance.rawValue),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -801,7 +794,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             wallet = walletAddress.rawValue,
                             blockNumber = blockNumber.value,
                             timestamp = fetchResponse.balance!!.timestamp,
-                            amount = assetbalance.rawValue
+                            amount = assetBalance.rawValue
                         ),
                         messageToSign = "Verification message ID to sign: $id",
                         signedMessage = signedMessage.value,
@@ -827,7 +820,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                 walletAddress.rawValue,
                 amount.rawValue.toBigDecimal(),
                 Convert.Unit.WEI
-            ).sendAndMine()
+            ).send()
         }
 
         val blockNumber = hardhatContainer.blockNumber()
@@ -937,7 +930,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                 walletAddress.rawValue,
                 amount.rawValue.toBigDecimal(),
                 Convert.Unit.WEI
-            ).sendAndMine()
+            ).send()
         }
 
         val blockNumber = hardhatContainer.blockNumber()
@@ -1040,7 +1033,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyFetchAssetBalanceRequestsByProjectId() {
         val mainAccount = accounts[0]
         val walletAddress = WalletAddress("0x865f603F42ca1231e5B5F90e15663b0FE19F0b21")
-        val assetbalance = Balance(BigInteger("10000"))
+        val assetBalance = Balance(BigInteger("10000"))
 
         val contract = suppose("simple asset contract is deployed") {
             SimpleERC20.deploy(
@@ -1048,9 +1041,9 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 listOf(walletAddress.rawValue),
-                listOf(assetbalance.rawValue),
+                listOf(assetBalance.rawValue),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -1138,7 +1131,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                                     wallet = walletAddress.rawValue,
                                     blockNumber = blockNumber.value,
                                     timestamp = fetchResponse.requests[0].balance!!.timestamp,
-                                    amount = assetbalance.rawValue
+                                    amount = assetBalance.rawValue
                                 ),
                                 messageToSign = "Verification message ID to sign: $id",
                                 signedMessage = signedMessage.value,
@@ -1157,7 +1150,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyFetchAssetBalanceRequestsByProjectIdWhenCustomRpcUrlIsSpecified() {
         val mainAccount = accounts[0]
         val walletAddress = WalletAddress("0x865f603F42ca1231e5B5F90e15663b0FE19F0b21")
-        val assetbalance = Balance(BigInteger("10000"))
+        val assetBalance = Balance(BigInteger("10000"))
 
         val contract = suppose("simple asset contract is deployed") {
             SimpleERC20.deploy(
@@ -1165,9 +1158,9 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                 mainAccount,
                 DefaultGasProvider(),
                 listOf(walletAddress.rawValue),
-                listOf(assetbalance.rawValue),
+                listOf(assetBalance.rawValue),
                 mainAccount.address
-            ).sendAndMine()
+            ).send()
         }
 
         val tokenAddress = ContractAddress(contract.contractAddress)
@@ -1257,7 +1250,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                                     wallet = walletAddress.rawValue,
                                     blockNumber = blockNumber.value,
                                     timestamp = fetchResponse.requests[0].balance!!.timestamp,
-                                    amount = assetbalance.rawValue
+                                    amount = assetBalance.rawValue
                                 ),
                                 messageToSign = "Verification message ID to sign: $id",
                                 signedMessage = signedMessage.value,

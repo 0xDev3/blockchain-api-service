@@ -226,7 +226,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 from = result.transactionData.fromAddress?.rawValue,
                                 to = result.transactionData.toAddress.rawValue,
                                 data = result.transactionData.data?.value,
-                                value = result.transactionData.value?.rawValue,
+                                value = result.transactionData.value.rawValue,
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = result.transactionData.timestamp?.value
                             )
@@ -329,7 +329,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                         from = result.transactionData.fromAddress?.rawValue,
                                         to = result.transactionData.toAddress.rawValue,
                                         data = result.transactionData.data?.value,
-                                        value = result.transactionData.value?.rawValue,
+                                        value = result.transactionData.value.rawValue,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = result.transactionData.timestamp?.value
                                     )

@@ -3,7 +3,7 @@ package com.ampnet.blockchainapiservice.repository
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
-import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
+import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
 import com.ampnet.blockchainapiservice.util.ContractTrait
@@ -23,7 +23,7 @@ import java.util.UUID
 class JooqContractMetadataRepositoryIntegTest : TestBase() {
 
     @Suppress("unused")
-    private val postgresContainer = PostgresTestContainer()
+    private val postgresContainer = SharedTestContainers.postgresContainer
 
     @Autowired
     private lateinit var repository: JooqContractMetadataRepository
@@ -33,7 +33,7 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.delete(ContractMetadataTable.CONTRACT_METADATA).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
     }
 
     @Test

@@ -2,12 +2,9 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import com.ampnet.blockchainapiservice.testcontainers.PostgresTestContainer
+import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -30,7 +27,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
     }
 
     @Suppress("unused")
-    private val postgresContainer = PostgresTestContainer()
+    private val postgresContainer = SharedTestContainers.postgresContainer
 
     @Autowired
     private lateinit var repository: JooqUserIdentifierRepository
@@ -40,9 +37,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
     @BeforeEach
     fun beforeEach() {
-        dslContext.delete(ApiKeyTable.API_KEY).execute()
-        dslContext.delete(ProjectTable.PROJECT).execute()
-        dslContext.delete(UserIdentifierTable.USER_IDENTIFIER).execute()
+        postgresContainer.cleanAllDatabaseTables(dslContext)
     }
 
     @Test

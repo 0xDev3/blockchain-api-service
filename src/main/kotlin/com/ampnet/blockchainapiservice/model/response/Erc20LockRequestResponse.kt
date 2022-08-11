@@ -2,6 +2,7 @@ package com.ampnet.blockchainapiservice.model.response
 
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
+import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WithFunctionData
 import com.ampnet.blockchainapiservice.util.WithTransactionData
@@ -45,14 +46,11 @@ data class Erc20LockRequestResponse(
         arbitraryData = lockRequest.value.arbitraryData,
         screenConfig = lockRequest.value.screenConfig.orEmpty(),
         redirectUrl = lockRequest.value.redirectUrl,
-        lockTx = TransactionResponse(
-            txHash = null,
-            from = lockRequest.value.tokenSenderAddress?.rawValue,
-            to = lockRequest.value.tokenAddress.rawValue,
-            data = lockRequest.data.value,
-            value = null,
-            blockConfirmations = null,
-            timestamp = null
+        lockTx = TransactionResponse.unmined(
+            from = lockRequest.value.tokenSenderAddress,
+            to = lockRequest.value.tokenAddress,
+            data = lockRequest.data,
+            value = Balance.ZERO
         ),
         createdAt = lockRequest.value.createdAt.value
     )
@@ -71,15 +69,7 @@ data class Erc20LockRequestResponse(
         arbitraryData = lockRequest.value.arbitraryData,
         screenConfig = lockRequest.value.screenConfig.orEmpty(),
         redirectUrl = lockRequest.value.redirectUrl,
-        lockTx = TransactionResponse(
-            txHash = lockRequest.transactionData.txHash?.value,
-            from = lockRequest.transactionData.fromAddress?.rawValue,
-            to = lockRequest.transactionData.toAddress.rawValue,
-            data = lockRequest.transactionData.data?.value,
-            value = null,
-            blockConfirmations = lockRequest.transactionData.blockConfirmations,
-            timestamp = lockRequest.transactionData.timestamp?.value
-        ),
+        lockTx = TransactionResponse(lockRequest.transactionData),
         createdAt = lockRequest.value.createdAt.value
     )
 }
