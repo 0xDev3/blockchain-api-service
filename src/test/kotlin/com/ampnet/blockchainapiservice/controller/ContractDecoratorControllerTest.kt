@@ -122,6 +122,7 @@ class ContractDecoratorControllerTest : TestBase() {
     fun mustCorrectlyFetchContractManifestJsonsWithFilters() {
         val repository = mock<ContractDecoratorRepository>()
         val result = ManifestJson(
+            description = "description",
             tags = emptyList(),
             implements = emptyList(),
             eventDecorators = emptyList(),
@@ -321,6 +322,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val id = ContractId("example")
         val repository = mock<ContractDecoratorRepository>()
         val result = ManifestJson(
+            description = "description",
             tags = emptyList(),
             implements = emptyList(),
             eventDecorators = emptyList(),

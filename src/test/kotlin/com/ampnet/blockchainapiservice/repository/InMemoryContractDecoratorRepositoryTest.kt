@@ -46,6 +46,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     fun mustCorrectlyStoreAndThenGetContractManifestJsonById() {
         val repository = InMemoryContractDecoratorRepository()
         val manifestJson = ManifestJson(
+            description = "description",
             tags = emptyList(),
             implements = emptyList(),
             eventDecorators = emptyList(),
@@ -133,6 +134,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         val manifestJson = ManifestJson(
+            description = "description",
             tags = emptyList(),
             implements = emptyList(),
             eventDecorators = emptyList(),
@@ -564,6 +566,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     ) = Pair(
         decorator(tags, implements),
         ManifestJson(
+            description = "description",
             tags = tags.map { it.value },
             implements = implements.map { it.value },
             eventDecorators = emptyList(),
