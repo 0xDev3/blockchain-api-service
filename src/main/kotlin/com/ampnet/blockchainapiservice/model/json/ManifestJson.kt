@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class ManifestJson(
+    val description: String?,
     val tags: List<String>,
     val implements: List<String>,
     val eventDecorators: List<EventDecorator>,
