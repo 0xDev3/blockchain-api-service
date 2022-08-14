@@ -22,6 +22,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val repository = InMemoryContractDecoratorRepository()
         val decorator = ContractDecorator(
             id = ContractId("example"),
+            description = "description",
             binary = ContractBinaryData("0x0"),
             tags = emptyList(),
             implements = emptyList(),
@@ -116,6 +117,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val repository = InMemoryContractDecoratorRepository()
         val decorator = ContractDecorator(
             id = ContractId("example"),
+            description = "description",
             binary = ContractBinaryData("0x0"),
             tags = emptyList(),
             implements = emptyList(),
@@ -552,6 +554,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     private fun decorator(tags: List<ContractTag> = emptyList(), implements: List<ContractTrait> = emptyList()) =
         ContractDecorator(
             id = ContractId(UUID.randomUUID().toString()),
+            description = "description",
             binary = ContractBinaryData("0x0"),
             tags = tags,
             implements = implements,
