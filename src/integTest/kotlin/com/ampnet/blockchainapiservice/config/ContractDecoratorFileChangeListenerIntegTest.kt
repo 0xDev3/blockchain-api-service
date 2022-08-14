@@ -201,6 +201,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
+                        description = "description",
                         binary = ContractBinaryData("0x0"),
                         tags = listOf(ContractTag("tag.example")),
                         implements = listOf(ContractTrait("trait.example")),
@@ -219,6 +220,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDecorator(
                         id = anotherContractId,
+                        description = "description",
                         binary = ContractBinaryData("0x2"),
                         tags = listOf(ContractTag("tag.another")),
                         implements = listOf(ContractTrait("trait.another")),
@@ -275,6 +277,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
 
         val withoutManifestDecorator = ContractDecorator(
             id = contractWithoutManifestId,
+            description = "description",
             binary = ContractBinaryData("0x1"),
             tags = listOf(ContractTag("tag.no.manifest")),
             implements = listOf(ContractTrait("trait.no.manifest")),
@@ -287,6 +290,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             contractDecoratorRepository.store(
                 ContractDecorator(
                     id = contractWithoutArtifactId,
+                    description = "description",
                     binary = ContractBinaryData("0x4"),
                     tags = listOf(ContractTag("tag.no.artifact")),
                     implements = listOf(ContractTrait("trait.no.artifact")),
@@ -328,6 +332,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
+                        description = "description",
                         binary = ContractBinaryData("0x0"),
                         tags = listOf(ContractTag("tag.example")),
                         implements = listOf(ContractTrait("trait.example")),

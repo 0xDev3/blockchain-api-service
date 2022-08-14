@@ -1,5 +1,6 @@
 {
     "tags": ["tag.no.artifact"],
+    "description": "description",
     "implements": ["trait.no.artifact"],
     "eventDecorators": [
         {
