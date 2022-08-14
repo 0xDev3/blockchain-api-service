@@ -37,6 +37,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val repository = mock<ContractDecoratorRepository>()
         val result = ContractDecorator(
             id = ContractId("examples.exampleContract"),
+            description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
             implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
@@ -104,6 +105,7 @@ class ContractDecoratorControllerTest : TestBase() {
                             listOf(
                                 ContractDecoratorResponse(
                                     id = result.id.value,
+                                    description = result.description,
                                     binary = result.binary.value,
                                     tags = result.tags.map { it.value },
                                     implements = result.implements.map { it.value },
@@ -229,6 +231,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val repository = mock<ContractDecoratorRepository>()
         val result = ContractDecorator(
             id = ContractId("examples.exampleContract"),
+            description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
             implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
@@ -286,6 +289,7 @@ class ContractDecoratorControllerTest : TestBase() {
                     ResponseEntity.ok(
                         ContractDecoratorResponse(
                             id = result.id.value,
+                            description = result.description,
                             binary = result.binary.value,
                             tags = result.tags.map { it.value },
                             implements = result.implements.map { it.value },

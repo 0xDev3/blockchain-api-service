@@ -72,6 +72,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
         private val CONTRACT_DECORATOR = ContractDecorator(
             id = CONTRACT_ID,
+            description = "description",
             binary = ContractBinaryData("12"),
             tags = listOf(ContractTag("test-tag")),
             implements = listOf(ContractTrait("test-trait")),
