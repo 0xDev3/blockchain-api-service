@@ -66,6 +66,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         private const val API_KEY = "api-key"
         private val CONTRACT_DECORATOR = ContractDecorator(
             id = ContractId("examples.exampleContract"),
+            description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
             implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),

@@ -7,6 +7,7 @@ import com.ampnet.blockchainapiservice.util.ContractTrait
 
 data class ContractDecorator(
     val id: ContractId,
+    val description: String?,
     val binary: ContractBinaryData,
     val tags: List<ContractTag>,
     val implements: List<ContractTrait>,

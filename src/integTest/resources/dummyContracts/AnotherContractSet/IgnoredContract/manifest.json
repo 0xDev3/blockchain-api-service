@@ -1,5 +1,6 @@
 {
     "tags": ["tag.ignored"],
+    "description": "description",
     "implements": ["trait.ignored"],
     "eventDecorators": [
         {

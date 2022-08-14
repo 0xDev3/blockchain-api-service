@@ -38,6 +38,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
     companion object {
         private val CONTRACT_DECORATOR = ContractDecorator(
             id = ContractId("examples.exampleContract"),
+            description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
             implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
@@ -165,6 +166,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                         listOf(
                             ContractDecoratorResponse(
                                 id = CONTRACT_DECORATOR.id.value,
+                                description = CONTRACT_DECORATOR.description,
                                 binary = CONTRACT_DECORATOR.binary.value,
                                 tags = CONTRACT_DECORATOR.tags.map { it.value },
                                 implements = CONTRACT_DECORATOR.implements.map { it.value },
@@ -283,6 +285,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     ContractDecoratorResponse(
                         id = CONTRACT_DECORATOR.id.value,
+                        description = CONTRACT_DECORATOR.description,
                         binary = CONTRACT_DECORATOR.binary.value,
                         tags = CONTRACT_DECORATOR.tags.map { it.value },
                         implements = CONTRACT_DECORATOR.implements.map { it.value },
