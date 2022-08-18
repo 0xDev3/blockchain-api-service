@@ -7,6 +7,7 @@ import com.ampnet.blockchainapiservice.model.result.ContractFunction
 
 data class ContractDecoratorResponse(
     val id: String,
+    val name: String?,
     val description: String?,
     val binary: String,
     val tags: List<String>,
@@ -17,6 +18,7 @@ data class ContractDecoratorResponse(
 ) {
     constructor(contractDecorator: ContractDecorator) : this(
         id = contractDecorator.id.value,
+        name = contractDecorator.name,
         description = contractDecorator.description,
         binary = contractDecorator.binary.value,
         tags = contractDecorator.tags.map { it.value },
