@@ -212,7 +212,8 @@ class ContractDecoratorFileChangeListener(
                 description = it.first.description,
                 solidityName = it.second.name,
                 solidityType = it.second.type,
-                recommendedTypes = it.first.recommendedTypes
+                recommendedTypes = it.first.recommendedTypes,
+                parameters = it.first.parameters?.toContractParameters(it.second.components ?: listOf())
             )
         }
 }

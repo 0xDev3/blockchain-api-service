@@ -21,7 +21,8 @@ data class ContractParameter(
     val description: String,
     val solidityName: String,
     val solidityType: String,
-    val recommendedTypes: List<String>
+    val recommendedTypes: List<String>,
+    val parameters: List<ContractParameter>?
 )
 
 data class ContractConstructor(
