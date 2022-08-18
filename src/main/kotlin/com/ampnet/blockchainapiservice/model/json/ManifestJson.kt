@@ -17,7 +17,8 @@ data class ManifestJson(
 data class TypeDecorator(
     val name: String,
     val description: String,
-    val recommendedTypes: List<String>
+    val recommendedTypes: List<String>,
+    val parameters: List<TypeDecorator>?
 )
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)

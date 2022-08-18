@@ -49,7 +49,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             description = "Contract owner address",
                             solidityName = "owner",
                             solidityType = "address",
-                            recommendedTypes = listOf()
+                            recommendedTypes = listOf(),
+                            parameters = null
                         )
                     ),
                     description = "Main constructor",
@@ -68,7 +69,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             description = "Contract owner address",
                             solidityName = "",
                             solidityType = "address",
-                            recommendedTypes = listOf()
+                            recommendedTypes = listOf(),
+                            parameters = null
                         )
                     ),
                     emittableEvents = emptyList(),
@@ -243,7 +245,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             description = "Contract owner address",
                             solidityName = "owner",
                             solidityType = "address",
-                            recommendedTypes = listOf()
+                            recommendedTypes = listOf(),
+                            parameters = null
                         )
                     ),
                     description = "Main constructor",
@@ -262,7 +265,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             description = "Contract owner address",
                             solidityName = "",
                             solidityType = "address",
-                            recommendedTypes = listOf()
+                            recommendedTypes = listOf(),
+                            parameters = null
                         )
                     ),
                     emittableEvents = emptyList(),
