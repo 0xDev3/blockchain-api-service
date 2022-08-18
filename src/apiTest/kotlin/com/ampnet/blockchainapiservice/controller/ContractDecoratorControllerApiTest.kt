@@ -38,6 +38,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
     companion object {
         private val CONTRACT_DECORATOR = ContractDecorator(
             id = ContractId("examples.exampleContract"),
+            name = "name",
             description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
@@ -50,7 +51,8 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                             description = "Contract owner address",
                             solidityName = "owner",
                             solidityType = "address",
-                            recommendedTypes = emptyList()
+                            recommendedTypes = emptyList(),
+                            parameters = null
                         )
                     ),
                     description = "Main constructor",
@@ -69,7 +71,8 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                             description = "Contract owner address",
                             solidityName = "",
                             solidityType = "address",
-                            recommendedTypes = emptyList()
+                            recommendedTypes = emptyList(),
+                            parameters = null
                         )
                     ),
                     emittableEvents = emptyList(),
@@ -79,6 +82,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
             events = emptyList()
         )
         private val MANIFEST_JSON = ManifestJson(
+            name = "name",
             description = "description",
             tags = listOf("example", "simple"),
             implements = listOf("traits.example", "traits.exampleOwnable"),
@@ -91,7 +95,8 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                         TypeDecorator(
                             name = "Owner address",
                             description = "Contract owner address",
-                            recommendedTypes = emptyList()
+                            recommendedTypes = emptyList(),
+                            parameters = null
                         )
                     )
                 )
@@ -106,7 +111,8 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                         TypeDecorator(
                             name = "Owner address",
                             description = "Contract owner address",
-                            recommendedTypes = emptyList()
+                            recommendedTypes = emptyList(),
+                            parameters = null
                         )
                     ),
                     emittableEvents = emptyList()
@@ -166,6 +172,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                         listOf(
                             ContractDecoratorResponse(
                                 id = CONTRACT_DECORATOR.id.value,
+                                name = CONTRACT_DECORATOR.name,
                                 description = CONTRACT_DECORATOR.description,
                                 binary = CONTRACT_DECORATOR.binary.value,
                                 tags = CONTRACT_DECORATOR.tags.map { it.value },
@@ -285,6 +292,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     ContractDecoratorResponse(
                         id = CONTRACT_DECORATOR.id.value,
+                        name = CONTRACT_DECORATOR.name,
                         description = CONTRACT_DECORATOR.description,
                         binary = CONTRACT_DECORATOR.binary.value,
                         tags = CONTRACT_DECORATOR.tags.map { it.value },

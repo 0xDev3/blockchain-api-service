@@ -37,6 +37,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val repository = mock<ContractDecoratorRepository>()
         val result = ContractDecorator(
             id = ContractId("examples.exampleContract"),
+            name = "name",
             description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
@@ -107,6 +108,7 @@ class ContractDecoratorControllerTest : TestBase() {
                             listOf(
                                 ContractDecoratorResponse(
                                     id = result.id.value,
+                                    name = result.name,
                                     description = result.description,
                                     binary = result.binary.value,
                                     tags = result.tags.map { it.value },
@@ -126,6 +128,7 @@ class ContractDecoratorControllerTest : TestBase() {
     fun mustCorrectlyFetchContractManifestJsonsWithFilters() {
         val repository = mock<ContractDecoratorRepository>()
         val result = ManifestJson(
+            name = "name",
             description = "description",
             tags = emptyList(),
             implements = emptyList(),
@@ -233,6 +236,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val repository = mock<ContractDecoratorRepository>()
         val result = ContractDecorator(
             id = ContractId("examples.exampleContract"),
+            name = "name",
             description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
@@ -293,6 +297,7 @@ class ContractDecoratorControllerTest : TestBase() {
                     ResponseEntity.ok(
                         ContractDecoratorResponse(
                             id = result.id.value,
+                            name = result.name,
                             description = result.description,
                             binary = result.binary.value,
                             tags = result.tags.map { it.value },
@@ -330,6 +335,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val id = ContractId("example")
         val repository = mock<ContractDecoratorRepository>()
         val result = ManifestJson(
+            name = "name",
             description = "description",
             tags = emptyList(),
             implements = emptyList(),

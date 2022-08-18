@@ -133,6 +133,7 @@ class ContractDecoratorFileChangeListener(
 
     private fun contractDecorator(id: ContractId, artifact: ArtifactJson, manifest: ManifestJson) = ContractDecorator(
         id = id,
+        name = manifest.name,
         description = manifest.description,
         binary = ContractBinaryData(artifact.bytecode),
         tags = manifest.tags.map { ContractTag(it) },
