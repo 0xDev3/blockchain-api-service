@@ -66,6 +66,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         private const val API_KEY = "api-key"
         private val CONTRACT_DECORATOR = ContractDecorator(
             id = ContractId("examples.exampleContract"),
+            name = "name",
             description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
@@ -78,7 +79,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             description = "Contract owner address",
                             solidityName = "owner",
                             solidityType = "address",
-                            recommendedTypes = listOf()
+                            recommendedTypes = listOf(),
+                            parameters = null
                         )
                     ),
                     description = "Main constructor",
@@ -97,7 +99,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             description = "Contract owner address",
                             solidityName = "",
                             solidityType = "address",
-                            recommendedTypes = listOf()
+                            recommendedTypes = listOf(),
+                            parameters = null
                         )
                     ),
                     emittableEvents = emptyList(),
