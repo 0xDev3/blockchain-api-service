@@ -133,6 +133,7 @@ class ContractDecoratorFileChangeListener(
 
     private fun contractDecorator(id: ContractId, artifact: ArtifactJson, manifest: ManifestJson) = ContractDecorator(
         id = id,
+        name = manifest.name,
         description = manifest.description,
         binary = ContractBinaryData(artifact.bytecode),
         tags = manifest.tags.map { ContractTag(it) },
@@ -201,9 +202,12 @@ class ContractDecoratorFileChangeListener(
         this[signature] ?: throw ContractDecoratorException("Decorator signature $signature not found in artifact.json")
 
     private fun List<AbiInputOutput>.toTypeList(): String =
-        joinToString(separator = ",") { if (it.type == "tuple") it.buildStructType() else it.type }
+        joinToString(separator = ",") {
+            if (it.type.startsWith("tuple")) it.buildStructType(it.type.removePrefix("tuple")) else it.type
+        }
 
-    private fun AbiInputOutput.buildStructType(): String = "struct(${components.orEmpty().toTypeList()})"
+    private fun AbiInputOutput.buildStructType(arraySuffix: String): String =
+        "struct(${components.orEmpty().toTypeList()})$arraySuffix"
 
     private fun List<TypeDecorator>.toContractParameters(abi: List<AbiInputOutput>): List<ContractParameter> =
         zip(abi).map {
@@ -212,7 +216,8 @@ class ContractDecoratorFileChangeListener(
                 description = it.first.description,
                 solidityName = it.second.name,
                 solidityType = it.second.type,
-                recommendedTypes = it.first.recommendedTypes
+                recommendedTypes = it.first.recommendedTypes,
+                parameters = it.first.parameters?.toContractParameters(it.second.components ?: emptyList())
             )
         }
 }

@@ -1,5 +1,6 @@
 {
     "tags": ["tag.another"],
+    "name": "name",
     "description": "description",
     "implements": ["trait.another"],
     "eventDecorators": [

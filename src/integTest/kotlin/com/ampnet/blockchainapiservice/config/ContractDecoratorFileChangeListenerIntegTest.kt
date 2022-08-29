@@ -41,7 +41,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "Arg description",
                         solidityName = "arg",
                         solidityType = "address",
-                        recommendedTypes = listOf("example")
+                        recommendedTypes = listOf("example"),
+                        parameters = null
                     )
                 ),
                 description = "Constructor description",
@@ -54,7 +55,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "Arg description",
                         solidityName = "arg",
                         solidityType = "string",
-                        recommendedTypes = listOf("example")
+                        recommendedTypes = listOf("example"),
+                        parameters = null
                     )
                 ),
                 description = "Payable constructor description",
@@ -72,7 +74,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "Arg description",
                         solidityName = "arg",
                         solidityType = "address",
-                        recommendedTypes = listOf("example")
+                        recommendedTypes = listOf("example"),
+                        parameters = null
                     )
                 ),
                 outputs = listOf(
@@ -81,7 +84,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "Return value description",
                         solidityName = "",
                         solidityType = "bool",
-                        recommendedTypes = listOf("example")
+                        recommendedTypes = listOf("example"),
+                        parameters = null
                     )
                 ),
                 emittableEvents = listOf("ExampleEvent(address)"),
@@ -97,7 +101,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "Arg description",
                         solidityName = "arg",
                         solidityType = "address",
-                        recommendedTypes = listOf("example")
+                        recommendedTypes = listOf("example"),
+                        parameters = null
                     )
                 ),
                 outputs = listOf(
@@ -106,7 +111,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "Return value description",
                         solidityName = "",
                         solidityType = "bool",
-                        recommendedTypes = listOf("example")
+                        recommendedTypes = listOf("example"),
+                        parameters = null
                     )
                 ),
                 emittableEvents = listOf("ExampleEvent(address)"),
@@ -122,7 +128,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "Arg description",
                         solidityName = "arg",
                         solidityType = "address",
-                        recommendedTypes = listOf("example")
+                        recommendedTypes = listOf("example"),
+                        parameters = null
                     )
                 ),
                 outputs = listOf(
@@ -131,7 +138,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "Return value description",
                         solidityName = "",
                         solidityType = "bool",
-                        recommendedTypes = listOf("example")
+                        recommendedTypes = listOf("example"),
+                        parameters = null
                     )
                 ),
                 emittableEvents = listOf("ExampleEvent(address)"),
@@ -149,7 +157,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "Arg description",
                         solidityName = "arg",
                         solidityType = "address",
-                        recommendedTypes = listOf("example")
+                        recommendedTypes = listOf("example"),
+                        parameters = null
                     )
                 )
             )
@@ -201,6 +210,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
+                        name = "name",
                         description = "description",
                         binary = ContractBinaryData("0x0"),
                         tags = listOf(ContractTag("tag.example")),
@@ -220,6 +230,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDecorator(
                         id = anotherContractId,
+                        name = "name",
                         description = "description",
                         binary = ContractBinaryData("0x2"),
                         tags = listOf(ContractTag("tag.another")),
@@ -277,6 +288,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
 
         val withoutManifestDecorator = ContractDecorator(
             id = contractWithoutManifestId,
+            name = "name",
             description = "description",
             binary = ContractBinaryData("0x1"),
             tags = listOf(ContractTag("tag.no.manifest")),
@@ -290,6 +302,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             contractDecoratorRepository.store(
                 ContractDecorator(
                     id = contractWithoutArtifactId,
+                    name = "name",
                     description = "description",
                     binary = ContractBinaryData("0x4"),
                     tags = listOf(ContractTag("tag.no.artifact")),
@@ -332,6 +345,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
+                        name = "name",
                         description = "description",
                         binary = ContractBinaryData("0x0"),
                         tags = listOf(ContractTag("tag.example")),

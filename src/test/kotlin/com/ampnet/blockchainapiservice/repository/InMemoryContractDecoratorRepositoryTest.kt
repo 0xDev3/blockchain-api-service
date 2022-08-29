@@ -22,6 +22,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val repository = InMemoryContractDecoratorRepository()
         val decorator = ContractDecorator(
             id = ContractId("example"),
+            name = "name",
             description = "description",
             binary = ContractBinaryData("0x0"),
             tags = emptyList(),
@@ -47,6 +48,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     fun mustCorrectlyStoreAndThenGetContractManifestJsonById() {
         val repository = InMemoryContractDecoratorRepository()
         val manifestJson = ManifestJson(
+            name = "name",
             description = "description",
             tags = emptyList(),
             implements = emptyList(),
@@ -117,6 +119,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val repository = InMemoryContractDecoratorRepository()
         val decorator = ContractDecorator(
             id = ContractId("example"),
+            name = "name",
             description = "description",
             binary = ContractBinaryData("0x0"),
             tags = emptyList(),
@@ -136,6 +139,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         val manifestJson = ManifestJson(
+            name = "name",
             description = "description",
             tags = emptyList(),
             implements = emptyList(),
@@ -554,6 +558,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     private fun decorator(tags: List<ContractTag> = emptyList(), implements: List<ContractTrait> = emptyList()) =
         ContractDecorator(
             id = ContractId(UUID.randomUUID().toString()),
+            name = "name",
             description = "description",
             binary = ContractBinaryData("0x0"),
             tags = tags,
@@ -569,6 +574,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     ) = Pair(
         decorator(tags, implements),
         ManifestJson(
+            name = "name",
             description = "description",
             tags = tags.map { it.value },
             implements = implements.map { it.value },
