@@ -106,7 +106,8 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
         val readonlyFunctionCallResult = ReadonlyFunctionCallResult(
             blockNumber = BlockNumber(BigInteger.ONE),
             timestamp = TestData.TIMESTAMP,
-            returnValues = listOf(BigInteger.TWO)
+            returnValues = listOf(BigInteger.TWO),
+            rawReturnValue = "0x0"
         )
 
         suppose("blockchain service will return some value for readonly function call") {

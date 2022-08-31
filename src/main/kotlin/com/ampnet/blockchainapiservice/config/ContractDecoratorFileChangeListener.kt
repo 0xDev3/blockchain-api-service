@@ -145,12 +145,12 @@ class ContractDecoratorFileChangeListener(
 
     private fun decorateConstructors(artifact: ArtifactJson, manifest: ManifestJson): List<ContractConstructor> {
         val constructors = artifact.abi.filter { it.type == "constructor" }
-            .associateBy { "constructor(${it.inputs.toTypeList()})" }
+            .associateBy { "constructor(${it.inputs.orEmpty().toTypeList()})" }
         return manifest.constructorDecorators.map {
             val artifactConstructor = constructors.getAbiObjectBySignature(it.signature)
 
             ContractConstructor(
-                inputs = it.parameterDecorators.toContractParameters(artifactConstructor.inputs),
+                inputs = it.parameterDecorators.toContractParameters(artifactConstructor.inputs.orEmpty()),
                 description = it.description,
                 payable = artifactConstructor.stateMutability == "payable"
             )
@@ -159,7 +159,7 @@ class ContractDecoratorFileChangeListener(
 
     private fun decorateFunctions(artifact: ArtifactJson, manifest: ManifestJson): List<ContractFunction> {
         val functions = artifact.abi.filter { it.type == "function" }
-            .associateBy { "${it.name}(${it.inputs.toTypeList()})" }
+            .associateBy { "${it.name}(${it.inputs.orEmpty().toTypeList()})" }
         return manifest.functionDecorators.map {
             val artifactFunction = functions.getAbiObjectBySignature(it.signature)
 
@@ -169,7 +169,7 @@ class ContractDecoratorFileChangeListener(
                 solidityName = artifactFunction.name ?: throw ContractDecoratorException(
                     "Function ${it.signature} is missing function name in artifact.json"
                 ),
-                inputs = it.parameterDecorators.toContractParameters(artifactFunction.inputs),
+                inputs = it.parameterDecorators.toContractParameters(artifactFunction.inputs.orEmpty()),
                 outputs = it.returnDecorators.toContractParameters(
                     artifactFunction.outputs ?: throw ContractDecoratorException(
                         "Function ${it.signature} is missing is missing outputs in artifact.json"
@@ -183,7 +183,7 @@ class ContractDecoratorFileChangeListener(
 
     private fun decorateEvents(artifact: ArtifactJson, manifest: ManifestJson): List<ContractEvent> {
         val events = artifact.abi.filter { it.type == "event" }
-            .associateBy { "${it.name}(${it.inputs.toTypeList()})" }
+            .associateBy { "${it.name}(${it.inputs.orEmpty().toTypeList()})" }
         return manifest.eventDecorators.map {
             val artifactEvent = events.getAbiObjectBySignature(it.signature)
 
@@ -193,7 +193,7 @@ class ContractDecoratorFileChangeListener(
                 solidityName = artifactEvent.name ?: throw ContractDecoratorException(
                     "Event ${it.signature} is missing event name in artifact.json"
                 ),
-                inputs = it.parameterDecorators.toContractParameters(artifactEvent.inputs)
+                inputs = it.parameterDecorators.toContractParameters(artifactEvent.inputs.orEmpty())
             )
         }
     }

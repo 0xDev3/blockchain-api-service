@@ -93,6 +93,10 @@
                     "indexed": true
                 }
             ]
+        },
+        {
+            "type": "receive",
+            "stateMutability": "payable"
         }
     ]
 }

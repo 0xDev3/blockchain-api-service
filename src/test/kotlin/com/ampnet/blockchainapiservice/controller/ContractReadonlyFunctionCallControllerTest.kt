@@ -42,7 +42,8 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
             value = ReadonlyFunctionCallResult(
                 blockNumber = params.blockNumber!!,
                 timestamp = TestData.TIMESTAMP,
-                returnValues = listOf("value", 1, true)
+                returnValues = listOf("value", 1, true),
+                rawReturnValue = "0x0"
             ),
             deployedContractId = deployedContractId,
             contractAddress = ContractAddress("caebafe")
