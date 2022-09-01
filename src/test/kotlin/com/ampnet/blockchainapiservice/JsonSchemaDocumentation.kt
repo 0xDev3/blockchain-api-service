@@ -19,8 +19,10 @@ import java.nio.file.StandardOpenOption
 
 object JsonSchemaDocumentation {
 
+    private val objectMapper = JsonConfig().objectMapper()
+
     private val generator = SchemaGeneratorConfigBuilder(
-        JsonConfig().objectMapper(),
+        objectMapper,
         SchemaVersion.DRAFT_2020_12,
         OptionPreset.PLAIN_JSON
     ).apply {
@@ -51,13 +53,21 @@ object JsonSchemaDocumentation {
 
     fun createSchema(type: Type) {
         Files.createDirectories(Paths.get("build/generated-snippets"))
+
+        // TODO temporary, find a better way to do this:
+        //  changes makes List<OutputParameterSchema> into List<String | OutputParameterSchema>
+        val toReplace = "\"\$ref\":\"#/\$defs/OutputParameterSchema\""
+        val uglySchema = generator.generateSchema(type).toString()
+            .replace(toReplace, "\"anyOf\":[{\"type\":\"string\"},{$toReplace}]")
+        val prettySchema = objectMapper.readTree(uglySchema).toPrettyString()
+
         Files.writeString(
             Paths.get("build/generated-snippets/${type.typeName}.adoc"),
             "[%collapsible]\n" +
                 "====\n" +
                 "[source,options=\"nowrap\"]\n" +
                 "----\n" +
-                "${generator.generateSchema(type).toPrettyString()}\n" +
+                "${prettySchema}\n" +
                 "----\n" +
                 "====\n",
             StandardOpenOption.CREATE

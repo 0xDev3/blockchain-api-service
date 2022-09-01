@@ -24,6 +24,7 @@ import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
+import com.ampnet.blockchainapiservice.util.UintType
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithDeployedContractIdAndAddress
 import org.assertj.core.api.Assertions.assertThat
@@ -54,7 +55,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
             blockNumber = null,
             functionName = "example",
             functionParams = listOf(FunctionArgument(Uint256(BigInteger.TEN))),
-            outputParams = listOf(OutputParameter("uint256")),
+            outputParams = listOf(OutputParameter(UintType)),
             callerAddress = CALLER_ADDRESS
         )
         private val ENCODED_FUNCTION_DATA = FunctionData("0x1234")
@@ -119,7 +120,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
                         callerAddress = CALLER_ADDRESS,
                         functionName = createParams.functionName,
                         functionData = ENCODED_FUNCTION_DATA,
-                        outputParams = listOf(OutputParameter("uint256"))
+                        outputParams = listOf(OutputParameter(UintType))
                     ),
                     blockParameter = BlockName.LATEST
                 )
