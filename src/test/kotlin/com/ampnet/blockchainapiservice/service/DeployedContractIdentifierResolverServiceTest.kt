@@ -50,6 +50,8 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         private val DEPLOYED_CONTRACT = ContractDeploymentRequest(
             id = DEPLOYED_CONTRACT_ID.id,
             alias = DEPLOYED_CONTRACT_ALIAS.alias,
+            name = "name",
+            description = "description",
             contractId = ContractId("cid"),
             contractData = ContractBinaryData("00"),
             constructorParams = TestData.EMPTY_JSON_ARRAY,

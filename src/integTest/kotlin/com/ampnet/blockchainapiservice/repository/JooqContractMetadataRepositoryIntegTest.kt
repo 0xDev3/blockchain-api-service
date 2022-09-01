@@ -39,12 +39,14 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyCreateContractMetadata() {
         val id = UUID.randomUUID()
+        val name = "name"
+        val description = "description"
         val contractId = ContractId("cid")
         val contractTags = listOf(ContractTag("tag"))
         val contractImplements = listOf(ContractTrait("trait"))
 
         suppose("contract metadata is stored into the database") {
-            repository.createOrUpdate(id, contractId, contractTags, contractImplements)
+            repository.createOrUpdate(id, name, description, contractId, contractTags, contractImplements)
         }
 
         verify("contract metadata is correctly stored into the database") {
@@ -56,6 +58,8 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     ContractMetadataRecord(
                         id = id,
+                        name = name,
+                        description = description,
                         contractId = contractId,
                         contractTags = contractTags.map { it.value }.toTypedArray(),
                         contractImplements = contractImplements.map { it.value }.toTypedArray()
@@ -67,20 +71,24 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyUpdateExistingContractMetadata() {
         val id = UUID.randomUUID()
+        val name = "name"
+        val description = "description"
         val contractId = ContractId("cid")
         val contractTags = listOf(ContractTag("tag"))
         val contractImplements = listOf(ContractTrait("trait"))
 
         suppose("contract metadata is stored into the database") {
-            repository.createOrUpdate(id, contractId, contractTags, contractImplements)
+            repository.createOrUpdate(id, name, description, contractId, contractTags, contractImplements)
         }
 
         val otherId = UUID.randomUUID()
+        val otherName = "name"
+        val otherDescription = "description"
         val otherTags = listOf(ContractTag("other-tag-1"), ContractTag("other-tag-2"))
         val otherImplements = listOf(ContractTrait("other-trait-1"), ContractTrait("other-trait-2"))
 
         suppose("contract metadata is stored into the database with different data") {
-            repository.createOrUpdate(otherId, contractId, otherTags, otherImplements)
+            repository.createOrUpdate(otherId, otherName, otherDescription, contractId, otherTags, otherImplements)
         }
 
         verify("contract metadata is correctly updated in the database") {
@@ -92,6 +100,8 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     ContractMetadataRecord(
                         id = id,
+                        name = name,
+                        description = description,
                         contractId = contractId,
                         contractTags = otherTags.map { it.value }.toTypedArray(),
                         contractImplements = otherImplements.map { it.value }.toTypedArray()
@@ -112,12 +122,14 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyCheckIfContractMetadataExists() {
         val id = UUID.randomUUID()
+        val name = "name"
+        val description = "description"
         val contractId = ContractId("cid")
         val contractTags = listOf(ContractTag("tag"))
         val contractImplements = listOf(ContractTrait("trait"))
 
         suppose("contract metadata is stored into the database") {
-            repository.createOrUpdate(id, contractId, contractTags, contractImplements)
+            repository.createOrUpdate(id, name, description, contractId, contractTags, contractImplements)
         }
 
         verify("contract metadata exists in the database") {

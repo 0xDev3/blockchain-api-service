@@ -62,6 +62,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         val result = ContractDeploymentRequest(
             id = UUID.randomUUID(),
             alias = params.alias,
+            name = "name",
+            description = "description",
             contractId = params.contractId,
             contractData = ContractBinaryData("00"),
             constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -118,6 +120,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                         ContractDeploymentRequestResponse(
                             id = result.id,
                             alias = params.alias,
+                            name = result.name,
+                            description = result.description,
                             status = Status.PENDING,
                             contractId = result.contractId.value,
                             contractDeploymentData = result.contractData.withPrefix,
@@ -157,6 +161,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             value = ContractDeploymentRequest(
                 id = UUID.randomUUID(),
                 alias = "alias",
+                name = "name",
+                description = "description",
                 contractId = ContractId("contract-id"),
                 contractData = ContractBinaryData("00"),
                 constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -206,6 +212,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                         ContractDeploymentRequestResponse(
                             id = result.value.id,
                             alias = result.value.alias,
+                            name = result.value.name,
+                            description = result.value.description,
                             status = result.status,
                             contractId = result.value.contractId.value,
                             contractDeploymentData = result.value.contractData.withPrefix,
@@ -245,6 +253,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             value = ContractDeploymentRequest(
                 id = UUID.randomUUID(),
                 alias = "alias",
+                name = "name",
+                description = "description",
                 contractId = ContractId("contract-id"),
                 contractData = ContractBinaryData("00"),
                 constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -309,6 +319,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 ContractDeploymentRequestResponse(
                                     id = result.value.id,
                                     alias = result.value.alias,
+                                    name = result.value.name,
+                                    description = result.value.description,
                                     status = result.status,
                                     contractId = result.value.contractId.value,
                                     contractDeploymentData = result.value.contractData.withPrefix,

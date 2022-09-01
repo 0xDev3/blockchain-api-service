@@ -105,6 +105,8 @@ class ContractDecoratorFileChangeListener(
                 contractDecoratorRepository.store(decorator.id, infoMarkdown)
                 contractMetadataRepository.createOrUpdate(
                     id = uuidProvider.getUuid(),
+                    name = decorator.name,
+                    description = decorator.description,
                     contractId = decorator.id,
                     contractTags = decorator.tags,
                     contractImplements = decorator.implements

@@ -8,6 +8,8 @@ import java.util.UUID
 interface ContractMetadataRepository {
     fun createOrUpdate(
         id: UUID,
+        name: String?,
+        description: String?,
         contractId: ContractId,
         contractTags: List<ContractTag>,
         contractImplements: List<ContractTrait>

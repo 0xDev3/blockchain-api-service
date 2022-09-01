@@ -187,7 +187,9 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                         contractAddress = contractAddress.rawValue,
                         blockNumber = blockNumber.value,
                         timestamp = response.timestamp,
-                        returnValues = listOf(value.toString())
+                        outputParams = response.outputParams,
+                        returnValues = listOf(value.toString()),
+                        rawReturnValue = response.rawReturnValue
                     )
                 )
 
@@ -264,7 +266,9 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                         contractAddress = contractAddress.rawValue,
                         blockNumber = blockNumber.value,
                         timestamp = response.timestamp,
-                        returnValues = listOf(value.toString())
+                        outputParams = response.outputParams,
+                        returnValues = listOf(value.toString()),
+                        rawReturnValue = response.rawReturnValue
                     )
                 )
 
@@ -334,7 +338,9 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                         contractAddress = contractAddress.rawValue,
                         blockNumber = blockNumber.value,
                         timestamp = response.timestamp,
-                        returnValues = listOf(value.toString())
+                        outputParams = response.outputParams,
+                        returnValues = listOf(value.toString()),
+                        rawReturnValue = response.rawReturnValue
                     )
                 )
 
