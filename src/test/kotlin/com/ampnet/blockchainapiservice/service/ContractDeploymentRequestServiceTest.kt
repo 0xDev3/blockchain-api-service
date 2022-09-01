@@ -103,6 +103,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         private val STORED_REQUEST = ContractDeploymentRequest(
             id = ID,
             alias = STORE_PARAMS.alias,
+            name = CONTRACT_DECORATOR.name,
+            description = CONTRACT_DECORATOR.description,
             contractId = CONTRACT_ID,
             contractData = STORE_PARAMS.contractData,
             constructorParams = TestData.EMPTY_JSON_ARRAY,

@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
+import com.ampnet.blockchainapiservice.config.JsonConfig
 import com.ampnet.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import com.ampnet.blockchainapiservice.model.params.OutputParameter
@@ -71,7 +72,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
                 .willReturn(result)
         }
 
-        val controller = ContractReadonlyFunctionCallController(service)
+        val controller = ContractReadonlyFunctionCallController(service, JsonConfig().objectMapper())
 
         verify("controller returns correct response") {
             val request = ReadonlyFunctionCallRequest(
@@ -97,7 +98,9 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
                             contractAddress = result.contractAddress.rawValue,
                             blockNumber = result.value.blockNumber.value,
                             timestamp = result.value.timestamp.value,
-                            returnValues = result.value.returnValues.map { it.toString() }
+                            outputParams = response.body!!.outputParams,
+                            returnValues = result.value.returnValues.map { it.toString() },
+                            rawReturnValue = result.value.rawReturnValue
                         )
                     )
                 )

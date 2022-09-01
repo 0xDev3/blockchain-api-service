@@ -22,6 +22,8 @@ import java.util.UUID
 data class ContractDeploymentRequest(
     val id: UUID,
     val alias: String,
+    val name: String?,
+    val description: String?,
     val contractId: ContractId,
     val contractData: ContractBinaryData,
     val constructorParams: JsonNode,
