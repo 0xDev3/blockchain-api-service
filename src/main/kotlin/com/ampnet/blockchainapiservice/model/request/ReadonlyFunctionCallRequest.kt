@@ -6,6 +6,7 @@ import com.ampnet.blockchainapiservice.config.validation.ValidEthAddress
 import com.ampnet.blockchainapiservice.config.validation.ValidUint256
 import com.ampnet.blockchainapiservice.model.params.DeployedContractIdentifierRequestBody
 import com.ampnet.blockchainapiservice.model.params.OutputParameter
+import com.ampnet.blockchainapiservice.model.params.OutputParameterSchema
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
 import com.ampnet.blockchainapiservice.util.annotation.SchemaName
@@ -42,5 +43,5 @@ data class ReadonlyFunctionCallRequest(
     @Suppress("unused") // used for JSON schema generation
     @JsonIgnore
     @SchemaName("output_params")
-    private val schemaOutputParams: List<String> = emptyList()
+    private val schemaOutputStructParams: List<OutputParameterSchema> = emptyList()
 }
