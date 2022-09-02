@@ -1,10 +1,13 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.exception.AliasAlreadyInUseException
+import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.AddressBookTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IAddressBookRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
 import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
@@ -35,13 +38,13 @@ class JooqAddressBookRepository(private val dslContext: DSLContext) : AddressBoo
                         changed(true)
                         changed(AddressBookTable.ADDRESS_BOOK.ID, false)
                         changed(AddressBookTable.ADDRESS_BOOK.CREATED_AT, false)
-                        changed(AddressBookTable.ADDRESS_BOOK.PROJECT_ID, false)
+                        changed(AddressBookTable.ADDRESS_BOOK.USER_ID, false)
                     }
                 )
                 .where(
                     DSL.and(
                         AddressBookTable.ADDRESS_BOOK.ID.eq(addressBookEntry.id),
-                        AddressBookTable.ADDRESS_BOOK.PROJECT_ID.eq(addressBookEntry.projectId)
+                        AddressBookTable.ADDRESS_BOOK.USER_ID.eq(addressBookEntry.userId)
                     )
                 )
                 .returning()
@@ -63,24 +66,33 @@ class JooqAddressBookRepository(private val dslContext: DSLContext) : AddressBoo
             .fetchOne { it.toModel() }
     }
 
-    override fun getByAliasAndProjectId(alias: String, projectId: UUID): AddressBookEntry? {
-        logger.debug { "Get address book entry by alias and project ID, alias: $alias, projectId: $projectId" }
+    override fun getByAliasAndUserId(alias: String, userId: UUID): AddressBookEntry? {
+        logger.debug { "Get address book entry by alias and project ID, alias: $alias, userId: $userId" }
         return dslContext.selectFrom(AddressBookTable.ADDRESS_BOOK)
             .where(
                 DSL.and(
                     AddressBookTable.ADDRESS_BOOK.ALIAS.eq(alias),
-                    AddressBookTable.ADDRESS_BOOK.PROJECT_ID.eq(projectId)
+                    AddressBookTable.ADDRESS_BOOK.USER_ID.eq(userId)
                 )
             )
             .fetchOne { it.toModel() }
     }
 
-    override fun getAllByProjectId(projectId: UUID): List<AddressBookEntry> {
-        logger.debug { "Get address book entries by projectId: $projectId" }
-        return dslContext.selectFrom(AddressBookTable.ADDRESS_BOOK)
-            .where(AddressBookTable.ADDRESS_BOOK.PROJECT_ID.eq(projectId))
+    override fun getAllByWalletAddress(walletAddress: WalletAddress): List<AddressBookEntry> {
+        logger.debug { "Get address book entries by walletAddress: $walletAddress" }
+        return dslContext.select(AddressBookTable.ADDRESS_BOOK.fields().toList())
+            .from(
+                AddressBookTable.ADDRESS_BOOK.join(UserIdentifierTable.USER_IDENTIFIER)
+                    .on(AddressBookTable.ADDRESS_BOOK.USER_ID.eq(UserIdentifierTable.USER_IDENTIFIER.ID))
+            )
+            .where(
+                DSL.and(
+                    UserIdentifierTable.USER_IDENTIFIER.IDENTIFIER_TYPE.eq(UserIdentifierType.ETH_WALLET_ADDRESS),
+                    UserIdentifierTable.USER_IDENTIFIER.USER_IDENTIFIER_.eq(walletAddress.rawValue)
+                )
+            )
             .orderBy(AddressBookTable.ADDRESS_BOOK.CREATED_AT.asc())
-            .fetch { it.toModel() }
+            .fetch { it.into(AddressBookTable.ADDRESS_BOOK).toModel() }
     }
 
     private fun AddressBookEntry.toRecord() =
@@ -91,7 +103,7 @@ class JooqAddressBookRepository(private val dslContext: DSLContext) : AddressBoo
             phoneNumber = phoneNumber,
             email = email,
             createdAt = createdAt,
-            projectId = projectId
+            userId = userId
         )
 
     private fun IAddressBookRecord.toModel() =
@@ -102,7 +114,7 @@ class JooqAddressBookRepository(private val dslContext: DSLContext) : AddressBoo
             phoneNumber = phoneNumber,
             email = email,
             createdAt = createdAt!!,
-            projectId = projectId!!
+            userId = userId!!
         )
 
     private fun <T> handleDuplicateAlias(alias: String, fn: () -> T): T =

@@ -10,8 +10,7 @@ data class AddressBookEntryResponse(
     val address: String,
     val phoneNumber: String?,
     val email: String?,
-    val createdAt: OffsetDateTime,
-    val projectId: UUID
+    val createdAt: OffsetDateTime
 ) {
     constructor(entry: AddressBookEntry) : this(
         id = entry.id,
@@ -19,7 +18,6 @@ data class AddressBookEntryResponse(
         address = entry.address.rawValue,
         phoneNumber = entry.phoneNumber,
         email = entry.email,
-        createdAt = entry.createdAt.value,
-        projectId = entry.projectId
+        createdAt = entry.createdAt.value
     )
 }

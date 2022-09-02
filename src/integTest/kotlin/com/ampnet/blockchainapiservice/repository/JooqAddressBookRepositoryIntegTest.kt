@@ -6,13 +6,9 @@ import com.ampnet.blockchainapiservice.exception.AliasAlreadyInUseException
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IAddressBookRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
 import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
-import com.ampnet.blockchainapiservice.util.BaseUrl
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -36,8 +32,8 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         private val ADDRESS = WalletAddress("a")
         private const val PHONE_NUMBER = "phone-number"
         private const val EMAIL = "email"
-        private val PROJECT_ID = UUID.randomUUID()
         private val OWNER_ID = UUID.randomUUID()
+        private val OWNER_ADDRESS = WalletAddress("cafebabe")
     }
 
     @Suppress("unused")
@@ -56,20 +52,8 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         dslContext.executeInsert(
             UserIdentifierRecord(
                 id = OWNER_ID,
-                userIdentifier = "user-identifier",
+                userIdentifier = OWNER_ADDRESS.rawValue,
                 identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
-            )
-        )
-
-        dslContext.executeInsert(
-            ProjectRecord(
-                id = PROJECT_ID,
-                ownerId = OWNER_ID,
-                issuerContractAddress = ContractAddress("0"),
-                baseRedirectUrl = BaseUrl("base-redirect-url"),
-                chainId = ChainId(1337L),
-                customRpcUrl = "custom-rpc-url",
-                createdAt = TestData.TIMESTAMP
             )
         )
     }
@@ -83,7 +67,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             phoneNumber = PHONE_NUMBER,
             email = EMAIL,
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         suppose("some address book entry is stored in database") {
@@ -99,7 +83,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchAddressBookEntryByAliasAndProjectId() {
+    fun mustCorrectlyFetchAddressBookEntryByAliasAndUserId() {
         val record = AddressBookRecord(
             id = UUID.randomUUID(),
             alias = ALIAS,
@@ -107,15 +91,15 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             phoneNumber = PHONE_NUMBER,
             email = EMAIL,
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         suppose("some address book entry is stored in database") {
             dslContext.executeInsert(record)
         }
 
-        verify("address book entry is correctly fetched by alias and project ID") {
-            val result = repository.getByAliasAndProjectId(ALIAS, PROJECT_ID)
+        verify("address book entry is correctly fetched by alias and user ID") {
+            val result = repository.getByAliasAndUserId(ALIAS, OWNER_ID)
 
             assertThat(result).withMessage()
                 .isEqualTo(record.toModel())
@@ -123,7 +107,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchAddressBookEntriesByProjectId() {
+    fun mustCorrectlyFetchAddressBookEntriesByWalletAddress() {
         val records = listOf(
             AddressBookRecord(
                 id = UUID.randomUUID(),
@@ -132,7 +116,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
                 phoneNumber = "phone-number-1",
                 email = "email-1",
                 createdAt = TestData.TIMESTAMP,
-                projectId = PROJECT_ID
+                userId = OWNER_ID
             ),
             AddressBookRecord(
                 id = UUID.randomUUID(),
@@ -141,7 +125,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
                 phoneNumber = "phone-number-2",
                 email = "email-2",
                 createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L),
-                projectId = PROJECT_ID
+                userId = OWNER_ID
             )
         )
 
@@ -149,8 +133,8 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             dslContext.batchInsert(records).execute()
         }
 
-        verify("address book entries are correctly fetched by project ID") {
-            val result = repository.getAllByProjectId(PROJECT_ID)
+        verify("address book entries are correctly fetched by wallet address") {
+            val result = repository.getAllByWalletAddress(OWNER_ADDRESS)
 
             assertThat(result).withMessage()
                 .isEqualTo(records.map { it.toModel() })
@@ -166,7 +150,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             phoneNumber = PHONE_NUMBER,
             email = EMAIL,
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         val storedAddressBookEntry = suppose("address book entry is stored in database") {
@@ -201,7 +185,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             phoneNumber = PHONE_NUMBER,
             email = EMAIL,
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         suppose("address book entry is stored in database") {
@@ -215,7 +199,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             phoneNumber = "new-phone-number",
             email = "new-email",
             createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L),
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         val updatedNonNullAddressBookEntry = suppose("address book entry is updated in database") {
@@ -263,7 +247,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             phoneNumber = "other-phone-number",
             email = "other-email",
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         suppose("other address book entry is stored in database") {
@@ -285,6 +269,6 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             phoneNumber = phoneNumber,
             email = email,
             createdAt = createdAt!!,
-            projectId = projectId!!
+            userId = userId!!
         )
 }

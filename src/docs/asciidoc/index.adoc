@@ -70,15 +70,12 @@ include::src/docs/asciidoc/function-call/fetch.adoc[]
 include::src/docs/asciidoc/function-call/fetch-by-project-id.adoc[]
 include::src/docs/asciidoc/function-call/attach.adoc[]
 
-== Address Book API
-All endpoints are public and do not require `Authorization: Bearer JWT` header.
+== Public Address Book API
+All endpoints are public and do not require `Authorization: Bearer JWT` header. Endpoints to modify address book entries
+can be found in the internal API documentation.
 
-include::src/docs/asciidoc/address-book/create.adoc[]
-include::src/docs/asciidoc/address-book/update.adoc[]
-include::src/docs/asciidoc/address-book/delete.adoc[]
 include::src/docs/asciidoc/address-book/fetch-by-id.adoc[]
-include::src/docs/asciidoc/address-book/fetch-by-alias.adoc[]
-include::src/docs/asciidoc/address-book/fetch-by-project.adoc[]
+include::src/docs/asciidoc/address-book/fetch-by-wallet-address.adoc[]
 
 == Available Function Argument Types
 include::src/docs/asciidoc/function-arg-types.adoc[]
