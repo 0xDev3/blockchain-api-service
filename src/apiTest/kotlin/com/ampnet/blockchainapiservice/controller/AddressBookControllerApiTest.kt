@@ -2,20 +2,14 @@ package com.ampnet.blockchainapiservice.controller
 
 import com.ampnet.blockchainapiservice.ControllerTestBase
 import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.blockchain.properties.Chain
-import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.blockchainapiservice.exception.ErrorCode
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.response.AddressBookEntriesResponse
 import com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse
 import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
-import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.AddressBookRepository
-import com.ampnet.blockchainapiservice.util.BaseUrl
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.security.WithMockUser
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
@@ -31,28 +25,10 @@ import java.util.UUID
 class AddressBookControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
         private val OWNER_ID = UUID.randomUUID()
-        private val PROJECT = Project(
-            id = PROJECT_ID,
-            ownerId = OWNER_ID,
-            issuerContractAddress = ContractAddress("0"),
-            baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
-            customRpcUrl = null,
-            createdAt = TestData.TIMESTAMP
-        )
-        private const val API_KEY = "api-key"
-        private val OTHER_PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = OWNER_ID,
-            issuerContractAddress = ContractAddress("1"),
-            baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
-            customRpcUrl = null,
-            createdAt = TestData.TIMESTAMP
-        )
-        private const val OTHER_API_KEY = "other-api-key"
+        private const val OWNER_ADDRESS = "abc123"
+        private val OTHER_OWNER_ID = UUID.randomUUID()
+        private const val OTHER_OWNER_ADDRESS = "def456"
     }
 
     @Autowired
@@ -68,55 +44,22 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         dslContext.executeInsert(
             UserIdentifierRecord(
                 id = OWNER_ID,
-                userIdentifier = "user-identifier",
+                userIdentifier = WalletAddress(OWNER_ADDRESS).rawValue,
                 identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
             )
         )
 
         dslContext.executeInsert(
-            ProjectRecord(
-                id = PROJECT.id,
-                ownerId = PROJECT.ownerId,
-                issuerContractAddress = PROJECT.issuerContractAddress,
-                baseRedirectUrl = PROJECT.baseRedirectUrl,
-                chainId = PROJECT.chainId,
-                customRpcUrl = PROJECT.customRpcUrl,
-                createdAt = PROJECT.createdAt
-            )
-        )
-
-        dslContext.executeInsert(
-            ProjectRecord(
-                id = OTHER_PROJECT.id,
-                ownerId = OTHER_PROJECT.ownerId,
-                issuerContractAddress = OTHER_PROJECT.issuerContractAddress,
-                baseRedirectUrl = OTHER_PROJECT.baseRedirectUrl,
-                chainId = OTHER_PROJECT.chainId,
-                customRpcUrl = OTHER_PROJECT.customRpcUrl,
-                createdAt = OTHER_PROJECT.createdAt
-            )
-        )
-
-        dslContext.executeInsert(
-            ApiKeyRecord(
-                id = UUID.randomUUID(),
-                projectId = PROJECT_ID,
-                apiKey = API_KEY,
-                createdAt = TestData.TIMESTAMP
-            )
-        )
-
-        dslContext.executeInsert(
-            ApiKeyRecord(
-                id = UUID.randomUUID(),
-                projectId = OTHER_PROJECT.id,
-                apiKey = OTHER_API_KEY,
-                createdAt = TestData.TIMESTAMP
+            UserIdentifierRecord(
+                id = OTHER_OWNER_ID,
+                userIdentifier = WalletAddress(OTHER_OWNER_ADDRESS).rawValue,
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
             )
         )
     }
 
     @Test
+    @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyCreateAddressBookEntry() {
         val alias = "alias"
         val address = WalletAddress("abc")
@@ -126,7 +69,6 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create address book entry is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/address-book")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -154,8 +96,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                         address = address.rawValue,
                         phoneNumber = phoneNumber,
                         email = email,
-                        createdAt = response.createdAt,
-                        projectId = PROJECT_ID
+                        createdAt = response.createdAt
                     )
                 )
 
@@ -175,7 +116,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                         phoneNumber = phoneNumber,
                         email = email,
                         createdAt = UtcDateTime(response.createdAt),
-                        projectId = PROJECT_ID
+                        userId = OWNER_ID
                     )
                 )
 
@@ -185,36 +126,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn401UnauthorizedWhenCreatingAddressBookEntryWithInvalidApiKey() {
-        val alias = "alias"
-        val address = WalletAddress("abc")
-        val phoneNumber = "phone-number"
-        val email = "email"
-
-        verify("401 is returned for invalid API key") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/address-book")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                            {
-                                "alias": "$alias",
-                                "address": "${address.rawValue}",
-                                "phone_number": "$phoneNumber",
-                                "email": "$email"
-                            }
-                        """.trimIndent()
-                    )
-            )
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
-        }
-    }
-
-    @Test
+    @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyUpdateAddressBookEntry() {
         val entry = AddressBookEntry(
             id = UUID.randomUUID(),
@@ -223,7 +135,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             phoneNumber = "phone-number",
             email = "email",
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         suppose("some address book entry exists in the database") {
@@ -238,7 +150,6 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         val response = suppose("request to update address book entry is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/address-book/${entry.id}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -266,8 +177,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                         address = newAddress.rawValue,
                         phoneNumber = newPhoneNumber,
                         email = newEmail,
-                        createdAt = entry.createdAt.value,
-                        projectId = entry.projectId
+                        createdAt = entry.createdAt.value
                     )
                 )
         }
@@ -284,43 +194,14 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                         phoneNumber = newPhoneNumber,
                         email = newEmail,
                         createdAt = entry.createdAt,
-                        projectId = entry.projectId
+                        userId = entry.userId
                     )
                 )
         }
     }
 
     @Test
-    fun mustReturn401UnauthorizedWhenUpdatingAddressBookEntryWithInvalidApiKey() {
-        val alias = "alias"
-        val address = WalletAddress("abc")
-        val phoneNumber = "phone-number"
-        val email = "email"
-
-        verify("401 is returned for invalid API key") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/address-book/${UUID.randomUUID()}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        """
-                            {
-                                "alias": "$alias",
-                                "address": "${address.rawValue}",
-                                "phone_number": "$phoneNumber",
-                                "email": "$email"
-                            }
-                        """.trimIndent()
-                    )
-            )
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
-        }
-    }
-
-    @Test
+    @WithMockUser(OTHER_OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenUpdatingNonOwnedAddressBookEntry() {
         val entry = AddressBookEntry(
             id = UUID.randomUUID(),
@@ -329,7 +210,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             phoneNumber = "phone-number",
             email = "email",
             createdAt = TestData.TIMESTAMP,
-            projectId = OTHER_PROJECT.id
+            userId = OWNER_ID
         )
 
         suppose("some address book entry exists in the database") {
@@ -344,7 +225,6 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-owned address book entry") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/address-book/${entry.id}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -365,6 +245,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     }
 
     @Test
+    @WithMockUser(OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenUpdatingNonExistentAddressBookEntry() {
         val alias = "alias"
         val address = WalletAddress("abc")
@@ -374,7 +255,6 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-existent address book entry") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/address-book/${UUID.randomUUID()}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -395,6 +275,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     }
 
     @Test
+    @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyDeleteAddressBookEntry() {
         val entry = AddressBookEntry(
             id = UUID.randomUUID(),
@@ -403,7 +284,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             phoneNumber = "phone-number",
             email = "email",
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         suppose("some address book entry exists in the database") {
@@ -413,7 +294,6 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         suppose("request to delete address book entry is made") {
             mockMvc.perform(
                 MockMvcRequestBuilders.delete("/v1/address-book/${entry.id}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
         }
@@ -425,20 +305,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn401UnauthorizedWhenDeletingAddressBookEntryWithInvalidApiKey() {
-        verify("401 is returned for invalid API key") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/v1/address-book/${UUID.randomUUID()}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
-            )
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
-        }
-    }
-
-    @Test
+    @WithMockUser(OTHER_OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenDeletingNonOwnedAddressBookEntry() {
         val entry = AddressBookEntry(
             id = UUID.randomUUID(),
@@ -447,7 +314,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             phoneNumber = "phone-number",
             email = "email",
             createdAt = TestData.TIMESTAMP,
-            projectId = OTHER_PROJECT.id
+            userId = OWNER_ID
         )
 
         suppose("some address book entry exists in the database") {
@@ -457,7 +324,6 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-owned address book entry") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/v1/address-book/${entry.id}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -467,11 +333,11 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     }
 
     @Test
+    @WithMockUser(OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenDeletingNonExistentAddressBookEntry() {
         verify("404 is returned for non-existent address book entry") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/v1/address-book/${UUID.randomUUID()}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -489,7 +355,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             phoneNumber = "phone-number",
             email = "email",
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         suppose("some address book entry exists in the database") {
@@ -499,7 +365,6 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         val response = suppose("request to fetch address book entry by id is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/address-book/${entry.id}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -516,38 +381,9 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                         address = entry.address.rawValue,
                         phoneNumber = entry.phoneNumber,
                         email = entry.email,
-                        createdAt = entry.createdAt.value,
-                        projectId = entry.projectId
+                        createdAt = entry.createdAt.value
                     )
                 )
-        }
-    }
-
-    @Test
-    fun mustReturn404NotFoundWhenFetchingNonOwnedAddressBookEntryById() {
-        val entry = AddressBookEntry(
-            id = UUID.randomUUID(),
-            alias = "alias",
-            address = WalletAddress("abc"),
-            phoneNumber = "phone-number",
-            email = "email",
-            createdAt = TestData.TIMESTAMP,
-            projectId = OTHER_PROJECT.id
-        )
-
-        suppose("some address book entry exists in the database") {
-            addressBookRepository.store(entry)
-        }
-
-        verify("404 is returned for non-owned address book entry") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/address-book/${entry.id}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
-            )
-                .andExpect(MockMvcResultMatchers.status().isNotFound)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -556,7 +392,6 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-existent address book entry") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/address-book/${UUID.randomUUID()}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -566,20 +401,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn401UnauthorizedWhenFetchingAddressBookEntryWithInvalidApiKeyById() {
-        verify("401 is returned for invalid API key") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/address-book/${UUID.randomUUID()}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
-            )
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
-        }
-    }
-
-    @Test
+    @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyFetchAddressBookEntryByAlias() {
         val entry = AddressBookEntry(
             id = UUID.randomUUID(),
@@ -588,7 +410,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             phoneNumber = "phone-number",
             email = "email",
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         suppose("some address book entry exists in the database") {
@@ -598,7 +420,6 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         val response = suppose("request to fetch address book entry by alias is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/address-book/by-alias/${entry.alias}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -615,19 +436,18 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                         address = entry.address.rawValue,
                         phoneNumber = entry.phoneNumber,
                         email = entry.email,
-                        createdAt = entry.createdAt.value,
-                        projectId = entry.projectId
+                        createdAt = entry.createdAt.value
                     )
                 )
         }
     }
 
     @Test
+    @WithMockUser(OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenFetchingNonExistentAddressBookEntryByAlias() {
         verify("404 is returned for non-existent address book entry") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/address-book/by-alias/non-existent-alias")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -637,21 +457,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn401UnauthorizedWhenFetchingAddressBookEntryWithInvalidApiKeyByAlias() {
-        verify("401 is returned for invalid API key") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/address-book/by-alias/alias")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
-            )
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
-        }
-    }
-
-    @Test
-    fun mustCorrectlyFetchAddressBookEntriesForProject() {
+    fun mustCorrectlyFetchAddressBookEntriesForWalletAddress() {
         val entry = AddressBookEntry(
             id = UUID.randomUUID(),
             alias = "alias",
@@ -659,17 +465,18 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             phoneNumber = "phone-number",
             email = "email",
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT_ID
+            userId = OWNER_ID
         )
 
         suppose("some address book entry exists in the database") {
             addressBookRepository.store(entry)
         }
 
-        val response = suppose("request to fetch address book entries for project is made") {
+        val response = suppose("request to fetch address book entries for wallet address is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/address-book")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                MockMvcRequestBuilders.get(
+                    "/v1/address-book/by-wallet-address/${WalletAddress(OWNER_ADDRESS).rawValue}"
+                )
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -688,26 +495,11 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                                 address = entry.address.rawValue,
                                 phoneNumber = entry.phoneNumber,
                                 email = entry.email,
-                                createdAt = entry.createdAt.value,
-                                projectId = entry.projectId
+                                createdAt = entry.createdAt.value
                             )
                         )
                     )
                 )
-        }
-    }
-
-    @Test
-    fun mustReturn401UnauthorizedWhenFetchingAddressBookEntriesWithInvalidApiKey() {
-        verify("401 is returned for invalid API key") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/address-book")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
-            )
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 }

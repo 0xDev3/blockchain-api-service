@@ -12,13 +12,13 @@ data class AddressBookEntry(
     val phoneNumber: String?,
     val email: String?,
     val createdAt: UtcDateTime,
-    val projectId: UUID
+    val userId: UUID
 ) {
     constructor(
         id: UUID,
         createdAt: UtcDateTime,
         request: CreateOrUpdateAddressBookEntryRequest,
-        project: Project
+        userIdentifier: UserIdentifier
     ) : this(
         id = id,
         alias = request.alias,
@@ -26,6 +26,6 @@ data class AddressBookEntry(
         phoneNumber = request.phoneNumber,
         email = request.email,
         createdAt = createdAt,
-        projectId = project.id
+        userId = userIdentifier.id
     )
 }
