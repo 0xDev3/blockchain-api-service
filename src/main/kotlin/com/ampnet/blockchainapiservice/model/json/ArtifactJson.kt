@@ -18,7 +18,7 @@ data class ArtifactJson(
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class AbiObject(
     val anonymous: Boolean?,
-    val inputs: List<AbiInputOutput>,
+    val inputs: List<AbiInputOutput>?,
     val outputs: List<AbiInputOutput>?,
     val stateMutability: String?,
     val name: String?,

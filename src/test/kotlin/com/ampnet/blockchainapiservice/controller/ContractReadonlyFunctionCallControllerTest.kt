@@ -13,8 +13,11 @@ import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.service.ContractReadonlyFunctionCallService
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.BlockNumber
+import com.ampnet.blockchainapiservice.util.BoolType
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.StringType
+import com.ampnet.blockchainapiservice.util.UintType
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.WithDeployedContractIdAndAddress
 import org.assertj.core.api.Assertions
@@ -35,14 +38,19 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
             blockNumber = BlockNumber(BigInteger.TEN),
             functionName = "example",
             functionParams = emptyList(),
-            outputParams = listOf("string", "uint256", "bool").map { OutputParameter(it) },
+            outputParams = listOf(
+                OutputParameter(StringType),
+                OutputParameter(UintType),
+                OutputParameter(BoolType)
+            ),
             callerAddress = WalletAddress("a")
         )
         val result = WithDeployedContractIdAndAddress(
             value = ReadonlyFunctionCallResult(
                 blockNumber = params.blockNumber!!,
                 timestamp = TestData.TIMESTAMP,
-                returnValues = listOf("value", 1, true)
+                returnValues = listOf("value", 1, true),
+                rawReturnValue = "0x0"
             ),
             deployedContractId = deployedContractId,
             contractAddress = ContractAddress("caebafe")
