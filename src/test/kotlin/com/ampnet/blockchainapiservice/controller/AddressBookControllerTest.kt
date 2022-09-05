@@ -7,11 +7,8 @@ import com.ampnet.blockchainapiservice.model.request.CreateOrUpdateAddressBookEn
 import com.ampnet.blockchainapiservice.model.response.AddressBookEntriesResponse
 import com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse
 import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
-import com.ampnet.blockchainapiservice.model.result.Project
+import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import com.ampnet.blockchainapiservice.service.AddressBookService
-import com.ampnet.blockchainapiservice.util.BaseUrl
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -25,14 +22,9 @@ import org.mockito.kotlin.verify as verifyMock
 class AddressBookControllerTest : TestBase() {
 
     companion object {
-        private val PROJECT = Project(
+        private val USER_IDENTIFIER = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
-            issuerContractAddress = ContractAddress("0"),
-            baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = ChainId(1337L),
-            customRpcUrl = "custom-rpc-url",
-            createdAt = TestData.TIMESTAMP
+            walletAddress = WalletAddress("cafebabe")
         )
         private val ENTRY = AddressBookEntry(
             id = UUID.randomUUID(),
@@ -41,7 +33,7 @@ class AddressBookControllerTest : TestBase() {
             phoneNumber = "phone-number",
             email = "email",
             createdAt = TestData.TIMESTAMP,
-            projectId = PROJECT.id
+            userId = USER_IDENTIFIER.id
         )
     }
 
@@ -57,14 +49,14 @@ class AddressBookControllerTest : TestBase() {
         val service = mock<AddressBookService>()
 
         suppose("address book entry will be created") {
-            given(service.createAddressBookEntry(request, PROJECT))
+            given(service.createAddressBookEntry(request, USER_IDENTIFIER))
                 .willReturn(ENTRY)
         }
 
         val controller = AddressBookController(service)
 
         verify("controller returns correct response") {
-            val response = controller.createAddressBookEntry(PROJECT, request)
+            val response = controller.createAddressBookEntry(USER_IDENTIFIER, request)
 
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
@@ -86,14 +78,14 @@ class AddressBookControllerTest : TestBase() {
         val service = mock<AddressBookService>()
 
         suppose("address book entry will be updated") {
-            given(service.updateAddressBookEntry(ENTRY.id, request, PROJECT))
+            given(service.updateAddressBookEntry(ENTRY.id, request, USER_IDENTIFIER))
                 .willReturn(ENTRY)
         }
 
         val controller = AddressBookController(service)
 
         verify("controller returns correct response") {
-            val response = controller.updateAddressBookEntry(ENTRY.id, PROJECT, request)
+            val response = controller.updateAddressBookEntry(ENTRY.id, USER_IDENTIFIER, request)
 
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
@@ -109,10 +101,10 @@ class AddressBookControllerTest : TestBase() {
         val controller = AddressBookController(service)
 
         verify("controller calls correct service method") {
-            controller.deleteAddressBookEntry(ENTRY.id, PROJECT)
+            controller.deleteAddressBookEntry(ENTRY.id, USER_IDENTIFIER)
 
             verifyMock(service)
-                .deleteAddressBookEntryById(ENTRY.id, PROJECT)
+                .deleteAddressBookEntryById(ENTRY.id, USER_IDENTIFIER)
             verifyNoMoreInteractions(service)
         }
     }
@@ -122,14 +114,14 @@ class AddressBookControllerTest : TestBase() {
         val service = mock<AddressBookService>()
 
         suppose("address book entry will be fetched by id") {
-            given(service.getAddressBookEntryById(ENTRY.id, PROJECT))
+            given(service.getAddressBookEntryById(ENTRY.id))
                 .willReturn(ENTRY)
         }
 
         val controller = AddressBookController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getAddressBookEntryById(ENTRY.id, PROJECT)
+            val response = controller.getAddressBookEntryById(ENTRY.id)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -143,14 +135,14 @@ class AddressBookControllerTest : TestBase() {
         val service = mock<AddressBookService>()
 
         suppose("address book entry will be fetched by alias") {
-            given(service.getAddressBookEntryByAlias(ENTRY.alias, PROJECT))
+            given(service.getAddressBookEntryByAlias(ENTRY.alias, USER_IDENTIFIER))
                 .willReturn(ENTRY)
         }
 
         val controller = AddressBookController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getAddressBookEntryByAlias(ENTRY.alias, PROJECT)
+            val response = controller.getAddressBookEntryByAlias(ENTRY.alias, USER_IDENTIFIER)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -160,18 +152,18 @@ class AddressBookControllerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchAddressBookEntriesForProject() {
+    fun mustCorrectlyFetchAddressBookEntriesForWalletAddress() {
         val service = mock<AddressBookService>()
 
-        suppose("address book entries will be fetched for project") {
-            given(service.getAddressBookEntriesByProjectId(PROJECT.id))
+        suppose("address book entries will be fetched for wallet address") {
+            given(service.getAddressBookEntriesByWalletAddress(USER_IDENTIFIER.walletAddress))
                 .willReturn(listOf(ENTRY))
         }
 
         val controller = AddressBookController(service)
 
         verify("controller returns correct response") {
-            val response = controller.getAddressBookEntriesForProject(PROJECT)
+            val response = controller.getAddressBookEntriesForWalletAddress(USER_IDENTIFIER.walletAddress.rawValue)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 

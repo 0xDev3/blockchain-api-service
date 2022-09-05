@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface AddressBookRepository {
@@ -8,6 +9,6 @@ interface AddressBookRepository {
     fun update(addressBookEntry: AddressBookEntry): AddressBookEntry?
     fun delete(id: UUID): Boolean
     fun getById(id: UUID): AddressBookEntry?
-    fun getByAliasAndProjectId(alias: String, projectId: UUID): AddressBookEntry?
-    fun getAllByProjectId(projectId: UUID): List<AddressBookEntry>
+    fun getByAliasAndUserId(alias: String, userId: UUID): AddressBookEntry?
+    fun getAllByWalletAddress(walletAddress: WalletAddress): List<AddressBookEntry>
 }

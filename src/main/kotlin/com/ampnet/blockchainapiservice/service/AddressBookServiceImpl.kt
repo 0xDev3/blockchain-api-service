@@ -3,8 +3,9 @@ package com.ampnet.blockchainapiservice.service
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
 import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
-import com.ampnet.blockchainapiservice.model.result.Project
+import com.ampnet.blockchainapiservice.model.result.UserIdentifier
 import com.ampnet.blockchainapiservice.repository.AddressBookRepository
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -20,15 +21,15 @@ class AddressBookServiceImpl(
 
     override fun createAddressBookEntry(
         request: CreateOrUpdateAddressBookEntryRequest,
-        project: Project
+        userIdentifier: UserIdentifier
     ): AddressBookEntry {
-        logger.info { "Creating address book entry, request: $request, project: $project" }
+        logger.info { "Creating address book entry, request: $request, userIdentifier: $userIdentifier" }
         return addressBookRepository.store(
             AddressBookEntry(
                 id = uuidProvider.getUuid(),
                 createdAt = utcDateTimeProvider.getUtcDateTime(),
                 request = request,
-                project = project
+                userIdentifier = userIdentifier
             )
         )
     }
@@ -36,42 +37,46 @@ class AddressBookServiceImpl(
     override fun updateAddressBookEntry(
         addressBookEntryId: UUID,
         request: CreateOrUpdateAddressBookEntryRequest,
-        project: Project
+        userIdentifier: UserIdentifier
     ): AddressBookEntry {
         logger.info {
-            "Update address book entry, addressBookEntryId: $addressBookEntryId, request: $request, project: $project"
+            "Update address book entry, addressBookEntryId: $addressBookEntryId, request: $request," +
+                " userIdentifier: $userIdentifier"
         }
-        val entry = getAddressBookEntryById(addressBookEntryId, project)
+        val entry = getOwnedAddressBookEntryById(addressBookEntryId, userIdentifier)
         return addressBookRepository.update(
             AddressBookEntry(
                 id = entry.id,
                 createdAt = entry.createdAt,
                 request = request,
-                project = project
+                userIdentifier = userIdentifier
             )
         ) ?: throw ResourceNotFoundException("Address book entry not found for ID: $addressBookEntryId")
     }
 
-    override fun deleteAddressBookEntryById(id: UUID, project: Project) {
-        logger.info { "Delete address book entry by id: $id" }
-        addressBookRepository.delete(getAddressBookEntryById(id, project).id)
+    override fun deleteAddressBookEntryById(id: UUID, userIdentifier: UserIdentifier) {
+        logger.info { "Delete address book entry by id: $id, userIdentifier: $userIdentifier" }
+        addressBookRepository.delete(getOwnedAddressBookEntryById(id, userIdentifier).id)
     }
 
-    override fun getAddressBookEntryById(id: UUID, project: Project): AddressBookEntry {
+    override fun getAddressBookEntryById(id: UUID): AddressBookEntry {
         logger.debug { "Get address book entry by id: $id" }
-        return addressBookRepository.getById(id)?.takeIf {
-            it.projectId == project.id
-        } ?: throw ResourceNotFoundException("Address book entry not found for ID: $id")
+        return addressBookRepository.getById(id)
+            ?: throw ResourceNotFoundException("Address book entry not found for ID: $id")
     }
 
-    override fun getAddressBookEntryByAlias(alias: String, project: Project): AddressBookEntry {
-        logger.debug { "Get address book entry by alias: $alias" }
-        return addressBookRepository.getByAliasAndProjectId(alias, project.id)
+    override fun getAddressBookEntryByAlias(alias: String, userIdentifier: UserIdentifier): AddressBookEntry {
+        logger.debug { "Get address book entry by alias: $alias, userIdentifier: $userIdentifier" }
+        return addressBookRepository.getByAliasAndUserId(alias, userIdentifier.id)
             ?: throw ResourceNotFoundException("Address book entry not found for alias: $alias")
     }
 
-    override fun getAddressBookEntriesByProjectId(projectId: UUID): List<AddressBookEntry> {
-        logger.debug { "Get address book entries by projectId: $projectId" }
-        return addressBookRepository.getAllByProjectId(projectId)
+    override fun getAddressBookEntriesByWalletAddress(walletAddress: WalletAddress): List<AddressBookEntry> {
+        logger.debug { "Get address book entries by walletAddress: $walletAddress" }
+        return addressBookRepository.getAllByWalletAddress(walletAddress)
     }
+
+    private fun getOwnedAddressBookEntryById(id: UUID, userIdentifier: UserIdentifier) =
+        getAddressBookEntryById(id).takeIf { it.userId == userIdentifier.id }
+            ?: throw ResourceNotFoundException("Address book entry not found for ID: $id")
 }

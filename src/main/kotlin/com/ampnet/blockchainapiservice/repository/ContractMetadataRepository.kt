@@ -6,6 +6,7 @@ import com.ampnet.blockchainapiservice.util.ContractTrait
 import java.util.UUID
 
 interface ContractMetadataRepository {
+    @Suppress("LongParameterList")
     fun createOrUpdate(
         id: UUID,
         name: String?,

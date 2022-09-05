@@ -23,3 +23,11 @@ include::src/docs/asciidoc/project/fetch-by-issuer.adoc[]
 include::src/docs/asciidoc/project/fetch-all.adoc[]
 include::src/docs/asciidoc/project/create-api-key.adoc[]
 include::src/docs/asciidoc/project/fetch-api-key.adoc[]
+
+== Address Book Management API
+All endpoints require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/address-book/create.adoc[]
+include::src/docs/asciidoc/address-book/update.adoc[]
+include::src/docs/asciidoc/address-book/delete.adoc[]
+include::src/docs/asciidoc/address-book/fetch-by-alias.adoc[]

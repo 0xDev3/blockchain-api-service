@@ -1,8 +1,6 @@
 === Delete Address Book Entry
 Deletes stored address book entry.
 
-*This request requires an API key present in the `X-API-KEY` header.*
-
 .Request Example
 [%collapsible]
 ====
