@@ -6,6 +6,7 @@ import com.ampnet.blockchainapiservice.model.request.ReadonlyFunctionCallRequest
 import com.ampnet.blockchainapiservice.model.response.ReadonlyFunctionCallResponse
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.ContractReadonlyFunctionCallService
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.PostMapping
@@ -16,7 +17,8 @@ import javax.validation.Valid
 @Validated
 @RestController
 class ContractReadonlyFunctionCallController(
-    private val contractReadonlyFunctionCallService: ContractReadonlyFunctionCallService
+    private val contractReadonlyFunctionCallService: ContractReadonlyFunctionCallService,
+    private val objectMapper: ObjectMapper
 ) {
 
     @PostMapping("/v1/readonly-function-call")
@@ -26,6 +28,13 @@ class ContractReadonlyFunctionCallController(
     ): ResponseEntity<ReadonlyFunctionCallResponse> {
         val params = CreateReadonlyFunctionCallParams(requestBody)
         val result = contractReadonlyFunctionCallService.callReadonlyContractFunction(params, project)
-        return ResponseEntity.ok(ReadonlyFunctionCallResponse(result))
+        return ResponseEntity.ok(
+            ReadonlyFunctionCallResponse(
+                result = result,
+                outputParams = objectMapper.createArrayNode().apply {
+                    addAll(requestBody.outputParams.map { it.rawJson })
+                }
+            )
+        )
     }
 }
