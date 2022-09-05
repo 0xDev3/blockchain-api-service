@@ -20,6 +20,8 @@ import java.util.UUID
 data class ContractDeploymentRequestResponse(
     val id: UUID,
     val alias: String,
+    val name: String?,
+    val description: String?,
     val status: Status,
     val contractId: String,
     val contractDeploymentData: String,
@@ -42,6 +44,8 @@ data class ContractDeploymentRequestResponse(
     constructor(contractDeploymentRequest: ContractDeploymentRequest) : this(
         id = contractDeploymentRequest.id,
         alias = contractDeploymentRequest.alias,
+        name = contractDeploymentRequest.name,
+        description = contractDeploymentRequest.description,
         status = Status.PENDING,
         contractId = contractDeploymentRequest.contractId.value,
         contractDeploymentData = contractDeploymentRequest.contractData.withPrefix,
@@ -68,6 +72,8 @@ data class ContractDeploymentRequestResponse(
     constructor(contractDeploymentRequest: WithTransactionData<ContractDeploymentRequest>) : this(
         id = contractDeploymentRequest.value.id,
         alias = contractDeploymentRequest.value.alias,
+        name = contractDeploymentRequest.value.name,
+        description = contractDeploymentRequest.value.description,
         status = contractDeploymentRequest.status,
         contractId = contractDeploymentRequest.value.contractId.value,
         contractDeploymentData = contractDeploymentRequest.value.contractData.withPrefix,

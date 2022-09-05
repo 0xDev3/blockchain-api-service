@@ -17,13 +17,15 @@ class JooqContractMetadataRepository(private val dslContext: DSLContext) : Contr
 
     override fun createOrUpdate(
         id: UUID,
+        name: String?,
+        description: String?,
         contractId: ContractId,
         contractTags: List<ContractTag>,
         contractImplements: List<ContractTrait>
     ): Boolean {
         logger.info {
-            "Create or update contract metadata, id: $id, contractId: $contractId, contractTags: $contractTags," +
-                " contractImplements: $contractImplements"
+            "Create or update contract metadata, id: $id, name: $name, description: $description," +
+                " contractId: $contractId, contractTags: $contractTags, contractImplements: $contractImplements"
         }
         val tags: Array<String?> = contractTags.map { it.value }.toTypedArray()
         val implements: Array<String?> = contractImplements.map { it.value }.toTypedArray()
@@ -32,6 +34,8 @@ class JooqContractMetadataRepository(private val dslContext: DSLContext) : Contr
             .set(
                 ContractMetadataRecord(
                     id = id,
+                    name = name,
+                    description = description,
                     contractId = contractId,
                     contractTags = tags,
                     contractImplements = implements

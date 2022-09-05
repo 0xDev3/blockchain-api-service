@@ -129,6 +129,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         dslContext.executeInsert(
             ContractMetadataRecord(
                 id = UUID.randomUUID(),
+                name = CONTRACT_DECORATOR.name,
+                description = CONTRACT_DECORATOR.description,
                 contractId = CONTRACT_DECORATOR.id,
                 contractTags = CONTRACT_DECORATOR.tags.map { it.value }.toTypedArray(),
                 contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray()
@@ -222,6 +224,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     ContractDeploymentRequestResponse(
                         id = response.id,
                         alias = alias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
                         status = Status.PENDING,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = response.contractDeploymentData,
@@ -264,6 +268,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     ContractDeploymentRequest(
                         id = response.id,
                         alias = alias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
                         contractId = CONTRACT_DECORATOR.id,
                         contractData = ContractBinaryData(response.contractDeploymentData),
                         constructorParams = objectMapper.readTree(paramsJson),
@@ -349,6 +355,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     ContractDeploymentRequestResponse(
                         id = response.id,
                         alias = alias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
                         status = Status.PENDING,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = response.contractDeploymentData,
@@ -391,6 +399,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     ContractDeploymentRequest(
                         id = response.id,
                         alias = alias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
                         contractId = CONTRACT_DECORATOR.id,
                         contractData = ContractBinaryData(response.contractDeploymentData),
                         constructorParams = objectMapper.readTree(paramsJson),
@@ -596,6 +606,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     ContractDeploymentRequestResponse(
                         id = createResponse.id,
                         alias = alias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
                         status = Status.SUCCESS,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = createResponse.contractDeploymentData,
@@ -732,6 +744,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     ContractDeploymentRequestResponse(
                         id = createResponse.id,
                         alias = alias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
                         status = Status.SUCCESS,
                         contractId = CONTRACT_DECORATOR.id.value,
                         contractDeploymentData = createResponse.contractDeploymentData,
@@ -884,6 +898,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             ContractDeploymentRequestResponse(
                                 id = createResponse.id,
                                 alias = alias,
+                                name = CONTRACT_DECORATOR.name,
+                                description = CONTRACT_DECORATOR.description,
                                 status = Status.SUCCESS,
                                 contractId = CONTRACT_DECORATOR.id.value,
                                 contractDeploymentData = createResponse.contractDeploymentData,
@@ -1030,6 +1046,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             ContractDeploymentRequestResponse(
                                 id = createResponse.id,
                                 alias = alias,
+                                name = CONTRACT_DECORATOR.name,
+                                description = CONTRACT_DECORATOR.description,
                                 status = Status.SUCCESS,
                                 contractId = CONTRACT_DECORATOR.id.value,
                                 contractDeploymentData = createResponse.contractDeploymentData,

@@ -152,6 +152,8 @@ class JooqContractDeploymentRequestRepository(
         return ContractDeploymentRequest(
             id = requestRecord.id!!,
             alias = requestRecord.alias!!,
+            name = metadataRecord.name,
+            description = metadataRecord.description,
             contractId = metadataRecord.contractId!!,
             contractData = requestRecord.contractData!!,
             constructorParams = requestRecord.constructorParams!!,

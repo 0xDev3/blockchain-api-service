@@ -46,7 +46,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         private val PROJECT_ID_1 = UUID.randomUUID()
         private val PROJECT_ID_2 = UUID.randomUUID()
         private val OWNER_ID = UUID.randomUUID()
-        private val ALIAS = "alias"
+        private const val ALIAS = "alias"
+        private const val NAME = "name"
+        private const val DESCRIPTION = "description"
         private val CONTRACT_ID = ContractId("contract-id")
         private val CONTRACT_DATA = ContractBinaryData("00")
         private val INITIAL_ETH_AMOUNT = Balance(BigInteger("10000"))
@@ -450,6 +452,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         val expectedContractDeploymentRequest = ContractDeploymentRequest(
             id = id,
             alias = ALIAS,
+            name = NAME,
+            description = DESCRIPTION,
             contractId = CONTRACT_ID,
             contractData = CONTRACT_DATA,
             constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -537,6 +541,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                     ContractDeploymentRequest(
                         id = id,
                         alias = ALIAS,
+                        name = NAME,
+                        description = DESCRIPTION,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -609,6 +615,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                     ContractDeploymentRequest(
                         id = id,
                         alias = ALIAS,
+                        name = NAME,
+                        description = DESCRIPTION,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -691,6 +699,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                     ContractDeploymentRequest(
                         id = id,
                         alias = ALIAS,
+                        name = NAME,
+                        description = DESCRIPTION,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -762,6 +772,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                     ContractDeploymentRequest(
                         id = id,
                         alias = ALIAS,
+                        name = NAME,
+                        description = DESCRIPTION,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -838,6 +850,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                     ContractDeploymentRequest(
                         id = id,
                         alias = ALIAS,
+                        name = NAME,
+                        description = DESCRIPTION,
                         contractId = CONTRACT_ID,
                         contractData = CONTRACT_DATA,
                         constructorParams = TestData.EMPTY_JSON_ARRAY,
@@ -867,6 +881,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         traits: List<String> = emptyList(),
     ) = ContractMetadataRecord(
         id = UUID.randomUUID(),
+        name = NAME,
+        description = DESCRIPTION,
         contractId = contractId,
         contractTags = tags.toTypedArray(),
         contractImplements = traits.toTypedArray(),
@@ -902,6 +918,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         ContractDeploymentRequest(
             id = id!!,
             alias = alias!!,
+            name = NAME,
+            description = DESCRIPTION,
             contractId = metadata.contractId!!,
             contractData = contractData!!,
             constructorParams = constructorParams!!,
