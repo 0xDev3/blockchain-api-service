@@ -8,6 +8,7 @@ import com.ampnet.blockchainapiservice.exception.TemporaryBlockchainReadExceptio
 import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
+import com.ampnet.blockchainapiservice.service.AbiDecoderService
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
@@ -22,8 +23,6 @@ import com.ampnet.blockchainapiservice.util.bind
 import com.ampnet.blockchainapiservice.util.shortCircuiting
 import mu.KLogging
 import org.springframework.stereotype.Service
-import org.web3j.abi.FunctionReturnDecoder
-import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.StaticArray
 import org.web3j.abi.datatypes.Type
@@ -38,7 +37,10 @@ import org.web3j.tx.gas.DefaultGasProvider
 import java.io.IOException
 
 @Service
-class Web3jBlockchainService(applicationProperties: ApplicationProperties) : BlockchainService {
+class Web3jBlockchainService(
+    private val abiDecoderService: AbiDecoderService,
+    applicationProperties: ApplicationProperties
+) : BlockchainService {
 
     companion object : KLogging()
 
@@ -142,17 +144,16 @@ class Web3jBlockchainService(applicationProperties: ApplicationProperties) : Blo
             ?: throw BlockchainReadException(
                 "Unable to call function ${params.functionName} on contract with address: ${params.contractAddress}"
             )
-        // TODO use custom type decoder here to add support for nested arrays and structs
-        @Suppress("UNCHECKED_CAST") val returnValues = FunctionReturnDecoder.decode(
-            functionCallResponse,
-            params.outputParams.map { it.typeReference } as List<TypeReference<Type<*>>>
+        val returnValues = abiDecoderService.decode(
+            types = params.outputParams.map { it.deserializedType },
+            encodedInput = functionCallResponse
         )
-            .map { it.extractValue() }
 
         return ReadonlyFunctionCallResult(
             blockNumber = blockNumber,
             timestamp = timestamp,
-            returnValues = returnValues
+            returnValues = returnValues,
+            rawReturnValue = functionCallResponse
         )
     }
 

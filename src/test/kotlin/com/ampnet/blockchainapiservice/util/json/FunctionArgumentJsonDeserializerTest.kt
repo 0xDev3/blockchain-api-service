@@ -119,7 +119,7 @@ import org.web3j.abi.datatypes.primitive.Byte as Web3Byte
 class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     companion object {
-        data class Result(val args: List<FunctionArgument>)
+        private data class Result(val args: List<FunctionArgument>)
     }
 
     private val objectMapper = JsonConfig().objectMapper()
@@ -810,7 +810,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse sized array type") {
+        verify("must correctly parse nested array type") {
             val readValue = objectMapper.readValue(json, Result::class.java).args
                 .map {
                     @Suppress("UNCHECKED_CAST")
@@ -875,10 +875,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
         verify("must correctly parse struct") {
             val result = objectMapper.readValue(json, Result::class.java).args
-                .map {
-                    @Suppress("UNCHECKED_CAST")
-                    it.value as DynamicStruct
-                }
+                .map { it.value as DynamicStruct }
                 .map { it.value.map { type -> type.value } }[0]
 
             assertThat(result).withMessage()
@@ -934,10 +931,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
         verify("must correctly parse nested struct") {
             val result = objectMapper.readValue(json, Result::class.java).args
-                .map {
-                    @Suppress("UNCHECKED_CAST")
-                    it.value as DynamicStruct
-                }
+                .map { it.value as DynamicStruct }
                 .map {
                     it.value.map { type ->
                         if (type is DynamicStruct) {
@@ -991,13 +985,9 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
         verify("must correctly parse struct with array elements") {
             val result = objectMapper.readValue(json, Result::class.java).args
-                .map {
-                    @Suppress("UNCHECKED_CAST")
-                    it.value as DynamicStruct
-                }
+                .map { it.value as DynamicStruct }
                 .map {
                     it.value.map { type ->
-                        @Suppress("UNCHECKED_CAST")
                         (type as DynamicArray<*>).value.map { s -> s.value }
                     }
                 }[0]

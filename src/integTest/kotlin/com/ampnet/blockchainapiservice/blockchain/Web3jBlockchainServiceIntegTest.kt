@@ -9,6 +9,7 @@ import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallP
 import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
+import com.ampnet.blockchainapiservice.service.EthereumAbiDecoderService
 import com.ampnet.blockchainapiservice.service.EthereumFunctionEncoderService
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
@@ -20,6 +21,7 @@ import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
+import com.ampnet.blockchainapiservice.util.UintType
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.ampnet.blockchainapiservice.util.ZeroAddress
@@ -76,7 +78,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
 
         verify("correct account balance is fetched for latest block") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
             val fetchedAccountBalance = service.fetchAccountBalance(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 walletAddress = accountBalance.wallet
@@ -129,7 +131,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             ).send()
         }
 
-        val service = Web3jBlockchainService(hardhatProperties())
+        val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
 
         verify("correct ETH balance is fetched for block number before ETH transfer is made") {
             val fetchedAccountBalance = service.fetchAccountBalance(
@@ -193,7 +195,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
 
         verify("correct ERC20 balance is fetched for latest block") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
@@ -241,7 +243,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             contract.transfer(accounts[1].address, accountBalance.amount.rawValue).send()
         }
 
-        val service = Web3jBlockchainService(hardhatProperties())
+        val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
 
         verify("correct ERC20 balance is fetched for block number before ERC20 transfer is made") {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
@@ -288,7 +290,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @Test
     fun mustThrowBlockchainReadExceptionWhenReadingErc20BalanceFromInvalidErc20ContractAddress() {
         verify("BlockchainReadException is thrown when reading ERC20 balance from invalid contract address") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
 
             assertThrows<BlockchainReadException>(message) {
                 service.fetchErc20AccountBalance(
@@ -331,7 +333,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
 
         verify("correct transaction info is fetched") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 txHash = txHash
@@ -409,7 +411,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
 
         verify("correct transaction info is fetched") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 txHash = txHash
@@ -468,7 +470,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
 
         verify("correct transaction info is fetched") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 txHash = txHash
@@ -534,7 +536,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         val data = "0x" + SimpleERC20.BINARY + encodedConstructor.withoutPrefix
 
         verify("correct transaction info is fetched") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 txHash = txHash
@@ -566,7 +568,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentTransactionInfo() {
         verify("null is returned for non existent transaction") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 txHash = TransactionHash("0x123456")
@@ -578,7 +580,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyCallReadonlyFunctionReturningUint() {
+    fun mustCorrectlyCallReadonlyFunction() {
         val mainAccount = accounts[0]
 
         val contract = suppose("readonly function calls contract is deployed") {
@@ -597,7 +599,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         )
 
         verify("correct value is returned for latest block") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
             val result = service.callReadonlyFunction(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 params = ExecuteReadonlyFunctionCallParams(
@@ -605,7 +607,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     callerAddress = WalletAddress("a"),
                     functionName = functionName,
                     functionData = functionData,
-                    outputParams = listOf(OutputParameter("uint256"))
+                    outputParams = listOf(OutputParameter(UintType))
                 )
             )
 
@@ -614,220 +616,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     ReadonlyFunctionCallResult(
                         blockNumber = result.blockNumber,
                         timestamp = result.timestamp,
-                        returnValues = listOf(uintValue.value)
-                    )
-                )
-            assertThat(result.blockNumber.value)
-                .isPositive()
-            assertThat(result.timestamp.value)
-                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCallReadonlyFunctionReturningString() {
-        val mainAccount = accounts[0]
-
-        val contract = suppose("readonly function calls contract is deployed") {
-            ReadonlyFunctionCallsContract.deploy(
-                hardhatContainer.web3j,
-                mainAccount,
-                DefaultGasProvider()
-            ).send()
-        }
-
-        val functionName = "returningString"
-        val functionData = EthereumFunctionEncoderService().encode(
-            functionName = functionName,
-            arguments = emptyList()
-        )
-
-        verify("correct value is returned for latest block") {
-            val service = Web3jBlockchainService(hardhatProperties())
-            val result = service.callReadonlyFunction(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                params = ExecuteReadonlyFunctionCallParams(
-                    contractAddress = ContractAddress(contract.contractAddress),
-                    callerAddress = WalletAddress("a"),
-                    functionName = functionName,
-                    functionData = functionData,
-                    outputParams = listOf(OutputParameter("string"))
-                )
-            )
-
-            assertThat(result).withMessage()
-                .isEqualTo(
-                    ReadonlyFunctionCallResult(
-                        blockNumber = result.blockNumber,
-                        timestamp = result.timestamp,
-                        returnValues = listOf("test")
-                    )
-                )
-            assertThat(result.blockNumber.value)
-                .isPositive()
-            assertThat(result.timestamp.value)
-                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCallReadonlyFunctionReturningUintArray() {
-        val mainAccount = accounts[0]
-
-        val contract = suppose("readonly function calls contract is deployed") {
-            ReadonlyFunctionCallsContract.deploy(
-                hardhatContainer.web3j,
-                mainAccount,
-                DefaultGasProvider()
-            ).send()
-        }
-
-        val functionName = "returningUintArray"
-        val arraySize = Uint256(BigInteger.valueOf(3L))
-        val functionData = EthereumFunctionEncoderService().encode(
-            functionName = functionName,
-            arguments = listOf(FunctionArgument(arraySize))
-        )
-
-        verify("correct value is returned for latest block") {
-            val service = Web3jBlockchainService(hardhatProperties())
-            val result = service.callReadonlyFunction(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                params = ExecuteReadonlyFunctionCallParams(
-                    contractAddress = ContractAddress(contract.contractAddress),
-                    callerAddress = WalletAddress("a"),
-                    functionName = functionName,
-                    functionData = functionData,
-                    outputParams = listOf(OutputParameter("uint256[]"))
-                )
-            )
-
-            assertThat(result).withMessage()
-                .isEqualTo(
-                    ReadonlyFunctionCallResult(
-                        blockNumber = result.blockNumber,
-                        timestamp = result.timestamp,
-                        returnValues = listOf(
-                            listOf(
-                                BigInteger.valueOf(0L),
-                                BigInteger.valueOf(1L),
-                                BigInteger.valueOf(2L)
-                            )
-                        )
-                    )
-                )
-            assertThat(result.blockNumber.value)
-                .isPositive()
-            assertThat(result.timestamp.value)
-                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-        }
-    }
-
-    // @Test // TODO currently not handled correctly by web3j, we will need some sort of custom decoder...
-    fun mustCorrectlyCallReadonlyFunctionReturningUintArrayArray() {
-        val mainAccount = accounts[0]
-
-        val contract = suppose("readonly function calls contract is deployed") {
-            ReadonlyFunctionCallsContract.deploy(
-                hardhatContainer.web3j,
-                mainAccount,
-                DefaultGasProvider()
-            ).send()
-        }
-
-        val functionName = "returningUintArrayArray"
-        val arraySize = Uint256(BigInteger.valueOf(3L))
-        val functionData = EthereumFunctionEncoderService().encode(
-            functionName = functionName,
-            arguments = listOf(FunctionArgument(arraySize))
-        )
-
-        verify("correct value is returned for latest block") {
-            val service = Web3jBlockchainService(hardhatProperties())
-            val result = service.callReadonlyFunction(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                params = ExecuteReadonlyFunctionCallParams(
-                    contractAddress = ContractAddress(contract.contractAddress),
-                    callerAddress = WalletAddress("a"),
-                    functionName = functionName,
-                    functionData = functionData,
-                    outputParams = listOf(OutputParameter("uint256[][2]"))
-                )
-            )
-
-            assertThat(result).withMessage()
-                .isEqualTo(
-                    ReadonlyFunctionCallResult(
-                        blockNumber = result.blockNumber,
-                        timestamp = result.timestamp,
-                        returnValues = listOf(
-                            listOf(
-                                listOf(
-                                    BigInteger.valueOf(0L),
-                                    BigInteger.valueOf(1L),
-                                    BigInteger.valueOf(2L)
-                                ),
-                                listOf(
-                                    BigInteger.valueOf(0L),
-                                    BigInteger.valueOf(1L),
-                                    BigInteger.valueOf(2L)
-                                )
-                            )
-                        )
-                    )
-                )
-            assertThat(result.blockNumber.value)
-                .isPositive()
-            assertThat(result.timestamp.value)
-                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-        }
-    }
-
-    @Test
-    fun mustCorrectlyCallReadonlyFunctionReturningMultipleValues() {
-        val mainAccount = accounts[0]
-
-        val contract = suppose("readonly function calls contract is deployed") {
-            ReadonlyFunctionCallsContract.deploy(
-                hardhatContainer.web3j,
-                mainAccount,
-                DefaultGasProvider()
-            ).send()
-        }
-
-        val functionName = "returningMultipleValues"
-        val functionData = EthereumFunctionEncoderService().encode(
-            functionName = functionName,
-            arguments = emptyList()
-        )
-
-        verify("correct value is returned for latest block") {
-            val service = Web3jBlockchainService(hardhatProperties())
-            val result = service.callReadonlyFunction(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                params = ExecuteReadonlyFunctionCallParams(
-                    contractAddress = ContractAddress(contract.contractAddress),
-                    callerAddress = WalletAddress("a"),
-                    functionName = functionName,
-                    functionData = functionData,
-                    outputParams = listOf(
-                        OutputParameter("uint256"),
-                        OutputParameter("string"),
-                        OutputParameter("bool[2]")
-                    )
-                )
-            )
-
-            assertThat(result).withMessage()
-                .isEqualTo(
-                    ReadonlyFunctionCallResult(
-                        blockNumber = result.blockNumber,
-                        timestamp = result.timestamp,
-                        returnValues = listOf(
-                            BigInteger.valueOf(42L),
-                            "test",
-                            listOf(true, false)
-                        )
+                        returnValues = listOf(uintValue.value),
+                        rawReturnValue = EthereumFunctionEncoderService()
+                            .encodeConstructor(listOf(FunctionArgument(uintValue))).value
                     )
                 )
             assertThat(result.blockNumber.value)
@@ -847,7 +638,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         )
 
         verify("BlockchainReadException is thrown when calling readonly function on invalid contract address") {
-            val service = Web3jBlockchainService(hardhatProperties())
+            val service = Web3jBlockchainService(EthereumAbiDecoderService(), hardhatProperties())
 
             assertThrows<BlockchainReadException>(message) {
                 service.callReadonlyFunction(
@@ -857,7 +648,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         callerAddress = WalletAddress("a"),
                         functionName = functionName,
                         functionData = functionData,
-                        outputParams = listOf(OutputParameter("uint256"))
+                        outputParams = listOf(OutputParameter(UintType))
                     )
                 )
             }

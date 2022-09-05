@@ -5,8 +5,10 @@ import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.config.validation.ValidationConstants
 import com.ampnet.blockchainapiservice.config.validation.ValidationConstants.FUNCTION_ARGUMENT_MAX_JSON_CHARS
 import com.ampnet.blockchainapiservice.model.params.OutputParameter
+import com.ampnet.blockchainapiservice.util.BoolType
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.JsonNodeConverter
+import com.ampnet.blockchainapiservice.util.UintType
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.JSON
@@ -392,7 +394,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 functionName = "",
                 functionParams = emptyList(),
                 outputParams = MutableList(ValidationConstants.REQUEST_BODY_MAX_ARGS_LENGTH + 1) {
-                    OutputParameter("uint256")
+                    OutputParameter(UintType)
                 },
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -417,7 +419,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "",
                 functionParams = emptyList(),
-                outputParams = listOf(OutputParameter("bool")),
+                outputParams = listOf(OutputParameter(BoolType)),
                 callerAddress = WalletAddress("0").rawValue
             )
         }
