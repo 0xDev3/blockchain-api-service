@@ -8,6 +8,10 @@ import com.ampnet.blockchainapiservice.config.validation.ValidUint256
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.DeployedContractIdentifierRequestBody
 import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.FunctionArgumentSchema
+import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
+import com.ampnet.blockchainapiservice.util.annotation.SchemaName
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import java.math.BigInteger
 import java.util.UUID
@@ -26,6 +30,7 @@ data class CreateContractFunctionCallRequest(
     @field:Valid
     @field:NotNull
     @field:MaxArgsSize
+    @field:SchemaIgnore
     val functionParams: List<FunctionArgument>,
     @field:NotNull
     @field:ValidUint256
@@ -38,4 +43,9 @@ data class CreateContractFunctionCallRequest(
     val screenConfig: ScreenConfig?,
     @field:ValidEthAddress
     val callerAddress: String?
-) : DeployedContractIdentifierRequestBody
+) : DeployedContractIdentifierRequestBody {
+    @Suppress("unused") // used for JSON schema generation
+    @JsonIgnore
+    @SchemaName("function_params")
+    private val schemaFunctionParams: List<FunctionArgumentSchema> = emptyList()
+}

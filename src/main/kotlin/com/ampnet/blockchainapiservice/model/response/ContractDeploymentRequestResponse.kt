@@ -2,7 +2,7 @@ package com.ampnet.blockchainapiservice.model.response
 
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
-import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.FunctionArgumentSchema
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WithTransactionData
@@ -95,5 +95,5 @@ data class ContractDeploymentRequestResponse(
     @Suppress("unused") // used for JSON schema generation
     @JsonIgnore
     @SchemaName("constructor_params")
-    private val schemaConstructorParams: List<FunctionArgument> = emptyList()
+    private val schemaConstructorParams: List<FunctionArgumentSchema> = emptyList()
 }

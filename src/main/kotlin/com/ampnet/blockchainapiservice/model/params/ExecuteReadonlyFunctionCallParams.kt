@@ -6,6 +6,7 @@ import com.ampnet.blockchainapiservice.util.AbiType
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.WalletAddress
+import com.ampnet.blockchainapiservice.util.annotation.SchemaAnyOf
 import com.fasterxml.jackson.databind.JsonNode
 
 data class ExecuteReadonlyFunctionCallParams(
@@ -24,5 +25,11 @@ data class OutputParameter(
 
 data class OutputParameterSchema(
     val type: String,
-    val elems: List<OutputParameterSchema>
+    val elems: List<OutputParameterTypes>
+)
+
+@SchemaAnyOf
+data class OutputParameterTypes(
+    val type1: OutputParameterSchema,
+    val type2: String
 )

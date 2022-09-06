@@ -2,7 +2,7 @@ package com.ampnet.blockchainapiservice.model.response
 
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.result.ContractFunctionCallRequest
-import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.FunctionArgumentSchema
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WithFunctionData
 import com.ampnet.blockchainapiservice.util.WithTransactionAndFunctionData
@@ -82,5 +82,5 @@ data class ContractFunctionCallRequestResponse(
     @Suppress("unused") // used for JSON schema generation
     @JsonIgnore
     @SchemaName("function_params")
-    private val schemaFunctionParams: List<FunctionArgument> = emptyList()
+    private val schemaFunctionParams: List<FunctionArgumentSchema> = emptyList()
 }
