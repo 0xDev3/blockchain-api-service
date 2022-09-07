@@ -260,6 +260,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         suppose("contract deployment request does not exist in database") {
             given(contractDeploymentRequestRepository.getById(any()))
                 .willReturn(null)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(any(), any()))
+                .willReturn(null)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
@@ -275,9 +277,18 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = mock()
         )
 
-        verify("ResourceNotFoundException is thrown") {
+        verify("ResourceNotFoundException is thrown when fetching by id") {
             assertThrows<ResourceNotFoundException>(message) {
                 service.getContractDeploymentRequest(id = UUID.randomUUID())
+            }
+        }
+
+        verify("ResourceNotFoundException is thrown when fetching by alias and project id") {
+            assertThrows<ResourceNotFoundException>(message) {
+                service.getContractDeploymentRequestByProjectIdAndAlias(
+                    projectId = UUID.randomUUID(),
+                    alias = "random-alias"
+                )
             }
         }
     }
@@ -292,6 +303,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(request)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(request)
         }
 
@@ -308,8 +321,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with pending status is returned") {
+        verify("contract deployment request by id with pending status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    request.withTransactionData(
+                        status = Status.PENDING,
+                        transactionInfo = null
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and projectId with pending status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
                 .isEqualTo(
                     request.withTransactionData(
                         status = Status.PENDING,
@@ -325,6 +349,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -348,8 +374,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with pending status is returned") {
+        verify("contract deployment request by id with pending status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.PENDING,
+                        transactionInfo = null
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and projectId with pending status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.PENDING,
@@ -365,6 +402,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -389,8 +428,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with failed status is returned") {
+        verify("contract deployment request by id with failed status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.FAILED,
+                        transactionInfo = transactionInfo
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and projectId with failed status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -406,6 +456,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -430,8 +482,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with failed status is returned") {
+        verify("contract deployment request by id with failed status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.FAILED,
+                        transactionInfo = transactionInfo
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and projectId with failed status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -447,6 +510,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -471,8 +536,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with failed status is returned") {
+        verify("contract deployment request by id with failed status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.FAILED,
+                        transactionInfo = transactionInfo
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and projectId with failed status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -488,6 +564,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -512,8 +590,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with failed status is returned") {
+        verify("contract deployment request by id with failed status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.FAILED,
+                        transactionInfo = transactionInfo
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and projectId with failed status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -529,6 +618,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -553,8 +644,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with failed status is returned") {
+        verify("contract deployment request by id with failed status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.FAILED,
+                        transactionInfo = transactionInfo
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and projectId with failed status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -570,6 +672,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -594,8 +698,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with failed status is returned") {
+        verify("contract deployment request by id with failed status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.FAILED,
+                        transactionInfo = transactionInfo
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and projectId with failed status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -611,6 +726,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -644,6 +761,17 @@ class ContractDeploymentRequestServiceTest : TestBase() {
                     )
                 )
         }
+
+        verify("contract deployment request with failed status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.FAILED,
+                        transactionInfo = transactionInfo
+                    )
+                )
+        }
     }
 
     @Test
@@ -653,6 +781,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(request)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(request)
         }
 
@@ -676,8 +806,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with successful status is returned") {
+        verify("contract deployment request by id with successful status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    request.withTransactionData(
+                        status = Status.SUCCESS,
+                        transactionInfo = TRANSACTION_INFO
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and contractId with successful status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
+                .withMessage()
                 .isEqualTo(
                     request.withTransactionData(
                         status = Status.SUCCESS,
@@ -693,6 +834,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         suppose("contract deployment request exists in database") {
             given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -716,8 +859,19 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             projectRepository = projectRepositoryMock(PROJECT.id)
         )
 
-        verify("contract deployment request with successful status is returned") {
+        verify("contract deployment request by id with successful status is returned") {
             assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+                .isEqualTo(
+                    STORED_REQUEST.withTransactionData(
+                        status = Status.SUCCESS,
+                        transactionInfo = TRANSACTION_INFO
+                    )
+                )
+        }
+
+        verify("contract deployment request by alias and projectId with successful status is returned") {
+            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, STORED_REQUEST.alias))
+                .withMessage()
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.SUCCESS,

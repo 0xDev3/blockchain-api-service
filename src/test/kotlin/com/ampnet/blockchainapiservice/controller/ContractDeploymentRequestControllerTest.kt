@@ -354,6 +354,99 @@ class ContractDeploymentRequestControllerTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchContractDeploymentRequestByProjectIdAndAlias() {
+        val projectId = UUID.randomUUID()
+        val alias = "alias"
+        val service = mock<ContractDeploymentRequestService>()
+        val txHash = TransactionHash("tx-hash")
+        val result = WithTransactionData(
+            value = ContractDeploymentRequest(
+                id = UUID.randomUUID(),
+                alias = alias,
+                name = "name",
+                description = "description",
+                contractId = ContractId("contract-id"),
+                contractData = ContractBinaryData("00"),
+                constructorParams = TestData.EMPTY_JSON_ARRAY,
+                contractTags = listOf(ContractTag("contract-tag")),
+                contractImplements = listOf(ContractTrait("contract-trait")),
+                initialEthAmount = Balance(BigInteger.TEN),
+                chainId = ChainId(1337),
+                redirectUrl = "redirect-url",
+                projectId = projectId,
+                createdAt = TestData.TIMESTAMP,
+                arbitraryData = TestData.EMPTY_JSON_OBJECT,
+                screenConfig = ScreenConfig(
+                    beforeActionMessage = "before-action-message",
+                    afterActionMessage = "after-action-message"
+                ),
+                contractAddress = ContractAddress("cafebabe"),
+                deployerAddress = WalletAddress("a"),
+                txHash = txHash
+            ),
+            status = Status.SUCCESS,
+            transactionData = TransactionData(
+                txHash = txHash,
+                fromAddress = WalletAddress("b"),
+                toAddress = ZeroAddress,
+                data = FunctionData("00"),
+                value = Balance(BigInteger.TEN),
+                blockConfirmations = BigInteger.ONE,
+                timestamp = TestData.TIMESTAMP
+            )
+        )
+
+        suppose("some contract deployment request will be fetched") {
+            given(service.getContractDeploymentRequestByProjectIdAndAlias(projectId, alias))
+                .willReturn(result)
+        }
+
+        val controller = ContractDeploymentRequestController(service)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractDeploymentRequestByProjectIdAndAlias(projectId, alias)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        ContractDeploymentRequestResponse(
+                            id = result.value.id,
+                            alias = result.value.alias,
+                            name = result.value.name,
+                            description = result.value.description,
+                            status = result.status,
+                            contractId = result.value.contractId.value,
+                            contractDeploymentData = result.value.contractData.withPrefix,
+                            constructorParams = TestData.EMPTY_JSON_ARRAY,
+                            contractTags = result.value.contractTags.map { it.value },
+                            contractImplements = result.value.contractImplements.map { it.value },
+                            initialEthAmount = result.value.initialEthAmount.rawValue,
+                            chainId = result.value.chainId.value,
+                            redirectUrl = result.value.redirectUrl,
+                            projectId = result.value.projectId,
+                            createdAt = result.value.createdAt.value,
+                            arbitraryData = result.value.arbitraryData,
+                            screenConfig = result.value.screenConfig.orEmpty(),
+                            contractAddress = result.value.contractAddress?.rawValue,
+                            deployerAddress = result.value.deployerAddress?.rawValue,
+                            deployTx = TransactionResponse(
+                                txHash = result.transactionData.txHash?.value,
+                                from = result.transactionData.fromAddress?.rawValue,
+                                to = result.transactionData.toAddress.rawValue,
+                                data = result.transactionData.data?.value,
+                                value = result.transactionData.value.rawValue,
+                                blockConfirmations = result.transactionData.blockConfirmations,
+                                timestamp = result.transactionData.timestamp?.value
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
     fun mustCorrectlyAttachTransactionInfo() {
         val service = mock<ContractDeploymentRequestService>()
         val controller = ContractDeploymentRequestController(service)

@@ -8,13 +8,13 @@ attached hash is not yet mined on blockchain, request will be in pending state.
 .Request Example
 [%collapsible]
 ====
-include::{snippets}/ContractDeploymentRequestControllerApiTest/mustCorrectlyFetchContractDeploymentRequest/http-request.adoc[]
+include::{snippets}/ContractDeploymentRequestControllerApiTest/mustCorrectlyFetchContractDeploymentRequestById/http-request.adoc[]
 ====
 
 .Response Example
 [%collapsible]
 ====
-include::{snippets}/ContractDeploymentRequestControllerApiTest/mustCorrectlyFetchContractDeploymentRequest/http-response.adoc[]
+include::{snippets}/ContractDeploymentRequestControllerApiTest/mustCorrectlyFetchContractDeploymentRequestById/http-response.adoc[]
 ====
 .Response Schema
 include::{snippets}/com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestResponse.adoc[]
