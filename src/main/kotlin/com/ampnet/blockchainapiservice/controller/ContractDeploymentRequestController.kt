@@ -76,6 +76,19 @@ class ContractDeploymentRequestController(
         )
     }
 
+    @GetMapping("/v1/deploy/by-project/{projectId}/by-alias/{alias}")
+    fun getContractDeploymentRequestByProjectIdAndAlias(
+        @PathVariable("projectId") projectId: UUID,
+        @PathVariable("alias") alias: String
+    ): ResponseEntity<ContractDeploymentRequestResponse> {
+        val contractDeploymentRequest = contractDeploymentRequestService
+            .getContractDeploymentRequestByProjectIdAndAlias(
+                projectId,
+                alias
+            )
+        return ResponseEntity.ok(ContractDeploymentRequestResponse(contractDeploymentRequest))
+    }
+
     @PutMapping("/v1/deploy/{id}")
     fun attachTransactionInfo(
         @PathVariable("id") id: UUID,

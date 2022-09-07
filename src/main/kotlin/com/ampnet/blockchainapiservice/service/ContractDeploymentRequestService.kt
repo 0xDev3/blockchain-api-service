@@ -20,6 +20,9 @@ interface ContractDeploymentRequestService {
         projectId: UUID,
         filters: ContractDeploymentRequestFilters
     ): List<WithTransactionData<ContractDeploymentRequest>>
-
+    fun getContractDeploymentRequestByProjectIdAndAlias(
+        projectId: UUID,
+        alias: String
+    ): WithTransactionData<ContractDeploymentRequest>
     fun attachTxInfo(id: UUID, txHash: TransactionHash, deployer: WalletAddress)
 }
