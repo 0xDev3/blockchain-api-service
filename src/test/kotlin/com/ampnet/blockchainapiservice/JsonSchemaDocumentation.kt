@@ -93,7 +93,7 @@ object JsonSchemaDocumentation {
     fun createSchema(type: Type) {
         Files.createDirectories(Paths.get("build/generated-snippets"))
 
-        val prettySchema = generator.generateSchema(type).apply {
+        val prettySchema = generator.generateSchema(type).apply { // TODO do this in a less hacky way
             val defs = this["\$defs"] as? ObjectNode
             val anyOf = defs?.get("FunctionArgumentTypes")
                 ?.get("properties")?.get("types")?.get("anyOf")?.deepCopy<JsonNode>()
