@@ -514,7 +514,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchContractDeploymentRequest() {
+    fun mustCorrectlyFetchContractDeploymentRequestById() {
         val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
@@ -648,7 +648,144 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustCorrectlyFetchContractDeploymentRequestWhenCustomRpcUrlIsSpecified() {
+    fun mustCorrectlyFetchContractDeploymentRequestByProjectIdAndAlias() {
+        val alias = "alias"
+        val ownerAddress = WalletAddress("a")
+        val mainAccount = accounts[0]
+        val deployerAddress = WalletAddress(mainAccount.address)
+        val initialEthAmount = Balance.ZERO
+
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
+        val createResponse = suppose("request to create contract deployment request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/deploy")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_id": "${CONTRACT_DECORATOR.id.value}",
+                                "constructor_params": $paramsJson,
+                                "deployer_address": "${deployerAddress.rawValue}",
+                                "initial_eth_amount": "${initialEthAmount.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(
+                createResponse.response.contentAsString,
+                ContractDeploymentRequestResponse::class.java
+            )
+        }
+
+        val contract = suppose("contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.mine()
+        }
+
+        val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
+
+        suppose("transaction info is attached to contract deployment request") {
+            contractDeploymentRequestRepository.setTxInfo(createResponse.id, txHash, deployerAddress)
+        }
+
+        val fetchResponse = suppose("request to fetch contract deployment request is made") {
+            val fetchResponse = mockMvc
+                .perform(
+                    MockMvcRequestBuilders.get(
+                        "/v1/deploy/by-project/${createResponse.projectId}/by-alias/${createResponse.alias}"
+                    )
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(
+                fetchResponse.response.contentAsString,
+                ContractDeploymentRequestResponse::class.java
+            )
+        }
+
+        verify("correct response is returned") {
+            assertThat(fetchResponse).withMessage()
+                .isEqualTo(
+                    ContractDeploymentRequestResponse(
+                        id = createResponse.id,
+                        alias = alias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
+                        status = Status.SUCCESS,
+                        contractId = CONTRACT_DECORATOR.id.value,
+                        contractDeploymentData = createResponse.contractDeploymentData,
+                        constructorParams = objectMapper.readTree(paramsJson),
+                        contractTags = CONTRACT_DECORATOR.tags.map { it.value },
+                        contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
+                        initialEthAmount = initialEthAmount.rawValue,
+                        chainId = PROJECT.chainId.value,
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${createResponse.id}/action",
+                        projectId = PROJECT_ID,
+                        createdAt = createResponse.createdAt,
+                        arbitraryData = createResponse.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        contractAddress = ContractAddress(contract.contractAddress).rawValue,
+                        deployerAddress = deployerAddress.rawValue,
+                        deployTx = TransactionResponse(
+                            txHash = txHash.value,
+                            from = deployerAddress.rawValue,
+                            to = ZeroAddress.rawValue,
+                            data = createResponse.deployTx.data,
+                            value = initialEthAmount.rawValue,
+                            blockConfirmations = fetchResponse.deployTx.blockConfirmations,
+                            timestamp = fetchResponse.deployTx.timestamp
+                        )
+                    )
+                )
+
+            assertThat(fetchResponse.deployTx.blockConfirmations)
+                .isNotZero()
+            assertThat(fetchResponse.deployTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractDeploymentRequestByIdWhenCustomRpcUrlIsSpecified() {
         val alias = "alias"
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
@@ -786,11 +923,168 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn404NotFoundForNonExistentContractDeploymentRequest() {
+    fun mustCorrectlyFetchContractDeploymentRequestByProjectIdAndAliasWhenCustomRpcUrlIsSpecified() {
+        val alias = "alias"
+        val ownerAddress = WalletAddress("a")
+        val mainAccount = accounts[0]
+        val deployerAddress = WalletAddress(mainAccount.address)
+        val initialEthAmount = Balance.ZERO
+
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
+            insertProjectWithCustomRpcUrl()
+        }
+
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
+        val createResponse = suppose("request to create contract deployment request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/deploy")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_id": "${CONTRACT_DECORATOR.id.value}",
+                                "constructor_params": $paramsJson,
+                                "deployer_address": "${deployerAddress.rawValue}",
+                                "initial_eth_amount": "${initialEthAmount.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(
+                createResponse.response.contentAsString,
+                ContractDeploymentRequestResponse::class.java
+            )
+        }
+
+        val contract = suppose("contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.mine()
+        }
+
+        val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
+
+        suppose("transaction info is attached to contract deployment request") {
+            contractDeploymentRequestRepository.setTxInfo(createResponse.id, txHash, deployerAddress)
+        }
+
+        val fetchResponse = suppose("request to fetch contract deployment request is made") {
+            val fetchResponse = mockMvc
+                .perform(
+                    MockMvcRequestBuilders.get(
+                        "/v1/deploy/by-project/${createResponse.projectId}/by-alias/${createResponse.alias}"
+                    )
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(
+                fetchResponse.response.contentAsString,
+                ContractDeploymentRequestResponse::class.java
+            )
+        }
+
+        verify("correct response is returned") {
+            assertThat(fetchResponse).withMessage()
+                .isEqualTo(
+                    ContractDeploymentRequestResponse(
+                        id = createResponse.id,
+                        alias = alias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
+                        status = Status.SUCCESS,
+                        contractId = CONTRACT_DECORATOR.id.value,
+                        contractDeploymentData = createResponse.contractDeploymentData,
+                        constructorParams = objectMapper.readTree(paramsJson),
+                        contractTags = CONTRACT_DECORATOR.tags.map { it.value },
+                        contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
+                        initialEthAmount = initialEthAmount.rawValue,
+                        chainId = chainId.value,
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${createResponse.id}/action",
+                        projectId = projectId,
+                        createdAt = createResponse.createdAt,
+                        arbitraryData = createResponse.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        contractAddress = ContractAddress(contract.contractAddress).rawValue,
+                        deployerAddress = deployerAddress.rawValue,
+                        deployTx = TransactionResponse(
+                            txHash = txHash.value,
+                            from = deployerAddress.rawValue,
+                            to = ZeroAddress.rawValue,
+                            data = createResponse.deployTx.data,
+                            value = initialEthAmount.rawValue,
+                            blockConfirmations = fetchResponse.deployTx.blockConfirmations,
+                            timestamp = fetchResponse.deployTx.timestamp
+                        )
+                    )
+                )
+
+            assertThat(fetchResponse.deployTx.blockConfirmations)
+                .isNotZero()
+            assertThat(fetchResponse.deployTx.timestamp)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(fetchResponse.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    fun mustReturn404NotFoundForNonExistentContractDeploymentRequestById() {
         verify("404 is returned for non-existent contract deployment request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/deploy/${UUID.randomUUID()}")
             )
+                .andExpect(MockMvcResultMatchers.status().isNotFound)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+        }
+    }
+
+    @Test
+    fun mustReturn404NotFoundForNonExistentContractDeploymentRequestByProjectIdAndAlias() {
+        verify("404 is returned for non-existent contract deployment request") {
+            val response = mockMvc
+                .perform(
+                    MockMvcRequestBuilders.get(
+                        "/v1/deploy/by-project/${UUID.randomUUID()}/by-alias/random-alias"
+                    )
+                )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 

@@ -99,6 +99,21 @@ class ContractDeploymentRequestServiceImpl(
         }
     }
 
+    override fun getContractDeploymentRequestByProjectIdAndAlias(
+        projectId: UUID,
+        alias: String
+    ): WithTransactionData<ContractDeploymentRequest> {
+        logger.debug { "Fetching contract deployment requests for projectId: $projectId, alias: $alias" }
+
+        val contractDeploymentRequest = ethCommonService.fetchResource(
+            contractDeploymentRequestRepository.getByAliasAndProjectId(alias, projectId),
+            "Contract deployment request not found for projectId: $projectId and alias: $alias"
+        )
+        val project = projectRepository.getById(contractDeploymentRequest.projectId)!!
+
+        return contractDeploymentRequest.appendTransactionData(project)
+    }
+
     override fun attachTxInfo(id: UUID, txHash: TransactionHash, deployer: WalletAddress) {
         logger.info { "Attach txInfo to contract deployment request, id: $id, txHash: $txHash, deployer: $deployer" }
 

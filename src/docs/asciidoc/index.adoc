@@ -57,7 +57,8 @@ include::src/docs/asciidoc/deployable-contracts/fetch-all-info-markdowns.adoc[]
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
 include::src/docs/asciidoc/deploy/create.adoc[]
-include::src/docs/asciidoc/deploy/fetch.adoc[]
+include::src/docs/asciidoc/deploy/fetch-by-id.adoc[]
+include::src/docs/asciidoc/deploy/fetch-by-project-id-alias.adoc[]
 include::src/docs/asciidoc/deploy/fetch-by-project-id.adoc[]
 include::src/docs/asciidoc/deploy/attach.adoc[]
 
