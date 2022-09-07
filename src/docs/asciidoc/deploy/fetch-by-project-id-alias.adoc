@@ -1,5 +1,5 @@
 === Fetch Contract Deployment Requests by Project ID and Contract Alias
-Fetches contract deployment request for given project ID and Contract Alias.
+Fetches contract deployment request for given project ID and contract alias.
 
 .Request Example
 [%collapsible]
