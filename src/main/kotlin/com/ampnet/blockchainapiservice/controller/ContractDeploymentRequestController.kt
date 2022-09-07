@@ -53,6 +53,19 @@ class ContractDeploymentRequestController(
         return ResponseEntity.ok(ContractDeploymentRequestResponse(contractDeploymentRequest))
     }
 
+    @GetMapping("/v1/deploy/by-project/{projectId}/by-alias/{alias}")
+    fun getContractDeploymentRequestByProjectIdAndAlias(
+        @PathVariable("projectId") projectId: UUID,
+        @PathVariable("alias") alias: String
+    ): ResponseEntity<ContractDeploymentRequestResponse> {
+        val contractDeploymentRequest = contractDeploymentRequestService
+            .getContractDeploymentRequestByProjectIdAndAlias(
+                projectId = projectId,
+                alias = alias
+            )
+        return ResponseEntity.ok(ContractDeploymentRequestResponse(contractDeploymentRequest))
+    }
+
     @GetMapping("/v1/deploy/by-project/{projectId}")
     fun getContractDeploymentRequestsByProjectIdAndFilters(
         @PathVariable("projectId") projectId: UUID,
@@ -74,19 +87,6 @@ class ContractDeploymentRequestController(
         return ResponseEntity.ok(
             ContractDeploymentRequestsResponse(contractDeploymentRequests.map { ContractDeploymentRequestResponse(it) })
         )
-    }
-
-    @GetMapping("/v1/deploy/by-project/{projectId}/by-alias/{alias}")
-    fun getContractDeploymentRequestByProjectIdAndAlias(
-        @PathVariable("projectId") projectId: UUID,
-        @PathVariable("alias") alias: String
-    ): ResponseEntity<ContractDeploymentRequestResponse> {
-        val contractDeploymentRequest = contractDeploymentRequestService
-            .getContractDeploymentRequestByProjectIdAndAlias(
-                projectId,
-                alias
-            )
-        return ResponseEntity.ok(ContractDeploymentRequestResponse(contractDeploymentRequest))
     }
 
     @PutMapping("/v1/deploy/{id}")
