@@ -20,10 +20,12 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.annotation.DirtiesContext
 import java.util.UUID
 
 @JooqTest
 @Import(JooqProjectRepository::class)
+@DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JooqProjectRepositoryIntegTest : TestBase() {
 
