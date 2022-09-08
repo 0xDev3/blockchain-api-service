@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
+@Suppress("TooManyFunctions")
 class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : MultiPaymentTemplateRepository {
 
     companion object : KLogging()
