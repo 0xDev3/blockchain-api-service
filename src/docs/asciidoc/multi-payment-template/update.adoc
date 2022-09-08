@@ -1,0 +1,20 @@
+=== Update Multi-Payment Template
+Updates multi-payment template with specified parameters.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/MultiPaymentTemplateControllerApiTest/mustCorrectlyUpdateMultiPaymentTemplate/http-request.adoc[]
+====
+.Response Example
+[%collapsible]
+====
+include::{snippets}/MultiPaymentTemplateControllerApiTest/mustCorrectlyUpdateMultiPaymentTemplate/http-response.adoc[]
+====
+
+Schemas:
+
+.Request Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.request.UpdateMultiPaymentTemplateRequest.adoc[]
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse.adoc[]

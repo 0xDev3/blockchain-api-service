@@ -31,3 +31,13 @@ include::src/docs/asciidoc/address-book/create.adoc[]
 include::src/docs/asciidoc/address-book/update.adoc[]
 include::src/docs/asciidoc/address-book/delete.adoc[]
 include::src/docs/asciidoc/address-book/fetch-by-alias.adoc[]
+
+== Multi-Payment Template Management API
+All endpoints require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/multi-payment-template/create.adoc[]
+include::src/docs/asciidoc/multi-payment-template/update.adoc[]
+include::src/docs/asciidoc/multi-payment-template/delete.adoc[]
+include::src/docs/asciidoc/multi-payment-template/add-item.adoc[]
+include::src/docs/asciidoc/multi-payment-template/update-item.adoc[]
+include::src/docs/asciidoc/multi-payment-template/delete-item.adoc[]
