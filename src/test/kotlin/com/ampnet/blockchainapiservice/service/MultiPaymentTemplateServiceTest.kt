@@ -112,6 +112,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyUpdateMultiPaymentTemplate() {
+        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
+        val updatedAt = TestData.TIMESTAMP + Duration.ofSeconds(10L)
+
+        suppose("some timestamp will be returned") {
+            given(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(updatedAt)
+        }
+
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
@@ -121,7 +129,8 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
         val updatedTemplate = TEMPLATE.copy(
             templateName = UPDATE_REQUEST.templateName,
-            chainId = ChainId(UPDATE_REQUEST.chainId)
+            chainId = ChainId(UPDATE_REQUEST.chainId),
+            updatedAt = updatedAt
         )
 
         suppose("multi-payment template will be updated in the database") {
@@ -132,7 +141,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val service = MultiPaymentTemplateServiceImpl(
             multiPaymentTemplateRepository = multiPaymentTemplateRepository,
             uuidProvider = mock(),
-            utcDateTimeProvider = mock()
+            utcDateTimeProvider = utcDateTimeProvider
         )
 
         verify("multi-payment template is updated in the database") {

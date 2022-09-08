@@ -69,7 +69,11 @@ class MultiPaymentTemplateServiceImpl(
         }
         val template = getOwnedMultiPaymentTemplateById(templateId, userIdentifier)
         return multiPaymentTemplateRepository.update(
-            template.copy(templateName = request.templateName, chainId = ChainId(request.chainId))
+            template.copy(
+                templateName = request.templateName,
+                chainId = ChainId(request.chainId),
+                updatedAt = utcDateTimeProvider.getUtcDateTime()
+            )
         ) ?: throw ResourceNotFoundException("Multi-payment template not found for ID: $templateId")
     }
 
