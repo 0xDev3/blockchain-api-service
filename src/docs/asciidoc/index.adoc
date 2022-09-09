@@ -78,6 +78,13 @@ can be found in the internal API documentation.
 include::src/docs/asciidoc/address-book/fetch-by-id.adoc[]
 include::src/docs/asciidoc/address-book/fetch-by-wallet-address.adoc[]
 
+== Public Multi-Payment Template API
+All endpoints are public and do not require `Authorization: Bearer JWT` header. Endpoints to modify multi-payment
+templates can be found in the internal API documentation.
+
+include::src/docs/asciidoc/multi-payment-template/fetch.adoc[]
+include::src/docs/asciidoc/multi-payment-template/fetch-by-wallet-address.adoc[]
+
 == Available Function Argument Types
 include::src/docs/asciidoc/function-arg-types.adoc[]
 

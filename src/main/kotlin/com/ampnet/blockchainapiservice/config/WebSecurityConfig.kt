@@ -81,6 +81,8 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) : WebSecurityCon
             .antMatchers("/v1/address-book/**").authenticated()
             .antMatchers(HttpMethod.GET, "/v1/address-book/**").permitAll()
             .antMatchers(HttpMethod.GET, "/v1/address-book/by-alias/**").authenticated()
+            .antMatchers("/v1/multi-payment-template/**").authenticated()
+            .antMatchers(HttpMethod.GET, "/v1/multi-payment-template/**").permitAll()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling().authenticationEntryPoint(authenticationHandler).and()

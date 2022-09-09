@@ -205,11 +205,11 @@ class ContractDecoratorFileChangeListener(
 
     private fun List<AbiInputOutput>.toTypeList(): String =
         joinToString(separator = ",") {
-            if (it.type.startsWith("tuple")) it.buildStructType(it.type.removePrefix("tuple")) else it.type
+            if (it.type.startsWith("tuple")) it.buildTupleType(it.type.removePrefix("tuple")) else it.type
         }
 
-    private fun AbiInputOutput.buildStructType(arraySuffix: String): String =
-        "struct(${components.orEmpty().toTypeList()})$arraySuffix"
+    private fun AbiInputOutput.buildTupleType(arraySuffix: String): String =
+        "tuple(${components.orEmpty().toTypeList()})$arraySuffix"
 
     private fun List<TypeDecorator>.toContractParameters(abi: List<AbiInputOutput>): List<ContractParameter> =
         zip(abi).map {

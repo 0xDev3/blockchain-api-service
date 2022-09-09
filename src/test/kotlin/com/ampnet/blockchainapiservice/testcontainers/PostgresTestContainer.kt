@@ -8,6 +8,8 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentR
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20LockRequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateItemTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import org.jooq.DSLContext
@@ -28,6 +30,8 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
         dslContext.deleteFrom(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST).execute()
         dslContext.deleteFrom(ContractMetadataTable.CONTRACT_METADATA).execute()
         dslContext.deleteFrom(Erc20LockRequestTable.ERC20_LOCK_REQUEST).execute()
+        dslContext.deleteFrom(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM).execute()
+        dslContext.deleteFrom(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE).execute()
         dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
         dslContext.deleteFrom(ProjectTable.PROJECT).execute()
         dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()

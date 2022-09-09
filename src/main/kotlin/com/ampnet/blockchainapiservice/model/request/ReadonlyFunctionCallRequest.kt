@@ -8,6 +8,7 @@ import com.ampnet.blockchainapiservice.model.params.DeployedContractIdentifierRe
 import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.model.params.OutputParameterSchema
 import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.FunctionArgumentSchema
 import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
 import com.ampnet.blockchainapiservice.util.annotation.SchemaName
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -30,6 +31,7 @@ data class ReadonlyFunctionCallRequest(
     @field:Valid
     @field:NotNull
     @field:MaxArgsSize
+    @field:SchemaIgnore
     val functionParams: List<FunctionArgument>,
     @field:Valid
     @field:NotNull
@@ -40,6 +42,11 @@ data class ReadonlyFunctionCallRequest(
     @field:ValidEthAddress
     val callerAddress: String
 ) : DeployedContractIdentifierRequestBody {
+    @Suppress("unused") // used for JSON schema generation
+    @JsonIgnore
+    @SchemaName("function_params")
+    private val schemaFunctionParams: List<FunctionArgumentSchema> = emptyList()
+
     @Suppress("unused") // used for JSON schema generation
     @JsonIgnore
     @SchemaName("output_params")

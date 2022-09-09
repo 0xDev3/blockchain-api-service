@@ -11,11 +11,11 @@ The `functionParams` field is an array of objects which must have `type` and `va
 section <<Available Function Argument Types>>.
 
 The `outputParams` field is an array of output parameter types, which correspond to the type name according to the table
-in section <<Available Function Argument Types>>. Structure types are constructed by providing an object instead of type
-name, for example `{"type": "struct", "elems": ["uint", "string"]}` is a struct with element types of `uint` and
-`string`. Structure nesting is possible by providing the appropriate value in the `elem` array. Any array dimensions of
-the structure must be expressed in its `type` field, for example `{"type": "struct[]", "elems": ["uint", "string"]}`
-defines an array of structures with element types of `uint` and `string`.
+in section <<Available Function Argument Types>>. Tuple types are constructed by providing an object instead of type
+name, for example `{"type": "tuple", "elems": ["uint", "string"]}` is a tuple with element types of `uint` and
+`string`. Tuple nesting is possible by providing the appropriate value in the `elem` array. Any array dimensions of
+the tuple must be expressed in its `type` field, for example `{"type": "tuple[]", "elems": ["uint", "string"]}`
+defines an array of tuples with element types of `uint` and `string`.
 
 *This request requires an API key present in the `X-API-KEY` header.*
 

@@ -854,11 +854,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDeserializeStruct() {
+    fun mustCorrectlyDeserializeTuple() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "value": [
             |        {
             |          "type": "string",
@@ -873,7 +873,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse struct") {
+        verify("must correctly parse tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args
                 .map { it.value as DynamicStruct }
                 .map { it.value.map { type -> type.value } }[0]
@@ -884,25 +884,25 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDeserializeNestedStruct() {
+    fun mustCorrectlyDeserializeNestedTuple() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "value": [
             |        {
             |          "type": "string",
             |          "value": "test"
             |        },
             |        {
-            |          "type": "struct",
+            |          "type": "tuple",
             |          "value": [
             |            {
             |              "type": "string",
             |              "value": "nested1"
             |            },
             |            {
-            |              "type": "struct",
+            |              "type": "tuple",
             |              "value": [
             |                {
             |                  "type": "string",
@@ -929,7 +929,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse nested struct") {
+        verify("must correctly parse nested tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args
                 .map { it.value as DynamicStruct }
                 .map {
@@ -964,11 +964,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDeserializeStructWithArrayElements() {
+    fun mustCorrectlyDeserializeTupleWithArrayElements() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "value": [
             |        {
             |          "type": "string[]",
@@ -983,7 +983,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse struct with array elements") {
+        verify("must correctly parse tuple with array elements") {
             val result = objectMapper.readValue(json, Result::class.java).args
                 .map { it.value as DynamicStruct }
                 .map {
@@ -1003,16 +1003,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDeserializeStructArray() {
+    fun mustCorrectlyDeserializeTupleArray() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct[]",
+            |      "type": "tuple[]",
             |      "value": [
             |        [
             |          {
             |            "type": "string",
-            |            "value": "struct1"
+            |            "value": "tuple1"
             |          },
             |          {
             |            "type": "uint",
@@ -1022,7 +1022,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |        [
             |          {
             |            "type": "string",
-            |            "value": "struct2"
+            |            "value": "tuple2"
             |          },
             |          {
             |            "type": "uint",
@@ -1034,32 +1034,32 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse struct array") {
+        verify("must correctly parse tuple array") {
             val result = objectMapper.readValue(json, Result::class.java).args
                 .map {
                     @Suppress("UNCHECKED_CAST")
                     it.value as DynamicArray<DynamicStruct>
                 }
                 .map {
-                    it.value.map { struct -> struct.value.map { elem -> elem.value } }
+                    it.value.map { tuple -> tuple.value.map { elem -> elem.value } }
                 }[0]
 
             assertThat(result).withMessage()
                 .isEqualTo(
                     listOf(
-                        listOf("struct1", BigInteger.ZERO),
-                        listOf("struct2", BigInteger.ONE)
+                        listOf("tuple1", BigInteger.ZERO),
+                        listOf("tuple2", BigInteger.ONE)
                     )
                 )
         }
     }
 
     @Test
-    fun mustCorrectlyDeserializeArrayOfNestedStructsWithArrays() {
+    fun mustCorrectlyDeserializeArrayOfNestedTuplesWithArrays() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct[]",
+            |      "type": "tuple[]",
             |      "value": [
             |        [
             |          {
@@ -1067,7 +1067,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |            "value": [["test1"]]
             |          },
             |          {
-            |            "type": "struct[]",
+            |            "type": "tuple[]",
             |            "value": [
             |              [
             |                {
@@ -1075,7 +1075,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |                  "value": ["0x0"]
             |                },
             |                {
-            |                  "type": "struct",
+            |                  "type": "tuple",
             |                  "value": [
             |                    {
             |                      "type": "int",
@@ -1088,7 +1088,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |                  "value": true
             |                },
             |                {
-            |                  "type": "struct[]",
+            |                  "type": "tuple[]",
             |                  "value": []
             |                }
             |              ]
@@ -1105,7 +1105,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |            "value": [["test2"]]
             |          },
             |          {
-            |            "type": "struct[]",
+            |            "type": "tuple[]",
             |            "value": [
             |              [
             |                {
@@ -1113,7 +1113,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |                  "value": ["0x1"]
             |                },
             |                {
-            |                  "type": "struct",
+            |                  "type": "tuple",
             |                  "value": [
             |                    {
             |                      "type": "int",
@@ -1126,7 +1126,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |                  "value": false
             |                },
             |                {
-            |                  "type": "struct[]",
+            |                  "type": "tuple[]",
             |                  "value": []
             |                }
             |              ]
@@ -1142,35 +1142,35 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse array of nested structs with arrays") {
+        verify("must correctly parse array of nested tuples with arrays") {
             val result = objectMapper.readValue(json, Result::class.java).args
                 .map {
                     @Suppress("UNCHECKED_CAST")
                     it.value as DynamicArray<DynamicStruct>
                 }
                 .map {
-                    it.value.map { struct ->
-                        struct.value.map { structElem ->
-                            if (structElem is DynamicArray<*>) {
+                    it.value.map { tuple ->
+                        tuple.value.map { tupleElem ->
+                            if (tupleElem is DynamicArray<*>) {
                                 @Suppress("UNCHECKED_CAST")
-                                val innerStructArray = structElem as DynamicArray<DynamicStruct>
+                                val innerTupleArray = tupleElem as DynamicArray<DynamicStruct>
 
-                                innerStructArray.value.map { innerStruct ->
-                                    innerStruct.value.map { innerStructElem ->
-                                        if (innerStructElem is DynamicStruct) {
-                                            innerStructElem.value.map { v -> v.value }
+                                innerTupleArray.value.map { innerTuple ->
+                                    innerTuple.value.map { innerTupleElem ->
+                                        if (innerTupleElem is DynamicStruct) {
+                                            innerTupleElem.value.map { v -> v.value }
                                         } else {
-                                            innerStructElem.value
+                                            innerTupleElem.value
                                         }
                                     }
                                 }
-                            } else if (structElem is SizedStaticArray<*>) {
-                                structElem.value.map { e ->
+                            } else if (tupleElem is SizedStaticArray<*>) {
+                                tupleElem.value.map { e ->
                                     @Suppress("UNCHECKED_CAST")
                                     (e as DynamicArray<Utf8String>).value.map { s -> s.value }
                                 }
                             } else {
-                                structElem.value
+                                tupleElem.value
                             }
                         }
                     }
@@ -1178,31 +1178,31 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
             assertThat(result).withMessage()
                 .isEqualTo(
-                    listOf( // struct array
-                        listOf( // struct 1
+                    listOf( // tuple array
+                        listOf( // tuple 1
                             listOf(listOf("test1")),
-                            listOf( // inner struct array 1
-                                listOf( // inner struct 1
+                            listOf( // inner tuple array 1
+                                listOf( // inner tuple 1
                                     listOf(Address("0x0")),
-                                    listOf( // innermost struct 1
+                                    listOf( // innermost tuple 1
                                         BigInteger.TWO
                                     ),
                                     true,
-                                    emptyList<Nothing>() // empty struct array
+                                    emptyList<Nothing>() // empty tuple array
                                 )
                             ),
                             BigInteger.ONE
                         ),
-                        listOf( // struct 2
+                        listOf( // tuple 2
                             listOf(listOf("test2")),
-                            listOf( // inner struct array 2
-                                listOf( // inner struct 2
+                            listOf( // inner tuple array 2
+                                listOf( // inner tuple 2
                                     listOf(Address("0x1")),
-                                    listOf( // innermost struct 2
+                                    listOf( // innermost tuple 2
                                         BigInteger.ZERO
                                     ),
                                     false,
-                                    emptyList<Nothing>() // empty struct array
+                                    emptyList<Nothing>() // empty tuple array
                                 )
                             ),
                             BigInteger.TEN
@@ -1263,8 +1263,8 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("string[1][1][]")
         }
 
-        val structJson = """{
-            |  "type": "struct",
+        val tupleJson = """{
+            |  "type": "tuple",
             |  "value": [
             |    {
             |      "type": "string",
@@ -1277,29 +1277,29 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("correct type hierarchy is returned for struct JSON") {
-            val tree = objectMapper.readTree(structJson)
+        verify("correct type hierarchy is returned for tuple JSON") {
+            val tree = objectMapper.readTree(tupleJson)
 
             assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
-                .isEqualTo("struct(string,uint)")
+                .isEqualTo("tuple(string,uint)")
         }
 
-        val nestedStructJson = """{
-            |  "type": "struct",
+        val nestedTupleJson = """{
+            |  "type": "tuple",
             |  "value": [
             |    {
             |      "type": "string",
             |      "value": "test"
             |    },
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "value": [
             |        {
             |          "type": "address",
             |          "value": "0x0"
             |        },
             |        {
-            |          "type": "struct",
+            |          "type": "tuple",
             |          "value": [
             |            {
             |              "type": "int",
@@ -1320,39 +1320,39 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("correct type hierarchy is returned for struct JSON") {
-            val tree = objectMapper.readTree(nestedStructJson)
+        verify("correct type hierarchy is returned for tuple JSON") {
+            val tree = objectMapper.readTree(nestedTupleJson)
 
             assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
-                .isEqualTo("struct(string,struct(address,struct(int),bool),uint)")
+                .isEqualTo("tuple(string,tuple(address,tuple(int),bool),uint)")
         }
 
-        val emptyStructArrayJson = """{
-            |  "type": "struct[]",
+        val emptyTupleArrayJson = """{
+            |  "type": "tuple[]",
             |  "value": []
             |}""".trimMargin()
 
-        verify("correct type hierarchy is returned for empty struct array JSON") {
-            val tree = objectMapper.readTree(emptyStructArrayJson)
+        verify("correct type hierarchy is returned for empty tuple array JSON") {
+            val tree = objectMapper.readTree(emptyTupleArrayJson)
 
             assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
-                .isEqualTo("struct(*)[]")
+                .isEqualTo("tuple(*)[]")
         }
 
-        val emptyNestedStructArrayJson = """{
-            |  "type": "struct[][0][]",
+        val emptyNestedTupleArrayJson = """{
+            |  "type": "tuple[][0][]",
             |  "value": [[[]]]
             |}""".trimMargin()
 
-        verify("correct type hierarchy is returned for nested empty struct array JSON") {
-            val tree = objectMapper.readTree(emptyNestedStructArrayJson)
+        verify("correct type hierarchy is returned for nested empty tuple array JSON") {
+            val tree = objectMapper.readTree(emptyNestedTupleArrayJson)
 
             assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
-                .isEqualTo("struct(*)[][0][]")
+                .isEqualTo("tuple(*)[][0][]")
         }
 
-        val structArrayJson = """{
-            |  "type": "struct[]",
+        val tupleArrayJson = """{
+            |  "type": "tuple[]",
             |  "value": [
             |    [
             |      {
@@ -1367,15 +1367,15 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("correct type hierarchy is returned for struct array JSON") {
-            val tree = objectMapper.readTree(structArrayJson)
+        verify("correct type hierarchy is returned for tuple array JSON") {
+            val tree = objectMapper.readTree(tupleArrayJson)
 
             assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
-                .isEqualTo("struct(string,uint)[]")
+                .isEqualTo("tuple(string,uint)[]")
         }
 
-        val nestedStructArrayJson = """{
-            |  "type": "struct[1][1][]",
+        val nestedTupleArrayJson = """{
+            |  "type": "tuple[1][1][]",
             |  "value": [
             |    [
             |      [
@@ -1394,15 +1394,15 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("correct type hierarchy is returned for nested struct array JSON") {
-            val tree = objectMapper.readTree(nestedStructArrayJson)
+        verify("correct type hierarchy is returned for nested tuple array JSON") {
+            val tree = objectMapper.readTree(nestedTupleArrayJson)
 
             assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
-                .isEqualTo("struct(string,uint)[1][1][]")
+                .isEqualTo("tuple(string,uint)[1][1][]")
         }
 
-        val nestedStructWithArraysJson = """{
-            |  "type": "struct[]",
+        val nestedTupleWithArraysJson = """{
+            |  "type": "tuple[]",
             |  "value": [
             |    [
             |      {
@@ -1410,7 +1410,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |        "value": [["test"]]
             |      },
             |      {
-            |        "type": "struct[]",
+            |        "type": "tuple[]",
             |        "value": [
             |          [
             |            {
@@ -1418,7 +1418,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |              "value": ["0x0"]
             |            },
             |            {
-            |              "type": "struct",
+            |              "type": "tuple",
             |              "value": [
             |                {
             |                  "type": "int",
@@ -1431,7 +1431,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |              "value": true
             |            },
             |            {
-            |              "type": "struct[]",
+            |              "type": "tuple[]",
             |              "value": []
             |            }
             |          ]
@@ -1445,11 +1445,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("correct type hierarchy is returned for struct with arrays JSON") {
-            val tree = objectMapper.readTree(nestedStructWithArraysJson)
+        verify("correct type hierarchy is returned for tuple with arrays JSON") {
+            val tree = objectMapper.readTree(nestedTupleWithArraysJson)
 
             assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
-                .isEqualTo("struct(string[][1],struct(address[],struct(int),bool,struct(*)[])[],uint)[]")
+                .isEqualTo("tuple(string[][1],tuple(address[],tuple(int),bool,tuple(*)[])[],uint)[]")
         }
     }
 
@@ -1722,11 +1722,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingEmptyStruct() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingEmptyTuple() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "value": []
             |    }
             |  ]
@@ -1743,11 +1743,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructWithNonArrayValue() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleWithNonArrayValue() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "value": "non-an-array"
             |    }
             |  ]
@@ -1764,11 +1764,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructWithMissingElementType() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleWithMissingElementType() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "value": [
             |        {
             |          "value": "missing-type"
@@ -1789,11 +1789,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructWithMissingElementValue() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleWithMissingElementValue() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "value": [
             |        {
             |          "type": "missing-value"
@@ -1814,16 +1814,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructArrayWithMismatchingStructs() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleArrayWithMismatchingTuples() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct[]",
+            |      "type": "tuple[]",
             |      "value": [
             |        [
             |          {
             |            "type": "string",
-            |            "value": "struct1"
+            |            "value": "tuple1"
             |          },
             |          {
             |            "type": "uint",
@@ -1833,7 +1833,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |        [
             |          {
             |            "type": "string",
-            |            "value": "struct2"
+            |            "value": "tuple2"
             |          }
             |        ]
             |      ]
@@ -1852,11 +1852,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingStructArrayWithMismatchingNestedStructs() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleArrayWithMismatchingNestedTuples() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct[]",
+            |      "type": "tuple[]",
             |      "value": [
             |        [
             |          {
@@ -1864,7 +1864,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |            "value": [["test1"]]
             |          },
             |          {
-            |            "type": "struct[]",
+            |            "type": "tuple[]",
             |            "value": [
             |              [
             |                {
@@ -1872,7 +1872,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |                  "value": ["0x0"]
             |                },
             |                {
-            |                  "type": "struct",
+            |                  "type": "tuple",
             |                  "value": [
             |                    {
             |                      "type": "int",
@@ -1885,7 +1885,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |                  "value": true
             |                },
             |                {
-            |                  "type": "struct[]",
+            |                  "type": "tuple[]",
             |                  "value": []
             |                }
             |              ]
@@ -1902,7 +1902,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |            "value": [["test2"]]
             |          },
             |          {
-            |            "type": "struct[]",
+            |            "type": "tuple[]",
             |            "value": [
             |              [
             |                {
@@ -1910,7 +1910,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |                  "value": ["0x1"]
             |                },
             |                {
-            |                  "type": "struct",
+            |                  "type": "tuple",
             |                  "value": [
             |                    {
             |                      "type": "int",
@@ -1923,7 +1923,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             |                  "value": false
             |                },
             |                {
-            |                  "type": "struct[]",
+            |                  "type": "tuple[]",
             |                  "value": [
             |                    [
             |                      {

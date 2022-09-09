@@ -41,8 +41,8 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
         return if (arrayMatchingResult != null) {
             val (_, arrayElementType, arraySize) = arrayMatchingResult.groupValues
             argumentValue.parseArray(p, arrayElementType, arraySize.toIntOrNull())
-        } else if (argumentType == "struct") {
-            argumentValue.parseStruct(p)
+        } else if (argumentType == "tuple") {
+            argumentValue.parseTuple(p)
         } else {
             Web3TypeMappings[argumentType]
                 ?.let { it(argumentValue, p) }
@@ -55,7 +55,7 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
             this.elements().asSequence().map { Pair(it, deserializeType(p, elementType, it)) }.toList().takeIf {
                 length == null || it.size == length
             }
-                ?.checkStructCompatibility(p, elementType)
+                ?.checkTupleCompatibility(p, elementType)
                 ?.createArray(elementType.web3ElementType(p, this), length)
                 ?: throw JsonParseException(p, "invalid array length")
         } else {
@@ -70,12 +70,12 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
             SizedStaticArray(web3ElementType as Class<Type<*>>, this)
         }
 
-    private fun List<Pair<JsonNode, Type<*>>>.checkStructCompatibility(
+    private fun List<Pair<JsonNode, Type<*>>>.checkTupleCompatibility(
         p: JsonParser,
         elementType: String
     ): List<Type<*>> {
-        if (elementType == "struct" && this.hasInvalidStructTypeHierarchy()) {
-            throw JsonParseException(p, "mismatching struct elements in array")
+        if (elementType == "tuple" && this.hasInvalidTupleTypeHierarchy()) {
+            throw JsonParseException(p, "mismatching tuple elements in array")
         }
 
         return this.map { it.second }
@@ -86,32 +86,32 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
             DynamicArray::class.java
         } else if (ARRAY_REGEX_WITH_SIZE.matches(this)) {
             SizedStaticArray::class.java
-        } else if (this == "struct") {
+        } else if (this == "tuple") {
             DynamicStruct::class.java
         } else {
             Web3TypeMappings.getWeb3Type(p, node, this)
                 ?: throw JsonParseException(p, "unknown type: $this")
         }
 
-    private fun JsonNode.parseStruct(p: JsonParser): DynamicStruct =
+    private fun JsonNode.parseTuple(p: JsonParser): DynamicStruct =
         if (this.isArray) {
-            val structElements = this.elements().asSequence().map {
-                val structArgumentType = it["type"]?.asText() ?: throw JsonParseException(p, "missing type")
-                val structArgumentValue = it["value"] ?: throw JsonParseException(p, "missing value")
-                deserializeType(p, structArgumentType, structArgumentValue)
-            }.toList().takeIf { it.isNotEmpty() } ?: throw JsonParseException(p, "structs cannot be empty")
+            val tupleElements = this.elements().asSequence().map {
+                val tupleArgumentType = it["type"]?.asText() ?: throw JsonParseException(p, "missing type")
+                val tupleArgumentValue = it["value"] ?: throw JsonParseException(p, "missing value")
+                deserializeType(p, tupleArgumentType, tupleArgumentValue)
+            }.toList().takeIf { it.isNotEmpty() } ?: throw JsonParseException(p, "tuples cannot be empty")
 
-            DynamicStruct(structElements)
+            DynamicStruct(tupleElements)
         } else {
             throw JsonParseException(p, ARRAY_VALUE_ERROR)
         }
 
-    private fun List<Pair<JsonNode, Type<*>>>.hasInvalidStructTypeHierarchy() =
+    private fun List<Pair<JsonNode, Type<*>>>.hasInvalidTupleTypeHierarchy() =
         this.map {
             getTypeHierarchy(
                 OBJECT_MAPPER.createObjectNode().apply {
                     set<JsonNode>("value", it.first)
-                    set<JsonNode>("type", textNode("struct"))
+                    set<JsonNode>("type", textNode("tuple"))
                 }
             )
         }.toSet().size > 1
@@ -131,10 +131,10 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
             }
 
             getTypeHierarchy(arrayNode) + arraySuffix
-        } else if (type == "struct") {
+        } else if (type == "tuple") {
             node["value"].elements().asSequence().map { getTypeHierarchy(it) }
                 .ifEmpty { sequenceOf("*") }
-                .joinToString(prefix = "struct(", separator = ",", postfix = ")")
+                .joinToString(prefix = "tuple(", separator = ",", postfix = ")")
         } else {
             type
         }
