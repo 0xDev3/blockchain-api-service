@@ -54,7 +54,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
                 rawReturnValue = "0x0"
             ),
             deployedContractId = deployedContractId,
-            contractAddress = ContractAddress("caebafe")
+            contractAddress = ContractAddress("cafebafe")
         )
         val project = Project(
             id = UUID.randomUUID(),
@@ -99,7 +99,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
                             blockNumber = result.value.blockNumber.value,
                             timestamp = result.value.timestamp.value,
                             outputParams = response.body!!.outputParams,
-                            returnValues = result.value.returnValues.map { it.toString() },
+                            returnValues = result.value.returnValues,
                             rawReturnValue = result.value.rawReturnValue
                         )
                     )

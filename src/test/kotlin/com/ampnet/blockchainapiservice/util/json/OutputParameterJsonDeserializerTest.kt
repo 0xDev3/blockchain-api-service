@@ -11,7 +11,7 @@ import com.ampnet.blockchainapiservice.util.IntType
 import com.ampnet.blockchainapiservice.util.StaticArrayType
 import com.ampnet.blockchainapiservice.util.StaticBytesType
 import com.ampnet.blockchainapiservice.util.StringType
-import com.ampnet.blockchainapiservice.util.StructType
+import com.ampnet.blockchainapiservice.util.TupleType
 import com.ampnet.blockchainapiservice.util.UintType
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
@@ -115,38 +115,38 @@ class OutputParameterJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDeserializeStruct() {
+    fun mustCorrectlyDeserializeTuple() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "elems": ["string", "uint"]
             |    }
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse struct") {
+        verify("must correctly parse tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
             assertThat(result).withMessage()
-                .isEqualTo(listOf(StructType(StringType, UintType)))
+                .isEqualTo(listOf(TupleType(StringType, UintType)))
         }
     }
 
     @Test
-    fun mustCorrectlyDeserializeNestedStruct() {
+    fun mustCorrectlyDeserializeNestedTuple() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "elems": [
             |        "string",
             |        {
-            |          "type": "struct",
+            |          "type": "tuple",
             |          "elems": [
             |            "string",
             |            {
-            |              "type": "struct",
+            |              "type": "tuple",
             |              "elems": ["string", "bool", "bytes5"]
             |            },
             |            "int"
@@ -158,17 +158,17 @@ class OutputParameterJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse nested struct") {
+        verify("must correctly parse nested tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
             assertThat(result).withMessage()
                 .isEqualTo(
                     listOf(
-                        StructType(
+                        TupleType(
                             StringType,
-                            StructType(
+                            TupleType(
                                 StringType,
-                                StructType(StringType, BoolType, StaticBytesType(5)),
+                                TupleType(StringType, BoolType, StaticBytesType(5)),
                                 IntType
                             ),
                             UintType
@@ -179,23 +179,23 @@ class OutputParameterJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDeserializeStructWithArrayElements() {
+    fun mustCorrectlyDeserializeTupleWithArrayElements() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "elems": ["string[]", "uint[]"]
             |    }
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse struct with array elements") {
+        verify("must correctly parse tuple with array elements") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
             assertThat(result).withMessage()
                 .isEqualTo(
                     listOf(
-                        StructType(
+                        TupleType(
                             DynamicArrayType(StringType),
                             DynamicArrayType(UintType)
                         )
@@ -205,24 +205,24 @@ class OutputParameterJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDeserializeStructArray() {
+    fun mustCorrectlyDeserializeTupleArray() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct[]",
+            |      "type": "tuple[]",
             |      "elems": ["string", "uint"]
             |    }
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse struct array") {
+        verify("must correctly parse tuple array") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
             assertThat(result).withMessage()
                 .isEqualTo(
                     listOf(
                         DynamicArrayType(
-                            StructType(StringType, UintType)
+                            TupleType(StringType, UintType)
                         )
                     )
                 )
@@ -230,24 +230,24 @@ class OutputParameterJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDeserializeArrayOfNestedStructsWithArrays() {
+    fun mustCorrectlyDeserializeArrayOfNestedTuplesWithArrays() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct[][2]",
+            |      "type": "tuple[][2]",
             |      "elems": [
             |        "string[][1]",
             |        {
-            |          "type": "struct[]",
+            |          "type": "tuple[]",
             |          "elems": [
             |            "address[]",
             |            {
-            |              "type": "struct",
+            |              "type": "tuple",
             |              "elems": ["int"]
             |            },
             |            "bool",
             |            {
-            |              "type": "struct[][]",
+            |              "type": "tuple[][]",
             |              "elems": ["uint"]
             |            }
             |          ]
@@ -258,7 +258,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
             |  ]
             |}""".trimMargin()
 
-        verify("must correctly parse array of nested structs with arrays") {
+        verify("must correctly parse array of nested tuples with arrays") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
             assertThat(result).withMessage()
@@ -266,14 +266,14 @@ class OutputParameterJsonDeserializerTest : TestBase() {
                     listOf(
                         StaticArrayType(
                             DynamicArrayType(
-                                StructType(
+                                TupleType(
                                     StaticArrayType(DynamicArrayType(StringType), 1),
                                     DynamicArrayType(
-                                        StructType(
+                                        TupleType(
                                             DynamicArrayType(AddressType),
-                                            StructType(IntType),
+                                            TupleType(IntType),
                                             BoolType,
-                                            DynamicArrayType(DynamicArrayType(StructType(UintType)))
+                                            DynamicArrayType(DynamicArrayType(TupleType(UintType)))
                                         )
                                     ),
                                     UintType
@@ -319,7 +319,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForMissingStructType() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForMissingTupleType() {
         val json = """{
             |  "args": [
             |    {
@@ -339,11 +339,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForInvalidStructType() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForInvalidTupleType() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "non-struct",
+            |      "type": "non-tuple",
             |      "elems": []
             |    }
             |  ]
@@ -360,11 +360,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForMissingStructElements() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForMissingTupleElements() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct"
+            |      "type": "tuple"
             |    }
             |  ]
             |}""".trimMargin()
@@ -380,11 +380,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
     }
 
     @Test
-    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForInvalidStructElement() {
+    fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForInvalidTupleElement() {
         val json = """{
             |  "args": [
             |    {
-            |      "type": "struct",
+            |      "type": "tuple",
             |      "elems": [[]]
             |    }
             |  ]

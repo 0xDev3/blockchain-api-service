@@ -30,11 +30,13 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.annotation.DirtiesContext
 import java.math.BigInteger
 import java.util.UUID
 
 @JooqTest
 @Import(JooqContractFunctionCallRequestRepository::class)
+@DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
 

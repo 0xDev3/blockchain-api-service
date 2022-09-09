@@ -10,7 +10,7 @@ import com.ampnet.blockchainapiservice.util.IntType
 import com.ampnet.blockchainapiservice.util.StaticArrayType
 import com.ampnet.blockchainapiservice.util.StaticBytesType
 import com.ampnet.blockchainapiservice.util.StringType
-import com.ampnet.blockchainapiservice.util.StructType
+import com.ampnet.blockchainapiservice.util.TupleType
 import com.ampnet.blockchainapiservice.util.UintType
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.ListAssert
@@ -486,10 +486,10 @@ class EthereumAbiDecoderServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDecodeStaticStruct() {
-        verify("struct(uint, bool, bytes5) is correctly decoded") {
+    fun mustCorrectlyDecodeStaticTuple() {
+        verify("tuple(uint, bool, bytes5) is correctly decoded") {
             decoding(
-                listOf(StructType(UintType, BoolType, StaticBytesType(5))),
+                listOf(TupleType(UintType, BoolType, StaticBytesType(5))),
                 "0x" +
                     "0000000000000000000000000000000000000000000000000000000000000064" + // uint
                     "0000000000000000000000000000000000000000000000000000000000000000" + // bool
@@ -506,14 +506,14 @@ class EthereumAbiDecoderServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDecodeDynamicStruct() {
-        verify("struct(uint, uint[2], string, bool, uint[]) is correctly decoded") {
+    fun mustCorrectlyDecodeDynamicTuple() {
+        verify("tuple(uint, uint[2], string, bool, uint[]) is correctly decoded") {
             decoding(
                 listOf(
-                    StructType(UintType, StaticArrayType(UintType, 2), StringType, BoolType, DynamicArrayType(UintType))
+                    TupleType(UintType, StaticArrayType(UintType, 2), StringType, BoolType, DynamicArrayType(UintType))
                 ),
                 "0x" +
-                    "0000000000000000000000000000000000000000000000000000000000000020" + // struct offset
+                    "0000000000000000000000000000000000000000000000000000000000000020" + // tuple offset
                     "0000000000000000000000000000000000000000000000000000000000000064" + // value 100
                     "00000000000000000000000000000000000000000000000000000000000000c8" + // value 200
                     "000000000000000000000000000000000000000000000000000000000000012c" + // value 300
@@ -547,10 +547,10 @@ class EthereumAbiDecoderServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDecodeStaticStructArray() {
-        verify("struct(uint, bool, bytes5)[] array is correctly decoded") {
+    fun mustCorrectlyDecodeStaticTupleArray() {
+        verify("tuple(uint, bool, bytes5)[] array is correctly decoded") {
             decoding(
-                listOf(DynamicArrayType(StructType(UintType, BoolType, StaticBytesType(5)))),
+                listOf(DynamicArrayType(TupleType(UintType, BoolType, StaticBytesType(5)))),
                 "0x" +
                     "0000000000000000000000000000000000000000000000000000000000000020" + // array offset
                     "0000000000000000000000000000000000000000000000000000000000000003" + // array length
@@ -575,13 +575,13 @@ class EthereumAbiDecoderServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDecodeStaticStructArrayTypeList() {
-        verify("(struct(uint[2], bool, uint), uint[4], struct(uint[2], bool, uint)[2], bool) is correctly decoded") {
+    fun mustCorrectlyDecodeStaticTupleArrayTypeList() {
+        verify("(tuple(uint[2], bool, uint), uint[4], tuple(uint[2], bool, uint)[2], bool) is correctly decoded") {
             decoding(
                 listOf(
-                    StructType(StaticArrayType(UintType, 2), BoolType, UintType),
+                    TupleType(StaticArrayType(UintType, 2), BoolType, UintType),
                     StaticArrayType(UintType, 4),
-                    StaticArrayType(StructType(StaticArrayType(UintType, 2), BoolType, UintType), 2),
+                    StaticArrayType(TupleType(StaticArrayType(UintType, 2), BoolType, UintType), 2),
                     BoolType
                 ),
                 "0x" +
@@ -633,12 +633,12 @@ class EthereumAbiDecoderServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDecodeDynamicStructArray() {
-        verify("struct(uint, uint[2], string, bool, uint[])[] array is correctly decoded") {
+    fun mustCorrectlyDecodeDynamicTupleArray() {
+        verify("tuple(uint, uint[2], string, bool, uint[])[] array is correctly decoded") {
             decoding(
                 listOf(
                     DynamicArrayType(
-                        StructType(
+                        TupleType(
                             UintType,
                             StaticArrayType(UintType, 2),
                             StringType,
@@ -650,29 +650,29 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                 "0x" +
                     "0000000000000000000000000000000000000000000000000000000000000020" + // array offset
                     "0000000000000000000000000000000000000000000000000000000000000002" + // array length
-                    "0000000000000000000000000000000000000000000000000000000000000040" + // struct1 offset
-                    "00000000000000000000000000000000000000000000000000000000000001c0" + // struct2 offset
+                    "0000000000000000000000000000000000000000000000000000000000000040" + // tuple1 offset
+                    "00000000000000000000000000000000000000000000000000000000000001c0" + // tuple2 offset
                     "0000000000000000000000000000000000000000000000000000000000000064" + // value 100
                     "00000000000000000000000000000000000000000000000000000000000000c8" + // value 200
                     "000000000000000000000000000000000000000000000000000000000000012c" + // value 300
-                    "00000000000000000000000000000000000000000000000000000000000000c0" + // struct1 string offset
+                    "00000000000000000000000000000000000000000000000000000000000000c0" + // tuple1 string offset
                     "0000000000000000000000000000000000000000000000000000000000000001" + // value true
-                    "0000000000000000000000000000000000000000000000000000000000000100" + // struct1 array offset
-                    "0000000000000000000000000000000000000000000000000000000000000005" + // struct1 string length
+                    "0000000000000000000000000000000000000000000000000000000000000100" + // tuple1 array offset
+                    "0000000000000000000000000000000000000000000000000000000000000005" + // tuple1 string length
                     "7465737431000000000000000000000000000000000000000000000000000000" + // value "test1"
-                    "0000000000000000000000000000000000000000000000000000000000000003" + // struct1 array length
+                    "0000000000000000000000000000000000000000000000000000000000000003" + // tuple1 array length
                     "0000000000000000000000000000000000000000000000000000000000000190" + // value 400
                     "00000000000000000000000000000000000000000000000000000000000001f4" + // value 500
                     "0000000000000000000000000000000000000000000000000000000000000258" + // value 600
                     "00000000000000000000000000000000000000000000000000000000000003e8" + // value 1000
                     "00000000000000000000000000000000000000000000000000000000000007d0" + // value 2000
                     "0000000000000000000000000000000000000000000000000000000000000bb8" + // value 3000
-                    "00000000000000000000000000000000000000000000000000000000000000c0" + // struct2 string offset
+                    "00000000000000000000000000000000000000000000000000000000000000c0" + // tuple2 string offset
                     "0000000000000000000000000000000000000000000000000000000000000000" + // value false
-                    "0000000000000000000000000000000000000000000000000000000000000100" + // struct2 array offset
-                    "0000000000000000000000000000000000000000000000000000000000000005" + // struct2 string length
+                    "0000000000000000000000000000000000000000000000000000000000000100" + // tuple2 array offset
+                    "0000000000000000000000000000000000000000000000000000000000000005" + // tuple2 string length
                     "7465737432000000000000000000000000000000000000000000000000000000" + // value "test2"
-                    "0000000000000000000000000000000000000000000000000000000000000002" + // struct2 array length
+                    "0000000000000000000000000000000000000000000000000000000000000002" + // tuple2 array length
                     "0000000000000000000000000000000000000000000000000000000000000fa0" + // value 4000
                     "0000000000000000000000000000000000000000000000000000000000001388" // value 5000
             )
@@ -711,15 +711,15 @@ class EthereumAbiDecoderServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDecodeNestedStruct() {
-        verify("struct(uint, struct(uint[], struct(uint, bool), string[]), bool, string) is correctly decoded") {
+    fun mustCorrectlyDecodeNestedTuple() {
+        verify("tuple(uint, tuple(uint[], tuple(uint, bool), string[]), bool, string) is correctly decoded") {
             decoding(
                 listOf(
-                    StructType(
+                    TupleType(
                         UintType,
-                        StructType(
+                        TupleType(
                             DynamicArrayType(UintType),
-                            StructType(UintType, BoolType),
+                            TupleType(UintType, BoolType),
                             DynamicArrayType(StringType)
                         ),
                         BoolType,
@@ -727,9 +727,9 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                     )
                 ),
                 "0x" +
-                    "0000000000000000000000000000000000000000000000000000000000000020" + // outer struct offset
+                    "0000000000000000000000000000000000000000000000000000000000000020" + // outer tuple offset
                     "00000000000000000000000000000000000000000000000000000000000001f4" + // value 500
-                    "0000000000000000000000000000000000000000000000000000000000000080" + // inner struct offset
+                    "0000000000000000000000000000000000000000000000000000000000000080" + // inner tuple offset
                     "0000000000000000000000000000000000000000000000000000000000000000" + // value false
                     "0000000000000000000000000000000000000000000000000000000000000200" + // outer string offset
                     "0000000000000000000000000000000000000000000000000000000000000080" + // uint[] array offset
@@ -770,17 +770,17 @@ class EthereumAbiDecoderServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyDecodeComplexNestedStruct() {
-        verify("struct(uint[], struct(uint[], struct(uint, bool)[], string[])[], bool, string) is correctly decoded") {
+    fun mustCorrectlyDecodeComplexNestedTuple() {
+        verify("tuple(uint[], tuple(uint[], tuple(uint, bool)[], string[])[], bool, string) is correctly decoded") {
             decoding(
                 listOf(
-                    StructType(
+                    TupleType(
                         DynamicArrayType(UintType),
                         DynamicArrayType(
-                            StructType(
+                            TupleType(
                                 DynamicArrayType(UintType),
                                 DynamicArrayType(
-                                    StructType(
+                                    TupleType(
                                         UintType,
                                         BoolType
                                     )
@@ -793,9 +793,9 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                     )
                 ),
                 "0x" +
-                    "0000000000000000000000000000000000000000000000000000000000000020" + // outer struct offset
+                    "0000000000000000000000000000000000000000000000000000000000000020" + // outer tuple offset
                     "0000000000000000000000000000000000000000000000000000000000000080" + // uint[] array offset
-                    "0000000000000000000000000000000000000000000000000000000000000140" + // inner struct offset
+                    "0000000000000000000000000000000000000000000000000000000000000140" + // inner tuple offset
                     "0000000000000000000000000000000000000000000000000000000000000000" + // false
                     "00000000000000000000000000000000000000000000000000000000000007c0" + // outer string offset
                     "0000000000000000000000000000000000000000000000000000000000000005" + // uint[] array length
@@ -804,63 +804,63 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                     "0000000000000000000000000000000000000000000000000000000000000003" + // value 3
                     "0000000000000000000000000000000000000000000000000000000000000004" + // value 4
                     "0000000000000000000000000000000000000000000000000000000000000005" + // value 5
-                    "0000000000000000000000000000000000000000000000000000000000000003" + // struct array length
-                    "0000000000000000000000000000000000000000000000000000000000000060" + // inner struct1 offset
-                    "0000000000000000000000000000000000000000000000000000000000000280" + // inner struct2 offset
-                    "0000000000000000000000000000000000000000000000000000000000000420" + // inner struct3 offset
-                    "0000000000000000000000000000000000000000000000000000000000000060" + // i. struct1 uint[] offset
-                    "00000000000000000000000000000000000000000000000000000000000000a0" + // i. struct1 struct[] offset
-                    "0000000000000000000000000000000000000000000000000000000000000140" + // i. struct1 string[] offset
-                    "0000000000000000000000000000000000000000000000000000000000000001" + // i. struct1 uint[] length
+                    "0000000000000000000000000000000000000000000000000000000000000003" + // tuple array length
+                    "0000000000000000000000000000000000000000000000000000000000000060" + // inner tuple1 offset
+                    "0000000000000000000000000000000000000000000000000000000000000280" + // inner tuple2 offset
+                    "0000000000000000000000000000000000000000000000000000000000000420" + // inner tuple3 offset
+                    "0000000000000000000000000000000000000000000000000000000000000060" + // i. tuple1 uint[] offset
+                    "00000000000000000000000000000000000000000000000000000000000000a0" + // i. tuple1 tuple[] offset
+                    "0000000000000000000000000000000000000000000000000000000000000140" + // i. tuple1 string[] offset
+                    "0000000000000000000000000000000000000000000000000000000000000001" + // i. tuple1 uint[] length
                     "000000000000000000000000000000000000000000000000000000000000012c" + // value 300
-                    "0000000000000000000000000000000000000000000000000000000000000002" + // i. struct1 struct[] length
+                    "0000000000000000000000000000000000000000000000000000000000000002" + // i. tuple1 tuple[] length
                     "0000000000000000000000000000000000000000000000000000000000000064" + // value 100
                     "0000000000000000000000000000000000000000000000000000000000000001" + // value true
                     "00000000000000000000000000000000000000000000000000000000000000c8" + // value 200
                     "0000000000000000000000000000000000000000000000000000000000000000" + // value false
-                    "0000000000000000000000000000000000000000000000000000000000000002" + // i. struct1 string[] length
-                    "0000000000000000000000000000000000000000000000000000000000000040" + // i. struct1 string[0] offset
-                    "0000000000000000000000000000000000000000000000000000000000000080" + // i. struct1 string[1] offset
-                    "0000000000000000000000000000000000000000000000000000000000000004" + // i. struct1 string[0] length
+                    "0000000000000000000000000000000000000000000000000000000000000002" + // i. tuple1 string[] length
+                    "0000000000000000000000000000000000000000000000000000000000000040" + // i. tuple1 string[0] offset
+                    "0000000000000000000000000000000000000000000000000000000000000080" + // i. tuple1 string[1] offset
+                    "0000000000000000000000000000000000000000000000000000000000000004" + // i. tuple1 string[0] length
                     "7374723100000000000000000000000000000000000000000000000000000000" + // value "str1"
-                    "0000000000000000000000000000000000000000000000000000000000000004" + // i. struct1 string[1] length
+                    "0000000000000000000000000000000000000000000000000000000000000004" + // i. tuple1 string[1] length
                     "7374723200000000000000000000000000000000000000000000000000000000" + // value "str2"
-                    "0000000000000000000000000000000000000000000000000000000000000060" + // i. struct2 uint[] offset
-                    "00000000000000000000000000000000000000000000000000000000000000c0" + // i. struct2 struct[] offset
-                    "0000000000000000000000000000000000000000000000000000000000000120" + // i. struct2 string[] offset
-                    "0000000000000000000000000000000000000000000000000000000000000002" + // i. struct2 uint[] length
+                    "0000000000000000000000000000000000000000000000000000000000000060" + // i. tuple2 uint[] offset
+                    "00000000000000000000000000000000000000000000000000000000000000c0" + // i. tuple2 tuple[] offset
+                    "0000000000000000000000000000000000000000000000000000000000000120" + // i. tuple2 string[] offset
+                    "0000000000000000000000000000000000000000000000000000000000000002" + // i. tuple2 uint[] length
                     "00000000000000000000000000000000000000000000000000000000000007d0" + // value 2000
                     "0000000000000000000000000000000000000000000000000000000000000bb8" + // value 3000
-                    "0000000000000000000000000000000000000000000000000000000000000001" + // i. struct2 struct[] length
+                    "0000000000000000000000000000000000000000000000000000000000000001" + // i. tuple2 tuple[] length
                     "00000000000000000000000000000000000000000000000000000000000003e8" + // value 1000
                     "0000000000000000000000000000000000000000000000000000000000000001" + // value true
-                    "0000000000000000000000000000000000000000000000000000000000000001" + // i. struct2 string[] length
-                    "0000000000000000000000000000000000000000000000000000000000000020" + // i. struct2 string[0] offset
-                    "0000000000000000000000000000000000000000000000000000000000000004" + // i. struct2 string[0] length
+                    "0000000000000000000000000000000000000000000000000000000000000001" + // i. tuple2 string[] length
+                    "0000000000000000000000000000000000000000000000000000000000000020" + // i. tuple2 string[0] offset
+                    "0000000000000000000000000000000000000000000000000000000000000004" + // i. tuple2 string[0] length
                     "7374723300000000000000000000000000000000000000000000000000000000" + // value "str3"
-                    "0000000000000000000000000000000000000000000000000000000000000060" + // i. struct3 uint[] offset
-                    "00000000000000000000000000000000000000000000000000000000000000e0" + // i. struct3 struct[] offset
-                    "00000000000000000000000000000000000000000000000000000000000001c0" + // i. struct3 string[] offset
-                    "0000000000000000000000000000000000000000000000000000000000000003" + // i. struct3 uint[] length
+                    "0000000000000000000000000000000000000000000000000000000000000060" + // i. tuple3 uint[] offset
+                    "00000000000000000000000000000000000000000000000000000000000000e0" + // i. tuple3 tuple[] offset
+                    "00000000000000000000000000000000000000000000000000000000000001c0" + // i. tuple3 string[] offset
+                    "0000000000000000000000000000000000000000000000000000000000000003" + // i. tuple3 uint[] length
                     "0000000000000000000000000000000000000000000000000000000000009c40" + // value 40000
                     "000000000000000000000000000000000000000000000000000000000000c350" + // value 50000
                     "0000000000000000000000000000000000000000000000000000000000000000" + // value 0
-                    "0000000000000000000000000000000000000000000000000000000000000003" + // i. struct3 struct[] length
+                    "0000000000000000000000000000000000000000000000000000000000000003" + // i. tuple3 tuple[] length
                     "0000000000000000000000000000000000000000000000000000000000002710" + // value 10000
                     "0000000000000000000000000000000000000000000000000000000000000001" + // value true
                     "0000000000000000000000000000000000000000000000000000000000004e20" + // value 20000
                     "0000000000000000000000000000000000000000000000000000000000000000" + // value false
                     "0000000000000000000000000000000000000000000000000000000000007530" + // value 30000
                     "0000000000000000000000000000000000000000000000000000000000000001" + // value true
-                    "0000000000000000000000000000000000000000000000000000000000000001" + // i. struct3 string[] length
-                    "0000000000000000000000000000000000000000000000000000000000000020" + // i. struct3 string[0] offset
-                    "0000000000000000000000000000000000000000000000000000000000000004" + // i. struct3 string[0] length
+                    "0000000000000000000000000000000000000000000000000000000000000001" + // i. tuple3 string[] length
+                    "0000000000000000000000000000000000000000000000000000000000000020" + // i. tuple3 string[0] offset
+                    "0000000000000000000000000000000000000000000000000000000000000004" + // i. tuple3 string[0] length
                     "7374723400000000000000000000000000000000000000000000000000000000" + // value "str4"
                     "0000000000000000000000000000000000000000000000000000000000000005" + // outer string length
                     "6f75746572000000000000000000000000000000000000000000000000000000" // value "outer"
             )
                 .returns(
-                    listOf( // struct
+                    listOf( // tuple
                         listOf( // uint[]
                             BigInteger.valueOf(1L),
                             BigInteger.valueOf(2L),
@@ -868,25 +868,25 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                             BigInteger.valueOf(4L),
                             BigInteger.valueOf(5L)
                         ),
-                        listOf( // struct(uint[], struct(uint, bool)[], string[])[]
-                            listOf( // struct(uint[], struct(uint, bool)[], string[])
+                        listOf( // tuple(uint[], tuple(uint, bool)[], string[])[]
+                            listOf( // tuple(uint[], tuple(uint, bool)[], string[])
                                 listOf(BigInteger.valueOf(300L)),
-                                listOf( // struct(uint, bool)[]
+                                listOf( // tuple(uint, bool)[]
                                     listOf(BigInteger.valueOf(100L), true),
                                     listOf(BigInteger.valueOf(200L), false)
                                 ),
                                 listOf("str1", "str2")
                             ),
-                            listOf( // struct(uint[], struct(uint, bool)[], string[])
+                            listOf( // tuple(uint[], tuple(uint, bool)[], string[])
                                 listOf(BigInteger.valueOf(2000L), BigInteger.valueOf(3000L)),
-                                listOf( // struct(uint, bool)[]
+                                listOf( // tuple(uint, bool)[]
                                     listOf(BigInteger.valueOf(1000L), true)
                                 ),
                                 listOf("str3")
                             ),
-                            listOf( // struct(uint[], struct(uint, bool)[], string[])
+                            listOf( // tuple(uint[], tuple(uint, bool)[], string[])
                                 listOf(BigInteger.valueOf(40000L), BigInteger.valueOf(50000L), BigInteger.ZERO),
-                                listOf( // struct(uint, bool)[]
+                                listOf( // tuple(uint, bool)[]
                                     listOf(BigInteger.valueOf(10000L), true),
                                     listOf(BigInteger.valueOf(20000L), false),
                                     listOf(BigInteger.valueOf(30000L), true)

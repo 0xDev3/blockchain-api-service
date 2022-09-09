@@ -8,8 +8,6 @@ import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WithFunctionDataOrEthValue
 import com.ampnet.blockchainapiservice.util.WithTransactionData
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -21,7 +19,6 @@ data class AssetSendRequestResponse(
     val chainId: Long,
     val tokenAddress: String?,
     val assetType: AssetType,
-    @JsonSerialize(using = ToStringSerializer::class)
     val amount: BigInteger,
     val senderAddress: String?,
     val recipientAddress: String,

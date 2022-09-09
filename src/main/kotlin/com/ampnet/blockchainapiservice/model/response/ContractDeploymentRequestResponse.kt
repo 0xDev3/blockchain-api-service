@@ -2,7 +2,7 @@ package com.ampnet.blockchainapiservice.model.response
 
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
-import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.FunctionArgumentSchema
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WithTransactionData
@@ -11,8 +11,6 @@ import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
 import com.ampnet.blockchainapiservice.util.annotation.SchemaName
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -29,7 +27,6 @@ data class ContractDeploymentRequestResponse(
     val constructorParams: JsonNode,
     val contractTags: List<String>,
     val contractImplements: List<String>,
-    @JsonSerialize(using = ToStringSerializer::class)
     val initialEthAmount: BigInteger,
     val chainId: Long,
     val redirectUrl: String,
@@ -95,5 +92,5 @@ data class ContractDeploymentRequestResponse(
     @Suppress("unused") // used for JSON schema generation
     @JsonIgnore
     @SchemaName("constructor_params")
-    private val schemaConstructorParams: List<FunctionArgument> = emptyList()
+    private val schemaConstructorParams: List<FunctionArgumentSchema> = emptyList()
 }

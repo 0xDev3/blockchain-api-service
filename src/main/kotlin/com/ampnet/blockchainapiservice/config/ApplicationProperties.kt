@@ -30,6 +30,7 @@ class JwtProperties {
 }
 
 class ChainProperties {
+    var rpcUrlOverride: String? = null
     var startBlockNumber: BigInteger? = null
 }
 

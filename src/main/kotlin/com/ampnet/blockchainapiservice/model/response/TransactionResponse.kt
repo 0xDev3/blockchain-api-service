@@ -5,8 +5,6 @@ import com.ampnet.blockchainapiservice.util.EthereumAddress
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionData
 import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
 import java.time.OffsetDateTime
 
@@ -15,9 +13,7 @@ data class TransactionResponse(
     val from: String?,
     val to: String,
     val data: String?,
-    @JsonSerialize(using = ToStringSerializer::class)
     val value: BigInteger,
-    @JsonSerialize(using = ToStringSerializer::class)
     val blockConfirmations: BigInteger?,
     val timestamp: OffsetDateTime?
 ) {

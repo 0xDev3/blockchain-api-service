@@ -6,8 +6,6 @@ import com.ampnet.blockchainapiservice.model.result.FullAssetBalanceRequest
 import com.ampnet.blockchainapiservice.util.AssetType
 import com.ampnet.blockchainapiservice.util.Status
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -20,7 +18,6 @@ data class AssetBalanceRequestResponse(
     val redirectUrl: String,
     val tokenAddress: String?,
     val assetType: AssetType,
-    @JsonSerialize(using = ToStringSerializer::class)
     val blockNumber: BigInteger?,
     val walletAddress: String?,
     val arbitraryData: JsonNode?,
@@ -76,9 +73,7 @@ data class AssetBalanceRequestResponse(
 
 data class BalanceResponse(
     val wallet: String,
-    @JsonSerialize(using = ToStringSerializer::class)
     val blockNumber: BigInteger,
     val timestamp: OffsetDateTime,
-    @JsonSerialize(using = ToStringSerializer::class)
     val amount: BigInteger
 )
