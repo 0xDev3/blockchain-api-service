@@ -90,21 +90,26 @@ object JsonSchemaDocumentation {
         null
     }
 
+    private fun flattenSchemaDef(defs: ObjectNode, defName: String) {
+        val anyOf = defs[defName]?.get("properties")?.get("types")?.get("anyOf")?.deepCopy<JsonNode>()
+
+        anyOf?.let {
+            defs.set<JsonNode>(
+                defName,
+                OBJECT_MAPPER.createObjectNode().apply {
+                    set<JsonNode>("anyOf", anyOf)
+                }
+            )
+        }
+    }
+
     fun createSchema(type: Type) {
         Files.createDirectories(Paths.get("build/generated-snippets"))
 
         val prettySchema = generator.generateSchema(type).apply { // TODO do this in a less hacky way
-            val defs = this["\$defs"] as? ObjectNode
-            val anyOf = defs?.get("FunctionArgumentTypes")
-                ?.get("properties")?.get("types")?.get("anyOf")?.deepCopy<JsonNode>()
-
-            anyOf?.let {
-                defs.set<JsonNode>(
-                    "FunctionArgumentTypes",
-                    OBJECT_MAPPER.createObjectNode().apply {
-                        set<JsonNode>("anyOf", anyOf)
-                    }
-                )
+            (this["\$defs"] as? ObjectNode)?.let {
+                flattenSchemaDef(it, "FunctionArgumentTypes")
+                flattenSchemaDef(it, "ReturnValueTypes")
             }
         }.toPrettyString()
 
