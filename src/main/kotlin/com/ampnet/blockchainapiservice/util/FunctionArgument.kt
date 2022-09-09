@@ -34,7 +34,7 @@ data class RecursiveFunctionArgumentTypes(
     val type2: Boolean,
     val type3: Number,
     val type4: List<StringOrNumber>,
-    val type6: List<FunctionArgumentSchema>, // struct type
+    val type6: List<FunctionArgumentSchema>, // tuple type
     val type7: List<FunctionArgumentTypes> // nested lists
 )
 

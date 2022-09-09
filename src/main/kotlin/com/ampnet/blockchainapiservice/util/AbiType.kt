@@ -50,7 +50,7 @@ object StringType : AbiType {
     override fun valueSize(): Int = 1
 }
 
-data class StructType(val elems: List<AbiType>) : AbiType {
+data class TupleType(val elems: List<AbiType>) : AbiType {
     constructor(vararg elems: AbiType) : this(elems.toList())
 
     override fun isDynamic() = elems.any { it.isDynamic() }

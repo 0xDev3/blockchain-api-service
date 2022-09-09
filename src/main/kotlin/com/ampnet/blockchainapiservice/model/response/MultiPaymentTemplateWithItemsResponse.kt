@@ -4,8 +4,6 @@ import com.ampnet.blockchainapiservice.model.result.MultiPaymentTemplate
 import com.ampnet.blockchainapiservice.model.result.MultiPaymentTemplateItem
 import com.ampnet.blockchainapiservice.model.result.WithItems
 import com.ampnet.blockchainapiservice.util.AssetType
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -35,7 +33,6 @@ data class MultiPaymentTemplateItemResponse(
     val itemName: String?,
     val assetType: AssetType,
     val tokenAddress: String?,
-    @JsonSerialize(using = ToStringSerializer::class)
     val amount: BigInteger,
     val createdAt: OffsetDateTime
 ) {

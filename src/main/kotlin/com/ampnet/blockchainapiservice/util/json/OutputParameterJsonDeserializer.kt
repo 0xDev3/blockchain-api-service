@@ -4,7 +4,7 @@ import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.util.AbiType
 import com.ampnet.blockchainapiservice.util.DynamicArrayType
 import com.ampnet.blockchainapiservice.util.StaticArrayType
-import com.ampnet.blockchainapiservice.util.StructType
+import com.ampnet.blockchainapiservice.util.TupleType
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
@@ -33,7 +33,7 @@ class OutputParameterJsonDeserializer : JsonDeserializer<OutputParameter>() {
                     ?: throw JsonParseException(p, "unknown type: $it")
             }
 
-            is ObjectNode -> deserializeStruct(p, jsonTree)
+            is ObjectNode -> deserializeTuple(p, jsonTree)
             else -> throw JsonParseException(p, "invalid value type; expected string or object")
         }
 
@@ -49,18 +49,18 @@ class OutputParameterJsonDeserializer : JsonDeserializer<OutputParameter>() {
     }
 
     @Suppress("ThrowsCount")
-    private fun deserializeStruct(p: JsonParser, jsonTree: ObjectNode): AbiType {
-        val structArrayType = jsonTree["type"]
+    private fun deserializeTuple(p: JsonParser, jsonTree: ObjectNode): AbiType {
+        val tupleArrayType = jsonTree["type"]
             ?.takeIf { it.isTextual }
-            ?.asText() ?: throw JsonParseException(p, "missing struct type")
+            ?.asText() ?: throw JsonParseException(p, "missing tuple type")
 
-        return deserializeType(p, structArrayType) { type ->
-            if (type != "struct") throw JsonParseException(p, "invalid struct type")
+        return deserializeType(p, tupleArrayType) { type ->
+            if (type != "tuple") throw JsonParseException(p, "invalid tuple type")
             jsonTree["elems"]
                 ?.takeIf { it.isArray }?.elements()?.asSequence()
                 ?.map { deserializeNode(p, it) }
-                ?.toList()?.let { StructType(it) }
-                ?: throw JsonParseException(p, "invalid or missing struct elements")
+                ?.toList()?.let { TupleType(it) }
+                ?: throw JsonParseException(p, "invalid or missing tuple elements")
         }
     }
 

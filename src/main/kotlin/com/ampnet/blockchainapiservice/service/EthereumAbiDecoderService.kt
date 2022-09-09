@@ -9,7 +9,7 @@ import com.ampnet.blockchainapiservice.util.IntType
 import com.ampnet.blockchainapiservice.util.StaticArrayType
 import com.ampnet.blockchainapiservice.util.StaticBytesType
 import com.ampnet.blockchainapiservice.util.StringType
-import com.ampnet.blockchainapiservice.util.StructType
+import com.ampnet.blockchainapiservice.util.TupleType
 import com.ampnet.blockchainapiservice.util.UintType
 import org.springframework.stereotype.Service
 import java.math.BigInteger
@@ -70,7 +70,7 @@ class EthereumAbiDecoderService : AbiDecoderService {
                 }
             }
 
-            is StructType -> decode(type.elems, value)
+            is TupleType -> decode(type.elems, value)
         }.withIndexIncrement(type)
 
     private fun Any.withIndexIncrement(type: AbiType): Pair<Any, Int> = Pair(this, type.valueSize())

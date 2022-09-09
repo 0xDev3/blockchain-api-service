@@ -2,7 +2,7 @@ Below table contains the list of all supported function argument types. Any type
 square brackets to the end of the type (`[]`). Fixed-size arrays are also supported by inserting a number inside the
 square brackets to indicate the array size (e.g. `string[1]` is an array of exactly one `string` element).
 Multi-dimensional arrays can be made by appending multiple square brackets. All array elements must be of the same type
-- this means that all `struct` arrays must have `struct` elements with matching field element types in the correct
+- this means that all `tuple` arrays must have `tuple` elements with matching field element types in the correct
 order.
 
 .Array Examples
@@ -18,7 +18,7 @@ order.
 |`int[1][2]`
 |`[[1], [2]]`
 
-|`struct[]`
+|`tuple[]`
 |`[ [{type: "string", "value": "a"}], [{"type": "string", "value": "b"}] ]`
 
 |===
@@ -28,13 +28,13 @@ order.
 |===
 | Type name |JSON value type |Example value |Description
 
-|`struct`
+|`tuple`
 |`{"type": string, "value": any}[]`
-|`[{"type": "string", "value": "example struct"}, {"type": "bool", "value": true}]`
+|`[{"type": "string", "value": "example tuple"}, {"type": "bool", "value": true}]`
 |Array of objects which must contain `type` and `name` elements. The `type` value must be one of the supported function
-argument types from this table and the `value` must match the type's accepted format. Order of structure elements is
-important and must be in the order in which the structure elements are declared. Structure nesting is supported to any
-arbitrary depth - simply use the `struct` type and provide a valid structure array for the `value` field.
+argument types from this table and the `value` must match the type's accepted format. Order of tuple elements is
+important and must be in the order in which the tuple elements are declared. Tuple nesting is supported to any
+arbitrary depth - simply use the `tuple` type and provide a valid tuple array for the `value` field.
 
 |`address`
 |`string`
