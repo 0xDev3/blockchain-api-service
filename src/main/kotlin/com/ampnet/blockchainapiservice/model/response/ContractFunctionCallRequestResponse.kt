@@ -10,8 +10,6 @@ import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
 import com.ampnet.blockchainapiservice.util.annotation.SchemaName
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -25,7 +23,6 @@ data class ContractFunctionCallRequestResponse(
     @SchemaIgnore
     val functionParams: JsonNode,
     val functionCallData: String,
-    @JsonSerialize(using = ToStringSerializer::class)
     val ethAmount: BigInteger,
     val chainId: Long,
     val redirectUrl: String,

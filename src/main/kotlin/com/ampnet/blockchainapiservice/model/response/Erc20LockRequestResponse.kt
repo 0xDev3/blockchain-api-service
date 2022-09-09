@@ -7,8 +7,6 @@ import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.WithFunctionData
 import com.ampnet.blockchainapiservice.util.WithTransactionData
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -19,9 +17,7 @@ data class Erc20LockRequestResponse(
     val status: Status,
     val chainId: Long,
     val tokenAddress: String,
-    @JsonSerialize(using = ToStringSerializer::class)
     val amount: BigInteger,
-    @JsonSerialize(using = ToStringSerializer::class)
     val lockDurationInSeconds: BigInteger,
     val unlocksAt: OffsetDateTime?,
     val lockContractAddress: String,

@@ -26,7 +26,7 @@ object JsonSchemaDocumentation {
 
     private val OBJECT_MAPPER = JsonConfig().objectMapper()
     private val BIG_INTEGER_TYPE_NODE = OBJECT_MAPPER.readTree(
-        "{\"anyOf\":[{\"type\":\"integer\"},{\"type\":\"string\",\"pattern\":\"^[+-]?[0-9]+$\"}]}"
+        "{\"type\":\"string\",\"pattern\":\"^[+-]?[0-9]+$\"}"
     ) as ObjectNode
 
     private val generator = SchemaGeneratorConfigBuilder(
