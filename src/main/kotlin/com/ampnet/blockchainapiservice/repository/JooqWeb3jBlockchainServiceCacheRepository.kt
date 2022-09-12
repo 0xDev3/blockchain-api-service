@@ -67,7 +67,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 FetchErc20AccountBalanceCacheRecord(
                     id = id,
                     chainId = chainSpec.chainId,
-                    customRpcUrl = chainSpec.customRpcUrl  ?: "",
+                    customRpcUrl = chainSpec.customRpcUrl ?: "",
                     contractAddress = contractAddress,
                     walletAddress = accountBalance.wallet,
                     blockNumber = accountBalance.blockNumber,
@@ -100,7 +100,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 FetchTransactionInfoCacheRecord(
                     id = id,
                     chainId = chainSpec.chainId,
-                    customRpcUrl = chainSpec.customRpcUrl  ?: "",
+                    customRpcUrl = chainSpec.customRpcUrl ?: "",
                     txHash = txHash,
                     fromAddress = txInfo.from,
                     toAddress = txInfo.to.toWalletAddress(),
@@ -167,7 +167,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 DSL.and(
                     FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.CHAIN_ID.eq(chainSpec.chainId),
                     FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.CUSTOM_RPC_URL
-                        .eq(chainSpec.customRpcUrl  ?: ""),
+                        .eq(chainSpec.customRpcUrl ?: ""),
                     FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.CONTRACT_ADDRESS
                         .eq(contractAddress),
                     FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.WALLET_ADDRESS
@@ -201,7 +201,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 DSL.and(
                     FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE.CHAIN_ID.eq(chainSpec.chainId),
                     FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE.CUSTOM_RPC_URL
-                        .eq(chainSpec.customRpcUrl  ?: ""),
+                        .eq(chainSpec.customRpcUrl ?: ""),
                     FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE.TX_HASH.eq(txHash)
                 )
             )
