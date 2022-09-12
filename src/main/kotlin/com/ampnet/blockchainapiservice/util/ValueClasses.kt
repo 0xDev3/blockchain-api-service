@@ -109,6 +109,11 @@ value class FunctionData private constructor(val value: String) {
         operator fun invoke(value: String) = FunctionData("0x" + value.removePrefix("0x").lowercase())
     }
 
+    constructor(binary: ByteArray) : this(String(binary))
+
+    val binary: ByteArray // TODO compact conversion
+        get() = value.toByteArray()
+
     val withoutPrefix
         get(): String = value.removePrefix("0x")
 }
@@ -151,8 +156,7 @@ value class ContractBinaryData private constructor(val value: String) {
 
     constructor(binary: ByteArray) : this(String(binary))
 
-    @Suppress("MagicNumber")
-    val binary: ByteArray
+    val binary: ByteArray  // TODO compact conversion
         get() = value.toByteArray()
 
     val withPrefix: String

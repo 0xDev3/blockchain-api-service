@@ -152,3 +152,14 @@ class ContractBinaryDataConverter : Converter<ByteArray, ContractBinaryData> {
         private const val serialVersionUID: Long = -1908613704199073695L
     }
 }
+
+class FunctionDataConverter : Converter<ByteArray, FunctionData> {
+    override fun from(value: ByteArray?): FunctionData? = value?.let { FunctionData(it) }
+    override fun to(value: FunctionData?): ByteArray? = value?.binary
+    override fun fromType(): Class<ByteArray> = ByteArray::class.java
+    override fun toType(): Class<FunctionData> = FunctionData::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = -5671993772596790084L
+    }
+}
