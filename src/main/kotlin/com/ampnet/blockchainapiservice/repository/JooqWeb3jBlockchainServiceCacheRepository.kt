@@ -36,7 +36,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 FetchAccountBalanceCacheRecord(
                     id = id,
                     chainId = chainSpec.chainId,
-                    customRpcUrl = chainSpec.customRpcUrl,
+                    customRpcUrl = chainSpec.customRpcUrl ?: "",
                     walletAddress = accountBalance.wallet,
                     blockNumber = accountBalance.blockNumber,
                     timestamp = accountBalance.timestamp,
@@ -67,7 +67,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 FetchErc20AccountBalanceCacheRecord(
                     id = id,
                     chainId = chainSpec.chainId,
-                    customRpcUrl = chainSpec.customRpcUrl,
+                    customRpcUrl = chainSpec.customRpcUrl  ?: "",
                     contractAddress = contractAddress,
                     walletAddress = accountBalance.wallet,
                     blockNumber = accountBalance.blockNumber,
@@ -92,7 +92,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
     ) {
         logger.info {
             "Caching fetchTransactionInfo call, id: $id, chainSpec: $chainSpec, txHash: $txHash," +
-                " blockNumber: $blockNumber, txInfo: $txInfo"
+                " blockNumber: $blockNumber"
         }
 
         try {
@@ -100,7 +100,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 FetchTransactionInfoCacheRecord(
                     id = id,
                     chainId = chainSpec.chainId,
-                    customRpcUrl = chainSpec.customRpcUrl,
+                    customRpcUrl = chainSpec.customRpcUrl  ?: "",
                     txHash = txHash,
                     fromAddress = txInfo.from,
                     toAddress = txInfo.to.toWalletAddress(),
@@ -115,7 +115,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
         } catch (_: DuplicateKeyException) {
             logger.info {
                 "Already cached fetchTransactionInfo call, id: $id, chainSpec: $chainSpec, txHash: $txHash," +
-                    " blockNumber: $blockNumber, txInfo: $txInfo"
+                    " blockNumber: $blockNumber"
             }
         }
     }
@@ -134,7 +134,8 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
             .where(
                 DSL.and(
                     FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE.CHAIN_ID.eq(chainSpec.chainId),
-                    FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl),
+                    FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE.CUSTOM_RPC_URL
+                        .eq(chainSpec.customRpcUrl ?: ""),
                     FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE.WALLET_ADDRESS.eq(walletAddress),
                     FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE.BLOCK_NUMBER.eq(blockNumber)
                 )
@@ -166,7 +167,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 DSL.and(
                     FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.CHAIN_ID.eq(chainSpec.chainId),
                     FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.CUSTOM_RPC_URL
-                        .eq(chainSpec.customRpcUrl),
+                        .eq(chainSpec.customRpcUrl  ?: ""),
                     FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.CONTRACT_ADDRESS
                         .eq(contractAddress),
                     FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.WALLET_ADDRESS
@@ -200,7 +201,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 DSL.and(
                     FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE.CHAIN_ID.eq(chainSpec.chainId),
                     FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE.CUSTOM_RPC_URL
-                        .eq(chainSpec.customRpcUrl),
+                        .eq(chainSpec.customRpcUrl  ?: ""),
                     FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE.TX_HASH.eq(txHash)
                 )
             )

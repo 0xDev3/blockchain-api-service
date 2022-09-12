@@ -1,7 +1,7 @@
 CREATE TABLE blockchain_api_service.fetch_account_balance_cache (
     id             UUID                     PRIMARY KEY,
     chain_id       BIGINT                   NOT NULL,
-    custom_rpc_url VARCHAR,
+    custom_rpc_url VARCHAR                  NOT NULL,
     wallet_address VARCHAR                  NOT NULL,
     block_number   NUMERIC(78)              NOT NULL,
     timestamp      TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -15,7 +15,7 @@ CREATE UNIQUE INDEX fetch_account_balance_cache_get_index ON blockchain_api_serv
 CREATE TABLE blockchain_api_service.fetch_erc20_account_balance_cache (
     id               UUID                     PRIMARY KEY,
     chain_id         BIGINT                   NOT NULL,
-    custom_rpc_url   VARCHAR,
+    custom_rpc_url   VARCHAR                  NOT NULL,
     contract_address VARCHAR                  NOT NULL,
     wallet_address   VARCHAR                  NOT NULL,
     block_number     NUMERIC(78)              NOT NULL,
@@ -31,7 +31,7 @@ CREATE UNIQUE INDEX fetch_erc20_account_balance_cache_get_index
 CREATE TABLE blockchain_api_service.fetch_transaction_info_cache (
     id                        UUID                     PRIMARY KEY,
     chain_id                  BIGINT                   NOT NULL,
-    custom_rpc_url            VARCHAR,
+    custom_rpc_url            VARCHAR                  NOT NULL,
     tx_hash                   VARCHAR                  NOT NULL,
     from_address              VARCHAR                  NOT NULL,
     to_address                VARCHAR                  NOT NULL,

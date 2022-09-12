@@ -35,7 +35,7 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
     companion object {
         private val CHAIN_SPEC = ChainSpec(
             chainId = ChainId(123L),
-            customRpcUrl = "example"
+            customRpcUrl = null
         )
         private val BLOCK_NUMBER = BlockNumber(BigInteger.valueOf(456L))
         private val ACCOUNT_BALANCE = AccountBalance(
