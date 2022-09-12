@@ -238,6 +238,12 @@ jooq {
                                 converter = "com.ampnet.blockchainapiservice.util.ContractBinaryDataConverter"
                                 includeExpression = "contract_data"
                                 includeTypes = "BYTEA"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.util.FunctionData"
+                                converter = "com.ampnet.blockchainapiservice.util.FunctionDataConverter"
+                                includeExpression = "tx_data"
+                                includeTypes = "BYTEA"
                             }
                         )
                     }

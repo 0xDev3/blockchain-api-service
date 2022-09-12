@@ -17,7 +17,10 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
 
         return if (chainSpec.customRpcUrl != null) {
             ChainPropertiesWithServices(
-                web3j = Web3j.build(HttpService(chainSpec.customRpcUrl))
+                web3j = Web3j.build(HttpService(chainSpec.customRpcUrl)),
+                minBlockConfirmationsForCaching = chain?.let {
+                    getChainProperties(it.id)?.minBlockConfirmationsForCaching
+                }
             )
         } else if (chain != null) {
             blockchainPropertiesMap.computeIfAbsent(chain.id) {
@@ -56,7 +59,8 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
     private fun generateBlockchainProperties(chain: Chain): ChainPropertiesWithServices {
         val rpcUrl = getChainRpcUrl(chain)
         return ChainPropertiesWithServices(
-            web3j = Web3j.build(HttpService(rpcUrl))
+            web3j = Web3j.build(HttpService(rpcUrl)),
+            minBlockConfirmationsForCaching = getChainProperties(chain.id)?.minBlockConfirmationsForCaching
         )
     }
 }

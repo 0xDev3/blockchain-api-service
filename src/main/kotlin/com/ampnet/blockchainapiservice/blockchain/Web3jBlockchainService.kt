@@ -8,7 +8,9 @@ import com.ampnet.blockchainapiservice.exception.TemporaryBlockchainReadExceptio
 import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
+import com.ampnet.blockchainapiservice.repository.Web3jBlockchainServiceCacheRepository
 import com.ampnet.blockchainapiservice.service.AbiDecoderService
+import com.ampnet.blockchainapiservice.service.UuidProvider
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
@@ -23,9 +25,6 @@ import com.ampnet.blockchainapiservice.util.bind
 import com.ampnet.blockchainapiservice.util.shortCircuiting
 import mu.KLogging
 import org.springframework.stereotype.Service
-import org.web3j.abi.datatypes.DynamicArray
-import org.web3j.abi.datatypes.StaticArray
-import org.web3j.abi.datatypes.Type
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameter
 import org.web3j.protocol.core.RemoteFunctionCall
@@ -35,14 +34,23 @@ import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.tx.ReadonlyTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import java.io.IOException
+import java.math.BigInteger
 
 @Service
 class Web3jBlockchainService(
     private val abiDecoderService: AbiDecoderService,
+    private val uuidProvider: UuidProvider,
+    private val web3jBlockchainServiceCacheRepository: Web3jBlockchainServiceCacheRepository,
     applicationProperties: ApplicationProperties
 ) : BlockchainService {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private data class BlockDescriptor(
+            val blockNumber: BlockNumber,
+            val blockConfirmations: BigInteger,
+            val timestamp: UtcDateTime
+        )
+    }
 
     private val chainHandler = ChainPropertiesHandler(applicationProperties)
 
@@ -56,12 +64,36 @@ class Web3jBlockchainService(
                 " blockParameter: $blockParameter"
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
-        val (blockNumber, timestamp) = blockchainProperties.web3j.getBlockNumberAndTimestamp(blockParameter)
-        val balance = blockchainProperties.web3j.ethGetBalance(walletAddress.rawValue, blockNumber.toWeb3Parameter())
-            .sendSafely()?.balance?.let { Balance(it) }
-            ?: throw BlockchainReadException("Unable to read balance of address: ${walletAddress.rawValue}")
+        val blockDescriptor = blockchainProperties.web3j.getBlockDescriptor(blockParameter)
 
-        return AccountBalance(walletAddress, blockNumber, timestamp, balance)
+        return web3jBlockchainServiceCacheRepository.getCachedFetchAccountBalance(
+            chainSpec = chainSpec,
+            walletAddress = walletAddress,
+            blockNumber = blockDescriptor.blockNumber
+        ) ?: run {
+            val balance = blockchainProperties.web3j.ethGetBalance(
+                walletAddress.rawValue,
+                blockDescriptor.blockNumber.toWeb3Parameter()
+            ).sendSafely()?.balance?.let { Balance(it) }
+                ?: throw BlockchainReadException("Unable to read balance of address: ${walletAddress.rawValue}")
+
+            val accountBalance = AccountBalance(
+                wallet = walletAddress,
+                blockNumber = blockDescriptor.blockNumber,
+                timestamp = blockDescriptor.timestamp,
+                amount = balance
+            )
+
+            if (blockchainProperties.shouldCache(blockDescriptor.blockConfirmations)) {
+                web3jBlockchainServiceCacheRepository.cacheFetchAccountBalance(
+                    id = uuidProvider.getUuid(),
+                    chainSpec = chainSpec,
+                    accountBalance = accountBalance
+                )
+            }
+
+            accountBalance
+        }
     }
 
     override fun fetchErc20AccountBalance(
@@ -75,51 +107,95 @@ class Web3jBlockchainService(
                 " walletAddress: $walletAddress, blockParameter: $blockParameter"
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
-        val (blockNumber, timestamp) = blockchainProperties.web3j.getBlockNumberAndTimestamp(blockParameter)
+        val blockDescriptor = blockchainProperties.web3j.getBlockDescriptor(blockParameter)
 
-        val contract = IERC20.load(
-            contractAddress.rawValue,
-            blockchainProperties.web3j,
-            ReadonlyTransactionManager(blockchainProperties.web3j, contractAddress.rawValue),
-            DefaultGasProvider()
-        )
+        return web3jBlockchainServiceCacheRepository.getCachedFetchErc20AccountBalance(
+            chainSpec = chainSpec,
+            contractAddress = contractAddress,
+            walletAddress = walletAddress,
+            blockNumber = blockDescriptor.blockNumber
+        ) ?: run {
+            val contract = IERC20.load(
+                contractAddress.rawValue,
+                blockchainProperties.web3j,
+                ReadonlyTransactionManager(blockchainProperties.web3j, contractAddress.rawValue),
+                DefaultGasProvider()
+            )
 
-        contract.setDefaultBlockParameter(blockNumber.toWeb3Parameter())
+            contract.setDefaultBlockParameter(blockDescriptor.blockNumber.toWeb3Parameter())
 
-        return contract.balanceOf(walletAddress.rawValue).sendSafely()
-            ?.let { AccountBalance(walletAddress, blockNumber, timestamp, Balance(it)) }
-            ?: throw BlockchainReadException(
+            val accountBalance = contract.balanceOf(walletAddress.rawValue).sendSafely()
+                ?.let {
+                    AccountBalance(
+                        walletAddress,
+                        blockDescriptor.blockNumber,
+                        blockDescriptor.timestamp,
+                        Balance(it)
+                    )
+                } ?: throw BlockchainReadException(
                 "Unable to read ERC20 contract at address: ${contractAddress.rawValue}" +
                     " on chain ID: ${chainSpec.chainId.value}"
             )
+
+            if (blockchainProperties.shouldCache(blockDescriptor.blockConfirmations)) {
+                web3jBlockchainServiceCacheRepository.cacheFetchErc20AccountBalance(
+                    id = uuidProvider.getUuid(),
+                    chainSpec = chainSpec,
+                    contractAddress = contractAddress,
+                    accountBalance = accountBalance
+                )
+            }
+
+            accountBalance
+        }
     }
 
     override fun fetchTransactionInfo(chainSpec: ChainSpec, txHash: TransactionHash): BlockchainTransactionInfo? {
         logger.debug { "Fetching transaction, chainSpec: $chainSpec, txHash: $txHash" }
-        val web3j = chainHandler.getBlockchainProperties(chainSpec).web3j
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
+        val web3j = blockchainProperties.web3j
 
         return shortCircuiting {
-            val transaction = web3j.ethGetTransactionByHash(txHash.value).sendSafely()
-                ?.transaction?.orElse(null).bind()
-            val receipt = web3j.ethGetTransactionReceipt(txHash.value).sendSafely()
-                ?.transactionReceipt?.orElse(null).bind()
             val currentBlockNumber = web3j.ethBlockNumber()?.sendSafely()
                 ?.blockNumber.bind()
-            val blockConfirmations = currentBlockNumber - transaction.blockNumber.bind()
-            val timestamp = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(transaction.blockNumber), false)
-                .sendSafely()?.block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }.bind()
 
-            BlockchainTransactionInfo(
-                hash = TransactionHash(transaction.hash),
-                from = WalletAddress(transaction.from),
-                to = transaction.to?.let { WalletAddress(it) } ?: ZeroAddress.toWalletAddress(),
-                deployedContractAddress = receipt.contractAddress?.let { ContractAddress(it) },
-                data = FunctionData(transaction.input),
-                value = Balance(transaction.value),
-                blockConfirmations = blockConfirmations,
-                timestamp = timestamp,
-                success = receipt.isStatusOK
-            )
+            web3jBlockchainServiceCacheRepository.getCachedFetchTransactionInfo(
+                chainSpec = chainSpec,
+                txHash = txHash,
+                currentBlockNumber = BlockNumber(currentBlockNumber)
+            ) ?: run {
+                val transaction = web3j.ethGetTransactionByHash(txHash.value).sendSafely()
+                    ?.transaction?.orElse(null).bind()
+                val receipt = web3j.ethGetTransactionReceipt(txHash.value).sendSafely()
+                    ?.transactionReceipt?.orElse(null).bind()
+                val blockConfirmations = currentBlockNumber - transaction.blockNumber.bind()
+                val txBlockNumber = transaction.blockNumber
+                val timestamp = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(txBlockNumber), false)
+                    .sendSafely()?.block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }.bind()
+                val txInfo = BlockchainTransactionInfo(
+                    hash = TransactionHash(transaction.hash),
+                    from = WalletAddress(transaction.from),
+                    to = transaction.to?.let { WalletAddress(it) } ?: ZeroAddress.toWalletAddress(),
+                    deployedContractAddress = receipt.contractAddress?.let { ContractAddress(it) },
+                    data = FunctionData(transaction.input),
+                    value = Balance(transaction.value),
+                    blockConfirmations = blockConfirmations,
+                    timestamp = timestamp,
+                    success = receipt.isStatusOK
+                )
+
+                if (blockchainProperties.shouldCache(blockConfirmations)) {
+                    web3jBlockchainServiceCacheRepository.cacheFetchTransactionInfo(
+                        id = uuidProvider.getUuid(),
+                        chainSpec = chainSpec,
+                        txHash = txHash,
+                        blockNumber = BlockNumber(txBlockNumber),
+                        txInfo = txInfo
+                    )
+                }
+
+                txInfo
+            }
         }
     }
 
@@ -132,14 +208,14 @@ class Web3jBlockchainService(
             "Executing read-only function call, chainSpec: $chainSpec, params: $params, blockParameter: $blockParameter"
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
-        val (blockNumber, timestamp) = blockchainProperties.web3j.getBlockNumberAndTimestamp(blockParameter)
+        val blockDescriptor = blockchainProperties.web3j.getBlockDescriptor(blockParameter)
         val functionCallResponse = blockchainProperties.web3j.ethCall(
             Transaction.createEthCallTransaction(
                 params.callerAddress.rawValue,
                 params.contractAddress.rawValue,
                 params.functionData.value
             ),
-            blockNumber.toWeb3Parameter()
+            blockDescriptor.blockNumber.toWeb3Parameter()
         ).sendSafely()?.value?.takeIf { it != "0x" }
             ?: throw BlockchainReadException(
                 "Unable to call function ${params.functionName} on contract with address: ${params.contractAddress}"
@@ -150,23 +226,33 @@ class Web3jBlockchainService(
         )
 
         return ReadonlyFunctionCallResult(
-            blockNumber = blockNumber,
-            timestamp = timestamp,
+            blockNumber = blockDescriptor.blockNumber,
+            timestamp = blockDescriptor.timestamp,
             returnValues = returnValues,
             rawReturnValue = functionCallResponse
         )
     }
 
     @Suppress("ReturnCount")
-    fun Web3j.getBlockNumberAndTimestamp(blockParameter: BlockParameter): Pair<BlockNumber, UtcDateTime> {
+    private fun Web3j.getBlockDescriptor(blockParameter: BlockParameter): BlockDescriptor {
         val block = ethGetBlockByNumber(blockParameter.toWeb3Parameter(), false).sendSafely()?.block
         val blockNumber = block?.number?.let { BlockNumber(it) }
+        val currentBlockNumber = ethBlockNumber()?.sendSafely()?.blockNumber
         val timestamp = block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }
-        return blockNumber?.let { b -> timestamp?.let { t -> Pair(b, t) } } ?: throw TemporaryBlockchainReadException()
+
+        return if (blockNumber != null && currentBlockNumber != null && timestamp != null) {
+            BlockDescriptor(
+                blockNumber = blockNumber,
+                blockConfirmations = currentBlockNumber - blockNumber.value,
+                timestamp = timestamp
+            )
+        } else {
+            throw TemporaryBlockchainReadException()
+        }
     }
 
     @Suppress("ReturnCount")
-    fun <S, T : Response<*>?> Request<S, T>.sendSafely(): T? {
+    private fun <S, T : Response<*>?> Request<S, T>.sendSafely(): T? {
         try {
             val value = this.send()
             if (value?.hasError() == true) {
@@ -187,12 +273,5 @@ class Web3jBlockchainService(
         } catch (ex: Exception) {
             logger.warn("Failed smart contract call", ex)
             null
-        }
-
-    private fun Type<*>.extractValue(): Any =
-        when (this) {
-            is StaticArray<*> -> value.map { it.extractValue() }
-            is DynamicArray<*> -> value.map { it.extractValue() }
-            else -> value
         }
 }
