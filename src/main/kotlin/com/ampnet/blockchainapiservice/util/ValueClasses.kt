@@ -156,7 +156,7 @@ value class ContractBinaryData private constructor(val value: String) {
 
     constructor(binary: ByteArray) : this(String(binary))
 
-    val binary: ByteArray  // TODO compact conversion
+    val binary: ByteArray // TODO compact conversion
         get() = value.toByteArray()
 
     val withPrefix: String
