@@ -31,6 +31,7 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
         val record = MultiPaymentTemplateRecord(
             id = multiPaymentTemplate.id,
             templateName = multiPaymentTemplate.templateName,
+            tokenAddress = multiPaymentTemplate.tokenAddress,
             chainId = multiPaymentTemplate.chainId,
             userId = multiPaymentTemplate.userId,
             createdAt = multiPaymentTemplate.createdAt,
@@ -44,7 +45,6 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
                 templateId = multiPaymentTemplate.id,
                 walletAddress = it.walletAddress,
                 itemName = it.itemName,
-                tokenAddress = it.tokenAddress,
                 assetAmount = it.assetAmount,
                 createdAt = it.createdAt
             )
@@ -58,6 +58,7 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
         logger.info { "Update multi-payment record, multiPaymentTemplate: $multiPaymentTemplate" }
         return dslContext.update(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE)
             .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.TEMPLATE_NAME, multiPaymentTemplate.templateName)
+            .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.TOKEN_ADDRESS, multiPaymentTemplate.tokenAddress)
             .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.CHAIN_ID, multiPaymentTemplate.chainId)
             .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.UPDATED_AT, multiPaymentTemplate.updatedAt)
             .where(
@@ -127,7 +128,6 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
                     templateId = item.templateId,
                     walletAddress = item.walletAddress,
                     itemName = item.itemName,
-                    tokenAddress = item.tokenAddress,
                     assetAmount = item.assetAmount,
                     createdAt = item.createdAt
                 )
@@ -147,7 +147,6 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
         dslContext.update(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM)
             .set(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.WALLET_ADDRESS, item.walletAddress)
             .set(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.ITEM_NAME, item.itemName)
-            .set(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.TOKEN_ADDRESS, item.tokenAddress)
             .set(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.ASSET_AMOUNT, item.assetAmount)
             .where(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.ID.eq(item.id))
             .execute()
@@ -173,6 +172,7 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
             id = id!!,
             items = NoItems,
             templateName = templateName!!,
+            tokenAddress = tokenAddress,
             chainId = chainId!!,
             userId = userId!!,
             createdAt = createdAt!!,
@@ -185,7 +185,6 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
             templateId = templateId!!,
             walletAddress = walletAddress!!,
             itemName = itemName,
-            tokenAddress = tokenAddress,
             assetAmount = assetAmount!!,
             createdAt = createdAt!!
         )

@@ -42,7 +42,6 @@ class MultiPaymentTemplateControllerTest : TestBase() {
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("a"),
             itemName = "itemName",
-            tokenAddress = ContractAddress("b"),
             assetAmount = Balance(BigInteger.TEN),
             createdAt = TestData.TIMESTAMP
         )
@@ -50,6 +49,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
             id = TEMPLATE_ID,
             items = WithItems(listOf(ITEM)),
             templateName = "templateName",
+            tokenAddress = ContractAddress("b"),
             chainId = ChainId(1337L),
             userId = USER_IDENTIFIER.id,
             createdAt = TestData.TIMESTAMP,
@@ -61,13 +61,13 @@ class MultiPaymentTemplateControllerTest : TestBase() {
     fun mustCorrectlyCreateMultiPaymentTemplate() {
         val request = CreateMultiPaymentTemplateRequest(
             templateName = TEMPLATE.templateName,
+            assetType = AssetType.TOKEN,
+            tokenAddress = TEMPLATE.tokenAddress?.rawValue,
             chainId = TEMPLATE.chainId.value,
             items = listOf(
                 MultiPaymentTemplateItemRequest(
                     walletAddress = ITEM.walletAddress.rawValue,
                     itemName = ITEM.itemName,
-                    assetType = AssetType.TOKEN,
-                    tokenAddress = ITEM.tokenAddress?.rawValue,
                     amount = ITEM.assetAmount.rawValue
                 )
             )
@@ -97,6 +97,8 @@ class MultiPaymentTemplateControllerTest : TestBase() {
     fun mustCorrectlyUpdateMultiPaymentTemplate() {
         val request = UpdateMultiPaymentTemplateRequest(
             templateName = TEMPLATE.templateName,
+            assetType = AssetType.TOKEN,
+            tokenAddress = TEMPLATE.tokenAddress?.rawValue,
             chainId = TEMPLATE.chainId.value
         )
 
@@ -189,8 +191,6 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         val request = MultiPaymentTemplateItemRequest(
             walletAddress = ITEM.walletAddress.rawValue,
             itemName = ITEM.itemName,
-            assetType = AssetType.TOKEN,
-            tokenAddress = ITEM.tokenAddress?.rawValue,
             amount = ITEM.assetAmount.rawValue
         )
 
@@ -219,8 +219,6 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         val request = MultiPaymentTemplateItemRequest(
             walletAddress = ITEM.walletAddress.rawValue,
             itemName = ITEM.itemName,
-            assetType = AssetType.TOKEN,
-            tokenAddress = ITEM.tokenAddress?.rawValue,
             amount = ITEM.assetAmount.rawValue
         )
 

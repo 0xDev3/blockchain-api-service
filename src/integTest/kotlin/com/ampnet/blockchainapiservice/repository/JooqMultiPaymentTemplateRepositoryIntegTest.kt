@@ -50,13 +50,13 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
                         templateId = TEMPLATE_ID,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -111,6 +111,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
 
         val templateUpdate = TEMPLATE.copy(
             templateName = "newName",
+            tokenAddress = null,
             chainId = ChainId(123L),
             updatedAt = TestData.TIMESTAMP
         )
@@ -202,7 +203,6 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("abc"),
             itemName = "newItemName",
-            tokenAddress = ContractAddress("def"),
             assetAmount = Balance(BigInteger.TWO),
             createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L)
         )
@@ -234,7 +234,6 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("abc"),
             itemName = "newItemName",
-            tokenAddress = ContractAddress("def"),
             assetAmount = Balance(BigInteger.TWO),
             createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L)
         )
@@ -254,7 +253,6 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         val updatedItem = TEMPLATE.items.value[0].copy(
             walletAddress = WalletAddress("fff"),
             itemName = "updatedItem",
-            tokenAddress = ContractAddress("111"),
             assetAmount = Balance(BigInteger.ONE)
         )
 
@@ -283,7 +281,6 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         val updatedItem = TEMPLATE.items.value[0].copy(
             walletAddress = WalletAddress("fff"),
             itemName = "updatedItem",
-            tokenAddress = ContractAddress("111"),
             assetAmount = Balance(BigInteger.ONE)
         )
 
