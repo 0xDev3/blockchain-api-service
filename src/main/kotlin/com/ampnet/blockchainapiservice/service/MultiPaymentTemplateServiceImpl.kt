@@ -43,13 +43,13 @@ class MultiPaymentTemplateServiceImpl(
                             templateId = templateId,
                             walletAddress = WalletAddress(it.walletAddress),
                             itemName = it.itemName,
-                            tokenAddress = it.tokenAddress?.let { ta -> ContractAddress(ta) },
                             assetAmount = Balance(it.amount),
                             createdAt = utcDateTimeProvider.getUtcDateTime()
                         )
                     }
                 ),
                 templateName = request.templateName,
+                tokenAddress = request.tokenAddress?.let { ContractAddress(it) },
                 chainId = ChainId(request.chainId),
                 userId = userIdentifier.id,
                 createdAt = utcDateTimeProvider.getUtcDateTime(),
@@ -71,6 +71,7 @@ class MultiPaymentTemplateServiceImpl(
         return multiPaymentTemplateRepository.update(
             template.copy(
                 templateName = request.templateName,
+                tokenAddress = request.tokenAddress?.let { ContractAddress(it) },
                 chainId = ChainId(request.chainId),
                 updatedAt = utcDateTimeProvider.getUtcDateTime()
             )
@@ -114,7 +115,6 @@ class MultiPaymentTemplateServiceImpl(
                 templateId = template.id,
                 walletAddress = WalletAddress(request.walletAddress),
                 itemName = request.itemName,
-                tokenAddress = request.tokenAddress?.let { ContractAddress(it) },
                 assetAmount = Balance(request.amount),
                 createdAt = updatedAt
             ),
@@ -142,7 +142,6 @@ class MultiPaymentTemplateServiceImpl(
                 templateId = template.id,
                 walletAddress = WalletAddress(request.walletAddress),
                 itemName = request.itemName,
-                tokenAddress = request.tokenAddress?.let { ContractAddress(it) },
                 assetAmount = Balance(request.amount),
                 createdAt = updatedAt
             ),

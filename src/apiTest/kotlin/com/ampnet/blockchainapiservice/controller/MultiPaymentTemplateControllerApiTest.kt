@@ -84,13 +84,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         """
                             {
                                 "template_name": "$TEMPLATE_NAME",
+                                "asset_type": "${AssetType.TOKEN.name}",
+                                "token_address": "${TOKEN_ADDRESS.rawValue}",
                                 "chain_id": ${CHAIN_ID.value},
                                 "items": [
                                     {
                                         "wallet_address": "${WALLET_ADDRESS.rawValue}",
                                         "item_name": "$ITEM_NAME",
-                                        "asset_type": "${AssetType.TOKEN.name}",
-                                        "token_address": "${TOKEN_ADDRESS.rawValue}",
                                         "amount": "${ASSET_AMOUNT.rawValue}"
                                     }
                                 ]
@@ -115,13 +115,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                                 templateId = response.id,
                                 walletAddress = WALLET_ADDRESS.rawValue,
                                 itemName = ITEM_NAME,
-                                assetType = AssetType.TOKEN,
-                                tokenAddress = TOKEN_ADDRESS.rawValue,
                                 amount = ASSET_AMOUNT.rawValue,
                                 createdAt = response.items[0].createdAt
                             )
                         ),
                         templateName = TEMPLATE_NAME,
+                        assetType = AssetType.TOKEN,
+                        tokenAddress = TOKEN_ADDRESS.rawValue,
                         chainId = CHAIN_ID.value,
                         createdAt = response.createdAt,
                         updatedAt = null
@@ -148,13 +148,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                                     templateId = response.id,
                                     walletAddress = WALLET_ADDRESS,
                                     itemName = ITEM_NAME,
-                                    tokenAddress = TOKEN_ADDRESS,
                                     assetAmount = ASSET_AMOUNT,
                                     createdAt = UtcDateTime(response.items[0].createdAt)
                                 )
                             )
                         ),
                         templateName = TEMPLATE_NAME,
+                        tokenAddress = TOKEN_ADDRESS,
                         chainId = CHAIN_ID,
                         userId = OWNER_ID,
                         createdAt = UtcDateTime(response.createdAt),
@@ -182,13 +182,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -210,6 +210,8 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         """
                             {
                                 "template_name": "$newTemplateName",
+                                "asset_type": "${AssetType.NATIVE.name}",
+                                "token_address": null,
                                 "chain_id": ${newChainId.value}
                             }
                         """.trimIndent()
@@ -226,6 +228,8 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     MultiPaymentTemplateWithItemsResponse(template).copy(
                         templateName = newTemplateName,
+                        assetType = AssetType.NATIVE,
+                        tokenAddress = null,
                         chainId = newChainId.value,
                         updatedAt = response.updatedAt
                     )
@@ -242,6 +246,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     template.copy(
                         templateName = newTemplateName,
+                        tokenAddress = null,
                         chainId = newChainId,
                         updatedAt = response.updatedAt?.let { UtcDateTime(it) }
                     )
@@ -265,13 +270,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -293,6 +298,8 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         """
                             {
                                 "template_name": "$newTemplateName",
+                                "asset_type": "${AssetType.NATIVE.name}",
+                                "token_address": null,
                                 "chain_id": ${newChainId.value}
                             }
                         """.trimIndent()
@@ -319,6 +326,8 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         """
                             {
                                 "template_name": "$newTemplateName",
+                                "asset_type": "${AssetType.NATIVE.name}",
+                                "token_address": null,
                                 "chain_id": ${newChainId.value}
                             }
                         """.trimIndent()
@@ -344,13 +353,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -387,13 +396,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -441,13 +450,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -499,13 +508,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -551,13 +560,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -581,8 +590,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                             {
                                 "wallet_address": "${newWalletAddress.rawValue}",
                                 "item_name": "$newItemName",
-                                "asset_type": "${AssetType.NATIVE.name}",
-                                "token_address": null,
                                 "amount": "${newAmount.rawValue}"
                             }
                         """.trimIndent()
@@ -605,8 +612,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                                 templateId = templateId,
                                 walletAddress = newWalletAddress.rawValue,
                                 itemName = newItemName,
-                                assetType = AssetType.NATIVE,
-                                tokenAddress = null,
                                 amount = newAmount.rawValue,
                                 createdAt = response.items[1].createdAt
                             )
@@ -635,7 +640,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                                     templateId = templateId,
                                     walletAddress = newWalletAddress,
                                     itemName = newItemName,
-                                    tokenAddress = null,
                                     assetAmount = newAmount,
                                     createdAt = UtcDateTime(response.items[1].createdAt)
                                 )
@@ -665,13 +669,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -695,8 +699,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                             {
                                 "wallet_address": "${newWalletAddress.rawValue}",
                                 "item_name": "$newItemName",
-                                "asset_type": "${AssetType.NATIVE.name}",
-                                "token_address": null,
                                 "amount": "${newAmount.rawValue}"
                             }
                         """.trimIndent()
@@ -725,8 +727,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                             {
                                 "wallet_address": "${newWalletAddress.rawValue}",
                                 "item_name": "$newItemName",
-                                "asset_type": "${AssetType.NATIVE.name}",
-                                "token_address": null,
                                 "amount": "${newAmount.rawValue}"
                             }
                         """.trimIndent()
@@ -752,13 +752,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -784,8 +784,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                             {
                                 "wallet_address": "${newWalletAddress.rawValue}",
                                 "item_name": "$newItemName",
-                                "asset_type": "${AssetType.NATIVE.name}",
-                                "token_address": null,
                                 "amount": "${newAmount.rawValue}"
                             }
                         """.trimIndent()
@@ -807,8 +805,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                                 templateId = templateId,
                                 walletAddress = newWalletAddress.rawValue,
                                 itemName = newItemName,
-                                assetType = AssetType.NATIVE,
-                                tokenAddress = null,
                                 amount = newAmount.rawValue,
                                 createdAt = template.items.value[0].createdAt.value
                             )
@@ -834,7 +830,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                                     templateId = templateId,
                                     walletAddress = newWalletAddress,
                                     itemName = newItemName,
-                                    tokenAddress = null,
                                     assetAmount = newAmount,
                                     createdAt = template.items.value[0].createdAt
                                 )
@@ -862,13 +857,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -894,8 +889,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                             {
                                 "wallet_address": "${newWalletAddress.rawValue}",
                                 "item_name": "$newItemName",
-                                "asset_type": "${AssetType.NATIVE.name}",
-                                "token_address": null,
                                 "amount": "${newAmount.rawValue}"
                             }
                         """.trimIndent()
@@ -926,8 +919,6 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                             {
                                 "wallet_address": "${newWalletAddress.rawValue}",
                                 "item_name": "$newItemName",
-                                "asset_type": "${AssetType.NATIVE.name}",
-                                "token_address": null,
                                 "amount": "${newAmount.rawValue}"
                             }
                         """.trimIndent()
@@ -953,13 +944,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,
@@ -1024,13 +1015,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
-                        tokenAddress = TOKEN_ADDRESS,
                         assetAmount = ASSET_AMOUNT,
                         createdAt = TestData.TIMESTAMP
                     )
                 )
             ),
             templateName = TEMPLATE_NAME,
+            tokenAddress = TOKEN_ADDRESS,
             chainId = CHAIN_ID,
             userId = OWNER_ID,
             createdAt = TestData.TIMESTAMP,

@@ -1,9 +1,6 @@
 === Add Item to Multi-Payment Template
 Adds item to stored multi-payment template.
 
-If `asset_type` is set to `NATIVE`, then chain-native currency will be send (i.e. Ether) and then `token_address` must
-not be present. If `asset_type` is set to `TOKEN`, then `token_address` must be present.
-
 .Request Example
 [%collapsible]
 ====

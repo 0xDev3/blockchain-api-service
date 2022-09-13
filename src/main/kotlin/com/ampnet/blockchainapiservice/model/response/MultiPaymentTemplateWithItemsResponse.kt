@@ -12,6 +12,8 @@ data class MultiPaymentTemplateWithItemsResponse(
     val id: UUID,
     val items: List<MultiPaymentTemplateItemResponse>,
     val templateName: String,
+    val assetType: AssetType,
+    val tokenAddress: String?,
     val chainId: Long,
     val createdAt: OffsetDateTime,
     val updatedAt: OffsetDateTime?
@@ -20,6 +22,8 @@ data class MultiPaymentTemplateWithItemsResponse(
         id = template.id,
         items = template.items.value.map { MultiPaymentTemplateItemResponse(it) },
         templateName = template.templateName,
+        assetType = if (template.tokenAddress == null) AssetType.NATIVE else AssetType.TOKEN,
+        tokenAddress = template.tokenAddress?.rawValue,
         chainId = template.chainId.value,
         createdAt = template.createdAt.value,
         updatedAt = template.updatedAt?.value
@@ -31,8 +35,6 @@ data class MultiPaymentTemplateItemResponse(
     val templateId: UUID,
     val walletAddress: String,
     val itemName: String?,
-    val assetType: AssetType,
-    val tokenAddress: String?,
     val amount: BigInteger,
     val createdAt: OffsetDateTime
 ) {
@@ -41,8 +43,6 @@ data class MultiPaymentTemplateItemResponse(
         templateId = item.templateId,
         walletAddress = item.walletAddress.rawValue,
         itemName = item.itemName,
-        assetType = if (item.tokenAddress == null) AssetType.NATIVE else AssetType.TOKEN,
-        tokenAddress = item.tokenAddress?.rawValue,
         amount = item.assetAmount.rawValue,
         createdAt = item.createdAt.value
     )
