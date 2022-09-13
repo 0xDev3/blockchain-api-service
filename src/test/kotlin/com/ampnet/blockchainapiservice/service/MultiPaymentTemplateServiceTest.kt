@@ -40,7 +40,6 @@ class MultiPaymentTemplateServiceTest : TestBase() {
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("a"),
             itemName = "itemName",
-            tokenAddress = ContractAddress("b"),
             assetAmount = Balance(BigInteger.TEN),
             createdAt = TestData.TIMESTAMP
         )
@@ -48,6 +47,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
             id = TEMPLATE_ID,
             items = WithItems(listOf(ITEM)),
             templateName = "templateName",
+            tokenAddress = ContractAddress("b"),
             chainId = ChainId(1337L),
             userId = USER_IDENTIFIER.id,
             createdAt = TestData.TIMESTAMP,
@@ -56,17 +56,19 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         private val ITEM_REQUEST = MultiPaymentTemplateItemRequest(
             walletAddress = ITEM.walletAddress.rawValue,
             itemName = ITEM.itemName,
-            assetType = AssetType.TOKEN,
-            tokenAddress = ITEM.tokenAddress?.rawValue,
             amount = ITEM.assetAmount.rawValue
         )
         private val CREATE_REQUEST = CreateMultiPaymentTemplateRequest(
             templateName = TEMPLATE.templateName,
+            assetType = AssetType.TOKEN,
+            tokenAddress = TEMPLATE.tokenAddress?.rawValue,
             chainId = TEMPLATE.chainId.value,
             items = listOf(ITEM_REQUEST)
         )
         private val UPDATE_REQUEST = UpdateMultiPaymentTemplateRequest(
             templateName = "newName",
+            assetType = AssetType.NATIVE,
+            tokenAddress = null,
             chainId = 123L
         )
     }
@@ -129,6 +131,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
         val updatedTemplate = TEMPLATE.copy(
             templateName = UPDATE_REQUEST.templateName,
+            tokenAddress = UPDATE_REQUEST.tokenAddress?.let { ContractAddress(it) },
             chainId = ChainId(UPDATE_REQUEST.chainId),
             updatedAt = updatedAt
         )
@@ -193,6 +196,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
         val updatedTemplate = TEMPLATE.copy(
             templateName = UPDATE_REQUEST.templateName,
+            tokenAddress = UPDATE_REQUEST.tokenAddress?.let { ContractAddress(it) },
             chainId = ChainId(UPDATE_REQUEST.chainId)
         )
 
@@ -406,7 +410,6 @@ class MultiPaymentTemplateServiceTest : TestBase() {
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress(ITEM_REQUEST.walletAddress),
             itemName = ITEM_REQUEST.itemName,
-            tokenAddress = ITEM_REQUEST.tokenAddress?.let { ContractAddress(it) },
             assetAmount = Balance(ITEM_REQUEST.amount),
             createdAt = newItemTimestamp
         )
@@ -494,7 +497,6 @@ class MultiPaymentTemplateServiceTest : TestBase() {
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress(ITEM_REQUEST.walletAddress),
             itemName = ITEM_REQUEST.itemName,
-            tokenAddress = ITEM_REQUEST.tokenAddress?.let { ContractAddress(it) },
             assetAmount = Balance(ITEM_REQUEST.amount),
             createdAt = newItemTimestamp
         )
@@ -545,7 +547,6 @@ class MultiPaymentTemplateServiceTest : TestBase() {
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("abc123"),
             itemName = "updatedItemName",
-            tokenAddress = ContractAddress("def456"),
             assetAmount = Balance(BigInteger.valueOf(123L)),
             createdAt = updateTimestamp
         )
@@ -568,8 +569,6 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val updateItemRequest = MultiPaymentTemplateItemRequest(
             walletAddress = updatedItem.walletAddress.rawValue,
             itemName = updatedItem.itemName,
-            assetType = AssetType.TOKEN,
-            tokenAddress = updatedItem.tokenAddress?.rawValue,
             amount = updatedItem.assetAmount.rawValue
         )
 
@@ -634,7 +633,6 @@ class MultiPaymentTemplateServiceTest : TestBase() {
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("abc123"),
             itemName = "updatedItemName",
-            tokenAddress = ContractAddress("def456"),
             assetAmount = Balance(BigInteger.valueOf(123L)),
             createdAt = updateTimestamp
         )
@@ -653,8 +651,6 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val updateItemRequest = MultiPaymentTemplateItemRequest(
             walletAddress = updatedItem.walletAddress.rawValue,
             itemName = updatedItem.itemName,
-            assetType = AssetType.TOKEN,
-            tokenAddress = updatedItem.tokenAddress?.rawValue,
             amount = updatedItem.assetAmount.rawValue
         )
 
