@@ -18,6 +18,7 @@ data class MultiPaymentTemplate<T : ItemsState>(
     val id: UUID,
     val items: T,
     val templateName: String,
+    val tokenAddress: ContractAddress?,
     val chainId: ChainId,
     val userId: UUID,
     val createdAt: UtcDateTime,
@@ -28,6 +29,7 @@ data class MultiPaymentTemplate<T : ItemsState>(
             id = id,
             items = WithItems(items),
             templateName = templateName,
+            tokenAddress = tokenAddress,
             chainId = chainId,
             userId = userId,
             createdAt = createdAt,
@@ -39,6 +41,7 @@ data class MultiPaymentTemplate<T : ItemsState>(
             id = id,
             items = NoItems,
             templateName = templateName,
+            tokenAddress = tokenAddress,
             chainId = chainId,
             userId = userId,
             createdAt = createdAt,
@@ -51,7 +54,6 @@ data class MultiPaymentTemplateItem(
     val templateId: UUID,
     val walletAddress: WalletAddress,
     val itemName: String?,
-    val tokenAddress: ContractAddress?,
     val assetAmount: Balance,
     val createdAt: UtcDateTime
 )
