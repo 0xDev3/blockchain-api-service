@@ -6,6 +6,7 @@ import com.ampnet.blockchainapiservice.exception.UnsupportedChainIdException
 import com.ampnet.blockchainapiservice.util.ChainId
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
+import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
 class ChainPropertiesHandler(private val applicationProperties: ApplicationProperties) {
@@ -16,11 +17,11 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
         val chain = Chain.fromId(chainSpec.chainId)
 
         return if (chainSpec.customRpcUrl != null) {
+            val chainProperties = chain?.let { getChainProperties(it.id) }
             ChainPropertiesWithServices(
                 web3j = Web3j.build(HttpService(chainSpec.customRpcUrl)),
-                minBlockConfirmationsForCaching = chain?.let {
-                    getChainProperties(it.id)?.minBlockConfirmationsForCaching
-                }
+                latestBlockCacheDuration = chainProperties?.latestBlockCacheDuration ?: Duration.ZERO,
+                minBlockConfirmationsForCaching = chainProperties?.minBlockConfirmationsForCaching
             )
         } else if (chain != null) {
             blockchainPropertiesMap.computeIfAbsent(chain.id) {
@@ -58,9 +59,11 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
 
     private fun generateBlockchainProperties(chain: Chain): ChainPropertiesWithServices {
         val rpcUrl = getChainRpcUrl(chain)
+        val chainProperties = getChainProperties(chain.id)
         return ChainPropertiesWithServices(
             web3j = Web3j.build(HttpService(rpcUrl)),
-            minBlockConfirmationsForCaching = getChainProperties(chain.id)?.minBlockConfirmationsForCaching
+            latestBlockCacheDuration = chainProperties?.latestBlockCacheDuration ?: Duration.ZERO,
+            minBlockConfirmationsForCaching = chainProperties?.minBlockConfirmationsForCaching
         )
     }
 }

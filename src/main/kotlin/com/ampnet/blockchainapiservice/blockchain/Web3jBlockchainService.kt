@@ -10,6 +10,7 @@ import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.repository.Web3jBlockchainServiceCacheRepository
 import com.ampnet.blockchainapiservice.service.AbiDecoderService
+import com.ampnet.blockchainapiservice.service.UtcDateTimeProvider
 import com.ampnet.blockchainapiservice.service.UuidProvider
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
@@ -35,11 +36,14 @@ import org.web3j.tx.ReadonlyTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import java.io.IOException
 import java.math.BigInteger
+import java.time.Duration
+import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class Web3jBlockchainService(
     private val abiDecoderService: AbiDecoderService,
     private val uuidProvider: UuidProvider,
+    private val utcDateTimeProvider: UtcDateTimeProvider,
     private val web3jBlockchainServiceCacheRepository: Web3jBlockchainServiceCacheRepository,
     applicationProperties: ApplicationProperties
 ) : BlockchainService {
@@ -50,9 +54,18 @@ class Web3jBlockchainService(
             val blockConfirmations: BigInteger,
             val timestamp: UtcDateTime
         )
+
+        private data class CachedBlockNumber(
+            val blockNumber: BlockNumber,
+            val cachedAt: UtcDateTime
+        ) {
+            fun shouldInvalidate(now: UtcDateTime, cacheDuration: Duration) =
+                (cachedAt.value + cacheDuration).isBefore(now.value)
+        }
     }
 
     private val chainHandler = ChainPropertiesHandler(applicationProperties)
+    private val latestBlockCache = ConcurrentHashMap<ChainSpec, CachedBlockNumber>()
 
     override fun fetchAccountBalance(
         chainSpec: ChainSpec,
@@ -64,7 +77,11 @@ class Web3jBlockchainService(
                 " blockParameter: $blockParameter"
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
-        val blockDescriptor = blockchainProperties.web3j.getBlockDescriptor(blockParameter)
+        val blockDescriptor = blockchainProperties.web3j.getBlockDescriptor(
+            blockParameter = blockParameter,
+            chainSpec = chainSpec,
+            cacheDuration = blockchainProperties.latestBlockCacheDuration
+        )
 
         return web3jBlockchainServiceCacheRepository.getCachedFetchAccountBalance(
             chainSpec = chainSpec,
@@ -107,7 +124,11 @@ class Web3jBlockchainService(
                 " walletAddress: $walletAddress, blockParameter: $blockParameter"
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
-        val blockDescriptor = blockchainProperties.web3j.getBlockDescriptor(blockParameter)
+        val blockDescriptor = blockchainProperties.web3j.getBlockDescriptor(
+            blockParameter = blockParameter,
+            chainSpec = chainSpec,
+            cacheDuration = blockchainProperties.latestBlockCacheDuration
+        )
 
         return web3jBlockchainServiceCacheRepository.getCachedFetchErc20AccountBalance(
             chainSpec = chainSpec,
@@ -156,19 +177,18 @@ class Web3jBlockchainService(
         val web3j = blockchainProperties.web3j
 
         return shortCircuiting {
-            val currentBlockNumber = web3j.ethBlockNumber()?.sendSafely()
-                ?.blockNumber.bind()
+            val currentBlockNumber = web3j.latestBlockNumber(chainSpec, blockchainProperties.latestBlockCacheDuration)
 
             web3jBlockchainServiceCacheRepository.getCachedFetchTransactionInfo(
                 chainSpec = chainSpec,
                 txHash = txHash,
-                currentBlockNumber = BlockNumber(currentBlockNumber)
+                currentBlockNumber = currentBlockNumber
             ) ?: run {
                 val transaction = web3j.ethGetTransactionByHash(txHash.value).sendSafely()
                     ?.transaction?.orElse(null).bind()
                 val receipt = web3j.ethGetTransactionReceipt(txHash.value).sendSafely()
                     ?.transactionReceipt?.orElse(null).bind()
-                val blockConfirmations = currentBlockNumber - transaction.blockNumber.bind()
+                val blockConfirmations = currentBlockNumber.value - transaction.blockNumber.bind()
                 val txBlockNumber = transaction.blockNumber
                 val timestamp = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(txBlockNumber), false)
                     .sendSafely()?.block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }.bind()
@@ -208,7 +228,11 @@ class Web3jBlockchainService(
             "Executing read-only function call, chainSpec: $chainSpec, params: $params, blockParameter: $blockParameter"
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
-        val blockDescriptor = blockchainProperties.web3j.getBlockDescriptor(blockParameter)
+        val blockDescriptor = blockchainProperties.web3j.getBlockDescriptor(
+            blockParameter = blockParameter,
+            chainSpec = chainSpec,
+            cacheDuration = blockchainProperties.latestBlockCacheDuration
+        )
         val functionCallResponse = blockchainProperties.web3j.ethCall(
             Transaction.createEthCallTransaction(
                 params.callerAddress.rawValue,
@@ -233,21 +257,39 @@ class Web3jBlockchainService(
         )
     }
 
-    @Suppress("ReturnCount")
-    private fun Web3j.getBlockDescriptor(blockParameter: BlockParameter): BlockDescriptor {
+    private fun Web3j.getBlockDescriptor(
+        blockParameter: BlockParameter,
+        chainSpec: ChainSpec,
+        cacheDuration: Duration
+    ): BlockDescriptor {
         val block = ethGetBlockByNumber(blockParameter.toWeb3Parameter(), false).sendSafely()?.block
         val blockNumber = block?.number?.let { BlockNumber(it) }
-        val currentBlockNumber = ethBlockNumber()?.sendSafely()?.blockNumber
+        val currentBlockNumber = latestBlockNumber(chainSpec, cacheDuration)
         val timestamp = block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }
 
-        return if (blockNumber != null && currentBlockNumber != null && timestamp != null) {
+        return if (blockNumber != null && timestamp != null) {
             BlockDescriptor(
                 blockNumber = blockNumber,
-                blockConfirmations = currentBlockNumber - blockNumber.value,
+                blockConfirmations = (currentBlockNumber.value - blockNumber.value).max(BigInteger.ZERO),
                 timestamp = timestamp
             )
         } else {
             throw TemporaryBlockchainReadException()
+        }
+    }
+
+    private fun Web3j.latestBlockNumber(chainSpec: ChainSpec, cacheDuration: Duration): BlockNumber {
+        val now = utcDateTimeProvider.getUtcDateTime()
+        val cachedBlockNumber = latestBlockCache[chainSpec]?.takeIf { it.shouldInvalidate(now, cacheDuration).not() }
+            ?.blockNumber
+
+        return if (cachedBlockNumber != null) {
+            cachedBlockNumber
+        } else {
+            val ethLatestBlockNumber = ethBlockNumber().sendSafely()?.blockNumber?.let { BlockNumber(it) }
+                ?: throw TemporaryBlockchainReadException()
+            latestBlockCache[chainSpec] = CachedBlockNumber(ethLatestBlockNumber, now)
+            ethLatestBlockNumber
         }
     }
 

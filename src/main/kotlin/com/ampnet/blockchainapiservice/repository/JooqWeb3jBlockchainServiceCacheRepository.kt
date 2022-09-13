@@ -18,6 +18,7 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Repository
+import java.math.BigInteger
 import java.util.UUID
 
 @Repository
@@ -214,7 +215,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                     deployedContractAddress = it.deployedContractAddress,
                     data = it.txData!!,
                     value = it.valueAmount!!,
-                    blockConfirmations = currentBlockNumber.value - it.blockNumber!!.value,
+                    blockConfirmations = (currentBlockNumber.value - it.blockNumber!!.value).max(BigInteger.ZERO),
                     timestamp = it.timestamp!!,
                     success = it.success!!
                 )

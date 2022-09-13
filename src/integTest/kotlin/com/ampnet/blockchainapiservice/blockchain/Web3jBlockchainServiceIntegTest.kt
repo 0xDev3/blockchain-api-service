@@ -9,6 +9,7 @@ import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallP
 import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
+import com.ampnet.blockchainapiservice.service.CurrentUtcDateTimeProvider
 import com.ampnet.blockchainapiservice.service.EthereumAbiDecoderService
 import com.ampnet.blockchainapiservice.service.EthereumFunctionEncoderService
 import com.ampnet.blockchainapiservice.service.RandomUuidProvider
@@ -81,6 +82,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct account balance is fetched for latest block") {
             val service = createService()
+            service.fetchAccountBalance(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                walletAddress = accountBalance.wallet
+            )
             val fetchedAccountBalance = service.fetchAccountBalance(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 walletAddress = accountBalance.wallet
@@ -665,6 +670,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         Web3jBlockchainService(
             abiDecoderService = EthereumAbiDecoderService(),
             uuidProvider = RandomUuidProvider(),
+            utcDateTimeProvider = CurrentUtcDateTimeProvider(),
             web3jBlockchainServiceCacheRepository = mock(),
             applicationProperties = hardhatProperties()
         )

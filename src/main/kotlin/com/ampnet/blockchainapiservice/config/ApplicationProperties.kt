@@ -31,6 +31,7 @@ class JwtProperties {
 
 class ChainProperties {
     var minBlockConfirmationsForCaching: BigInteger? = null
+    var latestBlockCacheDuration = Duration.ofSeconds(5L)
     var rpcUrlOverride: String? = null
     var startBlockNumber: BigInteger? = null
 }
