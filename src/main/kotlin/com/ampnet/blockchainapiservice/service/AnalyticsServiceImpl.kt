@@ -34,7 +34,7 @@ class AnalyticsServiceImpl(
                 "projectId: $projectId, origin: $origin, userAgent: $userAgent, remoteAddr: $remoteAddr"
         }
 
-        event.eventName("API Key Created")
+        event.eventName("Login")
             .eventTime(System.currentTimeMillis())
             .userData(UserData().externalId(userIdentifier.id.toString()))
             .customData(
