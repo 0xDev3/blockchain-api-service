@@ -13,6 +13,7 @@ import com.ampnet.blockchainapiservice.model.response.ProjectsResponse
 import com.ampnet.blockchainapiservice.model.result.ApiKey
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
+import com.ampnet.blockchainapiservice.service.AnalyticsService
 import com.ampnet.blockchainapiservice.service.ProjectService
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.http.ResponseEntity
+import org.springframework.mock.web.MockHttpServletRequest
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -56,13 +58,14 @@ class ProjectControllerTest : TestBase() {
         )
 
         val service = mock<ProjectService>()
+        val analyticsService = mock<AnalyticsService>()
 
         suppose("project will be created") {
             given(service.createProject(userIdentifier, params))
                 .willReturn(result)
         }
 
-        val controller = ProjectController(service)
+        val controller = ProjectController(service, analyticsService)
 
         verify("controller returns correct response") {
             val request = CreateProjectRequest(
@@ -98,13 +101,14 @@ class ProjectControllerTest : TestBase() {
         )
 
         val service = mock<ProjectService>()
+        val analyticsService = mock<AnalyticsService>()
 
         suppose("project will be returned") {
             given(service.getProjectById(userIdentifier, result.id))
                 .willReturn(result)
         }
 
-        val controller = ProjectController(service)
+        val controller = ProjectController(service, analyticsService)
 
         verify("controller returns correct response") {
             val response = controller.getById(userIdentifier, result.id)
@@ -133,13 +137,14 @@ class ProjectControllerTest : TestBase() {
         )
 
         val service = mock<ProjectService>()
+        val analyticsService = mock<AnalyticsService>()
 
         suppose("project will be returned") {
             given(service.getProjectByIssuer(userIdentifier, result.issuerContractAddress, result.chainId))
                 .willReturn(result)
         }
 
-        val controller = ProjectController(service)
+        val controller = ProjectController(service, analyticsService)
 
         verify("controller returns correct response") {
             val response = controller.getByIssuerAddress(
@@ -183,13 +188,14 @@ class ProjectControllerTest : TestBase() {
         )
 
         val service = mock<ProjectService>()
+        val analyticsService = mock<AnalyticsService>()
 
         suppose("projects will be returned") {
             given(service.getAllProjectsForUser(userIdentifier))
                 .willReturn(result)
         }
 
-        val controller = ProjectController(service)
+        val controller = ProjectController(service, analyticsService)
 
         verify("controller returns correct response") {
             val response = controller.getAll(userIdentifier)
@@ -215,13 +221,14 @@ class ProjectControllerTest : TestBase() {
         )
 
         val service = mock<ProjectService>()
+        val analyticsService = mock<AnalyticsService>()
 
         suppose("API key will be returned") {
             given(service.getProjectApiKeys(userIdentifier, result.projectId))
                 .willReturn(listOf(result))
         }
 
-        val controller = ProjectController(service)
+        val controller = ProjectController(service, analyticsService)
 
         verify("controller returns correct response") {
             val response = controller.getApiKey(userIdentifier, result.projectId)
@@ -242,13 +249,14 @@ class ProjectControllerTest : TestBase() {
         )
 
         val service = mock<ProjectService>()
+        val analyticsService = mock<AnalyticsService>()
 
         suppose("empty list will be returned") {
             given(service.getProjectApiKeys(userIdentifier, projectId))
                 .willReturn(listOf())
         }
 
-        val controller = ProjectController(service)
+        val controller = ProjectController(service, analyticsService)
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
@@ -271,6 +279,7 @@ class ProjectControllerTest : TestBase() {
         )
 
         val service = mock<ProjectService>()
+        val analyticsService = mock<AnalyticsService>()
 
         suppose("no API keys exist") {
             given(service.getProjectApiKeys(userIdentifier, result.projectId))
@@ -282,10 +291,10 @@ class ProjectControllerTest : TestBase() {
                 .willReturn(result)
         }
 
-        val controller = ProjectController(service)
+        val controller = ProjectController(service, analyticsService)
 
         verify("controller returns correct response") {
-            val response = controller.createApiKey(userIdentifier, result.projectId)
+            val response = controller.createApiKey(userIdentifier, result.projectId, MockHttpServletRequest())
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -308,17 +317,18 @@ class ProjectControllerTest : TestBase() {
         )
 
         val service = mock<ProjectService>()
+        val analyticsService = mock<AnalyticsService>()
 
         suppose("single API keys exist") {
             given(service.getProjectApiKeys(userIdentifier, result.projectId))
                 .willReturn(listOf(result))
         }
 
-        val controller = ProjectController(service)
+        val controller = ProjectController(service, analyticsService)
 
         verify("ApiKeyAlreadyExistsException is thrown") {
             assertThrows<ApiKeyAlreadyExistsException>(message) {
-                controller.createApiKey(userIdentifier, result.projectId)
+                controller.createApiKey(userIdentifier, result.projectId, MockHttpServletRequest())
             }
         }
     }
