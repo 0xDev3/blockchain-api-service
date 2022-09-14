@@ -10,10 +10,12 @@ import com.ampnet.blockchainapiservice.model.response.ApiKeyResponse
 import com.ampnet.blockchainapiservice.model.response.ProjectResponse
 import com.ampnet.blockchainapiservice.model.response.ProjectsResponse
 import com.ampnet.blockchainapiservice.model.result.UserIdentifier
+import com.ampnet.blockchainapiservice.service.AnalyticsService
 import com.ampnet.blockchainapiservice.service.ProjectService
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import mu.KLogging
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
@@ -22,11 +24,17 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @Validated
 @RestController
-class ProjectController(private val projectService: ProjectService) {
+class ProjectController(
+    private val projectService: ProjectService,
+    private val analyticsService: AnalyticsService
+) {
+
+    companion object : KLogging()
 
     @PostMapping("/v1/projects")
     fun createProject(
@@ -77,7 +85,7 @@ class ProjectController(private val projectService: ProjectService) {
     @GetMapping("/v1/projects/{id}/api-key")
     fun getApiKey(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
-        @PathVariable id: UUID
+        @PathVariable id: UUID,
     ): ResponseEntity<ApiKeyResponse> { // TODO return multiple API keys in the future
         val apiKey = projectService.getProjectApiKeys(userIdentifier, id).firstOrNull()
             ?: throw ResourceNotFoundException("API key not yet generated for provided project ID")
@@ -87,13 +95,23 @@ class ProjectController(private val projectService: ProjectService) {
     @PostMapping("/v1/projects/{id}/api-key")
     fun createApiKey(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
-        @PathVariable id: UUID
+        @PathVariable id: UUID,
+        request: HttpServletRequest
     ): ResponseEntity<ApiKeyResponse> { // TODO allow multiple API key creation in the future
         if (projectService.getProjectApiKeys(userIdentifier, id).isNotEmpty()) {
             throw ApiKeyAlreadyExistsException(id)
         }
 
         val apiKey = projectService.createApiKey(userIdentifier, id)
+
+        analyticsService.postApiKeyCreatedEvent(
+            userIdentifier,
+            apiKey.projectId,
+            request.getHeader("Origin"),
+            request.getHeader("User-Agent"),
+            request.remoteAddr
+        )
+
         return ResponseEntity.ok(ApiKeyResponse(apiKey))
     }
 }
