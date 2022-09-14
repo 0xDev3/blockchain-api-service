@@ -10,6 +10,7 @@ import com.ampnet.blockchainapiservice.model.response.ApiKeyResponse
 import com.ampnet.blockchainapiservice.model.response.ProjectResponse
 import com.ampnet.blockchainapiservice.model.response.ProjectsResponse
 import com.ampnet.blockchainapiservice.model.result.UserIdentifier
+import com.ampnet.blockchainapiservice.service.AnalyticsService
 import com.ampnet.blockchainapiservice.service.ProjectService
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -22,11 +23,15 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
+import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
 @Validated
 @RestController
-class ProjectController(private val projectService: ProjectService) {
+class ProjectController(
+    private val projectService: ProjectService,
+    private val analyticsService: AnalyticsService
+) {
 
     @PostMapping("/v1/projects")
     fun createProject(
@@ -87,13 +92,23 @@ class ProjectController(private val projectService: ProjectService) {
     @PostMapping("/v1/projects/{id}/api-key")
     fun createApiKey(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
-        @PathVariable id: UUID
+        @PathVariable id: UUID,
+        request: HttpServletRequest
     ): ResponseEntity<ApiKeyResponse> { // TODO allow multiple API key creation in the future
         if (projectService.getProjectApiKeys(userIdentifier, id).isNotEmpty()) {
             throw ApiKeyAlreadyExistsException(id)
         }
 
         val apiKey = projectService.createApiKey(userIdentifier, id)
+
+        analyticsService.postApiKeyCreatedEvent(
+            userIdentifier = userIdentifier,
+            projectId = apiKey.projectId,
+            origin = request.getHeader("Origin"),
+            userAgent = request.getHeader("User-Agent"),
+            remoteAddr = request.remoteAddr
+        )
+
         return ResponseEntity.ok(ApiKeyResponse(apiKey))
     }
 }
