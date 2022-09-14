@@ -8,6 +8,7 @@ import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
+import com.ampnet.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.service.CurrentUtcDateTimeProvider
 import com.ampnet.blockchainapiservice.service.EthereumAbiDecoderService
@@ -20,6 +21,7 @@ import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BlockNumber
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
@@ -659,6 +661,71 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     )
                 )
             }
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFindContractDeploymentTransaction() {
+        val mainAccount = accounts[0]
+        val accountBalance = AccountBalance(
+            wallet = WalletAddress(mainAccount.address),
+            blockNumber = BlockNumber(BigInteger.ZERO),
+            timestamp = UtcDateTime.ofEpochSeconds(0L),
+            amount = Balance(BigInteger("10000"))
+        )
+
+        suppose("1000 blocks will be mined before contract deployment transaction") {
+            repeat(1_000) { hardhatContainer.mine() }
+        }
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(accountBalance.wallet.rawValue),
+                listOf(accountBalance.amount.rawValue),
+                mainAccount.address
+            ).send()
+        }
+
+        val deploymentTransaction = contract.transactionReceipt.get()
+
+        suppose("1000 blocks will be mined after contract deployment transaction") {
+            repeat(1_000) { hardhatContainer.mine() }
+        }
+
+        val encodedConstructor = EthereumFunctionEncoderService().encodeConstructor(
+            arguments = listOf(
+                FunctionArgument(DynamicArray(Address::class.java, listOf(accountBalance.wallet.value))),
+                FunctionArgument(DynamicArray(Uint::class.java, listOf(accountBalance.amount.value))),
+                FunctionArgument(WalletAddress(mainAccount.address))
+            )
+        )
+        val data = "0x" + SimpleERC20.BINARY + encodedConstructor.withoutPrefix
+        val rawBinaryIndex = SimpleERC20.BINARY.lastIndexOf("608060")
+
+        verify("contract deployment transaction is correctly found") {
+            val service = createService()
+            val transactionInfo = service.findContractDeploymentTransaction(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                contractAddress = ContractAddress(contract.contractAddress)
+            )
+
+            assertThat(transactionInfo).withMessage()
+                .isNotNull()
+
+            assertThat(transactionInfo!!).withMessage()
+                .isEqualTo(
+                    ContractDeploymentTransactionInfo(
+                        hash = TransactionHash(deploymentTransaction.transactionHash),
+                        from = WalletAddress(mainAccount.address),
+                        deployedContractAddress = ContractAddress(contract.contractAddress),
+                        data = FunctionData(data),
+                        value = Balance.ZERO,
+                        binary = ContractBinaryData(SimpleERC20.BINARY.substring(rawBinaryIndex))
+                    )
+                )
         }
     }
 
