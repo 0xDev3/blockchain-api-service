@@ -43,5 +43,6 @@ object Versions {
         const val postgresDriver = "42.3.1"
         const val jwt = "1.0.1"
         const val sentry = "5.7.4"
+        const val facebookSdk = "8.0.3"
     }
 }

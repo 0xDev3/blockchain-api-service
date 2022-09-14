@@ -34,8 +34,6 @@ class ProjectController(
     private val analyticsService: AnalyticsService
 ) {
 
-    companion object : KLogging()
-
     @PostMapping("/v1/projects")
     fun createProject(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
@@ -85,7 +83,7 @@ class ProjectController(
     @GetMapping("/v1/projects/{id}/api-key")
     fun getApiKey(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
-        @PathVariable id: UUID,
+        @PathVariable id: UUID
     ): ResponseEntity<ApiKeyResponse> { // TODO return multiple API keys in the future
         val apiKey = projectService.getProjectApiKeys(userIdentifier, id).firstOrNull()
             ?: throw ResourceNotFoundException("API key not yet generated for provided project ID")
@@ -105,11 +103,11 @@ class ProjectController(
         val apiKey = projectService.createApiKey(userIdentifier, id)
 
         analyticsService.postApiKeyCreatedEvent(
-            userIdentifier,
-            apiKey.projectId,
-            request.getHeader("Origin"),
-            request.getHeader("User-Agent"),
-            request.remoteAddr
+            userIdentifier = userIdentifier,
+            projectId = apiKey.projectId,
+            origin = request.getHeader("Origin"),
+            userAgent = request.getHeader("User-Agent"),
+            remoteAddr = request.remoteAddr
         )
 
         return ResponseEntity.ok(ApiKeyResponse(apiKey))
