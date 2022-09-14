@@ -23,6 +23,7 @@ class ApplicationProperties {
     val chainAurora = ChainProperties()
     var infuraId: String = ""
     var contractDecorators = ContractDecoratorProperties()
+    var metaPixelProperties = MetaPixelProperties()
 }
 
 class JwtProperties {
@@ -43,4 +44,9 @@ class ContractDecoratorProperties {
     var ignoredDirs: List<String> = listOf(".git")
     var fillChangePollInterval: Duration = Duration.ofMinutes(1L)
     var fileChangeQuietInterval: Duration = Duration.ofSeconds(30L)
+}
+
+class MetaPixelProperties {
+    var accessToken: String? = null
+    var pixelId: String? = null
 }
