@@ -19,7 +19,9 @@ class AnalyticsServiceImpl(
 
     val context: APIContext? = createApiContext(applicationProperties)
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        const val TIME_DELAY = 5_000L
+    }
 
     override fun postApiKeyCreatedEvent(
         userIdentifier: UserIdentifier,
@@ -33,18 +35,20 @@ class AnalyticsServiceImpl(
             "Posting 'API Key Created' event to Meta Pixel for userIdentifier: $userIdentifier, " +
                 "projectId: $projectId, origin: $origin, userAgent: $userAgent, remoteAddr: $remoteAddr"
         }
-
         event.eventName("Login")
-            .eventTime(System.currentTimeMillis())
-            .userData(UserData().externalId(userIdentifier.id.toString()))
+            .eventTime(System.currentTimeMillis() - TIME_DELAY)
+            .userData(
+                UserData()
+                    .externalId(userIdentifier.id.toString())
+                    .clientUserAgent(userAgent)
+                    .clientIpAddress(remoteAddr)
+            )
+            .eventSourceUrl(origin)
             .customData(
                 CustomData().customProperties(
                     hashMapOf(
                         "wallet" to userIdentifier.userIdentifier,
-                        "projectId" to projectId.toString(),
-                        "origin" to origin,
-                        "userAgent" to userAgent,
-                        "ipAddress" to remoteAddr,
+                        "projectId" to projectId.toString()
                     )
                 )
             )
