@@ -19,9 +19,7 @@ class AnalyticsServiceImpl(
 
     val context: APIContext? = createApiContext(applicationProperties)
 
-    companion object : KLogging() {
-        const val TIME_DELAY = 5_000L
-    }
+    companion object : KLogging()
 
     override fun postApiKeyCreatedEvent(
         userIdentifier: UserIdentifier,
@@ -36,7 +34,7 @@ class AnalyticsServiceImpl(
                 "projectId: $projectId, origin: $origin, userAgent: $userAgent, remoteAddr: $remoteAddr"
         }
         event.eventName("Login")
-            .eventTime(System.currentTimeMillis() - TIME_DELAY)
+            .eventTime(System.currentTimeMillis() / 1000)
             .userData(
                 UserData()
                     .externalId(userIdentifier.id.toString())
