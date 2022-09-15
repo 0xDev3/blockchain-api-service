@@ -56,3 +56,5 @@ data class TupleType(val elems: List<AbiType>) : AbiType {
     override fun isDynamic() = elems.any { it.isDynamic() }
     override fun valueSize(): Int = if (isDynamic()) 1 else elems.sumOf { it.valueSize() }
 }
+
+data class Tuple(val elems: List<Any>)

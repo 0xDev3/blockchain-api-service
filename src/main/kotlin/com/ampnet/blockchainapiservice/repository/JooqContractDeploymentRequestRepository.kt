@@ -52,7 +52,8 @@ class JooqContractDeploymentRequestRepository(
             screenAfterActionMessage = params.screenConfig.afterActionMessage,
             contractAddress = null,
             deployerAddress = params.deployerAddress,
-            txHash = null
+            txHash = null,
+            imported = params.imported
         )
         val selectContractMetadataId = DSL.select(ContractMetadataTable.CONTRACT_METADATA.ID)
             .from(ContractMetadataTable.CONTRACT_METADATA)
@@ -171,7 +172,8 @@ class JooqContractDeploymentRequestRepository(
             ),
             contractAddress = requestRecord.contractAddress,
             deployerAddress = requestRecord.deployerAddress,
-            txHash = requestRecord.txHash
+            txHash = requestRecord.txHash,
+            imported = requestRecord.imported!!
         )
     }
 

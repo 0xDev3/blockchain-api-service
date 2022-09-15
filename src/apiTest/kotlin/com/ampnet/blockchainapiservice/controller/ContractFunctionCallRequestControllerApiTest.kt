@@ -72,7 +72,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             projectId = PROJECT_ID,
             createdAt = TestData.TIMESTAMP,
             arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = ScreenConfig.EMPTY
+            screenConfig = ScreenConfig.EMPTY,
+            imported = false
         )
     }
 

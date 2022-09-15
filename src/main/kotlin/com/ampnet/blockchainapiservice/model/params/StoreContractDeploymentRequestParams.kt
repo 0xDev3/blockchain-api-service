@@ -25,10 +25,11 @@ data class StoreContractDeploymentRequestParams(
     val projectId: UUID,
     val createdAt: UtcDateTime,
     val arbitraryData: JsonNode?,
-    val screenConfig: ScreenConfig
+    val screenConfig: ScreenConfig,
+    val imported: Boolean
 ) {
     companion object : ParamsFactory<PreStoreContractDeploymentRequestParams, StoreContractDeploymentRequestParams> {
-        private const val PATH = "/request-deploy/\${id}/action"
+        const val PATH = "/request-deploy/\${id}/action"
         private val objectMapper = ObjectMapper()
 
         override fun fromCreateParams(
@@ -53,7 +54,8 @@ data class StoreContractDeploymentRequestParams(
             projectId = project.id,
             createdAt = createdAt,
             arbitraryData = params.createParams.arbitraryData,
-            screenConfig = params.createParams.screenConfig
+            screenConfig = params.createParams.screenConfig,
+            imported = false
         )
     }
 }

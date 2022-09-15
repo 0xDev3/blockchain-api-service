@@ -66,7 +66,8 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
             screenConfig = ScreenConfig.EMPTY,
             contractAddress = DEPLOYED_CONTRACT_ADDRESS.contractAddress,
             deployerAddress = DEPLOYER_ADDRESS,
-            txHash = TX_HASH
+            txHash = TX_HASH,
+            imported = false
         )
         private val BLOCKCHAIN_TRANSACTION_INFO = BlockchainTransactionInfo(
             hash = TX_HASH,

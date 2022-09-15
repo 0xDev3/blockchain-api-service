@@ -10,7 +10,7 @@ import com.ampnet.blockchainapiservice.util.WalletAddress
 data class ContractDeploymentTransactionInfo(
     val hash: TransactionHash,
     val from: WalletAddress,
-    val deployedContractAddress: ContractAddress?,
+    val deployedContractAddress: ContractAddress,
     val data: FunctionData,
     val value: Balance,
     val binary: ContractBinaryData
