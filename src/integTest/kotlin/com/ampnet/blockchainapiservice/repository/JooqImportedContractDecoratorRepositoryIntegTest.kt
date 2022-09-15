@@ -1,10 +1,17 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.TestData
+import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
 import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
+import com.ampnet.blockchainapiservice.util.BaseUrl
+import com.ampnet.blockchainapiservice.util.ChainId
+import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractId
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -23,6 +30,11 @@ import java.util.UUID
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
 
+    companion object {
+        private val PROJECT_ID = UUID.randomUUID()
+        private val OWNER_ID = UUID.randomUUID()
+    }
+
     @Suppress("unused")
     private val postgresContainer = SharedTestContainers.postgresContainer
 
@@ -35,6 +47,26 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
     @BeforeEach
     fun beforeEach() {
         postgresContainer.cleanAllDatabaseTables(dslContext)
+
+        dslContext.executeInsert(
+            UserIdentifierRecord(
+                id = OWNER_ID,
+                userIdentifier = "user-identifier",
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+            )
+        )
+
+        dslContext.executeInsert(
+            ProjectRecord(
+                id = PROJECT_ID,
+                ownerId = OWNER_ID,
+                issuerContractAddress = ContractAddress("0"),
+                baseRedirectUrl = BaseUrl("base-redirect-url"),
+                chainId = ChainId(1337L),
+                customRpcUrl = "custom-rpc-url",
+                createdAt = TestData.TIMESTAMP
+            )
+        )
     }
 
     @Test
@@ -62,7 +94,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         val infoMarkdown = "markdown"
 
         val storedContractDecorator = suppose("imported contract decorator will be stored into the database") {
-            repository.store(id, contractId, manifestJson, artifactJson, infoMarkdown)
+            repository.store(id, PROJECT_ID, contractId, manifestJson, artifactJson, infoMarkdown)
         }
 
         val expectedDecorator = ContractDecorator(contractId, artifactJson, manifestJson)
@@ -73,7 +105,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         }
 
         verify("imported contract decorator was correctly stored into the database") {
-            assertThat(repository.getByContractId(contractId)).withMessage()
+            assertThat(repository.getByContractIdAndProjectId(contractId, PROJECT_ID)).withMessage()
                 .isEqualTo(expectedDecorator)
         }
     }
@@ -81,7 +113,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentImportedContractDecoratorByContractId() {
         verify("null is returned when fetching non-existent imported contract decorator by contract id") {
-            assertThat(repository.getByContractId(ContractId("abc"))).withMessage()
+            assertThat(repository.getByContractIdAndProjectId(ContractId("abc"), UUID.randomUUID())).withMessage()
                 .isNull()
         }
     }

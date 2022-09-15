@@ -7,13 +7,15 @@ import com.ampnet.blockchainapiservice.util.ContractId
 import java.util.UUID
 
 interface ImportedContractDecoratorRepository {
+    @Suppress("LongParameterList")
     fun store(
         id: UUID,
+        projectId: UUID,
         contractId: ContractId,
         manifestJson: ManifestJson,
         artifactJson: ArtifactJson,
         infoMarkdown: String
     ): ContractDecorator
 
-    fun getByContractId(contractId: ContractId): ContractDecorator?
+    fun getByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ContractDecorator?
 }

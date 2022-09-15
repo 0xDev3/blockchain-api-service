@@ -20,14 +20,16 @@ class JooqImportedContractDecoratorRepository(
 
     override fun store(
         id: UUID,
+        projectId: UUID,
         contractId: ContractId,
         manifestJson: ManifestJson,
         artifactJson: ArtifactJson,
         infoMarkdown: String
     ): ContractDecorator {
-        logger.info { "Store imported contract decorator, id: $id, contractId: $contractId" }
+        logger.info { "Store imported contract decorator, id: $id, projectId: $projectId, contractId: $contractId" }
         val record = ImportedContractDecoratorRecord(
             id = id,
+            projectId = projectId,
             contractId = contractId,
             manifestJson = manifestJson,
             artifactJson = artifactJson,
@@ -37,7 +39,7 @@ class JooqImportedContractDecoratorRepository(
         return ContractDecorator(contractId, artifactJson, manifestJson)
     }
 
-    override fun getByContractId(contractId: ContractId): ContractDecorator? {
+    override fun getByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ContractDecorator? {
         logger.debug { "Get imported contract decorator by contract id: $contractId" }
         return dslContext.selectFrom(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR)
             .where(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.CONTRACT_ID.eq(contractId))
