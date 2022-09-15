@@ -11,6 +11,7 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20LockRequestTab
 import com.ampnet.blockchainapiservice.generated.jooq.tables.FetchAccountBalanceCacheTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.FetchErc20AccountBalanceCacheTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.FetchTransactionInfoCacheTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.ImportedContractDecoratorTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateItemTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
@@ -41,5 +42,6 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
         dslContext.deleteFrom(FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE).execute()
         dslContext.deleteFrom(FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE).execute()
         dslContext.deleteFrom(FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE).execute()
+        dslContext.deleteFrom(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR).execute()
     }
 }

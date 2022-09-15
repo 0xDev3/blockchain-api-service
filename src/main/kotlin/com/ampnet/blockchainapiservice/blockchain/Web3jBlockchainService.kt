@@ -301,16 +301,14 @@ class Web3jBlockchainService(
             ?.find {
                 it.first.isStatusOK && it.first.contractAddress?.let { ca -> ContractAddress(ca) } == contractAddress
             }
-        val binary = contractDeploymentBlock?.let {
-            web3j.ethGetCode(contractAddress.rawValue, DefaultBlockParameter.valueOf(it)).sendSafely()?.code
-        }
+        val binary = web3j.ethGetCode(contractAddress.rawValue, currentBlockNumber.toWeb3Parameter()).sendSafely()?.code
 
         return deployTx?.let {
             binary?.let {
                 ContractDeploymentTransactionInfo(
                     hash = TransactionHash(deployTx.first.transactionHash),
                     from = WalletAddress(deployTx.first.from),
-                    deployedContractAddress = deployTx.first.contractAddress?.let { ca -> ContractAddress(ca) },
+                    deployedContractAddress = ContractAddress(deployTx.first.contractAddress),
                     data = FunctionData(deployTx.second.input),
                     value = Balance(deployTx.second.value),
                     binary = ContractBinaryData(binary)

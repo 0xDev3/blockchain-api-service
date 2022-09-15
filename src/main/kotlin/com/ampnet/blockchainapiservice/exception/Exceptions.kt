@@ -2,6 +2,7 @@ package com.ampnet.blockchainapiservice.exception
 
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.ContractId
 import org.springframework.http.HttpStatus
 import java.util.UUID
 
@@ -164,5 +165,29 @@ class InvalidRequestBodyException(message: String) : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = -3878710530557672092L
+    }
+}
+
+class ContractNotFoundException(contractAddress: ContractAddress) : ServiceException(
+    errorCode = ErrorCode.CONTRACT_NOT_FOUND,
+    httpStatus = HttpStatus.NOT_FOUND,
+    message = "Smart contract not found for contract address: ${contractAddress.rawValue}"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 4862558996776903135L
+    }
+}
+
+class ContractDecoratorBinaryMismatchException(
+    contractAddress: ContractAddress,
+    contractId: ContractId
+) : ServiceException(
+    errorCode = ErrorCode.CONTRACT_BINARY_MISMATCH,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Smart contract at address ${contractAddress.rawValue} does not match definition of smart" +
+        " contract with ID: ${contractId.value}"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 4385491497800278138L
     }
 }

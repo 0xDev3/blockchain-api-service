@@ -1,6 +1,8 @@
 package com.ampnet.blockchainapiservice.util
 
 import com.ampnet.blockchainapiservice.config.JsonConfig
+import com.ampnet.blockchainapiservice.model.json.ArtifactJson
+import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.fasterxml.jackson.databind.JsonNode
 import org.jooq.Converter
 import org.jooq.JSON
@@ -161,5 +163,39 @@ class FunctionDataConverter : Converter<ByteArray, FunctionData> {
 
     companion object {
         private const val serialVersionUID: Long = -5671993772596790084L
+    }
+}
+
+class ManifestJsonConverter : Converter<JSON, ManifestJson> {
+
+    private val objectMapper = JsonConfig().objectMapper()
+
+    override fun from(value: JSON?): ManifestJson? = value?.let {
+        objectMapper.readValue(it.data(), ManifestJson::class.java)
+    }
+
+    override fun to(value: ManifestJson?): JSON? = value?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) }
+    override fun fromType(): Class<JSON> = JSON::class.java
+    override fun toType(): Class<ManifestJson> = ManifestJson::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = -1324416320471064842L
+    }
+}
+
+class ArtifactJsonConverter : Converter<JSON, ArtifactJson> {
+
+    private val objectMapper = JsonConfig().objectMapper()
+
+    override fun from(value: JSON?): ArtifactJson? = value?.let {
+        objectMapper.readValue(it.data(), ArtifactJson::class.java)
+    }
+
+    override fun to(value: ArtifactJson?): JSON? = value?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) }
+    override fun fromType(): Class<JSON> = JSON::class.java
+    override fun toType(): Class<ArtifactJson> = ArtifactJson::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = 2789587672933464251L
     }
 }

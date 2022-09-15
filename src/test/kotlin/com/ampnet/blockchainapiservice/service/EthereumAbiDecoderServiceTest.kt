@@ -10,6 +10,7 @@ import com.ampnet.blockchainapiservice.util.IntType
 import com.ampnet.blockchainapiservice.util.StaticArrayType
 import com.ampnet.blockchainapiservice.util.StaticBytesType
 import com.ampnet.blockchainapiservice.util.StringType
+import com.ampnet.blockchainapiservice.util.Tuple
 import com.ampnet.blockchainapiservice.util.TupleType
 import com.ampnet.blockchainapiservice.util.UintType
 import org.assertj.core.api.Assertions.assertThat
@@ -496,7 +497,7 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                     "3132333435000000000000000000000000000000000000000000000000000000" // bytes5
             )
                 .returns(
-                    listOf(
+                    tupleOf(
                         BigInteger.valueOf(100L),
                         false,
                         "12345".byteList()
@@ -528,7 +529,7 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                     "0000000000000000000000000000000000000000000000000000000000000258" // value 600
             )
                 .returns(
-                    listOf(
+                    tupleOf(
                         BigInteger.valueOf(100L),
                         listOf(
                             BigInteger.valueOf(200L),
@@ -566,9 +567,9 @@ class EthereumAbiDecoderServiceTest : TestBase() {
             )
                 .returns(
                     listOf(
-                        listOf(BigInteger.valueOf(100L), true, "12345".byteList()),
-                        listOf(BigInteger.valueOf(200L), false, "67890".byteList()),
-                        listOf(BigInteger.valueOf(300L), true, "12345".byteList())
+                        tupleOf(BigInteger.valueOf(100L), true, "12345".byteList()),
+                        tupleOf(BigInteger.valueOf(200L), false, "67890".byteList()),
+                        tupleOf(BigInteger.valueOf(300L), true, "12345".byteList())
                     )
                 )
         }
@@ -604,7 +605,7 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                     "0000000000000000000000000000000000000000000000000000000000000001" // true
             )
                 .returns(
-                    listOf(
+                    tupleOf(
                         listOf(BigInteger.valueOf(100L), BigInteger.valueOf(200L)),
                         true,
                         BigInteger.valueOf(300L)
@@ -616,12 +617,12 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                         BigInteger.valueOf(700L)
                     ),
                     listOf(
-                        listOf(
+                        tupleOf(
                             listOf(BigInteger.valueOf(800L), BigInteger.valueOf(900L)),
                             true,
                             BigInteger.valueOf(1000L)
                         ),
-                        listOf(
+                        tupleOf(
                             listOf(BigInteger.valueOf(1100L), BigInteger.valueOf(1200L)),
                             true,
                             BigInteger.valueOf(1300L)
@@ -678,7 +679,7 @@ class EthereumAbiDecoderServiceTest : TestBase() {
             )
                 .returns(
                     listOf(
-                        listOf(
+                        tupleOf(
                             BigInteger.valueOf(100L),
                             listOf(
                                 BigInteger.valueOf(200L),
@@ -692,7 +693,7 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                                 BigInteger.valueOf(600L)
                             )
                         ),
-                        listOf(
+                        tupleOf(
                             BigInteger.valueOf(1000L),
                             listOf(
                                 BigInteger.valueOf(2000L),
@@ -748,15 +749,15 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                     "6f75746572000000000000000000000000000000000000000000000000000000" // value "outer"
             )
                 .returns(
-                    listOf(
+                    tupleOf(
                         BigInteger.valueOf(500L),
-                        listOf(
+                        tupleOf(
                             listOf(
                                 BigInteger.valueOf(200L),
                                 BigInteger.valueOf(300L),
                                 BigInteger.valueOf(400L)
                             ),
-                            listOf(
+                            tupleOf(
                                 BigInteger.valueOf(100L),
                                 true
                             ),
@@ -860,7 +861,7 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                     "6f75746572000000000000000000000000000000000000000000000000000000" // value "outer"
             )
                 .returns(
-                    listOf( // tuple
+                    tupleOf(
                         listOf( // uint[]
                             BigInteger.valueOf(1L),
                             BigInteger.valueOf(2L),
@@ -869,27 +870,27 @@ class EthereumAbiDecoderServiceTest : TestBase() {
                             BigInteger.valueOf(5L)
                         ),
                         listOf( // tuple(uint[], tuple(uint, bool)[], string[])[]
-                            listOf( // tuple(uint[], tuple(uint, bool)[], string[])
+                            tupleOf( // tuple(uint[], tuple(uint, bool)[], string[])
                                 listOf(BigInteger.valueOf(300L)),
                                 listOf( // tuple(uint, bool)[]
-                                    listOf(BigInteger.valueOf(100L), true),
-                                    listOf(BigInteger.valueOf(200L), false)
+                                    tupleOf(BigInteger.valueOf(100L), true),
+                                    tupleOf(BigInteger.valueOf(200L), false)
                                 ),
                                 listOf("str1", "str2")
                             ),
-                            listOf( // tuple(uint[], tuple(uint, bool)[], string[])
+                            tupleOf( // tuple(uint[], tuple(uint, bool)[], string[])
                                 listOf(BigInteger.valueOf(2000L), BigInteger.valueOf(3000L)),
                                 listOf( // tuple(uint, bool)[]
-                                    listOf(BigInteger.valueOf(1000L), true)
+                                    tupleOf(BigInteger.valueOf(1000L), true)
                                 ),
                                 listOf("str3")
                             ),
-                            listOf( // tuple(uint[], tuple(uint, bool)[], string[])
+                            tupleOf( // tuple(uint[], tuple(uint, bool)[], string[])
                                 listOf(BigInteger.valueOf(40000L), BigInteger.valueOf(50000L), BigInteger.ZERO),
                                 listOf( // tuple(uint, bool)[]
-                                    listOf(BigInteger.valueOf(10000L), true),
-                                    listOf(BigInteger.valueOf(20000L), false),
-                                    listOf(BigInteger.valueOf(30000L), true)
+                                    tupleOf(BigInteger.valueOf(10000L), true),
+                                    tupleOf(BigInteger.valueOf(20000L), false),
+                                    tupleOf(BigInteger.valueOf(30000L), true)
                                 ),
                                 listOf("str4")
                             )
@@ -907,4 +908,6 @@ class EthereumAbiDecoderServiceTest : TestBase() {
     private fun ListAssert<Any>.returns(vararg expected: Any) = isEqualTo(expected.toList())
 
     private fun String.byteList() = toByteArray().toList()
+
+    private fun tupleOf(vararg elems: Any) = Tuple(elems.toList())
 }

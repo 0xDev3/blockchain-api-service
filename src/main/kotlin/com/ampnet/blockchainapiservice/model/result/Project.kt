@@ -14,4 +14,7 @@ data class Project(
     val chainId: ChainId,
     val customRpcUrl: String?,
     val createdAt: UtcDateTime
-)
+) {
+    fun createRedirectUrl(redirectUrl: String?, id: UUID, path: String) =
+        (redirectUrl ?: (baseRedirectUrl.value + path)).replace("\${id}", id.toString())
+}
