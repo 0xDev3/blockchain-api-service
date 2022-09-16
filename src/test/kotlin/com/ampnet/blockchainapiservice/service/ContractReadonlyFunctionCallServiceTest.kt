@@ -79,7 +79,8 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
             screenConfig = ScreenConfig.EMPTY,
             contractAddress = CONTRACT_ADDRESS,
             deployerAddress = CALLER_ADDRESS,
-            txHash = TransactionHash("deployed-contract-hash")
+            txHash = TransactionHash("deployed-contract-hash"),
+            imported = false
         )
     }
 

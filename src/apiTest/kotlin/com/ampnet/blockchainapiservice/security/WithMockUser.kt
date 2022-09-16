@@ -7,5 +7,5 @@ import org.springframework.security.test.context.support.WithSecurityContext
 @Target(AnnotationTarget.FUNCTION)
 @WithSecurityContext(factory = WithMockUserSecurityFactory::class)
 annotation class WithMockUser(
-    val address: String = HardhatTestContainer.accountAddress1
+    val address: String = HardhatTestContainer.ACCOUNT_ADDRESS_1
 )

@@ -111,7 +111,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         )
     }
 
-    private val accounts = HardhatTestContainer.accounts
+    private val accounts = HardhatTestContainer.ACCOUNTS
 
     @Autowired
     private lateinit var contractDeploymentRequestRepository: ContractDeploymentRequestRepository
@@ -252,7 +252,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             value = initialEthAmount.rawValue,
                             blockConfirmations = null,
                             timestamp = null
-                        )
+                        ),
+                        imported = false
                     )
                 )
 
@@ -287,7 +288,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         contractAddress = null,
                         deployerAddress = deployerAddress,
-                        txHash = null
+                        txHash = null,
+                        imported = false
                     )
                 )
 
@@ -383,7 +385,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             value = initialEthAmount.rawValue,
                             blockConfirmations = null,
                             timestamp = null
-                        )
+                        ),
+                        imported = false
                     )
                 )
 
@@ -418,7 +421,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         contractAddress = null,
                         deployerAddress = deployerAddress,
-                        txHash = null
+                        txHash = null,
+                        imported = false
                     )
                 )
 
@@ -634,7 +638,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             value = initialEthAmount.rawValue,
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
                             timestamp = fetchResponse.deployTx.timestamp
-                        )
+                        ),
+                        imported = false
                     )
                 )
 
@@ -771,7 +776,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             value = initialEthAmount.rawValue,
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
                             timestamp = fetchResponse.deployTx.timestamp
-                        )
+                        ),
+                        imported = false
                     )
                 )
 
@@ -909,7 +915,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             value = initialEthAmount.rawValue,
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
                             timestamp = fetchResponse.deployTx.timestamp
-                        )
+                        ),
+                        imported = false
                     )
                 )
 
@@ -1050,7 +1057,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             value = initialEthAmount.rawValue,
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
                             timestamp = fetchResponse.deployTx.timestamp
-                        )
+                        ),
+                        imported = false
                     )
                 )
 
@@ -1221,7 +1229,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                     value = initialEthAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].deployTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].deployTx.timestamp
-                                )
+                                ),
+                                imported = false
                             )
                         )
                     )
@@ -1369,7 +1378,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                     value = initialEthAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].deployTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].deployTx.timestamp
-                                )
+                                ),
+                                imported = false
                             )
                         )
                     )
@@ -1408,7 +1418,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     screenConfig = ScreenConfig(
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"
-                    )
+                    ),
+                    imported = false
                 )
             )
         }
@@ -1465,7 +1476,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     screenConfig = ScreenConfig(
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"
-                    )
+                    ),
+                    imported = false
                 )
             )
             contractDeploymentRequestRepository.setTxInfo(id, txHash, deployerAddress)

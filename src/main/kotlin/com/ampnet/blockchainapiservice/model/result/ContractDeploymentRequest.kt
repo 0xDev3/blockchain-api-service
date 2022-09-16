@@ -38,7 +38,8 @@ data class ContractDeploymentRequest(
     val screenConfig: ScreenConfig,
     val contractAddress: ContractAddress?,
     val deployerAddress: WalletAddress?,
-    val txHash: TransactionHash?
+    val txHash: TransactionHash?,
+    val imported: Boolean
 ) {
     fun withTransactionData(
         status: Status,

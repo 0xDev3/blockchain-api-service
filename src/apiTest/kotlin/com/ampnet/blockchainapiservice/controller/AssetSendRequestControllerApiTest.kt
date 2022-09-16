@@ -58,7 +58,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         private const val API_KEY = "api-key"
     }
 
-    private val accounts = HardhatTestContainer.accounts
+    private val accounts = HardhatTestContainer.ACCOUNTS
 
     @Autowired
     private lateinit var assetSendRequestRepository: AssetSendRequestRepository

@@ -130,7 +130,8 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                 screenAfterActionMessage = SCREEN_AFTER_ACTION_MESSAGE,
                 contractAddress = CONTRACT_ADDRESS,
                 deployerAddress = CALLER_ADDRESS,
-                txHash = TX_HASH
+                txHash = TX_HASH,
+                imported = false
             )
         )
     }

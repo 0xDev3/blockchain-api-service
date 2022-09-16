@@ -78,7 +78,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             screenConfig = params.screenConfig,
             contractAddress = ContractAddress("cafebabe"),
             deployerAddress = params.deployerAddress,
-            txHash = null
+            txHash = null,
+            imported = false
         )
         val project = Project(
             id = result.projectId,
@@ -145,7 +146,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 value = result.initialEthAmount.rawValue,
                                 blockConfirmations = null,
                                 timestamp = null
-                            )
+                            ),
+                            imported = result.imported
                         )
                     )
                 )
@@ -180,7 +182,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 ),
                 contractAddress = ContractAddress("cafebabe"),
                 deployerAddress = WalletAddress("a"),
-                txHash = txHash
+                txHash = txHash,
+                imported = false
             ),
             status = Status.SUCCESS,
             transactionData = TransactionData(
@@ -237,7 +240,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 value = result.transactionData.value.rawValue,
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = result.transactionData.timestamp?.value
-                            )
+                            ),
+                            imported = result.value.imported
                         )
                     )
                 )
@@ -272,7 +276,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 ),
                 contractAddress = ContractAddress("cafebabe"),
                 deployerAddress = WalletAddress("a"),
-                txHash = txHash
+                txHash = txHash,
+                imported = false
             ),
             status = Status.SUCCESS,
             transactionData = TransactionData(
@@ -344,7 +349,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                         value = result.transactionData.value.rawValue,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = result.transactionData.timestamp?.value
-                                    )
+                                    ),
+                                    imported = result.value.imported
                                 )
                             )
                         )
@@ -382,7 +388,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 ),
                 contractAddress = ContractAddress("cafebabe"),
                 deployerAddress = WalletAddress("a"),
-                txHash = txHash
+                txHash = txHash,
+                imported = false
             ),
             status = Status.SUCCESS,
             transactionData = TransactionData(
@@ -439,7 +446,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 value = result.transactionData.value.rawValue,
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = result.transactionData.timestamp?.value
-                            )
+                            ),
+                            imported = result.value.imported
                         )
                     )
                 )

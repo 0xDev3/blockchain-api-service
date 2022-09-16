@@ -141,7 +141,8 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             screenConfig = STORE_PARAMS.screenConfig,
             contractAddress = CONTRACT_ADDRESS,
             deployerAddress = STORE_PARAMS.callerAddress,
-            txHash = TransactionHash("deployed-contract-hash")
+            txHash = TransactionHash("deployed-contract-hash"),
+            imported = false
         )
     }
 
