@@ -2,8 +2,10 @@ package com.ampnet.blockchainapiservice.config
 
 import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.util.FunctionArgument
+import com.ampnet.blockchainapiservice.util.Tuple
 import com.ampnet.blockchainapiservice.util.json.FunctionArgumentJsonDeserializer
 import com.ampnet.blockchainapiservice.util.json.OutputParameterJsonDeserializer
+import com.ampnet.blockchainapiservice.util.json.TupleSerializer
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
@@ -38,6 +40,7 @@ class JsonConfig {
             SimpleModule().apply {
                 addSerializer(BigInteger::class.java, ToStringSerializer())
                 addSerializer(BigDecimal::class.java, ToStringSerializer())
+                addSerializer(Tuple::class.java, TupleSerializer())
             }
         )
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)

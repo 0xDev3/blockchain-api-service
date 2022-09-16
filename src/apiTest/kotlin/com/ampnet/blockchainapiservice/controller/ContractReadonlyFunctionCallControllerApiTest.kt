@@ -64,11 +64,12 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
             projectId = PROJECT_ID,
             createdAt = TestData.TIMESTAMP,
             arbitraryData = TestData.EMPTY_JSON_OBJECT,
-            screenConfig = ScreenConfig.EMPTY
+            screenConfig = ScreenConfig.EMPTY,
+            imported = false
         )
     }
 
-    private val accounts = HardhatTestContainer.accounts
+    private val accounts = HardhatTestContainer.ACCOUNTS
 
     @Autowired
     private lateinit var contractDeploymentRequestRepository: ContractDeploymentRequestRepository

@@ -7,6 +7,7 @@ import com.ampnet.blockchainapiservice.exception.BlockchainReadException
 import com.ampnet.blockchainapiservice.exception.TemporaryBlockchainReadException
 import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
+import com.ampnet.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import com.ampnet.blockchainapiservice.repository.Web3jBlockchainServiceCacheRepository
 import com.ampnet.blockchainapiservice.service.AbiDecoderService
@@ -14,9 +15,11 @@ import com.ampnet.blockchainapiservice.service.UtcDateTimeProvider
 import com.ampnet.blockchainapiservice.service.UuidProvider
 import com.ampnet.blockchainapiservice.util.AccountBalance
 import com.ampnet.blockchainapiservice.util.Balance
+import com.ampnet.blockchainapiservice.util.BinarySearch
 import com.ampnet.blockchainapiservice.util.BlockNumber
 import com.ampnet.blockchainapiservice.util.BlockParameter
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.UtcDateTime
@@ -32,6 +35,7 @@ import org.web3j.protocol.core.RemoteFunctionCall
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
 import org.web3j.protocol.core.methods.request.Transaction
+import org.web3j.protocol.core.methods.response.EthBlock
 import org.web3j.tx.ReadonlyTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import java.io.IOException
@@ -257,6 +261,64 @@ class Web3jBlockchainService(
         )
     }
 
+    override fun findContractDeploymentTransaction(
+        chainSpec: ChainSpec,
+        contractAddress: ContractAddress
+    ): ContractDeploymentTransactionInfo? {
+        logger.debug {
+            "Searching for contract deployment transaction, chainSpec: $chainSpec, contractAddress: $contractAddress"
+        }
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
+        val web3j = blockchainProperties.web3j
+        val currentBlockNumber = web3j.latestBlockNumber(chainSpec, blockchainProperties.latestBlockCacheDuration)
+
+        val searchResult = BinarySearch(
+            lowerBound = BigInteger.ZERO,
+            upperBound = currentBlockNumber.value,
+            getValue = { currentBlock ->
+                web3j.ethGetTransactionCount(
+                    contractAddress.rawValue,
+                    DefaultBlockParameter.valueOf(currentBlock)
+                ).sendSafely()?.transactionCount ?: throw TemporaryBlockchainReadException()
+            },
+            updateLowerBound = { txCount -> txCount == BigInteger.ZERO },
+            updateUpperBound = { txCount -> txCount != BigInteger.ZERO }
+        )
+        val contractDeploymentBlock = listOf(searchResult, searchResult + BigInteger.ONE).find {
+            web3j.ethGetTransactionCount(
+                contractAddress.rawValue,
+                DefaultBlockParameter.valueOf(it)
+            ).sendSafely()?.transactionCount != BigInteger.ZERO
+        }
+
+        val deployTx = contractDeploymentBlock?.let {
+            web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(it), true).sendSafely()?.block?.transactions
+        }
+            ?.mapNotNull { it as? EthBlock.TransactionObject }
+            ?.filter { it.to == null || it.to?.let { t -> WalletAddress(t) } == ZeroAddress.toWalletAddress() }
+            ?.asSequence()
+            ?.mapNotNull {
+                web3j.ethGetTransactionReceipt(it.hash).sendSafely()?.transactionReceipt?.orElse(null)?.pairWith(it)
+            }
+            ?.find {
+                it.first.isStatusOK && it.first.contractAddress?.let { ca -> ContractAddress(ca) } == contractAddress
+            }
+        val binary = web3j.ethGetCode(contractAddress.rawValue, currentBlockNumber.toWeb3Parameter()).sendSafely()?.code
+
+        return deployTx?.let {
+            binary?.let {
+                ContractDeploymentTransactionInfo(
+                    hash = TransactionHash(deployTx.first.transactionHash),
+                    from = WalletAddress(deployTx.first.from),
+                    deployedContractAddress = ContractAddress(deployTx.first.contractAddress),
+                    data = FunctionData(deployTx.second.input),
+                    value = Balance(deployTx.second.value),
+                    binary = ContractBinaryData(binary)
+                )
+            }
+        }
+    }
+
     private fun Web3j.getBlockDescriptor(
         blockParameter: BlockParameter,
         chainSpec: ChainSpec,
@@ -316,4 +378,6 @@ class Web3jBlockchainService(
             logger.warn("Failed smart contract call", ex)
             null
         }
+
+    private fun <T, U> T.pairWith(that: U) = Pair(this, that)
 }

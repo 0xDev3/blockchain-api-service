@@ -2,6 +2,7 @@ package com.ampnet.blockchainapiservice.exception
 
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
+import com.ampnet.blockchainapiservice.util.ContractId
 import org.springframework.http.HttpStatus
 import java.util.UUID
 
@@ -164,5 +165,49 @@ class InvalidRequestBodyException(message: String) : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = -3878710530557672092L
+    }
+}
+
+class ContractNotFoundException(contractAddress: ContractAddress) : ServiceException(
+    errorCode = ErrorCode.CONTRACT_NOT_FOUND,
+    httpStatus = HttpStatus.NOT_FOUND,
+    message = "Smart contract not found for contract address: ${contractAddress.rawValue}"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 4862558996776903135L
+    }
+}
+
+class ContractDecoratorBinaryMismatchException(
+    contractAddress: ContractAddress,
+    contractId: ContractId
+) : ServiceException(
+    errorCode = ErrorCode.CONTRACT_BINARY_MISMATCH,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Smart contract at address ${contractAddress.rawValue} does not match definition of smart" +
+        " contract with ID: ${contractId.value}"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 4385491497800278138L
+    }
+}
+
+class CannotDecompileContractBinaryException : ServiceException(
+    errorCode = ErrorCode.CANNOT_DECOMPILE_CONTRACT_BINARY,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Contract binary of the requested smart contract cannot be successfully decompiled"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 2146904217800125145L
+    }
+}
+
+class ContractDecompilationTemporarilyUnavailableException : ServiceException(
+    errorCode = ErrorCode.CONTRACT_DECOMPILATION_TEMPORARILY_UNAVAILABLE,
+    httpStatus = HttpStatus.SERVICE_UNAVAILABLE,
+    message = "Contract binary decompilation is temporarily unavailable; try again at a later time"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 4124559311239162111L
     }
 }

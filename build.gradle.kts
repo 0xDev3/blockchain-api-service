@@ -199,6 +199,18 @@ jooq {
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.model.json.ManifestJson"
+                                converter = "com.ampnet.blockchainapiservice.util.ManifestJsonConverter"
+                                includeExpression = "manifest_json"
+                                includeTypes = "JSON"
+                            },
+                            ForcedType().apply {
+                                userType = "com.ampnet.blockchainapiservice.model.json.ArtifactJson"
+                                converter = "com.ampnet.blockchainapiservice.util.ArtifactJsonConverter"
+                                includeExpression = "artifact_json"
+                                includeTypes = "JSON"
+                            },
+                            ForcedType().apply {
                                 userType = "com.ampnet.blockchainapiservice.util.SignedMessage"
                                 converter = "com.ampnet.blockchainapiservice.util.SignedMessageConverter"
                                 includeExpression = "signed_message"

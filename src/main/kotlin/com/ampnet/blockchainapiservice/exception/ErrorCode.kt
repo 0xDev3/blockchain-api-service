@@ -59,5 +59,17 @@ enum class ErrorCode {
     INVALID_REQUEST_BODY,
 
     @Description("Indicates that one or more query parameters have invalid value")
-    INVALID_QUERY_PARAM
+    INVALID_QUERY_PARAM,
+
+    @Description("No smart contract can be found for given contract address")
+    CONTRACT_NOT_FOUND,
+
+    @Description("Indicates that the imported contract binary does not match binary of requested contract ID")
+    CONTRACT_BINARY_MISMATCH,
+
+    @Description("Binary of the requested contract cannot be successfully decompiled")
+    CANNOT_DECOMPILE_CONTRACT_BINARY,
+
+    @Description("Decompilation of contract binary is currently unavailable and should be tried at a later time")
+    CONTRACT_DECOMPILATION_TEMPORARILY_UNAVAILABLE
 }

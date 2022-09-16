@@ -97,7 +97,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = response.ownerId,
-                        walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+                        walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
                     )
                 )
         }
@@ -123,7 +123,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectById() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
         suppose("some user identifier exists in database") {
@@ -226,7 +226,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectByIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
         suppose("some user identifier exists in database") {
@@ -333,7 +333,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnAllProjectsForSomeUser() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
         suppose("some user identifier exists in database") {
@@ -408,7 +408,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
         suppose("some user identifier exists in database") {
@@ -468,7 +468,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForProjectWithoutApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
         suppose("some user identifier exists in database") {
@@ -505,7 +505,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
         suppose("some user identifier exists in database") {
@@ -566,7 +566,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn400BadRequestWhenCreatingAnotherApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
         suppose("some user identifier exists in database") {
@@ -610,11 +610,11 @@ class ProjectControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    @WithMockUser(address = HardhatTestContainer.accountAddress2)
+    @WithMockUser(address = HardhatTestContainer.ACCOUNT_ADDRESS_2)
     fun mustReturn404NotFoundWhenCreatingApiKeyByNonProjectOwner() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            walletAddress = WalletAddress(HardhatTestContainer.accountAddress1)
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
         suppose("some user identifier exists in database") {
