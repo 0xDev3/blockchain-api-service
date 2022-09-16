@@ -108,7 +108,7 @@ class EthereumAbiDecoderServiceTest : TestBase() {
 
         verify("address is correctly decoded") {
             decoding(listOf(AddressType), "0x00000000000000000000000000000000000000000000000000000000000000af")
-                .returns("0x00000000000000000000000000000000000000000000000000000000000000af")
+                .returns("0x00000000000000000000000000000000000000af")
         }
 
         verify("bool is correctly decoded") {

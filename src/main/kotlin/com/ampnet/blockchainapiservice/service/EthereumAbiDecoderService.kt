@@ -12,6 +12,7 @@ import com.ampnet.blockchainapiservice.util.StringType
 import com.ampnet.blockchainapiservice.util.Tuple
 import com.ampnet.blockchainapiservice.util.TupleType
 import com.ampnet.blockchainapiservice.util.UintType
+import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.springframework.stereotype.Service
 import java.math.BigInteger
 import kotlin.math.ceil
@@ -49,7 +50,7 @@ class EthereumAbiDecoderService : AbiDecoderService {
         when (type) {
             UintType -> value.takeValue().parseHexBigInteger()
             IntType -> value.takeValue().let { it.parseHexBigInteger().handleTwosComplement(it) }
-            AddressType -> "0x${value.takeValue()}"
+            AddressType -> WalletAddress(value.takeValue()).rawValue
             BoolType -> (BigInteger(value.takeValue(), HEX_RADIX) == BigInteger.ONE)
             is StaticBytesType -> value.takeValue().parseHexBytes(type.size)
             is StaticArrayType<*> -> decode(List(type.size) { type.elem }, value)
