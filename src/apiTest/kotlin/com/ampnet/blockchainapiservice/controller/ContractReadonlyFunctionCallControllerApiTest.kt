@@ -69,7 +69,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         )
     }
 
-    private val accounts = HardhatTestContainer.accounts
+    private val accounts = HardhatTestContainer.ACCOUNTS
 
     @Autowired
     private lateinit var contractDeploymentRequestRepository: ContractDeploymentRequestRepository

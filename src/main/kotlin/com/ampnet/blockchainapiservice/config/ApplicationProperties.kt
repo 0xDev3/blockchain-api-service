@@ -22,8 +22,9 @@ class ApplicationProperties {
     val chainAvalanche = ChainProperties()
     val chainAurora = ChainProperties()
     var infuraId: String = ""
-    var contractDecorators = ContractDecoratorProperties()
-    var metaPixelProperties = MetaPixelProperties()
+    val contractDecorators = ContractDecoratorProperties()
+    val metaPixelProperties = MetaPixelProperties()
+    val contractManifestService = ContractManifestServiceProperties()
 }
 
 class JwtProperties {
@@ -49,4 +50,9 @@ class ContractDecoratorProperties {
 class MetaPixelProperties {
     var accessToken: String? = null
     var pixelId: String? = null
+}
+
+class ContractManifestServiceProperties {
+    var baseUrl: String? = null
+    var decompileContractPath = "/decompile-contract"
 }

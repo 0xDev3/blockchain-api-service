@@ -420,6 +420,10 @@ class ContractImportServiceTest : TestBase() {
 
         val contractDecorator = CONTRACT_DECORATOR.copy(id = contractId)
         val contractDecoratorId = UUID.randomUUID()
+        val adjustedArtifactJson = ARTIFACT_JSON.copy(
+            bytecode = "$CONSTRUCTOR_BYTECODE$CONTRACT_BYTECODE",
+            deployedBytecode = CONTRACT_BYTECODE
+        )
 
         suppose("imported contract decorator will be stored into the database") {
             given(
@@ -428,7 +432,7 @@ class ContractImportServiceTest : TestBase() {
                     projectId = PROJECT.id,
                     contractId = contractId,
                     manifestJson = MANIFEST_JSON,
-                    artifactJson = ARTIFACT_JSON,
+                    artifactJson = adjustedArtifactJson,
                     infoMarkdown = "infoMd"
                 )
             )

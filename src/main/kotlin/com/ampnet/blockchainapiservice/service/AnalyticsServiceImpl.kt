@@ -17,9 +17,11 @@ class AnalyticsServiceImpl(
     private val applicationProperties: ApplicationProperties
 ) : AnalyticsService {
 
-    val context: APIContext? = createApiContext(applicationProperties)
+    companion object : KLogging() {
+        private const val SECONDS_IN_MILLISECOND = 1_000L
+    }
 
-    companion object : KLogging()
+    private val context: APIContext? = createApiContext(applicationProperties)
 
     override fun postApiKeyCreatedEvent(
         userIdentifier: UserIdentifier,
@@ -28,13 +30,26 @@ class AnalyticsServiceImpl(
         userAgent: String?,
         remoteAddr: String?
     ) {
-        val event = Event()
+        if (context === null) {
+            logger.warn { "Failed to post 'API Key Created' event to Meta Pixel. API not initialized properly!" }
+            return
+        }
+
+        val pixelId = applicationProperties.metaPixelProperties.pixelId
+
+        if (pixelId === null) {
+            logger.warn { "Failed to post 'API Key Created' event to Meta Pixel. Missing pixelId configuration!" }
+            return
+        }
+
         logger.info {
             "Posting 'API Key Created' event to Meta Pixel for userIdentifier: $userIdentifier, " +
                 "projectId: $projectId, origin: $origin, userAgent: $userAgent, remoteAddr: $remoteAddr"
         }
-        event.eventName("Login")
-            .eventTime(System.currentTimeMillis() / 1000)
+
+        val event = Event()
+            .eventName("Login")
+            .eventTime(System.currentTimeMillis() / SECONDS_IN_MILLISECOND)
             .userData(
                 UserData()
                     .externalId(userIdentifier.id.toString())
@@ -50,20 +65,8 @@ class AnalyticsServiceImpl(
                     )
                 )
             )
-
-        if (context === null) {
-            logger.warn { "Failed to post 'API Key Created' event to Meta Pixel. API not initialized properly!" }
-            return
-        }
-        val pixelId = applicationProperties.metaPixelProperties.pixelId
-        if (pixelId === null) {
-            logger.warn { "Failed to post 'API Key Created' event to Meta Pixel. Missing pixelId configuration!" }
-            return
-        }
-
         try {
-            val eventRequest = EventRequest(pixelId, context)
-            eventRequest.addDataItem(event)
+            val eventRequest = EventRequest(pixelId, context).addDataItem(event)
             val response = eventRequest.execute()
             logger.debug { "'API Key Created' event posted successfully to Meta Pixel. Response: $response" }
         } catch (e: APIException) {
