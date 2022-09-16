@@ -77,7 +77,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         )
     }
 
-    private val accounts = HardhatTestContainer.accounts
+    private val accounts = HardhatTestContainer.ACCOUNTS
 
     @Autowired
     private lateinit var contractFunctionCallRequestRepository: ContractFunctionCallRequestRepository

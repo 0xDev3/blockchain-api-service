@@ -101,14 +101,22 @@ class ProjectController(
 
         val apiKey = projectService.createApiKey(userIdentifier, id)
 
-        analyticsService.postApiKeyCreatedEvent(
-            userIdentifier = userIdentifier,
-            projectId = apiKey.projectId,
-            origin = request.getHeader("Origin"),
-            userAgent = request.getHeader("User-Agent"),
-            remoteAddr = request.remoteAddr
-        )
+        ignoreErrors {
+            analyticsService.postApiKeyCreatedEvent(
+                userIdentifier = userIdentifier,
+                projectId = apiKey.projectId,
+                origin = request.getHeader("Origin"),
+                userAgent = request.getHeader("User-Agent"),
+                remoteAddr = request.remoteAddr
+            )
+        }
 
         return ResponseEntity.ok(ApiKeyResponse(apiKey))
     }
+
+    private fun ignoreErrors(call: () -> Unit) =
+        try {
+            call()
+        } catch (_: Exception) {
+        }
 }

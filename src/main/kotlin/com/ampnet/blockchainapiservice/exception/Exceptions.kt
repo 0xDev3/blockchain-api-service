@@ -191,3 +191,23 @@ class ContractDecoratorBinaryMismatchException(
         private const val serialVersionUID: Long = 4385491497800278138L
     }
 }
+
+class CannotDecompileContractBinaryException : ServiceException(
+    errorCode = ErrorCode.CANNOT_DECOMPILE_CONTRACT_BINARY,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Contract binary of the requested smart contract cannot be successfully decompiled"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 2146904217800125145L
+    }
+}
+
+class ContractDecompilationTemporarilyUnavailableException : ServiceException(
+    errorCode = ErrorCode.CONTRACT_DECOMPILATION_TEMPORARILY_UNAVAILABLE,
+    httpStatus = HttpStatus.SERVICE_UNAVAILABLE,
+    message = "Contract binary decompilation is temporarily unavailable; try again at a later time"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 4124559311239162111L
+    }
+}

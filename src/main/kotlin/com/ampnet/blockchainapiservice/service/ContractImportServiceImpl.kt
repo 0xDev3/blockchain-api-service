@@ -113,7 +113,14 @@ class ContractImportServiceImpl(
             )
         }
 
-        val decompiledContract = contractDecompilerService.decompile(contractDeploymentTransactionInfo.binary)
+        val decompiledContract = contractDecompilerService.decompile(contractDeploymentTransactionInfo.binary).let {
+            it.copy(
+                artifact = it.artifact.copy(
+                    bytecode = contractDeploymentTransactionInfo.data.withoutPrefix.removeSuffix(constructorParams),
+                    deployedBytecode = contractDeploymentTransactionInfo.binary.value
+                )
+            )
+        }
         val contractAddress = contractDeploymentTransactionInfo.deployedContractAddress
         val contractId = ContractId("imported-${contractAddress.rawValue}-${project.chainId.value}")
 

@@ -50,7 +50,7 @@ import java.math.BigInteger
 class Web3jBlockchainServiceIntegTest : TestBase() {
 
     private val hardhatContainer = SharedTestContainers.hardhatContainer
-    private val accounts = HardhatTestContainer.accounts
+    private val accounts = HardhatTestContainer.ACCOUNTS
 
     @BeforeEach
     fun beforeEach() {

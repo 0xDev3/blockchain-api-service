@@ -65,5 +65,11 @@ enum class ErrorCode {
     CONTRACT_NOT_FOUND,
 
     @Description("Indicates that the imported contract binary does not match binary of requested contract ID")
-    CONTRACT_BINARY_MISMATCH
+    CONTRACT_BINARY_MISMATCH,
+
+    @Description("Binary of the requested contract cannot be successfully decompiled")
+    CANNOT_DECOMPILE_CONTRACT_BINARY,
+
+    @Description("Decompilation of contract binary is currently unavailable and should be tried at a later time")
+    CONTRACT_DECOMPILATION_TEMPORARILY_UNAVAILABLE
 }
