@@ -265,7 +265,9 @@ class Web3jBlockchainService(
         chainSpec: ChainSpec,
         contractAddress: ContractAddress
     ): ContractDeploymentTransactionInfo? {
-        logger.debug { "Searching for contract deployment transaction" }
+        logger.debug {
+            "Searching for contract deployment transaction, chainSpec: $chainSpec, contractAddress: $contractAddress"
+        }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
         val web3j = blockchainProperties.web3j
         val currentBlockNumber = web3j.latestBlockNumber(chainSpec, blockchainProperties.latestBlockCacheDuration)

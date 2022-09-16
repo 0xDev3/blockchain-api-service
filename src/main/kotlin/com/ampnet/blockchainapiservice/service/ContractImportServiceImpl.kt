@@ -42,7 +42,7 @@ class ContractImportServiceImpl(
         private const val ETH_VALUE_LENGTH = 64
 
         private data class OutputParams(val params: List<OutputParameter>)
-        internal data class TypeAndValue(val type: String, val value: Any)
+        data class TypeAndValue(val type: String, val value: Any)
     }
 
     override fun importContract(

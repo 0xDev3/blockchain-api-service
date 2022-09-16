@@ -36,12 +36,12 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
         dslContext.deleteFrom(Erc20LockRequestTable.ERC20_LOCK_REQUEST).execute()
         dslContext.deleteFrom(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM).execute()
         dslContext.deleteFrom(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE).execute()
+        dslContext.deleteFrom(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR).execute()
         dslContext.deleteFrom(ApiKeyTable.API_KEY).execute()
         dslContext.deleteFrom(ProjectTable.PROJECT).execute()
         dslContext.deleteFrom(UserIdentifierTable.USER_IDENTIFIER).execute()
         dslContext.deleteFrom(FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE).execute()
         dslContext.deleteFrom(FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE).execute()
         dslContext.deleteFrom(FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE).execute()
-        dslContext.deleteFrom(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR).execute()
     }
 }

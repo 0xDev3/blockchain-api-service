@@ -74,7 +74,7 @@ class ContractImportServiceTest : TestBase() {
         private val CONSTRUCTOR_PARAMS = listOf(FunctionArgument(WalletAddress("cafebabe")))
         private val ENCODED_CONSTRUCTOR_CALL = EthereumFunctionEncoderService().encodeConstructor(CONSTRUCTOR_PARAMS)
         private val CONSTRUCTOR_PARAMS_JSON = objectMapper.valueToTree<JsonNode>(
-            listOf(TypeAndValue(type = "address", value = ENCODED_CONSTRUCTOR_CALL.value))
+            listOf(TypeAndValue(type = "address", value = WalletAddress("cafebabe").rawValue))
         )
         private val CONSTRUCTOR_BYTES_32_JSON = objectMapper.valueToTree<JsonNode>(
             listOf(
@@ -144,7 +144,7 @@ class ContractImportServiceTest : TestBase() {
             from = WalletAddress("123"),
             deployedContractAddress = PARAMS.contractAddress,
             data = FunctionData("${ARTIFACT_JSON.bytecode}${ENCODED_CONSTRUCTOR_CALL.withoutPrefix}"),
-            value = Balance(BigInteger.ZERO),
+            value = Balance.ZERO,
             binary = ContractBinaryData(ARTIFACT_JSON.deployedBytecode)
         )
     }

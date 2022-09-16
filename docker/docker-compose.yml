@@ -1,4 +1,5 @@
 version: "3.9"
+
 services:
   blockchain-api-service-postgres:
     container_name: blockchain-api-service-postgres
@@ -10,6 +11,6 @@ services:
       - "5432:5432"
   contract-manifest-service:
     container_name: contract-manifest-service
-    image: "ampnet/contracts-manifest-service:0.1.0"
+    image: "ampnet/contracts-manifest-service:0.2.0"
     ports:
       - "42070:42070"
