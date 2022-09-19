@@ -262,9 +262,11 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
 
         suppose("some imported contract decorators exist in database") {
             dslContext.batchInsert(
-                (project1DecoratorsWithMatchingTags + project1DecoratorsWithNonMatchingTags +
-                    project1DecoratorsWithMatchingTraits + project1DecoratorsWithNonMatchingTraits +
-                    project2MatchingDecorators + project2NonMatchingDecorators)
+                (
+                    project1DecoratorsWithMatchingTags + project1DecoratorsWithNonMatchingTags +
+                        project1DecoratorsWithMatchingTraits + project1DecoratorsWithNonMatchingTraits +
+                        project2MatchingDecorators + project2NonMatchingDecorators
+                    )
                     .map {
                         ImportedContractDecoratorRecord(
                             id = UUID.randomUUID(),

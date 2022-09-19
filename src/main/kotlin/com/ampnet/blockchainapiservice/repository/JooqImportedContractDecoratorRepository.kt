@@ -20,6 +20,7 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
+@Suppress("TooManyFunctions")
 class JooqImportedContractDecoratorRepository(
     private val dslContext: DSLContext
 ) : ImportedContractDecoratorRepository {
