@@ -433,7 +433,8 @@ class ContractImportServiceTest : TestBase() {
                     contractId = contractId,
                     manifestJson = MANIFEST_JSON,
                     artifactJson = adjustedArtifactJson,
-                    infoMarkdown = "infoMd"
+                    infoMarkdown = "infoMd",
+                    importedAt = TestData.TIMESTAMP
                 )
             )
                 .willReturn(contractDecorator)

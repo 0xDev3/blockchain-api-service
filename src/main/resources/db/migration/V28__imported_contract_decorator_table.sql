@@ -9,4 +9,4 @@ CREATE TABLE blockchain_api_service.imported_contract_decorator (
     artifact_json JSON    NOT NULL,
     info_markdown VARCHAR NOT NULL,
     UNIQUE (project_id, contract_id)
-)
+);

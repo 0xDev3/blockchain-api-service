@@ -19,6 +19,7 @@ import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractFunction
 import com.ampnet.blockchainapiservice.model.result.ContractParameter
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
+import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.http.ResponseEntity
+import java.util.UUID
 
 class ContractDecoratorControllerTest : TestBase() {
 
@@ -91,12 +93,107 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(listOf(result))
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("controller returns correct response") {
             val response = controller.getContractDecorators(
                 contractTags = listOf("tag-1 AND tag-2"),
-                contractImplements = listOf("trait-1 AND trait-2")
+                contractImplements = listOf("trait-1 AND trait-2"),
+                projectId = null
+            )
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        ContractDecoratorsResponse(
+                            listOf(
+                                ContractDecoratorResponse(
+                                    id = result.id.value,
+                                    name = result.name,
+                                    description = result.description,
+                                    binary = result.binary.value,
+                                    tags = result.tags.map { it.value },
+                                    implements = result.implements.map { it.value },
+                                    constructors = result.constructors,
+                                    functions = result.functions,
+                                    events = result.events
+                                )
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractDecoratorsWithFiltersAndProjectId() {
+        val repository = mock<ImportedContractDecoratorRepository>()
+        val result = ContractDecorator(
+            id = ContractId("examples.exampleContract"),
+            name = "name",
+            description = "description",
+            binary = ContractBinaryData(ExampleContract.BINARY),
+            tags = listOf(ContractTag("example"), ContractTag("simple")),
+            implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
+            constructors = listOf(
+                ContractConstructor(
+                    inputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "owner",
+                            solidityType = "address",
+                            recommendedTypes = listOf(),
+                            parameters = null
+                        )
+                    ),
+                    description = "Main constructor",
+                    payable = true
+                )
+            ),
+            functions = listOf(
+                ContractFunction(
+                    name = "Get contract owner",
+                    description = "Fetches contract owner",
+                    solidityName = "getOWner",
+                    inputs = listOf(),
+                    outputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "",
+                            solidityType = "address",
+                            recommendedTypes = listOf(),
+                            parameters = null
+                        )
+                    ),
+                    emittableEvents = emptyList(),
+                    readOnly = true
+                )
+            ),
+            events = listOf()
+        )
+
+        val filters = ContractDecoratorFilters(
+            contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
+            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+        )
+        val projectId = UUID.randomUUID()
+
+        suppose("some contract decorators will be fetched with filters") {
+            given(repository.getAll(projectId, filters))
+                .willReturn(listOf(result))
+        }
+
+        val controller = ContractDecoratorController(emptyRepository(filters), repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractDecorators(
+                contractTags = listOf("tag-1 AND tag-2"),
+                contractImplements = listOf("trait-1 AND trait-2"),
+                projectId = projectId
             )
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
@@ -147,12 +244,53 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(listOf(result))
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("controller returns correct response") {
             val response = controller.getContractManifestJsonFiles(
                 contractTags = listOf("tag-1 AND tag-2"),
-                contractImplements = listOf("trait-1 AND trait-2")
+                contractImplements = listOf("trait-1 AND trait-2"),
+                projectId = null
+            )
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(ResponseEntity.ok(ManifestJsonsResponse(listOf(result))))
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractManifestJsonsWithFiltersAndProjectId() {
+        val repository = mock<ImportedContractDecoratorRepository>()
+        val result = ManifestJson(
+            name = "name",
+            description = "description",
+            tags = emptyList(),
+            implements = emptyList(),
+            eventDecorators = emptyList(),
+            constructorDecorators = emptyList(),
+            functionDecorators = emptyList()
+        )
+
+        val filters = ContractDecoratorFilters(
+            contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
+            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+        )
+        val projectId = UUID.randomUUID()
+
+        suppose("some contract manifest.json files will be fetched with filters") {
+            given(repository.getAllManifestJsonFiles(projectId, filters))
+                .willReturn(listOf(result))
+        }
+
+        val controller = ContractDecoratorController(emptyRepository(filters), repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractManifestJsonFiles(
+                contractTags = listOf("tag-1 AND tag-2"),
+                contractImplements = listOf("trait-1 AND trait-2"),
+                projectId = projectId
             )
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
@@ -185,12 +323,53 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(listOf(result))
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("controller returns correct response") {
             val response = controller.getContractArtifactJsonFiles(
                 contractTags = listOf("tag-1 AND tag-2"),
-                contractImplements = listOf("trait-1 AND trait-2")
+                contractImplements = listOf("trait-1 AND trait-2"),
+                projectId = null
+            )
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(ResponseEntity.ok(ArtifactJsonsResponse(listOf(result))))
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractArtifactJsonsWithFiltersAndProjectId() {
+        val repository = mock<ImportedContractDecoratorRepository>()
+        val result = ArtifactJson(
+            contractName = "example",
+            sourceName = "Example",
+            abi = emptyList(),
+            bytecode = "0x0",
+            deployedBytecode = "0x0",
+            linkReferences = null,
+            deployedLinkReferences = null
+        )
+
+        val filters = ContractDecoratorFilters(
+            contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
+            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+        )
+        val projectId = UUID.randomUUID()
+
+        suppose("some contract artifact.json files will be fetched with filters") {
+            given(repository.getAllArtifactJsonFiles(projectId, filters))
+                .willReturn(listOf(result))
+        }
+
+        val controller = ContractDecoratorController(emptyRepository(filters), repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractArtifactJsonFiles(
+                contractTags = listOf("tag-1 AND tag-2"),
+                contractImplements = listOf("trait-1 AND trait-2"),
+                projectId = projectId
             )
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
@@ -215,12 +394,45 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(listOf(result))
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("controller returns correct response") {
             val response = controller.getContractInfoMarkdownFiles(
                 contractTags = listOf("tag-1 AND tag-2"),
-                contractImplements = listOf("trait-1 AND trait-2")
+                contractImplements = listOf("trait-1 AND trait-2"),
+                projectId = null
+            )
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(ResponseEntity.ok(InfoMarkdownsResponse(listOf(result))))
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractInfoMarkdownsWithFiltersAndProjectId() {
+        val repository = mock<ImportedContractDecoratorRepository>()
+        val result = "info-md"
+
+        val filters = ContractDecoratorFilters(
+            contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
+            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+        )
+        val projectId = UUID.randomUUID()
+
+        suppose("some contract info.md files will be fetched with filters") {
+            given(repository.getAllInfoMarkdownFiles(projectId, filters))
+                .willReturn(listOf(result))
+        }
+
+        val controller = ContractDecoratorController(emptyRepository(filters), repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractInfoMarkdownFiles(
+                contractTags = listOf("tag-1 AND tag-2"),
+                contractImplements = listOf("trait-1 AND trait-2"),
+                projectId = projectId
             )
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
@@ -285,10 +497,92 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(result)
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("controller returns correct response") {
-            val response = controller.getContractDecorator(id.value)
+            val response = controller.getContractDecorator(id.value, null)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        ContractDecoratorResponse(
+                            id = result.id.value,
+                            name = result.name,
+                            description = result.description,
+                            binary = result.binary.value,
+                            tags = result.tags.map { it.value },
+                            implements = result.implements.map { it.value },
+                            constructors = result.constructors,
+                            functions = result.functions,
+                            events = result.events
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractDecoratorWithProjectId() {
+        val id = ContractId("example")
+        val repository = mock<ImportedContractDecoratorRepository>()
+        val result = ContractDecorator(
+            id = ContractId("examples.exampleContract"),
+            name = "name",
+            description = "description",
+            binary = ContractBinaryData(ExampleContract.BINARY),
+            tags = listOf(ContractTag("example"), ContractTag("simple")),
+            implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
+            constructors = listOf(
+                ContractConstructor(
+                    inputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "owner",
+                            solidityType = "address",
+                            recommendedTypes = listOf(),
+                            parameters = null
+                        )
+                    ),
+                    description = "Main constructor",
+                    payable = true
+                )
+            ),
+            functions = listOf(
+                ContractFunction(
+                    name = "Get contract owner",
+                    description = "Fetches contract owner",
+                    solidityName = "getOWner",
+                    inputs = listOf(),
+                    outputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "",
+                            solidityType = "address",
+                            recommendedTypes = listOf(),
+                            parameters = null
+                        )
+                    ),
+                    emittableEvents = emptyList(),
+                    readOnly = true
+                )
+            ),
+            events = listOf()
+        )
+        val projectId = UUID.randomUUID()
+
+        suppose("some contract decorator will be fetched") {
+            given(repository.getByContractIdAndProjectId(id, projectId))
+                .willReturn(result)
+        }
+
+        val controller = ContractDecoratorController(mock(), repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractDecorator(id.value, projectId)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -321,11 +615,11 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(null)
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
-                controller.getContractDecorator(id.value)
+                controller.getContractDecorator(id.value, null)
             }
         }
     }
@@ -349,10 +643,44 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(result)
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("controller returns correct response") {
-            val response = controller.getContractManifestJson(id.value)
+            val response = controller.getContractManifestJson(id.value, null)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(result)
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractManifestJsonWithProjectId() {
+        val id = ContractId("example")
+        val repository = mock<ImportedContractDecoratorRepository>()
+        val result = ManifestJson(
+            name = "name",
+            description = "description",
+            tags = emptyList(),
+            implements = emptyList(),
+            eventDecorators = emptyList(),
+            constructorDecorators = emptyList(),
+            functionDecorators = emptyList()
+        )
+        val projectId = UUID.randomUUID()
+
+        suppose("some contract manifest.json will be fetched") {
+            given(repository.getManifestJsonByContractIdAndProjectId(id, projectId))
+                .willReturn(result)
+        }
+
+        val controller = ContractDecoratorController(mock(), repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractManifestJson(id.value, projectId)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -373,11 +701,11 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(null)
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
-                controller.getContractManifestJson(id.value)
+                controller.getContractManifestJson(id.value, null)
             }
         }
     }
@@ -401,10 +729,44 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(result)
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("controller returns correct response") {
-            val response = controller.getContractArtifactJson(id.value)
+            val response = controller.getContractArtifactJson(id.value, null)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(result)
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractArtifactJsonWithProjectId() {
+        val id = ContractId("example")
+        val repository = mock<ImportedContractDecoratorRepository>()
+        val result = ArtifactJson(
+            contractName = "example",
+            sourceName = "Example",
+            abi = emptyList(),
+            bytecode = "0x0",
+            deployedBytecode = "0x0",
+            linkReferences = null,
+            deployedLinkReferences = null
+        )
+        val projectId = UUID.randomUUID()
+
+        suppose("some contract artifact.json will be fetched") {
+            given(repository.getArtifactJsonByContractIdAndProjectId(id, projectId))
+                .willReturn(result)
+        }
+
+        val controller = ContractDecoratorController(mock(), repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractArtifactJson(id.value, projectId)
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -425,11 +787,11 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(null)
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
-                controller.getContractArtifactJson(id.value)
+                controller.getContractArtifactJson(id.value, null)
             }
         }
     }
@@ -445,10 +807,34 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(result)
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("controller returns correct response") {
-            val response = controller.getContractInfoMarkdown(id.value)
+            val response = controller.getContractInfoMarkdown(id.value, null)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(result)
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchContractInfoMarkdownWithProjectId() {
+        val id = ContractId("example")
+        val repository = mock<ImportedContractDecoratorRepository>()
+        val result = "info-md"
+        val projectId = UUID.randomUUID()
+
+        suppose("some contract info.md will be fetched") {
+            given(repository.getInfoMarkdownByContractIdAndProjectId(id, projectId))
+                .willReturn(result)
+        }
+
+        val controller = ContractDecoratorController(mock(), repository)
+
+        verify("controller returns correct response") {
+            val response = controller.getContractInfoMarkdown(id.value, projectId)
 
             assertThat(response).withMessage()
                 .isEqualTo(
@@ -467,12 +853,23 @@ class ContractDecoratorControllerTest : TestBase() {
                 .willReturn(null)
         }
 
-        val controller = ContractDecoratorController(repository)
+        val controller = ContractDecoratorController(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
             assertThrows<ResourceNotFoundException>(message) {
-                controller.getContractInfoMarkdown(id.value)
+                controller.getContractInfoMarkdown(id.value, null)
             }
         }
+    }
+
+    private fun emptyRepository(filters: ContractDecoratorFilters): ContractDecoratorRepository {
+        val repository = mock<ContractDecoratorRepository>()
+
+        given(repository.getAll(filters)).willReturn(emptyList())
+        given(repository.getAllManifestJsonFiles(filters)).willReturn(emptyList())
+        given(repository.getAllArtifactJsonFiles(filters)).willReturn(emptyList())
+        given(repository.getAllInfoMarkdownFiles(filters)).willReturn(emptyList())
+
+        return repository
     }
 }
