@@ -14,6 +14,7 @@ import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.DynamicBytes
 import org.web3j.abi.datatypes.DynamicStruct
+import org.web3j.abi.datatypes.StaticStruct
 import org.web3j.abi.datatypes.Uint
 import org.web3j.abi.datatypes.Utf8String
 import org.web3j.abi.datatypes.generated.Bytes1
@@ -1157,7 +1158,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
                                 innerTupleArray.value.map { innerTuple ->
                                     innerTuple.value.map { innerTupleElem ->
-                                        if (innerTupleElem is DynamicStruct) {
+                                        if (innerTupleElem is StaticStruct) {
                                             innerTupleElem.value.map { v -> v.value }
                                         } else {
                                             innerTupleElem.value

@@ -9,10 +9,14 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import org.web3j.abi.datatypes.Bytes
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.DynamicStruct
+import org.web3j.abi.datatypes.StaticStruct
 import org.web3j.abi.datatypes.Type
+import org.web3j.abi.datatypes.Utf8String
 
+@Suppress("TooManyFunctions")
 class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
 
     companion object {
@@ -63,12 +67,19 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
         }
 
     @Suppress("UNCHECKED_CAST")
-    private fun List<Type<*>>.createArray(web3ElementType: Class<out Type<*>>, length: Int?): Type<*> =
-        if (length == null) {
-            DynamicArray(web3ElementType as Class<Type<*>>, this)
+    private fun List<Type<*>>.createArray(web3ElementType: Class<out Type<*>>, length: Int?): Type<*> {
+        val web3FixedStructElementType = web3ElementType.fixStructType(this)
+
+        return if (length == null) {
+            DynamicArray(web3FixedStructElementType as Class<Type<*>>, this)
         } else {
-            SizedStaticArray(web3ElementType as Class<Type<*>>, this)
+            SizedStaticArray(web3FixedStructElementType as Class<Type<*>>, this)
         }
+    }
+
+    private fun Class<out Type<*>>.fixStructType(elems: List<Type<*>>): Class<out Type<*>> =
+        elems.firstOrNull()?.javaClass?.takeIf { it == DynamicStruct::class.java || it == StaticStruct::class.java }
+            ?: this
 
     private fun List<Pair<JsonNode, Type<*>>>.checkTupleCompatibility(
         p: JsonParser,
@@ -93,7 +104,7 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
                 ?: throw JsonParseException(p, "unknown type: $this")
         }
 
-    private fun JsonNode.parseTuple(p: JsonParser): DynamicStruct =
+    private fun JsonNode.parseTuple(p: JsonParser): Type<*> =
         if (this.isArray) {
             val tupleElements = this.elements().asSequence().map {
                 val tupleArgumentType = it["type"]?.asText() ?: throw JsonParseException(p, "missing type")
@@ -101,7 +112,7 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
                 deserializeType(p, tupleArgumentType, tupleArgumentValue)
             }.toList().takeIf { it.isNotEmpty() } ?: throw JsonParseException(p, "tuples cannot be empty")
 
-            DynamicStruct(tupleElements)
+            if (tupleElements.any { it.isDynamic() }) DynamicStruct(tupleElements) else StaticStruct(tupleElements)
         } else {
             throw JsonParseException(p, ARRAY_VALUE_ERROR)
         }
@@ -139,4 +150,12 @@ class FunctionArgumentJsonDeserializer : JsonDeserializer<FunctionArgument>() {
             type
         }
     }
+
+    private fun Type<*>.isDynamic() =
+        when (this) {
+            is Utf8String -> true
+            is DynamicStruct -> true
+            is DynamicArray<*> -> true
+            else -> this == Bytes::class.java
+        }
 }
