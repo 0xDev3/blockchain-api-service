@@ -892,7 +892,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     private fun createMetadataRecord(
         contractId: ContractId = CONTRACT_ID,
         tags: List<String> = emptyList(),
-        traits: List<String> = emptyList(),
+        traits: List<String> = emptyList()
     ) = ContractMetadataRecord(
         id = UUID.randomUUID(),
         name = NAME,
