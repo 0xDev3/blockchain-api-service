@@ -1,9 +1,11 @@
 package com.ampnet.blockchainapiservice.repository
 
+import com.ampnet.blockchainapiservice.model.filters.ContractDecoratorFilters
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
 import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.UtcDateTime
 import java.util.UUID
 
 interface ImportedContractDecoratorRepository {
@@ -14,8 +16,16 @@ interface ImportedContractDecoratorRepository {
         contractId: ContractId,
         manifestJson: ManifestJson,
         artifactJson: ArtifactJson,
-        infoMarkdown: String
+        infoMarkdown: String,
+        importedAt: UtcDateTime
     ): ContractDecorator
 
     fun getByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ContractDecorator?
+    fun getManifestJsonByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ManifestJson?
+    fun getArtifactJsonByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ArtifactJson?
+    fun getInfoMarkdownByContractIdAndProjectId(contractId: ContractId, projectId: UUID): String?
+    fun getAll(projectId: UUID, filters: ContractDecoratorFilters): List<ContractDecorator>
+    fun getAllManifestJsonFiles(projectId: UUID, filters: ContractDecoratorFilters): List<ManifestJson>
+    fun getAllArtifactJsonFiles(projectId: UUID, filters: ContractDecoratorFilters): List<ArtifactJson>
+    fun getAllInfoMarkdownFiles(projectId: UUID, filters: ContractDecoratorFilters): List<String>
 }

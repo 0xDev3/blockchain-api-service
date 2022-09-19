@@ -132,7 +132,8 @@ class ContractImportServiceImpl(
                     contractId = contractId,
                     manifestJson = decompiledContract.manifest,
                     artifactJson = decompiledContract.artifact,
-                    infoMarkdown = decompiledContract.infoMarkdown ?: ""
+                    infoMarkdown = decompiledContract.infoMarkdown ?: "",
+                    importedAt = utcDateTimeProvider.getUtcDateTime()
                 )
 
         contractMetadataRepository.createOrUpdate(
