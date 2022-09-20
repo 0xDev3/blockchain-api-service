@@ -15,6 +15,14 @@ Source code is available on https://github.com/AMPnet/blockchain-api-service[Git
 
 include::src/docs/asciidoc/base-url.adoc[]
 
+== Wallet Authorization API
+All endpoints are public and do not require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/wallet-authorization/create.adoc[]
+include::src/docs/asciidoc/wallet-authorization/fetch.adoc[]
+include::src/docs/asciidoc/wallet-authorization/fetch-by-project-id.adoc[]
+include::src/docs/asciidoc/wallet-authorization/attach.adoc[]
+
 == Asset Balance Checking API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
