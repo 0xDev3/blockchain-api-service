@@ -17,7 +17,9 @@ import java.util.UUID
 @Repository
 class JooqProjectRepository(private val dslContext: DSLContext) : ProjectRepository {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val TABLE = ProjectTable.PROJECT
+    }
 
     override fun store(project: Project): Project {
         logger.info { "Store project: $project" }
@@ -42,18 +44,18 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
 
     override fun getById(id: UUID): Project? {
         logger.debug { "Get project by id: $id" }
-        return dslContext.selectFrom(ProjectTable.PROJECT)
-            .where(ProjectTable.PROJECT.ID.eq(id))
+        return dslContext.selectFrom(TABLE)
+            .where(TABLE.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun getByIssuer(issuerContractAddress: ContractAddress, chainId: ChainId): Project? {
         logger.debug { "Get project by issuerContractAddress: $issuerContractAddress, chainId: $chainId" }
-        return dslContext.selectFrom(ProjectTable.PROJECT)
+        return dslContext.selectFrom(TABLE)
             .where(
                 DSL.and(
-                    ProjectTable.PROJECT.ISSUER_CONTRACT_ADDRESS.eq(issuerContractAddress),
-                    ProjectTable.PROJECT.CHAIN_ID.eq(chainId)
+                    TABLE.ISSUER_CONTRACT_ADDRESS.eq(issuerContractAddress),
+                    TABLE.CHAIN_ID.eq(chainId)
                 )
             )
             .fetchOne { it.toModel() }
@@ -61,9 +63,9 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
 
     override fun getAllByOwnerId(ownerId: UUID): List<Project> {
         logger.info { "Get projects by ownerId: $ownerId" }
-        return dslContext.selectFrom(ProjectTable.PROJECT)
-            .where(ProjectTable.PROJECT.OWNER_ID.eq(ownerId))
-            .orderBy(ProjectTable.PROJECT.CREATED_AT.asc())
+        return dslContext.selectFrom(TABLE)
+            .where(TABLE.OWNER_ID.eq(ownerId))
+            .orderBy(TABLE.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 

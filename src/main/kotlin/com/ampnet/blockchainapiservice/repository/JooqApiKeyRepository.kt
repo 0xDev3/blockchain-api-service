@@ -12,7 +12,9 @@ import java.util.UUID
 @Repository
 class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepository {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val TABLE = ApiKeyTable.API_KEY
+    }
 
     override fun store(apiKey: ApiKey): ApiKey {
         logger.info { "Store API key, apiKey: $apiKey" }
@@ -28,31 +30,31 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
 
     override fun getById(id: UUID): ApiKey? {
         logger.debug { "Get API key by id: $id" }
-        return dslContext.selectFrom(ApiKeyTable.API_KEY)
-            .where(ApiKeyTable.API_KEY.ID.eq(id))
+        return dslContext.selectFrom(TABLE)
+            .where(TABLE.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun getByValue(value: String): ApiKey? {
         logger.debug { "Get API key by value: $value" }
-        return dslContext.selectFrom(ApiKeyTable.API_KEY)
-            .where(ApiKeyTable.API_KEY.API_KEY_.eq(value))
+        return dslContext.selectFrom(TABLE)
+            .where(TABLE.API_KEY_.eq(value))
             .fetchOne { it.toModel() }
     }
 
     override fun getAllByProjectId(projectId: UUID): List<ApiKey> {
         logger.debug { "Get API keys by projectId: $projectId" }
-        return dslContext.selectFrom(ApiKeyTable.API_KEY)
-            .where(ApiKeyTable.API_KEY.PROJECT_ID.eq(projectId))
-            .orderBy(ApiKeyTable.API_KEY.CREATED_AT.asc())
+        return dslContext.selectFrom(TABLE)
+            .where(TABLE.PROJECT_ID.eq(projectId))
+            .orderBy(TABLE.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
     override fun exists(apiKey: String): Boolean {
         logger.debug { "Check if API key exists: $apiKey" }
         return dslContext.fetchExists(
-            ApiKeyTable.API_KEY,
-            ApiKeyTable.API_KEY.API_KEY_.eq(apiKey)
+            TABLE,
+            TABLE.API_KEY_.eq(apiKey)
         )
     }
 

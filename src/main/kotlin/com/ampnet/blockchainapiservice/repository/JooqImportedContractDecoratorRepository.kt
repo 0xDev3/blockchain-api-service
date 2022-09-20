@@ -25,7 +25,9 @@ class JooqImportedContractDecoratorRepository(
     private val dslContext: DSLContext
 ) : ImportedContractDecoratorRepository {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val TABLE = ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR
+    }
 
     override fun store(
         id: UUID,
@@ -54,11 +56,11 @@ class JooqImportedContractDecoratorRepository(
 
     override fun getByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ContractDecorator? {
         logger.debug { "Get imported contract decorator by contract id: $contractId" }
-        return dslContext.selectFrom(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR)
+        return dslContext.selectFrom(TABLE)
             .where(
                 DSL.and(
-                    ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.CONTRACT_ID.eq(contractId),
-                    ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.PROJECT_ID.eq(projectId)
+                    TABLE.CONTRACT_ID.eq(contractId),
+                    TABLE.PROJECT_ID.eq(projectId)
                 )
             )
             .fetchOne()
@@ -73,11 +75,13 @@ class JooqImportedContractDecoratorRepository(
 
     override fun getManifestJsonByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ManifestJson? {
         logger.debug { "Get imported manifest.json by contract id: $contractId, project id: $projectId" }
-        return dslContext.select(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.MANIFEST_JSON)
-            .from(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR)
+        return dslContext.select(TABLE.MANIFEST_JSON)
+            .from(TABLE)
             .where(
-                ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.CONTRACT_ID.eq(contractId),
-                ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.PROJECT_ID.eq(projectId)
+                DSL.and(
+                    TABLE.CONTRACT_ID.eq(contractId),
+                    TABLE.PROJECT_ID.eq(projectId)
+                )
             )
             .fetchOne()
             ?.value1()
@@ -85,11 +89,13 @@ class JooqImportedContractDecoratorRepository(
 
     override fun getArtifactJsonByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ArtifactJson? {
         logger.debug { "Get imported artifact.json by contract id: $contractId, project id: $projectId" }
-        return dslContext.select(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.ARTIFACT_JSON)
-            .from(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR)
+        return dslContext.select(TABLE.ARTIFACT_JSON)
+            .from(TABLE)
             .where(
-                ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.CONTRACT_ID.eq(contractId),
-                ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.PROJECT_ID.eq(projectId)
+                DSL.and(
+                    TABLE.CONTRACT_ID.eq(contractId),
+                    TABLE.PROJECT_ID.eq(projectId)
+                )
             )
             .fetchOne()
             ?.value1()
@@ -97,11 +103,13 @@ class JooqImportedContractDecoratorRepository(
 
     override fun getInfoMarkdownByContractIdAndProjectId(contractId: ContractId, projectId: UUID): String? {
         logger.debug { "Get imported info.md by contract id: $contractId, project id: $projectId" }
-        return dslContext.select(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.INFO_MARKDOWN)
-            .from(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR)
+        return dslContext.select(TABLE.INFO_MARKDOWN)
+            .from(TABLE)
             .where(
-                ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.CONTRACT_ID.eq(contractId),
-                ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.PROJECT_ID.eq(projectId)
+                DSL.and(
+                    TABLE.CONTRACT_ID.eq(contractId),
+                    TABLE.PROJECT_ID.eq(projectId)
+                )
             )
             .fetchOne()
             ?.value1()
@@ -109,9 +117,9 @@ class JooqImportedContractDecoratorRepository(
 
     override fun getAll(projectId: UUID, filters: ContractDecoratorFilters): List<ContractDecorator> {
         logger.debug { "Get imported contract decorators by projectId: $projectId, filters: $filters" }
-        return dslContext.selectFrom(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR)
+        return dslContext.selectFrom(TABLE)
             .where(createConditions(projectId, filters))
-            .orderBy(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.IMPORTED_AT.asc())
+            .orderBy(TABLE.IMPORTED_AT.asc())
             .fetch {
                 ContractDecorator(
                     id = it.contractId!!,
@@ -123,48 +131,48 @@ class JooqImportedContractDecoratorRepository(
 
     override fun getAllManifestJsonFiles(projectId: UUID, filters: ContractDecoratorFilters): List<ManifestJson> {
         logger.debug { "Get imported manifest.json files by projectId: $projectId, filters: $filters" }
-        return dslContext.select(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.MANIFEST_JSON)
-            .from(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR)
+        return dslContext.select(TABLE.MANIFEST_JSON)
+            .from(TABLE)
             .where(createConditions(projectId, filters))
-            .orderBy(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.IMPORTED_AT.asc())
+            .orderBy(TABLE.IMPORTED_AT.asc())
             .fetch { it.value1() }
     }
 
     override fun getAllArtifactJsonFiles(projectId: UUID, filters: ContractDecoratorFilters): List<ArtifactJson> {
         logger.debug { "Get imported artifact.json files by projectId: $projectId, filters: $filters" }
-        return dslContext.select(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.ARTIFACT_JSON)
-            .from(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR)
+        return dslContext.select(TABLE.ARTIFACT_JSON)
+            .from(TABLE)
             .where(createConditions(projectId, filters))
-            .orderBy(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.IMPORTED_AT.asc())
+            .orderBy(TABLE.IMPORTED_AT.asc())
             .fetch { it.value1() }
     }
 
     override fun getAllInfoMarkdownFiles(projectId: UUID, filters: ContractDecoratorFilters): List<String> {
         logger.debug { "Get imported info.md files by projectId: $projectId, filters: $filters" }
-        return dslContext.select(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.INFO_MARKDOWN)
-            .from(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR)
+        return dslContext.select(TABLE.INFO_MARKDOWN)
+            .from(TABLE)
             .where(createConditions(projectId, filters))
-            .orderBy(ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.IMPORTED_AT.asc())
+            .orderBy(TABLE.IMPORTED_AT.asc())
             .fetch { it.value1() }
     }
 
     private fun createConditions(projectId: UUID, filters: ContractDecoratorFilters) =
         listOfNotNull(
-            ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.PROJECT_ID.eq(projectId),
+            TABLE.PROJECT_ID.eq(projectId),
             filters.contractTags.orAndCondition { it.contractTagsAndCondition() },
             filters.contractImplements.orAndCondition { it.contractTraitsAndCondition() }
         )
 
     private fun AndList<ContractTag>.contractTagsAndCondition(): Condition? =
         takeIf { list.isNotEmpty() }?.let {
-            ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.CONTRACT_TAGS.contains(
+            TABLE.CONTRACT_TAGS.contains(
                 it.list.map { v -> v.value }.toTypedArray()
             )
         }
 
     private fun AndList<ContractTrait>.contractTraitsAndCondition(): Condition? =
         takeIf { list.isNotEmpty() }?.let {
-            ImportedContractDecoratorTable.IMPORTED_CONTRACT_DECORATOR.CONTRACT_IMPLEMENTS.contains(
+            TABLE.CONTRACT_IMPLEMENTS.contains(
                 it.list.map { v -> v.value }.toTypedArray()
             )
         }
