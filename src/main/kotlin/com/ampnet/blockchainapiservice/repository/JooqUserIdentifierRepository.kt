@@ -16,7 +16,9 @@ import java.util.UUID
 @Repository
 class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIdentifierRepository {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val TABLE = UserIdentifierTable.USER_IDENTIFIER
+    }
 
     override fun store(userIdentifier: UserIdentifier): UserIdentifier {
         logger.info { "Store user identifier: $userIdentifier" }
@@ -31,18 +33,18 @@ class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIde
 
     override fun getById(id: UUID): UserIdentifier? {
         logger.debug { "Get user identifier by id: $id" }
-        return dslContext.selectFrom(UserIdentifierTable.USER_IDENTIFIER)
-            .where(UserIdentifierTable.USER_IDENTIFIER.ID.eq(id))
+        return dslContext.selectFrom(TABLE)
+            .where(TABLE.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun getByUserIdentifier(userIdentifier: String, identifierType: UserIdentifierType): UserIdentifier? {
         logger.debug { "Get user identifier by userIdentifier: $userIdentifier, identifierType: $identifierType" }
-        return dslContext.selectFrom(UserIdentifierTable.USER_IDENTIFIER)
+        return dslContext.selectFrom(TABLE)
             .where(
                 DSL.and(
-                    UserIdentifierTable.USER_IDENTIFIER.USER_IDENTIFIER_.eq(userIdentifier),
-                    UserIdentifierTable.USER_IDENTIFIER.IDENTIFIER_TYPE.eq(identifierType)
+                    TABLE.USER_IDENTIFIER_.eq(userIdentifier),
+                    TABLE.IDENTIFIER_TYPE.eq(identifierType)
                 )
             )
             .fetchOne { it.toModel() }

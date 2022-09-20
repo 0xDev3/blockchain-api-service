@@ -25,7 +25,12 @@ import java.util.UUID
 class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLContext) :
     Web3jBlockchainServiceCacheRepository {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val FETCH_ACCOUNT_BALANCE_CACHE_TABLE = FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE
+        private val FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE =
+            FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE
+        private val FETCH_TRANSACTION_INFO_CACHE_TABLE = FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE
+    }
 
     override fun cacheFetchAccountBalance(id: UUID, chainSpec: ChainSpec, accountBalance: AccountBalance) {
         logger.info {
@@ -131,14 +136,13 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 " blockNumber: $blockNumber"
         }
 
-        return dslContext.selectFrom(FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE)
+        return dslContext.selectFrom(FETCH_ACCOUNT_BALANCE_CACHE_TABLE)
             .where(
                 DSL.and(
-                    FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE.CHAIN_ID.eq(chainSpec.chainId),
-                    FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE.CUSTOM_RPC_URL
-                        .eq(chainSpec.customRpcUrl ?: ""),
-                    FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE.WALLET_ADDRESS.eq(walletAddress),
-                    FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE.BLOCK_NUMBER.eq(blockNumber)
+                    FETCH_ACCOUNT_BALANCE_CACHE_TABLE.CHAIN_ID.eq(chainSpec.chainId),
+                    FETCH_ACCOUNT_BALANCE_CACHE_TABLE.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
+                    FETCH_ACCOUNT_BALANCE_CACHE_TABLE.WALLET_ADDRESS.eq(walletAddress),
+                    FETCH_ACCOUNT_BALANCE_CACHE_TABLE.BLOCK_NUMBER.eq(blockNumber)
                 )
             )
             .fetchOne()
@@ -163,17 +167,14 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 " walletAddress: $walletAddress, blockNumber: $blockNumber"
         }
 
-        return dslContext.selectFrom(FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE)
+        return dslContext.selectFrom(FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE)
             .where(
                 DSL.and(
-                    FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.CHAIN_ID.eq(chainSpec.chainId),
-                    FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.CUSTOM_RPC_URL
-                        .eq(chainSpec.customRpcUrl ?: ""),
-                    FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.CONTRACT_ADDRESS
-                        .eq(contractAddress),
-                    FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.WALLET_ADDRESS
-                        .eq(walletAddress),
-                    FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE.BLOCK_NUMBER.eq(blockNumber)
+                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.CHAIN_ID.eq(chainSpec.chainId),
+                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
+                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.CONTRACT_ADDRESS.eq(contractAddress),
+                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.WALLET_ADDRESS.eq(walletAddress),
+                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.BLOCK_NUMBER.eq(blockNumber)
                 )
             )
             .fetchOne()
@@ -197,13 +198,12 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 " currentBlockNumber: $currentBlockNumber"
         }
 
-        return dslContext.selectFrom(FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE)
+        return dslContext.selectFrom(FETCH_TRANSACTION_INFO_CACHE_TABLE)
             .where(
                 DSL.and(
-                    FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE.CHAIN_ID.eq(chainSpec.chainId),
-                    FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE.CUSTOM_RPC_URL
-                        .eq(chainSpec.customRpcUrl ?: ""),
-                    FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE.TX_HASH.eq(txHash)
+                    FETCH_TRANSACTION_INFO_CACHE_TABLE.CHAIN_ID.eq(chainSpec.chainId),
+                    FETCH_TRANSACTION_INFO_CACHE_TABLE.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
+                    FETCH_TRANSACTION_INFO_CACHE_TABLE.TX_HASH.eq(txHash)
                 )
             )
             .fetchOne()

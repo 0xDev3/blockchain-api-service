@@ -23,7 +23,11 @@ import java.util.UUID
 @Suppress("TooManyFunctions")
 class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : MultiPaymentTemplateRepository {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val TEMPLATE_TABLE = MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE
+        private val ITEM_TABLE = MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM
+        private val USER_IDENTIFIER_TABLE = UserIdentifierTable.USER_IDENTIFIER
+    }
 
     override fun store(multiPaymentTemplate: MultiPaymentTemplate<WithItems>): MultiPaymentTemplate<WithItems> {
         logger.info { "Store multi-payment template: $multiPaymentTemplate" }
@@ -56,15 +60,15 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
 
     override fun update(multiPaymentTemplate: MultiPaymentTemplate<*>): MultiPaymentTemplate<WithItems>? {
         logger.info { "Update multi-payment record, multiPaymentTemplate: $multiPaymentTemplate" }
-        return dslContext.update(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE)
-            .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.TEMPLATE_NAME, multiPaymentTemplate.templateName)
-            .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.TOKEN_ADDRESS, multiPaymentTemplate.tokenAddress)
-            .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.CHAIN_ID, multiPaymentTemplate.chainId)
-            .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.UPDATED_AT, multiPaymentTemplate.updatedAt)
+        return dslContext.update(TEMPLATE_TABLE)
+            .set(TEMPLATE_TABLE.TEMPLATE_NAME, multiPaymentTemplate.templateName)
+            .set(TEMPLATE_TABLE.TOKEN_ADDRESS, multiPaymentTemplate.tokenAddress)
+            .set(TEMPLATE_TABLE.CHAIN_ID, multiPaymentTemplate.chainId)
+            .set(TEMPLATE_TABLE.UPDATED_AT, multiPaymentTemplate.updatedAt)
             .where(
                 DSL.and(
-                    MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.ID.eq(multiPaymentTemplate.id),
-                    MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.USER_ID.eq(multiPaymentTemplate.userId)
+                    TEMPLATE_TABLE.ID.eq(multiPaymentTemplate.id),
+                    TEMPLATE_TABLE.USER_ID.eq(multiPaymentTemplate.userId)
                 )
             )
             .returning()
@@ -74,48 +78,42 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
 
     override fun delete(id: UUID): Boolean {
         logger.info { "Delete multi-payment template, id: $id" }
-        dslContext.deleteFrom(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM)
-            .where(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.TEMPLATE_ID.eq(id))
+        dslContext.deleteFrom(ITEM_TABLE)
+            .where(ITEM_TABLE.TEMPLATE_ID.eq(id))
             .execute()
-        return dslContext.deleteFrom(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE)
-            .where(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.ID.eq(id))
+        return dslContext.deleteFrom(TEMPLATE_TABLE)
+            .where(TEMPLATE_TABLE.ID.eq(id))
             .execute() > 0
     }
 
     override fun getById(id: UUID): MultiPaymentTemplate<WithItems>? {
         logger.debug { "Get multi-payment template by id: $id" }
-        return dslContext.selectFrom(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE)
-            .where(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.ID.eq(id))
+        return dslContext.selectFrom(TEMPLATE_TABLE)
+            .where(TEMPLATE_TABLE.ID.eq(id))
             .fetchOne { it.toModel() }
             ?.withItems(getItemsById(id))
     }
 
     override fun getItemsById(id: UUID): List<MultiPaymentTemplateItem> {
         logger.debug { "Get multi-payment template items by id: $id" }
-        return dslContext.selectFrom(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM)
-            .where(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.TEMPLATE_ID.eq(id))
-            .orderBy(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.CREATED_AT.asc())
+        return dslContext.selectFrom(ITEM_TABLE)
+            .where(ITEM_TABLE.TEMPLATE_ID.eq(id))
+            .orderBy(ITEM_TABLE.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
     override fun getAllByWalletAddress(walletAddress: WalletAddress): List<MultiPaymentTemplate<NoItems>> {
         logger.debug { "Get multi-payment templates by walletAddress: $walletAddress" }
-        return dslContext.select(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.fields().toList())
-            .from(
-                MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.join(UserIdentifierTable.USER_IDENTIFIER)
-                    .on(
-                        MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.USER_ID
-                            .eq(UserIdentifierTable.USER_IDENTIFIER.ID)
-                    )
-            )
+        return dslContext.select(TEMPLATE_TABLE.fields().toList())
+            .from(TEMPLATE_TABLE.join(USER_IDENTIFIER_TABLE).on(TEMPLATE_TABLE.USER_ID.eq(USER_IDENTIFIER_TABLE.ID)))
             .where(
                 DSL.and(
-                    UserIdentifierTable.USER_IDENTIFIER.IDENTIFIER_TYPE.eq(UserIdentifierType.ETH_WALLET_ADDRESS),
-                    UserIdentifierTable.USER_IDENTIFIER.USER_IDENTIFIER_.eq(walletAddress.rawValue)
+                    USER_IDENTIFIER_TABLE.IDENTIFIER_TYPE.eq(UserIdentifierType.ETH_WALLET_ADDRESS),
+                    USER_IDENTIFIER_TABLE.USER_IDENTIFIER_.eq(walletAddress.rawValue)
                 )
             )
-            .orderBy(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.CREATED_AT.asc())
-            .fetch { it.into(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE).toModel() }
+            .orderBy(TEMPLATE_TABLE.CREATED_AT.asc())
+            .fetch { it.into(TEMPLATE_TABLE).toModel() }
     }
 
     override fun addItem(item: MultiPaymentTemplateItem, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>? {
@@ -136,33 +134,33 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
             return null
         }
 
-        dslContext.update(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE)
-            .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.UPDATED_AT, updatedAt)
+        dslContext.update(TEMPLATE_TABLE)
+            .set(TEMPLATE_TABLE.UPDATED_AT, updatedAt)
             .execute()
         return getById(item.templateId)
     }
 
     override fun updateItem(item: MultiPaymentTemplateItem, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>? {
         logger.info { "Update multi-payment record item, item: $item, updatedAt: $updatedAt" }
-        dslContext.update(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM)
-            .set(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.WALLET_ADDRESS, item.walletAddress)
-            .set(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.ITEM_NAME, item.itemName)
-            .set(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.ASSET_AMOUNT, item.assetAmount)
-            .where(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.ID.eq(item.id))
+        dslContext.update(ITEM_TABLE)
+            .set(ITEM_TABLE.WALLET_ADDRESS, item.walletAddress)
+            .set(ITEM_TABLE.ITEM_NAME, item.itemName)
+            .set(ITEM_TABLE.ASSET_AMOUNT, item.assetAmount)
+            .where(ITEM_TABLE.ID.eq(item.id))
             .execute()
-        dslContext.update(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE)
-            .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.UPDATED_AT, updatedAt)
+        dslContext.update(TEMPLATE_TABLE)
+            .set(TEMPLATE_TABLE.UPDATED_AT, updatedAt)
             .execute()
         return getById(item.templateId)
     }
 
     override fun deleteItem(id: UUID, itemId: UUID, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>? {
         logger.info { "Delete multi-payment template item, id: $id" }
-        dslContext.deleteFrom(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM)
-            .where(MultiPaymentTemplateItemTable.MULTI_PAYMENT_TEMPLATE_ITEM.TEMPLATE_ID.eq(id))
+        dslContext.deleteFrom(ITEM_TABLE)
+            .where(ITEM_TABLE.TEMPLATE_ID.eq(id))
             .execute()
-        dslContext.update(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE)
-            .set(MultiPaymentTemplateTable.MULTI_PAYMENT_TEMPLATE.UPDATED_AT, updatedAt)
+        dslContext.update(TEMPLATE_TABLE)
+            .set(TEMPLATE_TABLE.UPDATED_AT, updatedAt)
             .execute()
         return getById(id)
     }

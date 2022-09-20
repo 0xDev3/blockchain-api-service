@@ -32,7 +32,10 @@ class JooqContractDeploymentRequestRepository(
     private val dslContext: DSLContext
 ) : ContractDeploymentRequestRepository {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val CONTRACT_DEPLOYMENT_REQUEST_TABLE = ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST
+        private val CONTRACT_METADATA_TABLE = ContractMetadataTable.CONTRACT_METADATA
+    }
 
     override fun store(params: StoreContractDeploymentRequestParams): ContractDeploymentRequest {
         logger.info { "Store contract deployment request, params: $params" }
@@ -55,17 +58,15 @@ class JooqContractDeploymentRequestRepository(
             txHash = null,
             imported = params.imported
         )
-        val selectContractMetadataId = DSL.select(ContractMetadataTable.CONTRACT_METADATA.ID)
-            .from(ContractMetadataTable.CONTRACT_METADATA)
-            .where(ContractMetadataTable.CONTRACT_METADATA.CONTRACT_ID.eq(params.contractId))
+        val selectContractMetadataId = DSL.select(CONTRACT_METADATA_TABLE.ID)
+            .from(CONTRACT_METADATA_TABLE)
+            .where(CONTRACT_METADATA_TABLE.CONTRACT_ID.eq(params.contractId))
 
         try {
-            dslContext.insertInto(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
+            dslContext.insertInto(CONTRACT_DEPLOYMENT_REQUEST_TABLE)
                 .set(record)
-                .set(
-                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_METADATA_ID,
-                    selectContractMetadataId
-                ).execute()
+                .set(CONTRACT_DEPLOYMENT_REQUEST_TABLE.CONTRACT_METADATA_ID, selectContractMetadataId)
+                .execute()
         } catch (e: DuplicateKeyException) {
             throw AliasAlreadyInUseException(params.alias)
         }
@@ -76,7 +77,7 @@ class JooqContractDeploymentRequestRepository(
     override fun getById(id: UUID): ContractDeploymentRequest? {
         logger.debug { "Get contract deployment request by id: $id" }
         return dslContext.selectWithJoin()
-            .where(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.ID.eq(id))
+            .where(CONTRACT_DEPLOYMENT_REQUEST_TABLE.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
@@ -85,8 +86,8 @@ class JooqContractDeploymentRequestRepository(
         return dslContext.selectWithJoin()
             .where(
                 DSL.and(
-                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.ALIAS.eq(alias),
-                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.PROJECT_ID.eq(projectId)
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.ALIAS.eq(alias),
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.PROJECT_ID.eq(projectId)
                 )
             )
             .fetchOne { it.toModel() }
@@ -99,33 +100,31 @@ class JooqContractDeploymentRequestRepository(
         logger.debug { "Get contract deployment requests by projectId: $projectId, filters: $filters" }
 
         val conditions = listOfNotNull(
-            ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.PROJECT_ID.eq(projectId),
+            CONTRACT_DEPLOYMENT_REQUEST_TABLE.PROJECT_ID.eq(projectId),
             filters.contractIds.orCondition(),
             filters.contractTags.orAndCondition { it.contractTagsAndCondition() },
             filters.contractImplements.orAndCondition { it.contractTraitsAndCondition() },
-            filters.deployedOnly.takeIf { it }?.let {
-                ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.TX_HASH.isNotNull()
-            }
+            filters.deployedOnly.takeIf { it }?.let { CONTRACT_DEPLOYMENT_REQUEST_TABLE.TX_HASH.isNotNull() }
         )
 
         return dslContext.selectWithJoin()
             .where(conditions)
-            .orderBy(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CREATED_AT.asc())
+            .orderBy(CONTRACT_DEPLOYMENT_REQUEST_TABLE.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
     override fun setTxInfo(id: UUID, txHash: TransactionHash, deployer: WalletAddress): Boolean {
         logger.info { "Set txInfo for contract deployment request, id: $id, txHash: $txHash, deployer: $deployer" }
-        return dslContext.update(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
-            .set(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.TX_HASH, txHash)
+        return dslContext.update(CONTRACT_DEPLOYMENT_REQUEST_TABLE)
+            .set(CONTRACT_DEPLOYMENT_REQUEST_TABLE.TX_HASH, txHash)
             .set(
-                ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.DEPLOYER_ADDRESS,
-                coalesce(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.DEPLOYER_ADDRESS, deployer)
+                CONTRACT_DEPLOYMENT_REQUEST_TABLE.DEPLOYER_ADDRESS,
+                coalesce(CONTRACT_DEPLOYMENT_REQUEST_TABLE.DEPLOYER_ADDRESS, deployer)
             )
             .where(
                 DSL.and(
-                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.ID.eq(id),
-                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.TX_HASH.isNull()
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.ID.eq(id),
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.TX_HASH.isNull()
                 )
             )
             .execute() > 0
@@ -135,20 +134,20 @@ class JooqContractDeploymentRequestRepository(
         logger.info {
             "Set contract address for contract deployment request, id: $id, contractAddress: $contractAddress"
         }
-        return dslContext.update(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
-            .set(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_ADDRESS, contractAddress)
+        return dslContext.update(CONTRACT_DEPLOYMENT_REQUEST_TABLE)
+            .set(CONTRACT_DEPLOYMENT_REQUEST_TABLE.CONTRACT_ADDRESS, contractAddress)
             .where(
                 DSL.and(
-                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.ID.eq(id),
-                    ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_ADDRESS.isNull()
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.ID.eq(id),
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.CONTRACT_ADDRESS.isNull()
                 )
             )
             .execute() > 0
     }
 
     private fun Record.toModel(): ContractDeploymentRequest {
-        val requestRecord = this.into(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
-        val metadataRecord = this.into(ContractMetadataTable.CONTRACT_METADATA)
+        val requestRecord = this.into(CONTRACT_DEPLOYMENT_REQUEST_TABLE)
+        val metadataRecord = this.into(CONTRACT_METADATA_TABLE)
 
         return ContractDeploymentRequest(
             id = requestRecord.id!!,
@@ -178,28 +177,23 @@ class JooqContractDeploymentRequestRepository(
     }
 
     private fun DSLContext.selectWithJoin() = select()
-        .from(ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST)
-        .join(ContractMetadataTable.CONTRACT_METADATA)
-        .on(
-            ContractDeploymentRequestTable.CONTRACT_DEPLOYMENT_REQUEST.CONTRACT_METADATA_ID
-                .eq(ContractMetadataTable.CONTRACT_METADATA.ID)
-        )
+        .from(CONTRACT_DEPLOYMENT_REQUEST_TABLE)
+        .join(CONTRACT_METADATA_TABLE)
+        .on(CONTRACT_DEPLOYMENT_REQUEST_TABLE.CONTRACT_METADATA_ID.eq(CONTRACT_METADATA_TABLE.ID))
 
     private fun OrList<ContractId>.orCondition(): Condition? =
-        takeIf { list.isNotEmpty() }?.let {
-            ContractMetadataTable.CONTRACT_METADATA.CONTRACT_ID.`in`(it.list)
-        }
+        takeIf { list.isNotEmpty() }?.let { CONTRACT_METADATA_TABLE.CONTRACT_ID.`in`(it.list) }
 
     private fun AndList<ContractTag>.contractTagsAndCondition(): Condition? =
         takeIf { list.isNotEmpty() }?.let {
-            ContractMetadataTable.CONTRACT_METADATA.CONTRACT_TAGS.contains(
+            CONTRACT_METADATA_TABLE.CONTRACT_TAGS.contains(
                 it.list.map { v -> v.value }.toTypedArray()
             )
         }
 
     private fun AndList<ContractTrait>.contractTraitsAndCondition(): Condition? =
         takeIf { list.isNotEmpty() }?.let {
-            ContractMetadataTable.CONTRACT_METADATA.CONTRACT_IMPLEMENTS.contains(
+            CONTRACT_METADATA_TABLE.CONTRACT_IMPLEMENTS.contains(
                 it.list.map { v -> v.value }.toTypedArray()
             )
         }

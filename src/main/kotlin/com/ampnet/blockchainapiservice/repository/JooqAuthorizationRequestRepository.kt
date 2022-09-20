@@ -1,11 +1,11 @@
 package com.ampnet.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IAssetBalanceRequestRecord
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AssetBalanceRequestRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IAuthorizationRequestRecord
+import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AuthorizationRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.params.StoreAssetBalanceRequestParams
-import com.ampnet.blockchainapiservice.model.result.AssetBalanceRequest
+import com.ampnet.blockchainapiservice.model.params.StoreAuthorizationRequestParams
+import com.ampnet.blockchainapiservice.model.result.AuthorizationRequest
 import com.ampnet.blockchainapiservice.util.SignedMessage
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
@@ -15,21 +15,18 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : AssetBalanceRequestRepository {
+class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : AuthorizationRequestRepository {
 
     companion object : KLogging() {
-        private val TABLE = AssetBalanceRequestTable.ASSET_BALANCE_REQUEST
+        private val TABLE = AuthorizationRequestTable.AUTHORIZATION_REQUEST
     }
 
-    override fun store(params: StoreAssetBalanceRequestParams): AssetBalanceRequest {
-        logger.info { "Store asset balance request, params: $params" }
-        val record = AssetBalanceRequestRecord(
+    override fun store(params: StoreAuthorizationRequestParams): AuthorizationRequest {
+        logger.info { "Store authorization request, params: $params" }
+        val record = AuthorizationRequestRecord(
             id = params.id,
             projectId = params.projectId,
-            chainId = params.chainId,
             redirectUrl = params.redirectUrl,
-            tokenAddress = params.tokenAddress,
-            blockNumber = params.blockNumber,
             requestedWalletAddress = params.requestedWalletAddress,
             arbitraryData = params.arbitraryData,
             screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
@@ -42,15 +39,15 @@ class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : As
         return record.toModel()
     }
 
-    override fun getById(id: UUID): AssetBalanceRequest? {
-        logger.debug { "Get asset balance request by id: $id" }
+    override fun getById(id: UUID): AuthorizationRequest? {
+        logger.debug { "Get authorization request by id: $id" }
         return dslContext.selectFrom(TABLE)
             .where(TABLE.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
-    override fun getAllByProjectId(projectId: UUID): List<AssetBalanceRequest> {
-        logger.debug { "Get asset balance requests filtered by projectId: $projectId" }
+    override fun getAllByProjectId(projectId: UUID): List<AuthorizationRequest> {
+        logger.debug { "Get authorization requests filtered by projectId: $projectId" }
         return dslContext.selectFrom(TABLE)
             .where(TABLE.PROJECT_ID.eq(projectId))
             .orderBy(TABLE.CREATED_AT.asc())
@@ -59,7 +56,7 @@ class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : As
 
     override fun setSignedMessage(id: UUID, walletAddress: WalletAddress, signedMessage: SignedMessage): Boolean {
         logger.info {
-            "Set walletAddress and signedMessage for asset balance request, id: $id, walletAddress: $walletAddress," +
+            "Set walletAddress and signedMessage for authorization request, id: $id, walletAddress: $walletAddress," +
                 " signedMessage: $signedMessage"
         }
         return dslContext.update(TABLE)
@@ -75,14 +72,11 @@ class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : As
             .execute() > 0
     }
 
-    private fun IAssetBalanceRequestRecord.toModel(): AssetBalanceRequest =
-        AssetBalanceRequest(
+    private fun IAuthorizationRequestRecord.toModel(): AuthorizationRequest =
+        AuthorizationRequest(
             id = id!!,
             projectId = projectId!!,
-            chainId = chainId!!,
             redirectUrl = redirectUrl!!,
-            tokenAddress = tokenAddress,
-            blockNumber = blockNumber,
             requestedWalletAddress = requestedWalletAddress,
             actualWalletAddress = actualWalletAddress,
             signedMessage = signedMessage,

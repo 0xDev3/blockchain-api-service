@@ -13,7 +13,9 @@ import java.util.UUID
 @Repository
 class JooqContractMetadataRepository(private val dslContext: DSLContext) : ContractMetadataRepository {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val TABLE = ContractMetadataTable.CONTRACT_METADATA
+    }
 
     override fun createOrUpdate(
         id: UUID,
@@ -30,7 +32,7 @@ class JooqContractMetadataRepository(private val dslContext: DSLContext) : Contr
         val tags: Array<String?> = contractTags.map { it.value }.toTypedArray()
         val implements: Array<String?> = contractImplements.map { it.value }.toTypedArray()
 
-        return dslContext.insertInto(ContractMetadataTable.CONTRACT_METADATA)
+        return dslContext.insertInto(TABLE)
             .set(
                 ContractMetadataRecord(
                     id = id,
@@ -41,18 +43,15 @@ class JooqContractMetadataRepository(private val dslContext: DSLContext) : Contr
                     contractImplements = implements
                 )
             )
-            .onConflict(ContractMetadataTable.CONTRACT_METADATA.CONTRACT_ID)
+            .onConflict(TABLE.CONTRACT_ID)
             .doUpdate()
-            .set(ContractMetadataTable.CONTRACT_METADATA.CONTRACT_TAGS, tags)
-            .set(ContractMetadataTable.CONTRACT_METADATA.CONTRACT_IMPLEMENTS, implements)
+            .set(TABLE.CONTRACT_TAGS, tags)
+            .set(TABLE.CONTRACT_IMPLEMENTS, implements)
             .execute() > 0
     }
 
     override fun exists(contractId: ContractId): Boolean {
         logger.debug { "Check if contract metadata exists: $contractId" }
-        return dslContext.fetchExists(
-            ContractMetadataTable.CONTRACT_METADATA,
-            ContractMetadataTable.CONTRACT_METADATA.CONTRACT_ID.eq(contractId)
-        )
+        return dslContext.fetchExists(TABLE, TABLE.CONTRACT_ID.eq(contractId))
     }
 }
