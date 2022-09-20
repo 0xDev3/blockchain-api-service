@@ -21,7 +21,9 @@ class JooqContractFunctionCallRequestRepository(
     private val dslContext: DSLContext
 ) : ContractFunctionCallRequestRepository {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private val TABLE = ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST
+    }
 
     override fun store(params: StoreContractFunctionCallRequestParams): ContractFunctionCallRequest {
         logger.info { "Store contract function call request, params: $params" }
@@ -48,8 +50,8 @@ class JooqContractFunctionCallRequestRepository(
 
     override fun getById(id: UUID): ContractFunctionCallRequest? {
         logger.debug { "Get contract function call request by id: $id" }
-        return dslContext.selectFrom(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST)
-            .where(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.ID.eq(id))
+        return dslContext.selectFrom(TABLE)
+            .where(TABLE.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
@@ -60,33 +62,26 @@ class JooqContractFunctionCallRequestRepository(
         logger.debug { "Get contract function call requests by projectId: $projectId, filters: $filters" }
 
         val conditions = listOfNotNull(
-            ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.PROJECT_ID.eq(projectId),
-            filters.deployedContractId?.let {
-                ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.DEPLOYED_CONTRACT_ID.eq(it)
-            },
-            filters.contractAddress?.let {
-                ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.CONTRACT_ADDRESS.eq(it)
-            },
+            TABLE.PROJECT_ID.eq(projectId),
+            filters.deployedContractId?.let { TABLE.DEPLOYED_CONTRACT_ID.eq(it) },
+            filters.contractAddress?.let { TABLE.CONTRACT_ADDRESS.eq(it) },
         )
 
-        return dslContext.selectFrom(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST)
+        return dslContext.selectFrom(TABLE)
             .where(conditions)
-            .orderBy(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.CREATED_AT.asc())
+            .orderBy(TABLE.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
     override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
         logger.info { "Set txInfo for contract function call request, id: $id, txHash: $txHash, caller: $caller" }
-        return dslContext.update(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST)
-            .set(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.TX_HASH, txHash)
-            .set(
-                ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.CALLER_ADDRESS,
-                coalesce(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.CALLER_ADDRESS, caller)
-            )
+        return dslContext.update(TABLE)
+            .set(TABLE.TX_HASH, txHash)
+            .set(TABLE.CALLER_ADDRESS, coalesce(TABLE.CALLER_ADDRESS, caller))
             .where(
                 DSL.and(
-                    ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.ID.eq(id),
-                    ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST.TX_HASH.isNull()
+                    TABLE.ID.eq(id),
+                    TABLE.TX_HASH.isNull()
                 )
             )
             .execute() > 0

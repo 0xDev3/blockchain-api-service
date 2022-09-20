@@ -4,6 +4,7 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.AddressBookTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
+import com.ampnet.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
@@ -28,6 +29,7 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
 
     fun cleanAllDatabaseTables(dslContext: DSLContext) {
         dslContext.deleteFrom(AddressBookTable.ADDRESS_BOOK).execute()
+        dslContext.deleteFrom(AuthorizationRequestTable.AUTHORIZATION_REQUEST).execute()
         dslContext.deleteFrom(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST).execute()
         dslContext.deleteFrom(AssetSendRequestTable.ASSET_SEND_REQUEST).execute()
         dslContext.deleteFrom(ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST).execute()
