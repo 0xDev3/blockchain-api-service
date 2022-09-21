@@ -131,7 +131,8 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                 contractAddress = CONTRACT_ADDRESS,
                 deployerAddress = CALLER_ADDRESS,
                 txHash = TX_HASH,
-                imported = false
+                imported = false,
+                deleted = false
             )
         )
     }

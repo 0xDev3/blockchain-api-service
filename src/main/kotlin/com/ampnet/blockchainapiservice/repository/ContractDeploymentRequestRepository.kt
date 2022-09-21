@@ -10,6 +10,7 @@ import java.util.UUID
 
 interface ContractDeploymentRequestRepository {
     fun store(params: StoreContractDeploymentRequestParams): ContractDeploymentRequest
+    fun markAsDeleted(id: UUID): Boolean
     fun getById(id: UUID): ContractDeploymentRequest?
     fun getByAliasAndProjectId(alias: String, projectId: UUID): ContractDeploymentRequest?
     fun getAllByProjectId(projectId: UUID, filters: ContractDeploymentRequestFilters): List<ContractDeploymentRequest>
