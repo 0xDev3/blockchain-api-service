@@ -56,7 +56,8 @@ class JooqContractDeploymentRequestRepository(
             contractAddress = null,
             deployerAddress = params.deployerAddress,
             txHash = null,
-            imported = params.imported
+            imported = params.imported,
+            deleted = false
         )
         val selectContractMetadataId = DSL.select(CONTRACT_METADATA_TABLE.ID)
             .from(CONTRACT_METADATA_TABLE)
@@ -74,10 +75,28 @@ class JooqContractDeploymentRequestRepository(
         return getById(params.id)!!
     }
 
+    override fun markAsDeleted(id: UUID): Boolean {
+        logger.info { "Marking contract deployment request as deleted, id: $id" }
+        return dslContext.update(CONTRACT_DEPLOYMENT_REQUEST_TABLE)
+            .set(CONTRACT_DEPLOYMENT_REQUEST_TABLE.DELETED, true)
+            .where(
+                DSL.and(
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.ID.eq(id),
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.DELETED.eq(false)
+                )
+            )
+            .execute() > 0
+    }
+
     override fun getById(id: UUID): ContractDeploymentRequest? {
         logger.debug { "Get contract deployment request by id: $id" }
         return dslContext.selectWithJoin()
-            .where(CONTRACT_DEPLOYMENT_REQUEST_TABLE.ID.eq(id))
+            .where(
+                DSL.and(
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.ID.eq(id),
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.DELETED.eq(false)
+                )
+            )
             .fetchOne { it.toModel() }
     }
 
@@ -87,7 +106,8 @@ class JooqContractDeploymentRequestRepository(
             .where(
                 DSL.and(
                     CONTRACT_DEPLOYMENT_REQUEST_TABLE.ALIAS.eq(alias),
-                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.PROJECT_ID.eq(projectId)
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.PROJECT_ID.eq(projectId),
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.DELETED.eq(false)
                 )
             )
             .fetchOne { it.toModel() }
@@ -101,6 +121,7 @@ class JooqContractDeploymentRequestRepository(
 
         val conditions = listOfNotNull(
             CONTRACT_DEPLOYMENT_REQUEST_TABLE.PROJECT_ID.eq(projectId),
+            CONTRACT_DEPLOYMENT_REQUEST_TABLE.DELETED.eq(false),
             filters.contractIds.orCondition(),
             filters.contractTags.orAndCondition { it.contractTagsAndCondition() },
             filters.contractImplements.orAndCondition { it.contractTraitsAndCondition() },
@@ -124,7 +145,8 @@ class JooqContractDeploymentRequestRepository(
             .where(
                 DSL.and(
                     CONTRACT_DEPLOYMENT_REQUEST_TABLE.ID.eq(id),
-                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.TX_HASH.isNull()
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.TX_HASH.isNull(),
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.DELETED.eq(false)
                 )
             )
             .execute() > 0
@@ -139,7 +161,8 @@ class JooqContractDeploymentRequestRepository(
             .where(
                 DSL.and(
                     CONTRACT_DEPLOYMENT_REQUEST_TABLE.ID.eq(id),
-                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.CONTRACT_ADDRESS.isNull()
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.CONTRACT_ADDRESS.isNull(),
+                    CONTRACT_DEPLOYMENT_REQUEST_TABLE.DELETED.eq(false)
                 )
             )
             .execute() > 0

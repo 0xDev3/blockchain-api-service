@@ -15,6 +15,8 @@ interface ContractDeploymentRequestService {
         project: Project
     ): ContractDeploymentRequest
 
+    fun markContractDeploymentRequestAsDeleted(id: UUID, projectId: UUID)
+
     fun getContractDeploymentRequest(id: UUID): WithTransactionData<ContractDeploymentRequest>
     fun getContractDeploymentRequestsByProjectIdAndFilters(
         projectId: UUID,
