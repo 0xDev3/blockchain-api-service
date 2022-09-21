@@ -69,6 +69,14 @@ class ContractDeploymentRequestServiceImpl(
         return contractDeploymentRequestRepository.store(databaseParams)
     }
 
+    override fun markContractDeploymentRequestAsDeleted(id: UUID, projectId: UUID) {
+        logger.info { "Mark contract deployment request as deleted by id: $id, projectId: $projectId" }
+        ethCommonService.fetchResource(
+            contractDeploymentRequestRepository.getById(id)?.takeIf { it.projectId == projectId },
+            "Contract deployment request not found for ID: $id"
+        ).let { contractDeploymentRequestRepository.markAsDeleted(it.id) }
+    }
+
     override fun getContractDeploymentRequest(id: UUID): WithTransactionData<ContractDeploymentRequest> {
         logger.debug { "Fetching contract deployment request, id: $id" }
 

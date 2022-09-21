@@ -498,6 +498,34 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyMarkContractDeploymentRequestAsDeletedById() {
+        val id = UUID.randomUUID()
+        val metadata = createMetadataRecord()
+        val record = createRecord(id, metadata)
+
+        suppose("some contract deployment request exists in database") {
+            dslContext.executeInsert(metadata)
+            dslContext.executeInsert(record)
+        }
+
+        verify("contract deployment request is correctly fetched by ID") {
+            assertThat(repository.getById(id)).withMessage()
+                .isEqualTo(record.toModel(metadata))
+        }
+
+        val deletionResult = suppose("contract deployment request is marked as deleted") {
+            repository.markAsDeleted(id)
+        }
+
+        verify("contract deployment request was successfully marked as deleted in the database") {
+            assertThat(deletionResult).withMessage()
+                .isTrue()
+            assertThat(repository.getById(id)).withMessage()
+                .isNull()
+        }
+    }
+
+    @Test
     fun mustCorrectlySetTxInfoForContractDeploymentRequestWithNullTxHash() {
         suppose("some contract metadata is in database") {
             dslContext.executeInsert(
@@ -926,7 +954,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         contractAddress = contractAddress,
         deployerAddress = deployerAddress,
         txHash = txHash,
-        imported = false
+        imported = false,
+        deleted = false
     )
 
     private fun ContractDeploymentRequestRecord.toModel(metadata: ContractMetadataRecord) =
