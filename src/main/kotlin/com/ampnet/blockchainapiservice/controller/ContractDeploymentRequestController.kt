@@ -19,6 +19,7 @@ import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -43,6 +44,14 @@ class ContractDeploymentRequestController(
         val params = CreateContractDeploymentRequestParams(requestBody)
         val createdRequest = contractDeploymentRequestService.createContractDeploymentRequest(params, project)
         return ResponseEntity.ok(ContractDeploymentRequestResponse(createdRequest))
+    }
+
+    @DeleteMapping("/v1/deploy/{id}")
+    fun markContractDeploymentRequestAsDeleted(
+        @ApiKeyBinding project: Project,
+        @PathVariable("id") id: UUID
+    ) {
+        contractDeploymentRequestService.markContractDeploymentRequestAsDeleted(id, project.id)
     }
 
     @GetMapping("/v1/deploy/{id}")

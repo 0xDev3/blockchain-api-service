@@ -256,6 +256,105 @@ class ContractDeploymentRequestServiceTest : TestBase() {
     }
 
     @Test
+    fun mustSuccessfullyMarkContractDeploymentRequestAsDeleted() {
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("contract deployment request exists in database") {
+            given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+        }
+
+        val service = ContractDeploymentRequestServiceImpl(
+            functionEncoderService = mock(),
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = mock(),
+            contractDecoratorRepository = mock(),
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = mock()
+            ),
+            projectRepository = mock()
+        )
+
+        verify("contract deployment request is successfully marked as deleted") {
+            service.markContractDeploymentRequestAsDeleted(ID, STORED_REQUEST.projectId)
+
+            verifyMock(contractDeploymentRequestRepository)
+                .getById(ID)
+            verifyMock(contractDeploymentRequestRepository)
+                .markAsDeleted(ID)
+            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+        }
+    }
+
+    @Test
+    fun mustThrowResourceNotFoundExceptionWhenMarkingNonOwnedContractDeploymentRequestAsDeleted() {
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("contract deployment request exists in database") {
+            given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(STORED_REQUEST)
+        }
+
+        val service = ContractDeploymentRequestServiceImpl(
+            functionEncoderService = mock(),
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = mock(),
+            contractDecoratorRepository = mock(),
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = mock()
+            ),
+            projectRepository = mock()
+        )
+
+        verify("contract deployment request is successfully marked as deleted") {
+            assertThrows<ResourceNotFoundException>(message) {
+                service.markContractDeploymentRequestAsDeleted(ID, UUID.randomUUID())
+            }
+
+            verifyMock(contractDeploymentRequestRepository)
+                .getById(ID)
+            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+        }
+    }
+
+    @Test
+    fun mustThrowResourceNotFoundExceptionWhenMarkingNonExistentContractDeploymentRequestAsDeleted() {
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("contract deployment request exists in database") {
+            given(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(null)
+        }
+
+        val service = ContractDeploymentRequestServiceImpl(
+            functionEncoderService = mock(),
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = mock(),
+            contractDecoratorRepository = mock(),
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = mock()
+            ),
+            projectRepository = mock()
+        )
+
+        verify("contract deployment request is successfully marked as deleted") {
+            assertThrows<ResourceNotFoundException>(message) {
+                service.markContractDeploymentRequestAsDeleted(ID, STORED_REQUEST.projectId)
+            }
+
+            verifyMock(contractDeploymentRequestRepository)
+                .getById(ID)
+            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+        }
+    }
+
+    @Test
     fun mustThrowResourceNotFoundExceptionForNonExistentContractDeploymentRequest() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 

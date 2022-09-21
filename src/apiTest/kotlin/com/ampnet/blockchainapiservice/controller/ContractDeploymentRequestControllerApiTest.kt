@@ -518,6 +518,174 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
     }
 
     @Test
+    fun mustCorrectlyDeleteContractDeploymentRequestById() {
+        val alias = "alias"
+        val ownerAddress = WalletAddress("a")
+        val mainAccount = accounts[0]
+        val deployerAddress = WalletAddress(mainAccount.address)
+        val initialEthAmount = Balance.ZERO
+
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
+        val createResponse = suppose("request to create contract deployment request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/deploy")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_id": "${CONTRACT_DECORATOR.id.value}",
+                                "constructor_params": $paramsJson,
+                                "deployer_address": "${deployerAddress.rawValue}",
+                                "initial_eth_amount": "${initialEthAmount.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(
+                createResponse.response.contentAsString,
+                ContractDeploymentRequestResponse::class.java
+            )
+        }
+
+        verify("contract deployment request exists in the database") {
+            assertThat(contractDeploymentRequestRepository.getById(createResponse.id))
+                .isNotNull()
+        }
+
+        suppose("request to delete contract deployment request is made") {
+            mockMvc.perform(
+                MockMvcRequestBuilders.delete("/v1/deploy/${createResponse.id}")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+        }
+
+        verify("contract deployment request does not exist in the database") {
+            assertThat(contractDeploymentRequestRepository.getById(createResponse.id))
+                .isNull()
+        }
+    }
+
+    @Test
+    fun mustReturn404NotFoundWhenDeletingNonOwnedContractDeploymentRequestById() {
+        val alias = "alias"
+        val ownerAddress = WalletAddress("a")
+        val mainAccount = accounts[0]
+        val deployerAddress = WalletAddress(mainAccount.address)
+        val initialEthAmount = Balance.ZERO
+
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
+        val createResponse = suppose("request to create contract deployment request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/deploy")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_id": "${CONTRACT_DECORATOR.id.value}",
+                                "constructor_params": $paramsJson,
+                                "deployer_address": "${deployerAddress.rawValue}",
+                                "initial_eth_amount": "${initialEthAmount.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(
+                createResponse.response.contentAsString,
+                ContractDeploymentRequestResponse::class.java
+            )
+        }
+
+        verify("contract deployment request exists in the database") {
+            assertThat(contractDeploymentRequestRepository.getById(createResponse.id))
+                .isNotNull()
+        }
+
+        val (_, _, apiKey) = insertProjectWithCustomRpcUrl()
+
+        verify("404 is returned for non-existent contract deployment request") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/v1/deploy/${createResponse.id}")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+            )
+                .andExpect(MockMvcResultMatchers.status().isNotFound)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+        }
+
+        verify("contract deployment request still exists in the database") {
+            assertThat(contractDeploymentRequestRepository.getById(createResponse.id))
+                .isNotNull()
+        }
+    }
+
+    @Test
+    fun mustReturn404NotFoundWhenDeletingNonExistentContractDeploymentRequestById() {
+        verify("404 is returned for non-existent contract deployment request") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/v1/deploy/${UUID.randomUUID()}")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+            )
+                .andExpect(MockMvcResultMatchers.status().isNotFound)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+        }
+    }
+
+    @Test
     fun mustCorrectlyFetchContractDeploymentRequestById() {
         val alias = "alias"
         val ownerAddress = WalletAddress("a")

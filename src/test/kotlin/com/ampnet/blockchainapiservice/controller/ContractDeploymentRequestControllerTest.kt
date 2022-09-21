@@ -155,6 +155,30 @@ class ContractDeploymentRequestControllerTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyMarkContractDeploymentRequestAsDeleted() {
+        val id = UUID.randomUUID()
+        val project = Project(
+            id = UUID.randomUUID(),
+            ownerId = UUID.randomUUID(),
+            issuerContractAddress = ContractAddress("b"),
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
+            chainId = ChainId(1337L),
+            customRpcUrl = "custom-rpc-url",
+            createdAt = TestData.TIMESTAMP
+        )
+        val service = mock<ContractDeploymentRequestService>()
+
+        val controller = ContractDeploymentRequestController(service)
+
+        verify("correct service call is made") {
+            controller.markContractDeploymentRequestAsDeleted(project, id)
+
+            verifyMock(service)
+                .markContractDeploymentRequestAsDeleted(id, project.id)
+        }
+    }
+
+    @Test
     fun mustCorrectlyFetchContractDeploymentRequest() {
         val id = UUID.randomUUID()
         val service = mock<ContractDeploymentRequestService>()
