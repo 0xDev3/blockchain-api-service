@@ -33,7 +33,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         val requestWithTooLongAlias = suppose("request with too long alias is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH + 1),
-                address = "",
+                address = "0",
                 phoneNumber = null,
                 email = null
             )
@@ -56,7 +56,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         val requestWithTooShortAlias = suppose("request with too short alias is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a",
-                address = "",
+                address = "0",
                 phoneNumber = null,
                 email = null
             )
@@ -79,7 +79,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         val requestWithInvalidAlias = suppose("request with invalid alias is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a&%?",
-                address = "",
+                address = "0",
                 phoneNumber = null,
                 email = null
             )
@@ -102,7 +102,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         val requestWithValidAlias = suppose("request with valid alias is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a-b_3.1/",
-                address = "",
+                address = "0",
                 phoneNumber = null,
                 email = null
             )
@@ -117,37 +117,37 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
     }
 
     @Test
-    fun mustNotAllowTooLongStringForAddress() {
-        val requestWithTooLongString = suppose("request with too long string is created") {
+    fun mustNotAllowInvalidAddress() {
+        val requestWithInvalidAddress = suppose("request with invalid address is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a-b_3.1",
-                address = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH + 1),
+                address = "invalid",
                 phoneNumber = null,
                 email = null
             )
         }
 
-        verify("request with too long string is marked as invalid") {
-            val violations = validator.validate(requestWithTooLongString).toList()
+        verify("request with invalid address is marked as invalid") {
+            val violations = validator.validate(requestWithInvalidAddress).toList()
 
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("value must be a valid Ethereum address")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("address")
         }
 
-        val requestWithValidLengthString = suppose("request with valid length string is created") {
+        val requestWithValidLengthString = suppose("request with valid address is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a-b_3.1",
-                address = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH),
+                address = "a",
                 phoneNumber = null,
                 email = null
             )
         }
 
-        verify("request with valid length string is marked as valid") {
+        verify("request with valid address is marked as valid") {
             val violations = validator.validate(requestWithValidLengthString).toList()
 
             assertThat(violations).withMessage()
@@ -160,7 +160,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         val requestWithTooLongString = suppose("request with too long string is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a-b_3.1",
-                address = "",
+                address = "0",
                 phoneNumber = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH + 1),
                 email = null
             )
@@ -180,7 +180,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         val requestWithValidLengthString = suppose("request with valid length string is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a-b_3.1",
-                address = "",
+                address = "0",
                 phoneNumber = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH),
                 email = null
             )
@@ -199,7 +199,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         val requestWithTooLongString = suppose("request with too long string is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a-b_3.1",
-                address = "",
+                address = "0",
                 phoneNumber = null,
                 email = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH + 1)
             )
@@ -219,7 +219,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         val requestWithValidLengthString = suppose("request with valid length string is created") {
             CreateOrUpdateAddressBookEntryRequest(
                 alias = "a-b_3.1",
-                address = "",
+                address = "0",
                 phoneNumber = null,
                 email = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH)
             )
