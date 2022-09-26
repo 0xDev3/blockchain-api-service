@@ -21,6 +21,11 @@ class ApplicationProperties {
     val chainMoonriver = ChainProperties()
     val chainAvalanche = ChainProperties()
     val chainAurora = ChainProperties()
+    val chainArbitrum = ChainProperties()
+    val chainOptimism = ChainProperties()
+    val chainCelo = ChainProperties()
+    val chainParaTime = ChainProperties()
+    val chainMoonbeam = ChainProperties()
     var infuraId: String = ""
     val contractDecorators = ContractDecoratorProperties()
     val metaPixelProperties = MetaPixelProperties()
