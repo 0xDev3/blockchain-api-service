@@ -9,7 +9,7 @@ import com.ampnet.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface ContractDeploymentRequestRepository {
-    fun store(params: StoreContractDeploymentRequestParams): ContractDeploymentRequest
+    fun store(params: StoreContractDeploymentRequestParams, metadataProjectId: UUID): ContractDeploymentRequest
     fun markAsDeleted(id: UUID): Boolean
     fun getById(id: UUID): ContractDeploymentRequest?
     fun getByAliasAndProjectId(alias: String, projectId: UUID): ContractDeploymentRequest?

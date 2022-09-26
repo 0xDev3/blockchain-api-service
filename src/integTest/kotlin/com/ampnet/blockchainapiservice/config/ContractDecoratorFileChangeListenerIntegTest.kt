@@ -11,6 +11,7 @@ import com.ampnet.blockchainapiservice.repository.InMemoryContractDecoratorRepos
 import com.ampnet.blockchainapiservice.repository.JooqContractMetadataRepository
 import com.ampnet.blockchainapiservice.service.RandomUuidProvider
 import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
@@ -246,16 +247,16 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         }
 
         verify("correct contract metadata exists in the database") {
-            assertThat(contractMetadataRepository.exists(dummyContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID)).withMessage()
                 .isTrue()
-            assertThat(contractMetadataRepository.exists(anotherContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID)).withMessage()
                 .isTrue()
 
-            assertThat(contractMetadataRepository.exists(contractWithoutArtifactId)).withMessage()
+            assertThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID)).withMessage()
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(contractWithoutManifestId)).withMessage()
+            assertThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID)).withMessage()
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(ignoredContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID)).withMessage()
                 .isFalse()
         }
     }
@@ -368,16 +369,16 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         }
 
         verify("correct contract metadata exists in the database") {
-            assertThat(contractMetadataRepository.exists(dummyContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID)).withMessage()
                 .isTrue()
-            assertThat(contractMetadataRepository.exists(anotherContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID)).withMessage()
                 .isTrue()
 
-            assertThat(contractMetadataRepository.exists(contractWithoutArtifactId)).withMessage()
+            assertThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID)).withMessage()
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(contractWithoutManifestId)).withMessage()
+            assertThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID)).withMessage()
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(ignoredContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID)).withMessage()
                 .isFalse()
         }
     }
@@ -420,17 +421,23 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         }
 
         verify("correct contract metadata exists in the database") {
-            assertThat(contractMetadataRepository.exists(unparsableArtifactContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(unparsableArtifactContractId, Constants.NIL_UUID))
+                .withMessage()
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(unparsableManifestContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(unparsableManifestContractId, Constants.NIL_UUID))
+                .withMessage()
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(missingConstructorSignatureContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(missingConstructorSignatureContractId, Constants.NIL_UUID))
+                .withMessage()
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(missingEventNameContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(missingEventNameContractId, Constants.NIL_UUID))
+                .withMessage()
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(missingFunctionNameContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(missingFunctionNameContractId, Constants.NIL_UUID))
+                .withMessage()
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(missingFunctionOutputsContractId)).withMessage()
+            assertThat(contractMetadataRepository.exists(missingFunctionOutputsContractId, Constants.NIL_UUID))
+                .withMessage()
                 .isFalse()
         }
     }

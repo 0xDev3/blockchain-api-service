@@ -36,7 +36,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.jooq.JSON
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.description
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoMoreInteractions

@@ -4,9 +4,11 @@ import com.ampnet.blockchainapiservice.model.json.ArtifactJson
 import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator.Companion.ContractDecoratorException
+import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.service.UuidProvider
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.fasterxml.jackson.databind.DatabindException
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -89,12 +91,15 @@ class ContractDecoratorFileChangeListener(
                 contractDecoratorRepository.store(decorator.id, artifactJson)
                 contractDecoratorRepository.store(decorator.id, infoMarkdown)
                 contractMetadataRepository.createOrUpdate(
-                    id = uuidProvider.getUuid(),
-                    name = decorator.name,
-                    description = decorator.description,
-                    contractId = decorator.id,
-                    contractTags = decorator.tags,
-                    contractImplements = decorator.implements
+                    ContractMetadata(
+                        id = uuidProvider.getUuid(),
+                        name = decorator.name,
+                        description = decorator.description,
+                        contractId = decorator.id,
+                        contractTags = decorator.tags,
+                        contractImplements = decorator.implements,
+                        projectId = Constants.NIL_UUID
+                    )
                 )
             } catch (e: ContractDecoratorException) {
                 logger.warn(e) { "${e.message} for contract decorator: $id, skipping..." }

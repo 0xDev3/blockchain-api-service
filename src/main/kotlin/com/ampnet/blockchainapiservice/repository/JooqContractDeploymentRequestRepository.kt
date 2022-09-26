@@ -37,8 +37,11 @@ class JooqContractDeploymentRequestRepository(
         private val CONTRACT_METADATA_TABLE = ContractMetadataTable.CONTRACT_METADATA
     }
 
-    override fun store(params: StoreContractDeploymentRequestParams): ContractDeploymentRequest {
-        logger.info { "Store contract deployment request, params: $params" }
+    override fun store(
+        params: StoreContractDeploymentRequestParams,
+        metadataProjectId: UUID
+    ): ContractDeploymentRequest {
+        logger.info { "Store contract deployment request, params: $params, metadataProjectId: $metadataProjectId" }
         val record = ContractDeploymentRequestRecord(
             id = params.id,
             alias = params.alias,
@@ -61,7 +64,12 @@ class JooqContractDeploymentRequestRepository(
         )
         val selectContractMetadataId = DSL.select(CONTRACT_METADATA_TABLE.ID)
             .from(CONTRACT_METADATA_TABLE)
-            .where(CONTRACT_METADATA_TABLE.CONTRACT_ID.eq(params.contractId))
+            .where(
+                DSL.and(
+                    CONTRACT_METADATA_TABLE.CONTRACT_ID.eq(params.contractId),
+                    CONTRACT_METADATA_TABLE.PROJECT_ID.eq(metadataProjectId)
+                )
+            )
 
         try {
             dslContext.insertInto(CONTRACT_DEPLOYMENT_REQUEST_TABLE)

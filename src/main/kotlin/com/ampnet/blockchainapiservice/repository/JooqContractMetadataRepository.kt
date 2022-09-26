@@ -2,11 +2,11 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
+import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
 import mu.KLogging
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
 import java.util.UUID
 
@@ -17,41 +17,40 @@ class JooqContractMetadataRepository(private val dslContext: DSLContext) : Contr
         private val TABLE = ContractMetadataTable.CONTRACT_METADATA
     }
 
-    override fun createOrUpdate(
-        id: UUID,
-        name: String?,
-        description: String?,
-        contractId: ContractId,
-        contractTags: List<ContractTag>,
-        contractImplements: List<ContractTrait>
-    ): Boolean {
-        logger.info {
-            "Create or update contract metadata, id: $id, name: $name, description: $description," +
-                " contractId: $contractId, contractTags: $contractTags, contractImplements: $contractImplements"
-        }
-        val tags: Array<String?> = contractTags.map { it.value }.toTypedArray()
-        val implements: Array<String?> = contractImplements.map { it.value }.toTypedArray()
+    override fun createOrUpdate(contractMetadata: ContractMetadata): Boolean {
+        logger.info { "Create or update contract metadata: $contractMetadata" }
+        val tags: Array<String?> = contractMetadata.contractTags.map { it.value }.toTypedArray()
+        val implements: Array<String?> = contractMetadata.contractImplements.map { it.value }.toTypedArray()
 
         return dslContext.insertInto(TABLE)
             .set(
                 ContractMetadataRecord(
-                    id = id,
-                    name = name,
-                    description = description,
-                    contractId = contractId,
+                    id = contractMetadata.id,
+                    name = contractMetadata.name,
+                    description = contractMetadata.description,
+                    contractId = contractMetadata.contractId,
                     contractTags = tags,
-                    contractImplements = implements
+                    contractImplements = implements,
+                    projectId = contractMetadata.projectId
                 )
             )
-            .onConflict(TABLE.CONTRACT_ID)
+            .onConflict(TABLE.CONTRACT_ID, TABLE.PROJECT_ID)
             .doUpdate()
+            .set(TABLE.NAME, contractMetadata.name)
+            .set(TABLE.DESCRIPTION, contractMetadata.description)
             .set(TABLE.CONTRACT_TAGS, tags)
             .set(TABLE.CONTRACT_IMPLEMENTS, implements)
             .execute() > 0
     }
 
-    override fun exists(contractId: ContractId): Boolean {
-        logger.debug { "Check if contract metadata exists: $contractId" }
-        return dslContext.fetchExists(TABLE, TABLE.CONTRACT_ID.eq(contractId))
+    override fun exists(contractId: ContractId, projectId: UUID): Boolean {
+        logger.debug { "Check if contract metadata exists, contractId: $contractId, projectId: $projectId" }
+        return dslContext.fetchExists(
+            TABLE,
+            DSL.and(
+                TABLE.CONTRACT_ID.eq(contractId),
+                TABLE.PROJECT_ID.eq(projectId)
+            )
+        )
     }
 }

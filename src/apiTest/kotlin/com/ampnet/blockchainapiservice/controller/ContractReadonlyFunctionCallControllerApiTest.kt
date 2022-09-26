@@ -19,6 +19,7 @@ import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepos
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
@@ -86,7 +87,8 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 id = UUID.randomUUID(),
                 contractId = CONTRACT_DECORATOR_ID,
                 contractTags = emptyArray(),
-                contractImplements = emptyArray()
+                contractImplements = emptyArray(),
+                projectId = Constants.NIL_UUID
             )
         )
 
@@ -141,7 +143,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress(contract.contractAddress)
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -220,7 +222,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress(contract.contractAddress)
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -356,7 +358,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress("cafebabe")
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
             contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
         }
 
@@ -393,7 +395,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress("cafebabe")
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
             contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
         }
 
@@ -484,7 +486,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val callerAddress = WalletAddress("b")
 
         suppose("some non-deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
         }
 
         verify("400 is returned when calling readonly contract function request") {
@@ -517,7 +519,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val callerAddress = WalletAddress("b")
 
         suppose("some non-deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
         }
 
         verify("400 is returned when calling readonly contract function request") {
