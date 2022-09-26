@@ -207,6 +207,7 @@ object Web3TypeMappings {
         "int248" to TypeInfo(IntType) { v: JsonNode, p: JsonParser, t: Boolean -> Int248(v.parseBigInt(p, t)) },
         "int256" to TypeInfo(IntType) { v: JsonNode, p: JsonParser, t: Boolean -> Int256(v.parseBigInt(p, t)) }
     )
+
     @Suppress("MagicNumber")
     private val BYTES_TYPE_MAPPINGS: Map<String, TypeInfo> = mapOf(
         "bytes1" to TypeInfo(StaticBytesType(1)) { v: JsonNode, p: JsonParser, t: Boolean ->

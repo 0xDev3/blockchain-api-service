@@ -17,6 +17,7 @@ import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
@@ -110,6 +111,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                 contractId = ContractId("contract-id"),
                 contractTags = emptyArray(),
                 contractImplements = emptyArray(),
+                projectId = Constants.NIL_UUID
             )
         )
 

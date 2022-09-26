@@ -13,6 +13,7 @@ import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.ProjectRepository
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -44,12 +45,15 @@ class ContractDeploymentRequestServiceImpl(
         logger.info { "Creating contract deployment request, params: $params, project: $project" }
 
         val decoratorNotFoundMessage = "Contract decorator not found for contract ID: ${params.contractId.value}"
+
+        // TODO add support for imported contract decorators
         val contractDecorator = ethCommonService.fetchResource(
             contractDecoratorRepository.getById(params.contractId),
             decoratorNotFoundMessage
         )
 
-        if (!contractMetadataRepository.exists(params.contractId)) {
+        // TODO add support for imported contract decorators
+        if (!contractMetadataRepository.exists(params.contractId, Constants.NIL_UUID)) {
             throw ResourceNotFoundException(decoratorNotFoundMessage)
         }
 
@@ -66,7 +70,7 @@ class ContractDeploymentRequestServiceImpl(
             project = project
         )
 
-        return contractDeploymentRequestRepository.store(databaseParams)
+        return contractDeploymentRequestRepository.store(databaseParams, Constants.NIL_UUID)
     }
 
     override fun markContractDeploymentRequestAsDeleted(id: UUID, projectId: UUID) {

@@ -1,20 +1,10 @@
 package com.ampnet.blockchainapiservice.repository
 
+import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
 import java.util.UUID
 
 interface ContractMetadataRepository {
-    @Suppress("LongParameterList")
-    fun createOrUpdate(
-        id: UUID,
-        name: String?,
-        description: String?,
-        contractId: ContractId,
-        contractTags: List<ContractTag>,
-        contractImplements: List<ContractTrait>
-    ): Boolean
-
-    fun exists(contractId: ContractId): Boolean
+    fun createOrUpdate(contractMetadata: ContractMetadata): Boolean
+    fun exists(contractId: ContractId, projectId: UUID): Boolean
 }

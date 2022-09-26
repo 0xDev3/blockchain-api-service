@@ -20,6 +20,7 @@ import com.ampnet.blockchainapiservice.model.params.ImportContractParams
 import com.ampnet.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
+import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.model.result.ContractParameter
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
@@ -30,6 +31,7 @@ import com.ampnet.blockchainapiservice.service.ContractImportServiceImpl.Compani
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
@@ -161,7 +163,7 @@ class ContractImportServiceTest : TestBase() {
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
         suppose("contract metadata exists") {
-            given(contractMetadataRepository.exists(CONTRACT_ID))
+            given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
                 .willReturn(true)
         }
 
@@ -209,7 +211,7 @@ class ContractImportServiceTest : TestBase() {
 
             verifyMock(contractDeploymentRequestRepository)
                 .store(
-                    StoreContractDeploymentRequestParams(
+                    params = StoreContractDeploymentRequestParams(
                         id = id,
                         alias = PARAMS.alias,
                         contractId = CONTRACT_ID,
@@ -224,7 +226,8 @@ class ContractImportServiceTest : TestBase() {
                         arbitraryData = PARAMS.arbitraryData,
                         screenConfig = PARAMS.screenConfig,
                         imported = true
-                    )
+                    ),
+                    metadataProjectId = Constants.NIL_UUID
                 )
             verifyMock(contractDeploymentRequestRepository)
                 .setContractAddress(id, PARAMS.contractAddress)
@@ -275,7 +278,7 @@ class ContractImportServiceTest : TestBase() {
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
         suppose("contract metadata does not exist") {
-            given(contractMetadataRepository.exists(CONTRACT_ID))
+            given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
                 .willReturn(false)
         }
 
@@ -311,7 +314,7 @@ class ContractImportServiceTest : TestBase() {
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
         suppose("contract metadata exists") {
-            given(contractMetadataRepository.exists(CONTRACT_ID))
+            given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
                 .willReturn(true)
         }
 
@@ -355,7 +358,7 @@ class ContractImportServiceTest : TestBase() {
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
         suppose("contract metadata exists") {
-            given(contractMetadataRepository.exists(CONTRACT_ID))
+            given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
                 .willReturn(true)
         }
 
@@ -478,18 +481,21 @@ class ContractImportServiceTest : TestBase() {
 
             verifyMock(contractMetadataRepository)
                 .createOrUpdate(
-                    id = contractMetadataId,
-                    name = contractDecorator.name,
-                    description = contractDecorator.description,
-                    contractId = contractId,
-                    contractTags = contractDecorator.tags,
-                    contractImplements = contractDecorator.implements
+                    ContractMetadata(
+                        id = contractMetadataId,
+                        name = contractDecorator.name,
+                        description = contractDecorator.description,
+                        contractId = contractId,
+                        contractTags = contractDecorator.tags,
+                        contractImplements = contractDecorator.implements,
+                        projectId = PROJECT.id
+                    )
                 )
             verifyNoMoreInteractions(contractMetadataRepository)
 
             verifyMock(contractDeploymentRequestRepository)
                 .store(
-                    StoreContractDeploymentRequestParams(
+                    params = StoreContractDeploymentRequestParams(
                         id = deployedContractId,
                         alias = PARAMS.alias,
                         contractId = contractId,
@@ -504,7 +510,8 @@ class ContractImportServiceTest : TestBase() {
                         arbitraryData = PARAMS.arbitraryData,
                         screenConfig = PARAMS.screenConfig,
                         imported = true
-                    )
+                    ),
+                    metadataProjectId = PROJECT.id
                 )
             verifyMock(contractDeploymentRequestRepository)
                 .setContractAddress(deployedContractId, PARAMS.contractAddress)
@@ -588,18 +595,21 @@ class ContractImportServiceTest : TestBase() {
 
             verifyMock(contractMetadataRepository)
                 .createOrUpdate(
-                    id = contractMetadataId,
-                    name = contractDecorator.name,
-                    description = contractDecorator.description,
-                    contractId = contractId,
-                    contractTags = contractDecorator.tags,
-                    contractImplements = contractDecorator.implements
+                    ContractMetadata(
+                        id = contractMetadataId,
+                        name = contractDecorator.name,
+                        description = contractDecorator.description,
+                        contractId = contractId,
+                        contractTags = contractDecorator.tags,
+                        contractImplements = contractDecorator.implements,
+                        projectId = PROJECT.id
+                    )
                 )
             verifyNoMoreInteractions(contractMetadataRepository)
 
             verifyMock(contractDeploymentRequestRepository)
                 .store(
-                    StoreContractDeploymentRequestParams(
+                    params = StoreContractDeploymentRequestParams(
                         id = deployedContractId,
                         alias = PARAMS.alias,
                         contractId = contractId,
@@ -614,7 +624,8 @@ class ContractImportServiceTest : TestBase() {
                         arbitraryData = PARAMS.arbitraryData,
                         screenConfig = PARAMS.screenConfig,
                         imported = true
-                    )
+                    ),
+                    metadataProjectId = PROJECT.id
                 )
             verifyMock(contractDeploymentRequestRepository)
                 .setContractAddress(deployedContractId, PARAMS.contractAddress)

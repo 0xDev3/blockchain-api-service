@@ -18,6 +18,7 @@ import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
@@ -418,13 +419,13 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreContractDeploymentRequest() {
+        val metadata = createMetadataRecord(
+            tags = listOf("test-tag"),
+            traits = listOf("test-trait"),
+        )
+
         suppose("some contract metadata is in database") {
-            dslContext.executeInsert(
-                createMetadataRecord(
-                    tags = listOf("test-tag"),
-                    traits = listOf("test-trait"),
-                )
-            )
+            dslContext.executeInsert(metadata)
         }
 
         val id = UUID.randomUUID()
@@ -449,7 +450,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         val storedContractDeploymentRequest = suppose("contract deployment request is stored in database") {
-            repository.store(params)
+            repository.store(params, metadata.projectId!!)
         }
 
         val expectedContractDeploymentRequest = ContractDeploymentRequest(
@@ -492,7 +493,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
         verify("storing contract deployment request with conflicting alias throws AliasAlreadyInUseException") {
             assertThrows<AliasAlreadyInUseException>(message) {
-                repository.store(params.copy(id = UUID.randomUUID()))
+                repository.store(params.copy(id = UUID.randomUUID()), metadata.projectId!!)
             }
         }
     }
@@ -527,13 +528,13 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetTxInfoForContractDeploymentRequestWithNullTxHash() {
+        val metadata = createMetadataRecord(
+            tags = listOf("test-tag"),
+            traits = listOf("test-trait"),
+        )
+
         suppose("some contract metadata is in database") {
-            dslContext.executeInsert(
-                createMetadataRecord(
-                    tags = listOf("test-tag"),
-                    traits = listOf("test-trait"),
-                )
-            )
+            dslContext.executeInsert(metadata)
         }
 
         val id = UUID.randomUUID()
@@ -558,7 +559,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params)
+            repository.store(params, metadata.projectId!!)
         }
 
         verify("setting txInfo will succeed") {
@@ -602,13 +603,13 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotUpdateDeployerAddressForContractDeploymentRequestWhenDeployerIsAlreadySet() {
+        val metadata = createMetadataRecord(
+            tags = listOf("test-tag"),
+            traits = listOf("test-trait"),
+        )
+
         suppose("some contract metadata is in database") {
-            dslContext.executeInsert(
-                createMetadataRecord(
-                    tags = listOf("test-tag"),
-                    traits = listOf("test-trait"),
-                )
-            )
+            dslContext.executeInsert(metadata)
         }
 
         val id = UUID.randomUUID()
@@ -633,7 +634,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params)
+            repository.store(params, metadata.projectId!!)
         }
 
         verify("setting txInfo will succeed") {
@@ -678,13 +679,13 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetTxInfoForContractDeploymentRequestWhenTxHashIsAlreadySet() {
+        val metadata = createMetadataRecord(
+            tags = listOf("test-tag"),
+            traits = listOf("test-trait"),
+        )
+
         suppose("some contract metadata is in database") {
-            dslContext.executeInsert(
-                createMetadataRecord(
-                    tags = listOf("test-tag"),
-                    traits = listOf("test-trait"),
-                )
-            )
+            dslContext.executeInsert(metadata)
         }
 
         val id = UUID.randomUUID()
@@ -709,7 +710,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params)
+            repository.store(params, metadata.projectId!!)
         }
 
         verify("setting txInfo will succeed") {
@@ -764,13 +765,13 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetContractAddressForContractDeploymentRequestWithNullContractAddress() {
+        val metadata = createMetadataRecord(
+            tags = listOf("test-tag"),
+            traits = listOf("test-trait"),
+        )
+
         suppose("some contract metadata is in database") {
-            dslContext.executeInsert(
-                createMetadataRecord(
-                    tags = listOf("test-tag"),
-                    traits = listOf("test-trait"),
-                )
-            )
+            dslContext.executeInsert(metadata)
         }
 
         val id = UUID.randomUUID()
@@ -795,7 +796,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params)
+            repository.store(params, metadata.projectId!!)
         }
 
         verify("setting contract address will succeed") {
@@ -839,13 +840,13 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetContractAddressForContractDeploymentRequestWhenContractAddressIsAlreadySet() {
+        val metadata = createMetadataRecord(
+            tags = listOf("test-tag"),
+            traits = listOf("test-trait"),
+        )
+
         suppose("some contract metadata is in database") {
-            dslContext.executeInsert(
-                createMetadataRecord(
-                    tags = listOf("test-tag"),
-                    traits = listOf("test-trait"),
-                )
-            )
+            dslContext.executeInsert(metadata)
         }
 
         val id = UUID.randomUUID()
@@ -870,7 +871,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params)
+            repository.store(params, metadata.projectId!!)
         }
 
         verify("setting contract address will succeed") {
@@ -928,6 +929,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         contractId = contractId,
         contractTags = tags.toTypedArray(),
         contractImplements = traits.toTypedArray(),
+        projectId = Constants.NIL_UUID
     )
 
     private fun createRecord(

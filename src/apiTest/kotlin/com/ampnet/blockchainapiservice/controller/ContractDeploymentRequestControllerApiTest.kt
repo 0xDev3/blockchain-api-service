@@ -28,6 +28,7 @@ import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
@@ -133,7 +134,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 description = CONTRACT_DECORATOR.description,
                 contractId = CONTRACT_DECORATOR.id,
                 contractTags = CONTRACT_DECORATOR.tags.map { it.value }.toTypedArray(),
-                contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray()
+                contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray(),
+                projectId = Constants.NIL_UUID
             )
         )
 
@@ -1570,7 +1572,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         suppose("some contract deployment request without transaction info exists in database") {
             contractDeploymentRequestRepository.store(
-                StoreContractDeploymentRequestParams(
+                params = StoreContractDeploymentRequestParams(
                     id = id,
                     alias = alias,
                     contractId = CONTRACT_DECORATOR.id,
@@ -1588,7 +1590,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         afterActionMessage = "after-action-message"
                     ),
                     imported = false
-                )
+                ),
+                metadataProjectId = Constants.NIL_UUID
             )
         }
 
@@ -1628,7 +1631,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         suppose("some contract deployment request with transaction info exists in database") {
             contractDeploymentRequestRepository.store(
-                StoreContractDeploymentRequestParams(
+                params = StoreContractDeploymentRequestParams(
                     id = id,
                     alias = alias,
                     contractId = CONTRACT_DECORATOR.id,
@@ -1646,7 +1649,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         afterActionMessage = "after-action-message"
                     ),
                     imported = false
-                )
+                ),
+                metadataProjectId = Constants.NIL_UUID
             )
             contractDeploymentRequestRepository.setTxInfo(id, txHash, deployerAddress)
         }

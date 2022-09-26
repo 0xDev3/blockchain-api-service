@@ -28,6 +28,7 @@ import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
 import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
@@ -139,7 +140,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 description = CONTRACT_DECORATOR.description,
                 contractId = CONTRACT_DECORATOR.id,
                 contractTags = CONTRACT_DECORATOR.tags.map { it.value }.toTypedArray(),
-                contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray()
+                contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray(),
+                projectId = Constants.NIL_UUID
             )
         )
 

@@ -22,6 +22,7 @@ import com.ampnet.blockchainapiservice.repository.ProjectRepository
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
@@ -170,7 +171,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request is stored in database") {
-            given(contractDeploymentRequestRepository.store(STORE_PARAMS))
+            given(contractDeploymentRequestRepository.store(STORE_PARAMS, Constants.NIL_UUID))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -192,7 +193,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
                 .isEqualTo(STORED_REQUEST)
 
             verifyMock(contractDeploymentRequestRepository)
-                .store(STORE_PARAMS)
+                .store(STORE_PARAMS, Constants.NIL_UUID)
             verifyNoMoreInteractions(contractDeploymentRequestRepository)
         }
     }
@@ -1265,7 +1266,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
     private fun contractMetadataRepositoryMock(exists: Boolean): ContractMetadataRepository {
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
-        given(contractMetadataRepository.exists(CONTRACT_ID))
+        given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
             .willReturn(exists)
 
         return contractMetadataRepository

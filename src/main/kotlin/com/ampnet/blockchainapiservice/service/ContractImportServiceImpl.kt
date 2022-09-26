@@ -9,12 +9,14 @@ import com.ampnet.blockchainapiservice.model.params.ImportContractParams
 import com.ampnet.blockchainapiservice.model.params.OutputParameter
 import com.ampnet.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
+import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.model.result.ContractParameter
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepository
+import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.Tuple
@@ -65,10 +67,13 @@ class ContractImportServiceImpl(
         contractId: ContractId
     ): UUID {
         val decoratorNotFoundMessage = "Contract decorator not found for contract ID: ${contractId.value}"
+
+        // TODO add support for imported contract decorators
         val contractDecorator = contractDecoratorRepository.getById(contractId)
             ?: throw ResourceNotFoundException(decoratorNotFoundMessage)
 
-        if (!contractMetadataRepository.exists(contractId)) {
+        // TODO add support for imported contract decorators
+        if (!contractMetadataRepository.exists(contractId, Constants.NIL_UUID)) {
             throw ResourceNotFoundException(decoratorNotFoundMessage)
         }
 
@@ -90,7 +95,8 @@ class ContractImportServiceImpl(
             params = params,
             contractId = contractId,
             contractDeploymentTransactionInfo = contractDeploymentTransactionInfo,
-            project = project
+            project = project,
+            metadataProjectId = Constants.NIL_UUID
         )
     }
 
@@ -137,12 +143,15 @@ class ContractImportServiceImpl(
                 )
 
         contractMetadataRepository.createOrUpdate(
-            id = uuidProvider.getUuid(),
-            name = contractDecorator.name,
-            description = contractDecorator.description,
-            contractId = contractId,
-            contractTags = contractDecorator.tags,
-            contractImplements = contractDecorator.implements
+            ContractMetadata(
+                id = uuidProvider.getUuid(),
+                name = contractDecorator.name,
+                description = contractDecorator.description,
+                contractId = contractId,
+                contractTags = contractDecorator.tags,
+                contractImplements = contractDecorator.implements,
+                projectId = project.id
+            )
         )
 
         return storeContractDeploymentRequest(
@@ -151,7 +160,8 @@ class ContractImportServiceImpl(
             params = params,
             contractId = contractId,
             contractDeploymentTransactionInfo = contractDeploymentTransactionInfo,
-            project = project
+            project = project,
+            metadataProjectId = project.id
         )
     }
 
@@ -171,7 +181,8 @@ class ContractImportServiceImpl(
         params: ImportContractParams,
         contractId: ContractId,
         contractDeploymentTransactionInfo: ContractDeploymentTransactionInfo,
-        project: Project
+        project: Project,
+        metadataProjectId: UUID
     ): UUID {
         val constructorInputTypes = constructorInputs
             .joinToString(separator = ",") { it.toSolidityTypeJson() }
@@ -201,7 +212,7 @@ class ContractImportServiceImpl(
             imported = true
         )
 
-        contractDeploymentRequestRepository.store(storeParams)
+        contractDeploymentRequestRepository.store(storeParams, metadataProjectId)
         contractDeploymentRequestRepository.setContractAddress(
             id = id,
             contractAddress = contractDeploymentTransactionInfo.deployedContractAddress

@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.repository
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
+import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
@@ -46,9 +47,20 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         val contractId = ContractId("cid")
         val contractTags = listOf(ContractTag("tag"))
         val contractImplements = listOf(ContractTrait("trait"))
+        val projectId = UUID.randomUUID()
 
         suppose("contract metadata is stored into the database") {
-            repository.createOrUpdate(id, name, description, contractId, contractTags, contractImplements)
+            repository.createOrUpdate(
+                ContractMetadata(
+                    id = id,
+                    name = name,
+                    description = description,
+                    contractId = contractId,
+                    contractTags = contractTags,
+                    contractImplements = contractImplements,
+                    projectId = projectId
+                )
+            )
         }
 
         verify("contract metadata is correctly stored into the database") {
@@ -64,7 +76,8 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
                         description = description,
                         contractId = contractId,
                         contractTags = contractTags.map { it.value }.toTypedArray(),
-                        contractImplements = contractImplements.map { it.value }.toTypedArray()
+                        contractImplements = contractImplements.map { it.value }.toTypedArray(),
+                        projectId = projectId
                     )
                 )
         }
@@ -78,9 +91,20 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         val contractId = ContractId("cid")
         val contractTags = listOf(ContractTag("tag"))
         val contractImplements = listOf(ContractTrait("trait"))
+        val projectId = UUID.randomUUID()
 
         suppose("contract metadata is stored into the database") {
-            repository.createOrUpdate(id, name, description, contractId, contractTags, contractImplements)
+            repository.createOrUpdate(
+                ContractMetadata(
+                    id = id,
+                    name = name,
+                    description = description,
+                    contractId = contractId,
+                    contractTags = contractTags,
+                    contractImplements = contractImplements,
+                    projectId = projectId
+                )
+            )
         }
 
         val otherId = UUID.randomUUID()
@@ -90,7 +114,17 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         val otherImplements = listOf(ContractTrait("other-trait-1"), ContractTrait("other-trait-2"))
 
         suppose("contract metadata is stored into the database with different data") {
-            repository.createOrUpdate(otherId, otherName, otherDescription, contractId, otherTags, otherImplements)
+            repository.createOrUpdate(
+                ContractMetadata(
+                    id = otherId,
+                    name = otherName,
+                    description = otherDescription,
+                    contractId = contractId,
+                    contractTags = otherTags,
+                    contractImplements = otherImplements,
+                    projectId = projectId
+                )
+            )
         }
 
         verify("contract metadata is correctly updated in the database") {
@@ -106,7 +140,8 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
                         description = description,
                         contractId = contractId,
                         contractTags = otherTags.map { it.value }.toTypedArray(),
-                        contractImplements = otherImplements.map { it.value }.toTypedArray()
+                        contractImplements = otherImplements.map { it.value }.toTypedArray(),
+                        projectId = projectId
                     )
                 )
         }
@@ -129,18 +164,29 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         val contractId = ContractId("cid")
         val contractTags = listOf(ContractTag("tag"))
         val contractImplements = listOf(ContractTrait("trait"))
+        val projectId = UUID.randomUUID()
 
         suppose("contract metadata is stored into the database") {
-            repository.createOrUpdate(id, name, description, contractId, contractTags, contractImplements)
+            repository.createOrUpdate(
+                ContractMetadata(
+                    id = id,
+                    name = name,
+                    description = description,
+                    contractId = contractId,
+                    contractTags = contractTags,
+                    contractImplements = contractImplements,
+                    projectId = projectId
+                )
+            )
         }
 
         verify("contract metadata exists in the database") {
-            assertThat(repository.exists(contractId)).withMessage()
+            assertThat(repository.exists(contractId, projectId)).withMessage()
                 .isTrue()
         }
 
         verify("no other contract metadata exists in the database") {
-            assertThat(repository.exists(ContractId("non-existent"))).withMessage()
+            assertThat(repository.exists(ContractId("non-existent"), projectId)).withMessage()
                 .isFalse()
         }
     }
