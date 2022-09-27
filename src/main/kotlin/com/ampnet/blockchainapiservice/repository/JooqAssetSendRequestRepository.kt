@@ -17,9 +17,7 @@ import java.util.UUID
 @Repository
 class JooqAssetSendRequestRepository(private val dslContext: DSLContext) : AssetSendRequestRepository {
 
-    companion object : KLogging() {
-        private val TABLE = AssetSendRequestTable.ASSET_SEND_REQUEST
-    }
+    companion object : KLogging()
 
     override fun store(params: StoreAssetSendRequestParams): AssetSendRequest {
         logger.info { "Store asset send request, params: $params" }
@@ -44,47 +42,47 @@ class JooqAssetSendRequestRepository(private val dslContext: DSLContext) : Asset
 
     override fun getById(id: UUID): AssetSendRequest? {
         logger.debug { "Get asset send request by id: $id" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.ID.eq(id))
+        return dslContext.selectFrom(AssetSendRequestTable)
+            .where(AssetSendRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun getAllByProjectId(projectId: UUID): List<AssetSendRequest> {
         logger.debug { "Get asset send requests filtered by projectId: $projectId" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.PROJECT_ID.eq(projectId))
-            .orderBy(TABLE.CREATED_AT.asc())
+        return dslContext.selectFrom(AssetSendRequestTable)
+            .where(AssetSendRequestTable.PROJECT_ID.eq(projectId))
+            .orderBy(AssetSendRequestTable.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
     override fun getBySender(sender: WalletAddress): List<AssetSendRequest> {
         logger.debug { "Get asset send requests filtered by sender address: $sender" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.ASSET_SENDER_ADDRESS.eq(sender))
-            .orderBy(TABLE.CREATED_AT.asc())
+        return dslContext.selectFrom(AssetSendRequestTable)
+            .where(AssetSendRequestTable.ASSET_SENDER_ADDRESS.eq(sender))
+            .orderBy(AssetSendRequestTable.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
     override fun getByRecipient(recipient: WalletAddress): List<AssetSendRequest> {
         logger.debug { "Get asset send requests filtered by recipient address: $recipient" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.ASSET_RECIPIENT_ADDRESS.eq(recipient))
-            .orderBy(TABLE.CREATED_AT.asc())
+        return dslContext.selectFrom(AssetSendRequestTable)
+            .where(AssetSendRequestTable.ASSET_RECIPIENT_ADDRESS.eq(recipient))
+            .orderBy(AssetSendRequestTable.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
     override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
         logger.info { "Set txInfo for asset send request, id: $id, txHash: $txHash, caller: $caller" }
-        return dslContext.update(TABLE)
-            .set(TABLE.TX_HASH, txHash)
+        return dslContext.update(AssetSendRequestTable)
+            .set(AssetSendRequestTable.TX_HASH, txHash)
             .set(
-                TABLE.ASSET_SENDER_ADDRESS,
-                coalesce(TABLE.ASSET_SENDER_ADDRESS, caller)
+                AssetSendRequestTable.ASSET_SENDER_ADDRESS,
+                coalesce(AssetSendRequestTable.ASSET_SENDER_ADDRESS, caller)
             )
             .where(
                 DSL.and(
-                    TABLE.ID.eq(id),
-                    TABLE.TX_HASH.isNull()
+                    AssetSendRequestTable.ID.eq(id),
+                    AssetSendRequestTable.TX_HASH.isNull()
                 )
             )
             .execute() > 0

@@ -16,9 +16,7 @@ import java.util.UUID
 @Repository
 class JooqProjectRepository(private val dslContext: DSLContext) : ProjectRepository {
 
-    companion object : KLogging() {
-        private val TABLE = ProjectTable.PROJECT
-    }
+    companion object : KLogging()
 
     override fun store(project: Project): Project {
         logger.info { "Store project: $project" }
@@ -43,18 +41,18 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
 
     override fun getById(id: UUID): Project? {
         logger.debug { "Get project by id: $id" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.ID.eq(id))
+        return dslContext.selectFrom(ProjectTable)
+            .where(ProjectTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun getByIssuer(issuerContractAddress: ContractAddress, chainId: ChainId): Project? {
         logger.debug { "Get project by issuerContractAddress: $issuerContractAddress, chainId: $chainId" }
-        return dslContext.selectFrom(TABLE)
+        return dslContext.selectFrom(ProjectTable)
             .where(
                 DSL.and(
-                    TABLE.ISSUER_CONTRACT_ADDRESS.eq(issuerContractAddress),
-                    TABLE.CHAIN_ID.eq(chainId)
+                    ProjectTable.ISSUER_CONTRACT_ADDRESS.eq(issuerContractAddress),
+                    ProjectTable.CHAIN_ID.eq(chainId)
                 )
             )
             .fetchOne { it.toModel() }
@@ -62,9 +60,9 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
 
     override fun getAllByOwnerId(ownerId: UUID): List<Project> {
         logger.info { "Get projects by ownerId: $ownerId" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.OWNER_ID.eq(ownerId))
-            .orderBy(TABLE.CREATED_AT.asc())
+        return dslContext.selectFrom(ProjectTable)
+            .where(ProjectTable.OWNER_ID.eq(ownerId))
+            .orderBy(ProjectTable.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 

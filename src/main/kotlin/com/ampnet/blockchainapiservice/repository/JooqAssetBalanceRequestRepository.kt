@@ -16,9 +16,7 @@ import java.util.UUID
 @Repository
 class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : AssetBalanceRequestRepository {
 
-    companion object : KLogging() {
-        private val TABLE = AssetBalanceRequestTable.ASSET_BALANCE_REQUEST
-    }
+    companion object : KLogging()
 
     override fun store(params: StoreAssetBalanceRequestParams): AssetBalanceRequest {
         logger.info { "Store asset balance request, params: $params" }
@@ -43,16 +41,16 @@ class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : As
 
     override fun getById(id: UUID): AssetBalanceRequest? {
         logger.debug { "Get asset balance request by id: $id" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.ID.eq(id))
+        return dslContext.selectFrom(AssetBalanceRequestTable)
+            .where(AssetBalanceRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun getAllByProjectId(projectId: UUID): List<AssetBalanceRequest> {
         logger.debug { "Get asset balance requests filtered by projectId: $projectId" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.PROJECT_ID.eq(projectId))
-            .orderBy(TABLE.CREATED_AT.asc())
+        return dslContext.selectFrom(AssetBalanceRequestTable)
+            .where(AssetBalanceRequestTable.PROJECT_ID.eq(projectId))
+            .orderBy(AssetBalanceRequestTable.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
@@ -61,14 +59,14 @@ class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : As
             "Set walletAddress and signedMessage for asset balance request, id: $id, walletAddress: $walletAddress," +
                 " signedMessage: $signedMessage"
         }
-        return dslContext.update(TABLE)
-            .set(TABLE.ACTUAL_WALLET_ADDRESS, walletAddress)
-            .set(TABLE.SIGNED_MESSAGE, signedMessage)
+        return dslContext.update(AssetBalanceRequestTable)
+            .set(AssetBalanceRequestTable.ACTUAL_WALLET_ADDRESS, walletAddress)
+            .set(AssetBalanceRequestTable.SIGNED_MESSAGE, signedMessage)
             .where(
                 DSL.and(
-                    TABLE.ID.eq(id),
-                    TABLE.ACTUAL_WALLET_ADDRESS.isNull(),
-                    TABLE.SIGNED_MESSAGE.isNull()
+                    AssetBalanceRequestTable.ID.eq(id),
+                    AssetBalanceRequestTable.ACTUAL_WALLET_ADDRESS.isNull(),
+                    AssetBalanceRequestTable.SIGNED_MESSAGE.isNull()
                 )
             )
             .execute() > 0

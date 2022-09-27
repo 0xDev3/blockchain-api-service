@@ -16,9 +16,7 @@ import java.util.UUID
 @Repository
 class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : AuthorizationRequestRepository {
 
-    companion object : KLogging() {
-        private val TABLE = AuthorizationRequestTable.AUTHORIZATION_REQUEST
-    }
+    companion object : KLogging()
 
     override fun store(params: StoreAuthorizationRequestParams): AuthorizationRequest {
         logger.info { "Store authorization request, params: $params" }
@@ -40,16 +38,16 @@ class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : A
 
     override fun getById(id: UUID): AuthorizationRequest? {
         logger.debug { "Get authorization request by id: $id" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.ID.eq(id))
+        return dslContext.selectFrom(AuthorizationRequestTable)
+            .where(AuthorizationRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun getAllByProjectId(projectId: UUID): List<AuthorizationRequest> {
         logger.debug { "Get authorization requests filtered by projectId: $projectId" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.PROJECT_ID.eq(projectId))
-            .orderBy(TABLE.CREATED_AT.asc())
+        return dslContext.selectFrom(AuthorizationRequestTable)
+            .where(AuthorizationRequestTable.PROJECT_ID.eq(projectId))
+            .orderBy(AuthorizationRequestTable.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
@@ -58,14 +56,14 @@ class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : A
             "Set walletAddress and signedMessage for authorization request, id: $id, walletAddress: $walletAddress," +
                 " signedMessage: $signedMessage"
         }
-        return dslContext.update(TABLE)
-            .set(TABLE.ACTUAL_WALLET_ADDRESS, walletAddress)
-            .set(TABLE.SIGNED_MESSAGE, signedMessage)
+        return dslContext.update(AuthorizationRequestTable)
+            .set(AuthorizationRequestTable.ACTUAL_WALLET_ADDRESS, walletAddress)
+            .set(AuthorizationRequestTable.SIGNED_MESSAGE, signedMessage)
             .where(
                 DSL.and(
-                    TABLE.ID.eq(id),
-                    TABLE.ACTUAL_WALLET_ADDRESS.isNull(),
-                    TABLE.SIGNED_MESSAGE.isNull()
+                    AuthorizationRequestTable.ID.eq(id),
+                    AuthorizationRequestTable.ACTUAL_WALLET_ADDRESS.isNull(),
+                    AuthorizationRequestTable.SIGNED_MESSAGE.isNull()
                 )
             )
             .execute() > 0

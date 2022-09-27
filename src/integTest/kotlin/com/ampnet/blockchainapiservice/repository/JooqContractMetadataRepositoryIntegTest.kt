@@ -64,8 +64,8 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         }
 
         verify("contract metadata is correctly stored into the database") {
-            val record = dslContext.selectFrom(ContractMetadataTable.CONTRACT_METADATA)
-                .where(ContractMetadataTable.CONTRACT_METADATA.ID.eq(id))
+            val record = dslContext.selectFrom(ContractMetadataTable)
+                .where(ContractMetadataTable.ID.eq(id))
                 .fetchOne()
 
             assertThat(record).withMessage()
@@ -128,8 +128,8 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         }
 
         verify("contract metadata is correctly updated in the database") {
-            val record = dslContext.selectFrom(ContractMetadataTable.CONTRACT_METADATA)
-                .where(ContractMetadataTable.CONTRACT_METADATA.ID.eq(id))
+            val record = dslContext.selectFrom(ContractMetadataTable)
+                .where(ContractMetadataTable.ID.eq(id))
                 .fetchOne()
 
             assertThat(record).withMessage()
@@ -147,8 +147,8 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         }
 
         verify("contract metadata is not created for different UUID") {
-            val record = dslContext.selectFrom(ContractMetadataTable.CONTRACT_METADATA)
-                .where(ContractMetadataTable.CONTRACT_METADATA.ID.eq(otherId))
+            val record = dslContext.selectFrom(ContractMetadataTable)
+                .where(ContractMetadataTable.ID.eq(otherId))
                 .fetchOne()
 
             assertThat(record).withMessage()
