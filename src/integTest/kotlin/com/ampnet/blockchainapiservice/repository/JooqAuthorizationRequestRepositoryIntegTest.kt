@@ -214,9 +214,9 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                 .containsExactlyInAnyOrderElementsOf(
                     projectRequests.map {
                         AuthorizationRequest(
-                            id = it.id!!,
-                            projectId = it.projectId!!,
-                            redirectUrl = it.redirectUrl!!,
+                            id = it.id,
+                            projectId = it.projectId,
+                            redirectUrl = it.redirectUrl,
                             requestedWalletAddress = it.requestedWalletAddress,
                             actualWalletAddress = it.actualWalletAddress,
                             signedMessage = it.signedMessage,
@@ -225,7 +225,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                                 beforeActionMessage = it.screenBeforeActionMessage,
                                 afterActionMessage = it.screenAfterActionMessage
                             ),
-                            createdAt = it.createdAt!!
+                            createdAt = it.createdAt
                         )
                     }
                 )

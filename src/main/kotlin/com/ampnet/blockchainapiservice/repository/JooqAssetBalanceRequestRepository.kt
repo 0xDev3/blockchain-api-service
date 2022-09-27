@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IAssetBalanceRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AssetBalanceRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreAssetBalanceRequestParams
@@ -75,12 +74,12 @@ class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : As
             .execute() > 0
     }
 
-    private fun IAssetBalanceRequestRecord.toModel(): AssetBalanceRequest =
+    private fun AssetBalanceRequestRecord.toModel(): AssetBalanceRequest =
         AssetBalanceRequest(
-            id = id!!,
-            projectId = projectId!!,
-            chainId = chainId!!,
-            redirectUrl = redirectUrl!!,
+            id = id,
+            projectId = projectId,
+            chainId = chainId,
+            redirectUrl = redirectUrl,
             tokenAddress = tokenAddress,
             blockNumber = blockNumber,
             requestedWalletAddress = requestedWalletAddress,
@@ -91,6 +90,6 @@ class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : As
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage
             ),
-            createdAt = createdAt!!
+            createdAt = createdAt
         )
 }

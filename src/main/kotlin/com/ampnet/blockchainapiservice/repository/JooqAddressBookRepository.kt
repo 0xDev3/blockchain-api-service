@@ -4,7 +4,6 @@ import com.ampnet.blockchainapiservice.exception.AliasAlreadyInUseException
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import com.ampnet.blockchainapiservice.generated.jooq.tables.AddressBookTable
 import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IAddressBookRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
 import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -109,15 +108,15 @@ class JooqAddressBookRepository(private val dslContext: DSLContext) : AddressBoo
             userId = userId
         )
 
-    private fun IAddressBookRecord.toModel() =
+    private fun AddressBookRecord.toModel() =
         AddressBookEntry(
-            id = id!!,
-            alias = alias!!,
-            address = walletAddress!!,
+            id = id,
+            alias = alias,
+            address = walletAddress,
             phoneNumber = phoneNumber,
             email = email,
-            createdAt = createdAt!!,
-            userId = userId!!
+            createdAt = createdAt,
+            userId = userId
         )
 
     private fun <T> handleDuplicateAlias(alias: String, fn: () -> T): T =

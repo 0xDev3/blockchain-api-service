@@ -99,6 +99,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 contractId = CONTRACT_DECORATOR_ID,
                 contractTags = emptyArray(),
                 contractImplements = emptyArray(),
+                name = null,
+                description = null,
                 projectId = Constants.NIL_UUID
             )
         )

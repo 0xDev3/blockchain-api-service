@@ -66,9 +66,9 @@ class JooqImportedContractDecoratorRepository(
             .fetchOne()
             ?.let {
                 ContractDecorator(
-                    id = it.contractId!!,
-                    artifact = it.artifactJson!!,
-                    manifest = it.manifestJson!!
+                    id = it.contractId,
+                    artifact = it.artifactJson,
+                    manifest = it.manifestJson
                 )
             }
     }
@@ -122,9 +122,9 @@ class JooqImportedContractDecoratorRepository(
             .orderBy(TABLE.IMPORTED_AT.asc())
             .fetch {
                 ContractDecorator(
-                    id = it.contractId!!,
-                    artifact = it.artifactJson!!,
-                    manifest = it.manifestJson!!
+                    id = it.contractId,
+                    artifact = it.artifactJson,
+                    manifest = it.manifestJson
                 )
             }
     }

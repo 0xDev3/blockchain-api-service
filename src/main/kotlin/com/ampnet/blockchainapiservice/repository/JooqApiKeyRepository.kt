@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IApiKeyRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import com.ampnet.blockchainapiservice.model.result.ApiKey
 import mu.KLogging
@@ -58,11 +57,11 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
         )
     }
 
-    private fun IApiKeyRecord.toModel(): ApiKey =
+    private fun ApiKeyRecord.toModel(): ApiKey =
         ApiKey(
-            id = id!!,
-            projectId = projectId!!,
-            apiKey = apiKey!!,
-            createdAt = createdAt!!
+            id = id,
+            projectId = projectId,
+            apiKey = apiKey,
+            createdAt = createdAt
         )
 }

@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IAssetSendRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AssetSendRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreAssetSendRequestParams
@@ -91,22 +90,22 @@ class JooqAssetSendRequestRepository(private val dslContext: DSLContext) : Asset
             .execute() > 0
     }
 
-    private fun IAssetSendRequestRecord.toModel(): AssetSendRequest =
+    private fun AssetSendRequestRecord.toModel(): AssetSendRequest =
         AssetSendRequest(
-            id = id!!,
-            projectId = projectId!!,
-            chainId = chainId!!,
-            redirectUrl = redirectUrl!!,
+            id = id,
+            projectId = projectId,
+            chainId = chainId,
+            redirectUrl = redirectUrl,
             tokenAddress = tokenAddress,
-            assetAmount = assetAmount!!,
+            assetAmount = assetAmount,
             assetSenderAddress = assetSenderAddress,
-            assetRecipientAddress = assetRecipientAddress!!,
+            assetRecipientAddress = assetRecipientAddress,
             txHash = txHash,
             arbitraryData = arbitraryData,
             screenConfig = ScreenConfig(
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage
             ),
-            createdAt = createdAt!!
+            createdAt = createdAt
         )
 }

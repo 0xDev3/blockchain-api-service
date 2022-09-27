@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IAuthorizationRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AuthorizationRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreAuthorizationRequestParams
@@ -72,11 +71,11 @@ class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : A
             .execute() > 0
     }
 
-    private fun IAuthorizationRequestRecord.toModel(): AuthorizationRequest =
+    private fun AuthorizationRequestRecord.toModel(): AuthorizationRequest =
         AuthorizationRequest(
-            id = id!!,
-            projectId = projectId!!,
-            redirectUrl = redirectUrl!!,
+            id = id,
+            projectId = projectId,
+            redirectUrl = redirectUrl,
             requestedWalletAddress = requestedWalletAddress,
             actualWalletAddress = actualWalletAddress,
             signedMessage = signedMessage,
@@ -85,6 +84,6 @@ class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : A
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage
             ),
-            createdAt = createdAt!!
+            createdAt = createdAt
         )
 }

@@ -2,7 +2,6 @@ package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.exception.DuplicateIssuerContractAddressException
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -69,14 +68,14 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
             .fetch { it.toModel() }
     }
 
-    private fun IProjectRecord.toModel(): Project =
+    private fun ProjectRecord.toModel(): Project =
         Project(
-            id = id!!,
-            ownerId = ownerId!!,
-            issuerContractAddress = issuerContractAddress!!,
-            baseRedirectUrl = baseRedirectUrl!!,
-            chainId = chainId!!,
+            id = id,
+            ownerId = ownerId,
+            issuerContractAddress = issuerContractAddress,
+            baseRedirectUrl = baseRedirectUrl,
+            chainId = chainId,
             customRpcUrl = customRpcUrl,
-            createdAt = createdAt!!
+            createdAt = createdAt
         )
 }

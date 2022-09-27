@@ -264,13 +264,15 @@ jooq {
                         isDeprecated = false
                         isRecords = true
                         isImmutablePojos = false
-                        isImmutableInterfaces = true
+                        isImmutableInterfaces = false
                         isFluentSetters = false
                         isIndexes = false
                         isGlobalObjectReferences = false
                         isRecordsImplementingRecordN = false
                         isKeys = false
                         generatedSerialVersionUID = GeneratedSerialVersionUID.HASH
+                        withNonnullAnnotation(true)
+                        withNonnullAnnotationType("NotNull")
                     }
                     target.apply {
                         packageName = "com.ampnet.blockchainapiservice.generated.jooq"
@@ -303,12 +305,17 @@ tasks.withType<JooqGenerate> {
     dependsOn(tasks["flywayMigrate"])
 }
 
+tasks.register<TransformJooqClassesTask>("transformJooqClasses") {
+    jooqClassesPath.set("$buildDir/generated/sources/jooq/main/kotlin/com/ampnet/blockchainapiservice/generated/jooq")
+    dependsOn(tasks["generateJooq"])
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = Configurations.Compile.compilerArgs
         jvmTarget = Versions.Compile.jvmTarget
     }
-    dependsOn.add(tasks["generateJooq"])
+    dependsOn.add(tasks["transformJooqClasses"])
 }
 
 tasks.withType<Test> {
