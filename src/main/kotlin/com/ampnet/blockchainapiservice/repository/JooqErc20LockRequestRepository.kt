@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20LockRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IErc20LockRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20LockRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
@@ -73,16 +72,16 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
             .execute() > 0
     }
 
-    private fun IErc20LockRequestRecord.toModel(): Erc20LockRequest =
+    private fun Erc20LockRequestRecord.toModel(): Erc20LockRequest =
         Erc20LockRequest(
-            id = id!!,
-            projectId = projectId!!,
-            chainId = chainId!!,
-            redirectUrl = redirectUrl!!,
-            tokenAddress = tokenAddress!!,
-            tokenAmount = tokenAmount!!,
-            lockDuration = lockDurationSeconds!!,
-            lockContractAddress = lockContractAddress!!,
+            id = id,
+            projectId = projectId,
+            chainId = chainId,
+            redirectUrl = redirectUrl,
+            tokenAddress = tokenAddress,
+            tokenAmount = tokenAmount,
+            lockDuration = lockDurationSeconds,
+            lockContractAddress = lockContractAddress,
             tokenSenderAddress = tokenSenderAddress,
             txHash = txHash,
             arbitraryData = arbitraryData,
@@ -90,6 +89,6 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage
             ),
-            createdAt = createdAt!!
+            createdAt = createdAt
         )
 }

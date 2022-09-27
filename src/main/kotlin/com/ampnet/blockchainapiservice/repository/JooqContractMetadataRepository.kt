@@ -19,18 +19,18 @@ class JooqContractMetadataRepository(private val dslContext: DSLContext) : Contr
 
     override fun createOrUpdate(contractMetadata: ContractMetadata): Boolean {
         logger.info { "Create or update contract metadata: $contractMetadata" }
-        val tags: Array<String?> = contractMetadata.contractTags.map { it.value }.toTypedArray()
-        val implements: Array<String?> = contractMetadata.contractImplements.map { it.value }.toTypedArray()
+        val tags = contractMetadata.contractTags.map { it.value }.toTypedArray()
+        val implements = contractMetadata.contractImplements.map { it.value }.toTypedArray()
 
         return dslContext.insertInto(TABLE)
             .set(
                 ContractMetadataRecord(
                     id = contractMetadata.id,
-                    name = contractMetadata.name,
-                    description = contractMetadata.description,
                     contractId = contractMetadata.contractId,
                     contractTags = tags,
                     contractImplements = implements,
+                    name = contractMetadata.name,
+                    description = contractMetadata.description,
                     projectId = contractMetadata.projectId
                 )
             )

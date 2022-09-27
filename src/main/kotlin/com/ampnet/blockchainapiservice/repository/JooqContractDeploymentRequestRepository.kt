@@ -42,10 +42,18 @@ class JooqContractDeploymentRequestRepository(
         metadataProjectId: UUID
     ): ContractDeploymentRequest {
         logger.info { "Store contract deployment request, params: $params, metadataProjectId: $metadataProjectId" }
+        val contractMetadataId = DSL.select(CONTRACT_METADATA_TABLE.ID)
+            .from(CONTRACT_METADATA_TABLE)
+            .where(
+                CONTRACT_METADATA_TABLE.CONTRACT_ID.eq(params.contractId),
+                CONTRACT_METADATA_TABLE.PROJECT_ID.eq(metadataProjectId)
+            )
+            .fetchOne(CONTRACT_METADATA_TABLE.ID)
+
         val record = ContractDeploymentRequestRecord(
             id = params.id,
             alias = params.alias,
-            contractMetadataId = null,
+            contractMetadataId = contractMetadataId!!,
             contractData = params.contractData,
             constructorParams = params.constructorParams,
             initialEthAmount = params.initialEthAmount,
@@ -62,20 +70,9 @@ class JooqContractDeploymentRequestRepository(
             imported = params.imported,
             deleted = false
         )
-        val selectContractMetadataId = DSL.select(CONTRACT_METADATA_TABLE.ID)
-            .from(CONTRACT_METADATA_TABLE)
-            .where(
-                DSL.and(
-                    CONTRACT_METADATA_TABLE.CONTRACT_ID.eq(params.contractId),
-                    CONTRACT_METADATA_TABLE.PROJECT_ID.eq(metadataProjectId)
-                )
-            )
 
         try {
-            dslContext.insertInto(CONTRACT_DEPLOYMENT_REQUEST_TABLE)
-                .set(record)
-                .set(CONTRACT_DEPLOYMENT_REQUEST_TABLE.CONTRACT_METADATA_ID, selectContractMetadataId)
-                .execute()
+            dslContext.executeInsert(record)
         } catch (e: DuplicateKeyException) {
             throw AliasAlreadyInUseException(params.alias)
         }
@@ -181,20 +178,20 @@ class JooqContractDeploymentRequestRepository(
         val metadataRecord = this.into(CONTRACT_METADATA_TABLE)
 
         return ContractDeploymentRequest(
-            id = requestRecord.id!!,
-            alias = requestRecord.alias!!,
+            id = requestRecord.id,
+            alias = requestRecord.alias,
             name = metadataRecord.name,
             description = metadataRecord.description,
-            contractId = metadataRecord.contractId!!,
-            contractData = requestRecord.contractData!!,
-            constructorParams = requestRecord.constructorParams!!,
-            contractTags = metadataRecord.contractTags!!.map { ContractTag(it!!) },
-            contractImplements = metadataRecord.contractImplements!!.map { ContractTrait(it!!) },
-            initialEthAmount = requestRecord.initialEthAmount!!,
-            chainId = requestRecord.chainId!!,
-            redirectUrl = requestRecord.redirectUrl!!,
-            projectId = requestRecord.projectId!!,
-            createdAt = requestRecord.createdAt!!,
+            contractId = metadataRecord.contractId,
+            contractData = requestRecord.contractData,
+            constructorParams = requestRecord.constructorParams,
+            contractTags = metadataRecord.contractTags.map { ContractTag(it) },
+            contractImplements = metadataRecord.contractImplements.map { ContractTrait(it) },
+            initialEthAmount = requestRecord.initialEthAmount,
+            chainId = requestRecord.chainId,
+            redirectUrl = requestRecord.redirectUrl,
+            projectId = requestRecord.projectId,
+            createdAt = requestRecord.createdAt,
             arbitraryData = requestRecord.arbitraryData,
             screenConfig = ScreenConfig(
                 beforeActionMessage = requestRecord.screenBeforeActionMessage,
@@ -203,7 +200,7 @@ class JooqContractDeploymentRequestRepository(
             contractAddress = requestRecord.contractAddress,
             deployerAddress = requestRecord.deployerAddress,
             txHash = requestRecord.txHash,
-            imported = requestRecord.imported!!
+            imported = requestRecord.imported
         )
     }
 

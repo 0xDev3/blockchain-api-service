@@ -167,23 +167,23 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
 
     private fun MultiPaymentTemplateRecord.toModel() =
         MultiPaymentTemplate(
-            id = id!!,
+            id = id,
             items = NoItems,
-            templateName = templateName!!,
+            templateName = templateName,
             tokenAddress = tokenAddress,
-            chainId = chainId!!,
-            userId = userId!!,
-            createdAt = createdAt!!,
+            chainId = chainId,
+            userId = userId,
+            createdAt = createdAt,
             updatedAt = updatedAt
         )
 
     private fun MultiPaymentTemplateItemRecord.toModel() =
         MultiPaymentTemplateItem(
-            id = id!!,
-            templateId = templateId!!,
-            walletAddress = walletAddress!!,
+            id = id,
+            templateId = templateId,
+            walletAddress = walletAddress,
             itemName = itemName,
-            assetAmount = assetAmount!!,
-            createdAt = createdAt!!
+            assetAmount = assetAmount,
+            createdAt = createdAt
         )
 }

@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IContractFunctionCallRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractFunctionCallRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
@@ -87,18 +86,18 @@ class JooqContractFunctionCallRequestRepository(
             .execute() > 0
     }
 
-    private fun IContractFunctionCallRequestRecord.toModel() =
+    private fun ContractFunctionCallRequestRecord.toModel() =
         ContractFunctionCallRequest(
-            id = id!!,
+            id = id,
             deployedContractId = deployedContractId,
-            contractAddress = contractAddress!!,
-            functionName = functionName!!,
-            functionParams = functionParams!!,
-            ethAmount = ethAmount!!,
-            chainId = chainId!!,
-            redirectUrl = redirectUrl!!,
-            projectId = projectId!!,
-            createdAt = createdAt!!,
+            contractAddress = contractAddress,
+            functionName = functionName,
+            functionParams = functionParams,
+            ethAmount = ethAmount,
+            chainId = chainId,
+            redirectUrl = redirectUrl,
+            projectId = projectId,
+            createdAt = createdAt,
             arbitraryData = arbitraryData,
             screenConfig = ScreenConfig(
                 beforeActionMessage = screenBeforeActionMessage,

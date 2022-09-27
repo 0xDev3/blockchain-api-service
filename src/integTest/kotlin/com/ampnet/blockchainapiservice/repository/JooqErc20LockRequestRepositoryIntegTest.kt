@@ -245,14 +245,14 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                 .containsExactlyInAnyOrderElementsOf(
                     projectRequests.map {
                         Erc20LockRequest(
-                            id = it.id!!,
-                            projectId = it.projectId!!,
-                            chainId = it.chainId!!,
-                            redirectUrl = it.redirectUrl!!,
-                            tokenAddress = it.tokenAddress!!,
-                            tokenAmount = it.tokenAmount!!,
-                            lockDuration = it.lockDurationSeconds!!,
-                            lockContractAddress = it.lockContractAddress!!,
+                            id = it.id,
+                            projectId = it.projectId,
+                            chainId = it.chainId,
+                            redirectUrl = it.redirectUrl,
+                            tokenAddress = it.tokenAddress,
+                            tokenAmount = it.tokenAmount,
+                            lockDuration = it.lockDurationSeconds,
+                            lockContractAddress = it.lockContractAddress,
                             tokenSenderAddress = it.tokenSenderAddress,
                             txHash = it.txHash,
                             arbitraryData = it.arbitraryData,
@@ -260,7 +260,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                                 beforeActionMessage = it.screenBeforeActionMessage,
                                 afterActionMessage = it.screenAfterActionMessage
                             ),
-                            createdAt = it.createdAt!!
+                            createdAt = it.createdAt
                         )
                     }
                 )

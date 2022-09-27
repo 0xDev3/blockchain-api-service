@@ -237,11 +237,11 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
                 .containsExactlyInAnyOrderElementsOf(
                     projectRequests.map {
                         AssetBalanceRequest(
-                            id = it.id!!,
-                            projectId = it.projectId!!,
-                            chainId = it.chainId!!,
-                            redirectUrl = it.redirectUrl!!,
-                            tokenAddress = it.tokenAddress!!,
+                            id = it.id,
+                            projectId = it.projectId,
+                            chainId = it.chainId,
+                            redirectUrl = it.redirectUrl,
+                            tokenAddress = it.tokenAddress,
                             blockNumber = it.blockNumber,
                             requestedWalletAddress = it.requestedWalletAddress,
                             actualWalletAddress = it.actualWalletAddress,
@@ -251,7 +251,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
                                 beforeActionMessage = it.screenBeforeActionMessage,
                                 afterActionMessage = it.screenAfterActionMessage
                             ),
-                            createdAt = it.createdAt!!
+                            createdAt = it.createdAt
                         )
                     }
                 )

@@ -237,21 +237,21 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
                 .containsExactlyInAnyOrderElementsOf(
                     projectRequests.map {
                         AssetSendRequest(
-                            id = it.id!!,
-                            projectId = it.projectId!!,
-                            chainId = it.chainId!!,
-                            redirectUrl = it.redirectUrl!!,
-                            tokenAddress = it.tokenAddress!!,
-                            assetAmount = it.assetAmount!!,
+                            id = it.id,
+                            projectId = it.projectId,
+                            chainId = it.chainId,
+                            redirectUrl = it.redirectUrl,
+                            tokenAddress = it.tokenAddress,
+                            assetAmount = it.assetAmount,
                             assetSenderAddress = it.assetSenderAddress,
-                            assetRecipientAddress = it.assetRecipientAddress!!,
+                            assetRecipientAddress = it.assetRecipientAddress,
                             txHash = it.txHash,
                             arbitraryData = it.arbitraryData,
                             screenConfig = ScreenConfig(
                                 beforeActionMessage = it.screenBeforeActionMessage,
                                 afterActionMessage = it.screenAfterActionMessage
                             ),
-                            createdAt = it.createdAt!!
+                            createdAt = it.createdAt
                         )
                     }
                 )
@@ -336,21 +336,21 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
                 .containsExactlyInAnyOrderElementsOf(
                     senderRequests.map {
                         AssetSendRequest(
-                            id = it.id!!,
-                            projectId = it.projectId!!,
-                            chainId = it.chainId!!,
-                            redirectUrl = it.redirectUrl!!,
-                            tokenAddress = it.tokenAddress!!,
-                            assetAmount = it.assetAmount!!,
+                            id = it.id,
+                            projectId = it.projectId,
+                            chainId = it.chainId,
+                            redirectUrl = it.redirectUrl,
+                            tokenAddress = it.tokenAddress,
+                            assetAmount = it.assetAmount,
                             assetSenderAddress = it.assetSenderAddress,
-                            assetRecipientAddress = it.assetRecipientAddress!!,
+                            assetRecipientAddress = it.assetRecipientAddress,
                             txHash = it.txHash,
                             arbitraryData = it.arbitraryData,
                             screenConfig = ScreenConfig(
                                 beforeActionMessage = it.screenBeforeActionMessage,
                                 afterActionMessage = it.screenAfterActionMessage
                             ),
-                            createdAt = it.createdAt!!
+                            createdAt = it.createdAt
                         )
                     }
                 )
@@ -420,21 +420,21 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
                 .containsExactlyInAnyOrderElementsOf(
                     recipientRequests.map {
                         AssetSendRequest(
-                            id = it.id!!,
-                            projectId = it.projectId!!,
-                            chainId = it.chainId!!,
-                            redirectUrl = it.redirectUrl!!,
-                            tokenAddress = it.tokenAddress!!,
-                            assetAmount = it.assetAmount!!,
+                            id = it.id,
+                            projectId = it.projectId,
+                            chainId = it.chainId,
+                            redirectUrl = it.redirectUrl,
+                            tokenAddress = it.tokenAddress,
+                            assetAmount = it.assetAmount,
                             assetSenderAddress = it.assetSenderAddress,
-                            assetRecipientAddress = it.assetRecipientAddress!!,
+                            assetRecipientAddress = it.assetRecipientAddress,
                             txHash = it.txHash,
                             arbitraryData = it.arbitraryData,
                             screenConfig = ScreenConfig(
                                 beforeActionMessage = it.screenBeforeActionMessage,
                                 afterActionMessage = it.screenAfterActionMessage
                             ),
-                            createdAt = it.createdAt!!
+                            createdAt = it.createdAt
                         )
                     }
                 )
