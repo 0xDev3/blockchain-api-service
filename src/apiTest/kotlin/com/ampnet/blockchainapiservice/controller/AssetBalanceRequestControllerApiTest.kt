@@ -631,10 +631,10 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
 
         suppose("ID from pre-signed message is used in database") {
-            dslContext.update(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID, id)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.REDIRECT_URL, "https://example.com/$id")
-                .where(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID.eq(createResponse.id))
+            dslContext.update(AssetBalanceRequestTable)
+                .set(AssetBalanceRequestTable.ID, id)
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
 
@@ -748,10 +748,10 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
 
         suppose("ID from pre-signed message is used in database") {
-            dslContext.update(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID, id)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.REDIRECT_URL, "https://example.com/$id")
-                .where(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID.eq(createResponse.id))
+            dslContext.update(AssetBalanceRequestTable)
+                .set(AssetBalanceRequestTable.ID, id)
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
 
@@ -856,10 +856,10 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
 
         suppose("ID from pre-signed message is used in database") {
-            dslContext.update(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID, id)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.REDIRECT_URL, "https://example.com/$id")
-                .where(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID.eq(createResponse.id))
+            dslContext.update(AssetBalanceRequestTable)
+                .set(AssetBalanceRequestTable.ID, id)
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
 
@@ -970,10 +970,10 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
 
         suppose("ID from pre-signed message is used in database") {
-            dslContext.update(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID, id)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.REDIRECT_URL, "https://example.com/$id")
-                .where(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID.eq(createResponse.id))
+            dslContext.update(AssetBalanceRequestTable)
+                .set(AssetBalanceRequestTable.ID, id)
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
 
@@ -1081,10 +1081,10 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
 
         suppose("ID from pre-signed message is used in database") {
-            dslContext.update(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID, id)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.REDIRECT_URL, "https://example.com/$id")
-                .where(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID.eq(createResponse.id))
+            dslContext.update(AssetBalanceRequestTable)
+                .set(AssetBalanceRequestTable.ID, id)
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
 
@@ -1202,10 +1202,10 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
 
         suppose("ID from pre-signed message is used in database") {
-            dslContext.update(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID, id)
-                .set(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.REDIRECT_URL, "https://example.com/$id")
-                .where(AssetBalanceRequestTable.ASSET_BALANCE_REQUEST.ID.eq(createResponse.id))
+            dslContext.update(AssetBalanceRequestTable)
+                .set(AssetBalanceRequestTable.ID, id)
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
 

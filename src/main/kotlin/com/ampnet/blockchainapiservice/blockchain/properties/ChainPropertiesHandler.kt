@@ -11,6 +11,27 @@ import java.util.concurrent.ConcurrentHashMap
 
 class ChainPropertiesHandler(private val applicationProperties: ApplicationProperties) {
 
+    companion object {
+        private val CHAIN_PROPERTIES_RESOLVER_MAP = mapOf<ChainId, (ApplicationProperties) -> ChainProperties>(
+            Chain.MATIC_MAIN.id to { it.chainMatic },
+            Chain.MATIC_TESTNET_MUMBAI.id to { it.chainMumbai },
+            Chain.ETHEREUM_MAIN.id to { it.chainEthereum },
+            Chain.GOERLI_TESTNET.id to { it.chainGoerli },
+            Chain.HARDHAT_TESTNET.id to { it.chainHardhatTestnet },
+            Chain.BSC.id to { it.chainBsc },
+            Chain.XDAI.id to { it.chainXdai },
+            Chain.FANTOM.id to { it.chainFantom },
+            Chain.MOONRIVER.id to { it.chainMoonriver },
+            Chain.AVAX.id to { it.chainAvalanche },
+            Chain.AURORA.id to { it.chainAurora },
+            Chain.ARBITRUM.id to { it.chainArbitrum },
+            Chain.OPTIMISM.id to { it.chainOptimism },
+            Chain.CELO.id to { it.chainCelo },
+            Chain.PARATIME.id to { it.chainParaTime },
+            Chain.MOONBEAM.id to { it.chainMoonbeam }
+        )
+    }
+
     private val blockchainPropertiesMap = ConcurrentHashMap<ChainId, ChainPropertiesWithServices>()
 
     fun getBlockchainProperties(chainSpec: ChainSpec): ChainPropertiesWithServices {
@@ -33,25 +54,7 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
     }
 
     fun getChainProperties(chainId: ChainId): ChainProperties? {
-        return when (chainId) {
-            Chain.MATIC_MAIN.id -> applicationProperties.chainMatic
-            Chain.MATIC_TESTNET_MUMBAI.id -> applicationProperties.chainMumbai
-            Chain.ETHEREUM_MAIN.id -> applicationProperties.chainEthereum
-            Chain.GOERLI_TESTNET.id -> applicationProperties.chainGoerli
-            Chain.HARDHAT_TESTNET.id -> applicationProperties.chainHardhatTestnet
-            Chain.BSC.id -> applicationProperties.chainBsc
-            Chain.XDAI.id -> applicationProperties.chainXdai
-            Chain.FANTOM.id -> applicationProperties.chainFantom
-            Chain.MOONRIVER.id -> applicationProperties.chainMoonriver
-            Chain.AVAX.id -> applicationProperties.chainAvalanche
-            Chain.AURORA.id -> applicationProperties.chainAurora
-            Chain.ARBITRUM.id -> applicationProperties.chainArbitrum
-            Chain.OPTIMISM.id -> applicationProperties.chainOptimism
-            Chain.CELO.id -> applicationProperties.chainCelo
-            Chain.PARATIME.id -> applicationProperties.chainParaTime
-            Chain.MOONBEAM.id -> applicationProperties.chainMoonbeam
-            else -> null
-        }
+        return CHAIN_PROPERTIES_RESOLVER_MAP[chainId]?.invoke(applicationProperties)
     }
 
     internal fun getChainRpcUrl(chain: Chain): String =

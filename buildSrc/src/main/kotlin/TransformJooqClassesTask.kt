@@ -15,6 +15,8 @@ abstract class TransformJooqClassesTask : DefaultTask() {
             val actualType = if (nonNull) type else "${type}?"
         }
 
+        private data class TableClassInfo(val className: String, val valueName: String)
+
         private const val PLACEHOLDER = "<< PLACEHOLDER >>"
         private val ALL_PLACEHOLDERS_REGEX = "($PLACEHOLDER\n)+".toRegex()
         private val RECORD_PROPERTY_REGEX = "[ ]+var[^\n]+\n[ ]+set[^\n]+\n([ ]+@NotNull\n)?[ ]+get[^\n]+\n".toRegex()
@@ -24,6 +26,7 @@ abstract class TransformJooqClassesTask : DefaultTask() {
         private val TABLE_COLUMN_REGEX =
             "val ([^:]+): TableField<([^,]+), (Array<[^>]+>[^>]+|[^>]+)>( = createField[^\n]+)".toRegex()
         private val UPPERCASE_TO_CAMEL_CASE_REGEX = "_([a-z])".toRegex()
+        private val COMPANION_OBJECT_REGEX = "companion object \\{\n\n[ ]+val ([^:]+):[^\n]+\n[ ]+}".toRegex()
     }
 
     @get:Input
@@ -34,17 +37,16 @@ abstract class TransformJooqClassesTask : DefaultTask() {
         val rootPath = Paths.get(jooqClassesPath.get())
 
         val recordInfos = transformRecordClasses(rootPath)
+        val tableInfos = transformTableClasses(rootPath, recordInfos)
 
-        transformTableClasses(rootPath, recordInfos)
+        renameTableReferences(rootPath, tableInfos)
     }
 
-    private fun transformRecordClasses(rootPath: Path): Map<String, RecordClassInfo> {
-        val path = rootPath.resolve("tables/records")
-
-        return path.toFile().listFiles().filter { it.isFile }
+    private fun transformRecordClasses(rootPath: Path): Map<String, RecordClassInfo> =
+        rootPath.resolve("tables/records")
+            .toFile().listFiles().filter { it.isFile }
             .map { transformRecordClass(it.toPath()) }
             .associateBy { it.name }
-    }
 
     private fun transformRecordClass(path: Path): RecordClassInfo {
         val recordSource = Files.readString(path)
@@ -73,21 +75,21 @@ abstract class TransformJooqClassesTask : DefaultTask() {
 
         Files.writeString(path, modifiedSource)
 
-        return RecordClassInfo(path.fileName.toString().replace(".kt", ""), properties.associateBy { it.name })
+        return RecordClassInfo(path.fileName.toString().removeSuffix(".kt"), properties.associateBy { it.name })
     }
 
-    private fun transformTableClasses(rootPath: Path, recordInfos: Map<String, RecordClassInfo>) {
-        val path = rootPath.resolve("tables")
+    private fun transformTableClasses(rootPath: Path, recordInfos: Map<String, RecordClassInfo>): List<TableClassInfo> =
+        rootPath.resolve("tables")
+            .toFile().listFiles().filter { it.isFile }
+            .map { transformTableClass(it.toPath(), recordInfos) }
 
-        path.toFile().listFiles().filter { it.isFile }
-            .forEach { transformTableClass(it.toPath(), recordInfos) }
-    }
-
-    private fun transformTableClass(path: Path, recordInfos: Map<String, RecordClassInfo>) {
+    private fun transformTableClass(path: Path, recordInfos: Map<String, RecordClassInfo>): TableClassInfo {
         val recordSource = Files.readString(path)
+        val tableClassName = path.fileName.toString().removeSuffix(".kt")
+        var tableValueName = ""
 
-        val modifiedSource = TABLE_COLUMN_REGEX
-            .replace(recordSource) {
+        val modifiedSource = recordSource
+            .replace(TABLE_COLUMN_REGEX) {
                 val (_, uppercaseName, recordName, _, rest) = it.groupValues
                 val record = recordInfos[recordName]!!
                 val camelCaseName = UPPERCASE_TO_CAMEL_CASE_REGEX
@@ -97,7 +99,30 @@ abstract class TransformJooqClassesTask : DefaultTask() {
 
                 "val $uppercaseName: TableField<$recordName, ${field.actualType}>$rest"
             }
+            .replace(COMPANION_OBJECT_REGEX) {
+                val (_, valueName) = it.groupValues
+                tableValueName = valueName
+                "companion object : $tableClassName()"
+            }
 
         Files.writeString(path, modifiedSource)
+
+        return TableClassInfo(tableClassName, tableValueName)
+    }
+
+    private fun renameTableReferences(rootPath: Path, tableInfos: List<TableClassInfo>) {
+        val replacements = tableInfos.map { Pair("${it.className}.${it.valueName}", it.className) }
+        val recordFiles = rootPath.resolve("tables/records").toFile().listFiles().asSequence()
+        val tableFiles = rootPath.resolve("tables").toFile().listFiles().asSequence()
+        val baseFiles = rootPath.toFile().listFiles().asSequence()
+
+        sequenceOf(recordFiles, tableFiles, baseFiles)
+            .flatMap { it }.filter { it.isFile }
+            .map { it.toPath() }
+            .forEach { path ->
+                val source = Files.readString(path)
+                val modifiedSource = replacements.fold(source) { acc, pair -> acc.replace(pair.first, pair.second) }
+                Files.writeString(path, modifiedSource)
+            }
     }
 }

@@ -270,6 +270,7 @@ jooq {
                         isGlobalObjectReferences = false
                         isRecordsImplementingRecordN = false
                         isKeys = false
+                        isJavadoc = false
                         generatedSerialVersionUID = GeneratedSerialVersionUID.HASH
                         withNonnullAnnotation(true)
                         withNonnullAnnotationType("NotNull")
