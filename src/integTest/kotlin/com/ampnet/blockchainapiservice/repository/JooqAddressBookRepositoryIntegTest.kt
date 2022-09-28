@@ -4,7 +4,6 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.exception.AliasAlreadyInUseException
 import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IAddressBookRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
@@ -77,7 +76,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         }
 
         verify("address book entry is correctly fetched by ID") {
-            val result = repository.getById(record.id!!)
+            val result = repository.getById(record.id)
 
             assertThat(result).withMessage()
                 .isEqualTo(record.toModel())
@@ -263,14 +262,14 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         }
     }
 
-    private fun IAddressBookRecord.toModel() =
+    private fun AddressBookRecord.toModel() =
         AddressBookEntry(
-            id = id!!,
-            alias = alias!!,
-            address = walletAddress!!,
+            id = id,
+            alias = alias,
+            address = walletAddress,
             phoneNumber = phoneNumber,
             email = email,
-            createdAt = createdAt!!,
-            userId = userId!!
+            createdAt = createdAt,
+            userId = userId
         )
 }

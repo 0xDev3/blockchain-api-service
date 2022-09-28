@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IContractFunctionCallRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractFunctionCallRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
@@ -21,9 +20,7 @@ class JooqContractFunctionCallRequestRepository(
     private val dslContext: DSLContext
 ) : ContractFunctionCallRequestRepository {
 
-    companion object : KLogging() {
-        private val TABLE = ContractFunctionCallRequestTable.CONTRACT_FUNCTION_CALL_REQUEST
-    }
+    companion object : KLogging()
 
     override fun store(params: StoreContractFunctionCallRequestParams): ContractFunctionCallRequest {
         logger.info { "Store contract function call request, params: $params" }
@@ -50,8 +47,8 @@ class JooqContractFunctionCallRequestRepository(
 
     override fun getById(id: UUID): ContractFunctionCallRequest? {
         logger.debug { "Get contract function call request by id: $id" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.ID.eq(id))
+        return dslContext.selectFrom(ContractFunctionCallRequestTable)
+            .where(ContractFunctionCallRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
@@ -62,43 +59,46 @@ class JooqContractFunctionCallRequestRepository(
         logger.debug { "Get contract function call requests by projectId: $projectId, filters: $filters" }
 
         val conditions = listOfNotNull(
-            TABLE.PROJECT_ID.eq(projectId),
-            filters.deployedContractId?.let { TABLE.DEPLOYED_CONTRACT_ID.eq(it) },
-            filters.contractAddress?.let { TABLE.CONTRACT_ADDRESS.eq(it) },
+            ContractFunctionCallRequestTable.PROJECT_ID.eq(projectId),
+            filters.deployedContractId?.let { ContractFunctionCallRequestTable.DEPLOYED_CONTRACT_ID.eq(it) },
+            filters.contractAddress?.let { ContractFunctionCallRequestTable.CONTRACT_ADDRESS.eq(it) },
         )
 
-        return dslContext.selectFrom(TABLE)
+        return dslContext.selectFrom(ContractFunctionCallRequestTable)
             .where(conditions)
-            .orderBy(TABLE.CREATED_AT.asc())
+            .orderBy(ContractFunctionCallRequestTable.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
     override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
         logger.info { "Set txInfo for contract function call request, id: $id, txHash: $txHash, caller: $caller" }
-        return dslContext.update(TABLE)
-            .set(TABLE.TX_HASH, txHash)
-            .set(TABLE.CALLER_ADDRESS, coalesce(TABLE.CALLER_ADDRESS, caller))
+        return dslContext.update(ContractFunctionCallRequestTable)
+            .set(ContractFunctionCallRequestTable.TX_HASH, txHash)
+            .set(
+                ContractFunctionCallRequestTable.CALLER_ADDRESS,
+                coalesce(ContractFunctionCallRequestTable.CALLER_ADDRESS, caller)
+            )
             .where(
                 DSL.and(
-                    TABLE.ID.eq(id),
-                    TABLE.TX_HASH.isNull()
+                    ContractFunctionCallRequestTable.ID.eq(id),
+                    ContractFunctionCallRequestTable.TX_HASH.isNull()
                 )
             )
             .execute() > 0
     }
 
-    private fun IContractFunctionCallRequestRecord.toModel() =
+    private fun ContractFunctionCallRequestRecord.toModel() =
         ContractFunctionCallRequest(
-            id = id!!,
+            id = id,
             deployedContractId = deployedContractId,
-            contractAddress = contractAddress!!,
-            functionName = functionName!!,
-            functionParams = functionParams!!,
-            ethAmount = ethAmount!!,
-            chainId = chainId!!,
-            redirectUrl = redirectUrl!!,
-            projectId = projectId!!,
-            createdAt = createdAt!!,
+            contractAddress = contractAddress,
+            functionName = functionName,
+            functionParams = functionParams,
+            ethAmount = ethAmount,
+            chainId = chainId,
+            redirectUrl = redirectUrl,
+            projectId = projectId,
+            createdAt = createdAt,
             arbitraryData = arbitraryData,
             screenConfig = ScreenConfig(
                 beforeActionMessage = screenBeforeActionMessage,

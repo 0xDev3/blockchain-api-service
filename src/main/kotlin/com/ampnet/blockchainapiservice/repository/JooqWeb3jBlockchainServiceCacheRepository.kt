@@ -25,12 +25,7 @@ import java.util.UUID
 class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLContext) :
     Web3jBlockchainServiceCacheRepository {
 
-    companion object : KLogging() {
-        private val FETCH_ACCOUNT_BALANCE_CACHE_TABLE = FetchAccountBalanceCacheTable.FETCH_ACCOUNT_BALANCE_CACHE
-        private val FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE =
-            FetchErc20AccountBalanceCacheTable.FETCH_ERC20_ACCOUNT_BALANCE_CACHE
-        private val FETCH_TRANSACTION_INFO_CACHE_TABLE = FetchTransactionInfoCacheTable.FETCH_TRANSACTION_INFO_CACHE
-    }
+    companion object : KLogging()
 
     override fun cacheFetchAccountBalance(id: UUID, chainSpec: ChainSpec, accountBalance: AccountBalance) {
         logger.info {
@@ -136,22 +131,22 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 " blockNumber: $blockNumber"
         }
 
-        return dslContext.selectFrom(FETCH_ACCOUNT_BALANCE_CACHE_TABLE)
+        return dslContext.selectFrom(FetchAccountBalanceCacheTable)
             .where(
                 DSL.and(
-                    FETCH_ACCOUNT_BALANCE_CACHE_TABLE.CHAIN_ID.eq(chainSpec.chainId),
-                    FETCH_ACCOUNT_BALANCE_CACHE_TABLE.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
-                    FETCH_ACCOUNT_BALANCE_CACHE_TABLE.WALLET_ADDRESS.eq(walletAddress),
-                    FETCH_ACCOUNT_BALANCE_CACHE_TABLE.BLOCK_NUMBER.eq(blockNumber)
+                    FetchAccountBalanceCacheTable.CHAIN_ID.eq(chainSpec.chainId),
+                    FetchAccountBalanceCacheTable.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
+                    FetchAccountBalanceCacheTable.WALLET_ADDRESS.eq(walletAddress),
+                    FetchAccountBalanceCacheTable.BLOCK_NUMBER.eq(blockNumber)
                 )
             )
             .fetchOne()
             ?.let {
                 AccountBalance(
-                    wallet = it.walletAddress!!,
-                    blockNumber = it.blockNumber!!,
-                    timestamp = it.timestamp!!,
-                    amount = it.assetAmount!!
+                    wallet = it.walletAddress,
+                    blockNumber = it.blockNumber,
+                    timestamp = it.timestamp,
+                    amount = it.assetAmount
                 )
             }
     }
@@ -167,23 +162,23 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 " walletAddress: $walletAddress, blockNumber: $blockNumber"
         }
 
-        return dslContext.selectFrom(FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE)
+        return dslContext.selectFrom(FetchErc20AccountBalanceCacheTable)
             .where(
                 DSL.and(
-                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.CHAIN_ID.eq(chainSpec.chainId),
-                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
-                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.CONTRACT_ADDRESS.eq(contractAddress),
-                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.WALLET_ADDRESS.eq(walletAddress),
-                    FETCH_ERC20_ACCOUNT_BALANCE_CACHE_TABLE.BLOCK_NUMBER.eq(blockNumber)
+                    FetchErc20AccountBalanceCacheTable.CHAIN_ID.eq(chainSpec.chainId),
+                    FetchErc20AccountBalanceCacheTable.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
+                    FetchErc20AccountBalanceCacheTable.CONTRACT_ADDRESS.eq(contractAddress),
+                    FetchErc20AccountBalanceCacheTable.WALLET_ADDRESS.eq(walletAddress),
+                    FetchErc20AccountBalanceCacheTable.BLOCK_NUMBER.eq(blockNumber)
                 )
             )
             .fetchOne()
             ?.let {
                 AccountBalance(
-                    wallet = it.walletAddress!!,
-                    blockNumber = it.blockNumber!!,
-                    timestamp = it.timestamp!!,
-                    amount = it.assetAmount!!
+                    wallet = it.walletAddress,
+                    blockNumber = it.blockNumber,
+                    timestamp = it.timestamp,
+                    amount = it.assetAmount
                 )
             }
     }
@@ -198,26 +193,26 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                 " currentBlockNumber: $currentBlockNumber"
         }
 
-        return dslContext.selectFrom(FETCH_TRANSACTION_INFO_CACHE_TABLE)
+        return dslContext.selectFrom(FetchTransactionInfoCacheTable)
             .where(
                 DSL.and(
-                    FETCH_TRANSACTION_INFO_CACHE_TABLE.CHAIN_ID.eq(chainSpec.chainId),
-                    FETCH_TRANSACTION_INFO_CACHE_TABLE.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
-                    FETCH_TRANSACTION_INFO_CACHE_TABLE.TX_HASH.eq(txHash)
+                    FetchTransactionInfoCacheTable.CHAIN_ID.eq(chainSpec.chainId),
+                    FetchTransactionInfoCacheTable.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
+                    FetchTransactionInfoCacheTable.TX_HASH.eq(txHash)
                 )
             )
             .fetchOne()
             ?.let {
                 BlockchainTransactionInfo(
-                    hash = it.txHash!!,
-                    from = it.fromAddress!!,
-                    to = it.toAddress!!,
+                    hash = it.txHash,
+                    from = it.fromAddress,
+                    to = it.toAddress,
                     deployedContractAddress = it.deployedContractAddress,
-                    data = it.txData!!,
-                    value = it.valueAmount!!,
-                    blockConfirmations = (currentBlockNumber.value - it.blockNumber!!.value).max(BigInteger.ZERO),
-                    timestamp = it.timestamp!!,
-                    success = it.success!!
+                    data = it.txData,
+                    value = it.valueAmount,
+                    blockConfirmations = (currentBlockNumber.value - it.blockNumber.value).max(BigInteger.ZERO),
+                    timestamp = it.timestamp,
+                    success = it.success
                 )
             }
     }

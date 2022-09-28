@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.generated.jooq.tables.Erc20LockRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.interfaces.IErc20LockRequestRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.Erc20LockRequestRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
@@ -18,9 +17,7 @@ import java.util.UUID
 @Repository
 class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20LockRequestRepository {
 
-    companion object : KLogging() {
-        private val TABLE = Erc20LockRequestTable.ERC20_LOCK_REQUEST
-    }
+    companion object : KLogging()
 
     override fun store(params: StoreErc20LockRequestParams): Erc20LockRequest {
         logger.info { "Store ERC20 lock request, params: $params" }
@@ -46,43 +43,46 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
 
     override fun getById(id: UUID): Erc20LockRequest? {
         logger.debug { "Get ERC20 lock request by id: $id" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.ID.eq(id))
+        return dslContext.selectFrom(Erc20LockRequestTable)
+            .where(Erc20LockRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
     override fun getAllByProjectId(projectId: UUID): List<Erc20LockRequest> {
         logger.debug { "Get ERC20 lock requests filtered by projectId: $projectId" }
-        return dslContext.selectFrom(TABLE)
-            .where(TABLE.PROJECT_ID.eq(projectId))
-            .orderBy(TABLE.CREATED_AT.asc())
+        return dslContext.selectFrom(Erc20LockRequestTable)
+            .where(Erc20LockRequestTable.PROJECT_ID.eq(projectId))
+            .orderBy(Erc20LockRequestTable.CREATED_AT.asc())
             .fetch { it.toModel() }
     }
 
     override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
         logger.info { "Set txInfo for ERC20 lock request, id: $id, txHash: $txHash, caller: $caller" }
-        return dslContext.update(TABLE)
-            .set(TABLE.TX_HASH, txHash)
-            .set(TABLE.TOKEN_SENDER_ADDRESS, coalesce(TABLE.TOKEN_SENDER_ADDRESS, caller))
+        return dslContext.update(Erc20LockRequestTable)
+            .set(Erc20LockRequestTable.TX_HASH, txHash)
+            .set(
+                Erc20LockRequestTable.TOKEN_SENDER_ADDRESS,
+                coalesce(Erc20LockRequestTable.TOKEN_SENDER_ADDRESS, caller)
+            )
             .where(
                 DSL.and(
-                    TABLE.ID.eq(id),
-                    TABLE.TX_HASH.isNull()
+                    Erc20LockRequestTable.ID.eq(id),
+                    Erc20LockRequestTable.TX_HASH.isNull()
                 )
             )
             .execute() > 0
     }
 
-    private fun IErc20LockRequestRecord.toModel(): Erc20LockRequest =
+    private fun Erc20LockRequestRecord.toModel(): Erc20LockRequest =
         Erc20LockRequest(
-            id = id!!,
-            projectId = projectId!!,
-            chainId = chainId!!,
-            redirectUrl = redirectUrl!!,
-            tokenAddress = tokenAddress!!,
-            tokenAmount = tokenAmount!!,
-            lockDuration = lockDurationSeconds!!,
-            lockContractAddress = lockContractAddress!!,
+            id = id,
+            projectId = projectId,
+            chainId = chainId,
+            redirectUrl = redirectUrl,
+            tokenAddress = tokenAddress,
+            tokenAmount = tokenAmount,
+            lockDuration = lockDurationSeconds,
+            lockContractAddress = lockContractAddress,
             tokenSenderAddress = tokenSenderAddress,
             txHash = txHash,
             arbitraryData = arbitraryData,
@@ -90,6 +90,6 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
                 beforeActionMessage = screenBeforeActionMessage,
                 afterActionMessage = screenAfterActionMessage
             ),
-            createdAt = createdAt!!
+            createdAt = createdAt
         )
 }

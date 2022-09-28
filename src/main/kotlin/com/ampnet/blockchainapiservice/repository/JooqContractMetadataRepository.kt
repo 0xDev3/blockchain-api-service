@@ -13,43 +13,41 @@ import java.util.UUID
 @Repository
 class JooqContractMetadataRepository(private val dslContext: DSLContext) : ContractMetadataRepository {
 
-    companion object : KLogging() {
-        private val TABLE = ContractMetadataTable.CONTRACT_METADATA
-    }
+    companion object : KLogging()
 
     override fun createOrUpdate(contractMetadata: ContractMetadata): Boolean {
         logger.info { "Create or update contract metadata: $contractMetadata" }
-        val tags: Array<String?> = contractMetadata.contractTags.map { it.value }.toTypedArray()
-        val implements: Array<String?> = contractMetadata.contractImplements.map { it.value }.toTypedArray()
+        val tags = contractMetadata.contractTags.map { it.value }.toTypedArray()
+        val implements = contractMetadata.contractImplements.map { it.value }.toTypedArray()
 
-        return dslContext.insertInto(TABLE)
+        return dslContext.insertInto(ContractMetadataTable)
             .set(
                 ContractMetadataRecord(
                     id = contractMetadata.id,
-                    name = contractMetadata.name,
-                    description = contractMetadata.description,
                     contractId = contractMetadata.contractId,
                     contractTags = tags,
                     contractImplements = implements,
+                    name = contractMetadata.name,
+                    description = contractMetadata.description,
                     projectId = contractMetadata.projectId
                 )
             )
-            .onConflict(TABLE.CONTRACT_ID, TABLE.PROJECT_ID)
+            .onConflict(ContractMetadataTable.CONTRACT_ID, ContractMetadataTable.PROJECT_ID)
             .doUpdate()
-            .set(TABLE.NAME, contractMetadata.name)
-            .set(TABLE.DESCRIPTION, contractMetadata.description)
-            .set(TABLE.CONTRACT_TAGS, tags)
-            .set(TABLE.CONTRACT_IMPLEMENTS, implements)
+            .set(ContractMetadataTable.NAME, contractMetadata.name)
+            .set(ContractMetadataTable.DESCRIPTION, contractMetadata.description)
+            .set(ContractMetadataTable.CONTRACT_TAGS, tags)
+            .set(ContractMetadataTable.CONTRACT_IMPLEMENTS, implements)
             .execute() > 0
     }
 
     override fun exists(contractId: ContractId, projectId: UUID): Boolean {
         logger.debug { "Check if contract metadata exists, contractId: $contractId, projectId: $projectId" }
         return dslContext.fetchExists(
-            TABLE,
+            ContractMetadataTable,
             DSL.and(
-                TABLE.CONTRACT_ID.eq(contractId),
-                TABLE.PROJECT_ID.eq(projectId)
+                ContractMetadataTable.CONTRACT_ID.eq(contractId),
+                ContractMetadataTable.PROJECT_ID.eq(projectId)
             )
         )
     }
