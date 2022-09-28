@@ -151,7 +151,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("contract deployment request is correctly fetched by alias") {
-            val result = repository.getByAliasAndProjectId(record.alias!!, record.projectId!!)
+            val result = repository.getByAliasAndProjectId(record.alias, record.projectId)
 
             assertThat(result).withMessage()
                 .isEqualTo(record.toModel(metadata))
@@ -325,7 +325,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             ).withMessage()
                 .containsExactlyInAnyOrderElementsOf(
                     (project1ContractsWithMatchingCid + project1NonDeployedContractsWithMatchingCid)
-                        .map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
+                        .map { it.toModel(metadataById[it.contractMetadataId]!!) }
                 )
         }
 
@@ -342,7 +342,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 )
             ).withMessage()
                 .containsExactlyInAnyOrderElementsOf(
-                    project1ContractsWithMatchingCid.map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
+                    project1ContractsWithMatchingCid.map { it.toModel(metadataById[it.contractMetadataId]!!) }
                 )
         }
 
@@ -362,7 +362,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 )
             ).withMessage()
                 .containsExactlyInAnyOrderElementsOf(
-                    project1ContractsWithMatchingTags.map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
+                    project1ContractsWithMatchingTags.map { it.toModel(metadataById[it.contractMetadataId]!!) }
                 )
         }
 
@@ -382,7 +382,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 )
             ).withMessage()
                 .containsExactlyInAnyOrderElementsOf(
-                    project1ContractsWithMatchingTraits.map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
+                    project1ContractsWithMatchingTraits.map { it.toModel(metadataById[it.contractMetadataId]!!) }
                 )
         }
 
@@ -412,7 +412,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 )
             ).withMessage()
                 .containsExactlyInAnyOrderElementsOf(
-                    project2MatchingContracts.map { it.toModel(metadataById[it.contractMetadataId!!]!!) }
+                    project2MatchingContracts.map { it.toModel(metadataById[it.contractMetadataId]!!) }
                 )
         }
     }
@@ -450,7 +450,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         val storedContractDeploymentRequest = suppose("contract deployment request is stored in database") {
-            repository.store(params, metadata.projectId!!)
+            repository.store(params, metadata.projectId)
         }
 
         val expectedContractDeploymentRequest = ContractDeploymentRequest(
@@ -493,7 +493,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
         verify("storing contract deployment request with conflicting alias throws AliasAlreadyInUseException") {
             assertThrows<AliasAlreadyInUseException>(message) {
-                repository.store(params.copy(id = UUID.randomUUID()), metadata.projectId!!)
+                repository.store(params.copy(id = UUID.randomUUID()), metadata.projectId)
             }
         }
     }
@@ -559,7 +559,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params, metadata.projectId!!)
+            repository.store(params, metadata.projectId)
         }
 
         verify("setting txInfo will succeed") {
@@ -634,7 +634,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params, metadata.projectId!!)
+            repository.store(params, metadata.projectId)
         }
 
         verify("setting txInfo will succeed") {
@@ -710,7 +710,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params, metadata.projectId!!)
+            repository.store(params, metadata.projectId)
         }
 
         verify("setting txInfo will succeed") {
@@ -796,7 +796,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params, metadata.projectId!!)
+            repository.store(params, metadata.projectId)
         }
 
         verify("setting contract address will succeed") {
@@ -871,7 +871,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         suppose("contract deployment request is stored in database") {
-            repository.store(params, metadata.projectId!!)
+            repository.store(params, metadata.projectId)
         }
 
         verify("setting contract address will succeed") {
@@ -962,20 +962,20 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     private fun ContractDeploymentRequestRecord.toModel(metadata: ContractMetadataRecord) =
         ContractDeploymentRequest(
-            id = id!!,
-            alias = alias!!,
+            id = id,
+            alias = alias,
             name = NAME,
             description = DESCRIPTION,
-            contractId = metadata.contractId!!,
-            contractData = contractData!!,
-            constructorParams = constructorParams!!,
-            contractTags = metadata.contractTags!!.map { ContractTag(it!!) },
-            contractImplements = metadata.contractImplements!!.map { ContractTrait(it!!) },
+            contractId = metadata.contractId,
+            contractData = contractData,
+            constructorParams = constructorParams,
+            contractTags = metadata.contractTags.map { ContractTag(it) },
+            contractImplements = metadata.contractImplements.map { ContractTrait(it) },
             initialEthAmount = INITIAL_ETH_AMOUNT,
-            chainId = chainId!!,
-            redirectUrl = redirectUrl!!,
-            projectId = projectId!!,
-            createdAt = createdAt!!,
+            chainId = chainId,
+            redirectUrl = redirectUrl,
+            projectId = projectId,
+            createdAt = createdAt,
             arbitraryData = arbitraryData,
             screenConfig = ScreenConfig(
                 beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,

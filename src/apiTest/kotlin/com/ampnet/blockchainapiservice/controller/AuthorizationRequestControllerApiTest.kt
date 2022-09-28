@@ -315,10 +315,10 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
         val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
 
         suppose("ID from pre-signed message is used in database") {
-            dslContext.update(AuthorizationRequestTable.AUTHORIZATION_REQUEST)
-                .set(AuthorizationRequestTable.AUTHORIZATION_REQUEST.ID, id)
-                .set(AuthorizationRequestTable.AUTHORIZATION_REQUEST.REDIRECT_URL, "https://example.com/$id")
-                .where(AuthorizationRequestTable.AUTHORIZATION_REQUEST.ID.eq(createResponse.id))
+            dslContext.update(AuthorizationRequestTable)
+                .set(AuthorizationRequestTable.ID, id)
+                .set(AuthorizationRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .where(AuthorizationRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
 
@@ -399,10 +399,10 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
         val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
 
         suppose("ID from pre-signed message is used in database") {
-            dslContext.update(AuthorizationRequestTable.AUTHORIZATION_REQUEST)
-                .set(AuthorizationRequestTable.AUTHORIZATION_REQUEST.ID, id)
-                .set(AuthorizationRequestTable.AUTHORIZATION_REQUEST.REDIRECT_URL, "https://example.com/$id")
-                .where(AuthorizationRequestTable.AUTHORIZATION_REQUEST.ID.eq(createResponse.id))
+            dslContext.update(AuthorizationRequestTable)
+                .set(AuthorizationRequestTable.ID, id)
+                .set(AuthorizationRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .where(AuthorizationRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
 
