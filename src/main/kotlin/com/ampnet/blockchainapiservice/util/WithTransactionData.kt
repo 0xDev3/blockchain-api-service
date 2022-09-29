@@ -5,6 +5,13 @@ import java.math.BigInteger
 
 data class WithTransactionData<T>(val value: T, val status: Status, val transactionData: TransactionData)
 
+data class WithMultiTransactionData<T>(
+    val value: T,
+    val status: Status,
+    val approveTransactionData: TransactionData?,
+    val sendTransactionData: TransactionData
+)
+
 data class TransactionData(
     val txHash: TransactionHash?,
     val fromAddress: WalletAddress?,
