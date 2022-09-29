@@ -195,7 +195,7 @@ jooq {
                             ForcedType().apply {
                                 userType = "com.ampnet.blockchainapiservice.util.TransactionHash"
                                 converter = "com.ampnet.blockchainapiservice.util.TransactionHashConverter"
-                                includeExpression = "tx_hash"
+                                includeExpression = ".*tx_hash"
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
