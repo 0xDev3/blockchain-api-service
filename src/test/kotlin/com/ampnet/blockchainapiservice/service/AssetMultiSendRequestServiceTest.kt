@@ -217,7 +217,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -352,7 +352,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -472,7 +472,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -594,7 +594,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -716,7 +716,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -838,7 +838,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -960,7 +960,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -1082,7 +1082,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -1204,7 +1204,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -1326,7 +1326,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -1401,7 +1401,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(CREATE_PARAMS.tokenAddress!!),
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -1462,7 +1462,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -1537,7 +1537,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(CREATE_PARAMS.tokenAddress!!),
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -1602,7 +1602,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     functionName = "disperseEther",
                     arguments = listOf(
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )
@@ -1684,7 +1684,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                     arguments = listOf(
                         FunctionArgument(CREATE_PARAMS.tokenAddress!!),
                         FunctionArgument.fromAddresses(CREATE_PARAMS.assetRecipientAddresses),
-                        FunctionArgument.fromUints(CREATE_PARAMS.assetAmounts)
+                        FunctionArgument.fromUint256s(CREATE_PARAMS.assetAmounts)
                     )
                 )
             )

@@ -7,8 +7,8 @@ import com.fasterxml.jackson.databind.JsonNode
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.Type
-import org.web3j.abi.datatypes.Uint
 import org.web3j.abi.datatypes.Utf8String
+import org.web3j.abi.datatypes.generated.Uint256
 
 @Suppress("DataClassPrivateConstructor")
 data class FunctionArgument(
@@ -25,8 +25,8 @@ data class FunctionArgument(
         fun fromAddresses(elems: List<EthereumAddress>) =
             FunctionArgument(DynamicArray(Address::class.java, elems.map { it.value }))
 
-        fun fromUints(elems: List<EthereumUint>) =
-            FunctionArgument(DynamicArray(Uint::class.java, elems.map { it.value }))
+        fun fromUint256s(elems: List<EthereumUint>) =
+            FunctionArgument(DynamicArray(Uint256::class.java, elems.map { Uint256(it.rawValue) }))
     }
 }
 

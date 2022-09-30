@@ -19,9 +19,6 @@ import com.ampnet.blockchainapiservice.util.WithFunctionDataOrEthValue
 import com.ampnet.blockchainapiservice.util.WithMultiTransactionData
 import mu.KLogging
 import org.springframework.stereotype.Service
-import org.web3j.abi.datatypes.Address
-import org.web3j.abi.datatypes.DynamicArray
-import org.web3j.abi.datatypes.Uint
 import java.util.UUID
 
 @Service
@@ -132,7 +129,7 @@ class AssetMultiSendRequestServiceImpl(
             functionName = "disperseEther",
             arguments = listOf(
                 FunctionArgument.fromAddresses(recipients),
-                FunctionArgument.fromUints(amounts)
+                FunctionArgument.fromUint256s(amounts)
             )
         )
 
@@ -146,7 +143,7 @@ class AssetMultiSendRequestServiceImpl(
             arguments = listOf(
                 FunctionArgument(tokenAddress),
                 FunctionArgument.fromAddresses(recipients),
-                FunctionArgument.fromUints(amounts)
+                FunctionArgument.fromUint256s(amounts)
             )
         )
 
@@ -240,13 +237,13 @@ class AssetMultiSendRequestServiceImpl(
     ): Status =
         if (transactionInfo == null) { // implies that either txHash is null or transaction is not yet mined
             Status.PENDING
-        } else if (isSendSuccess(transactionInfo, expectedData, sendValue)) {
+        } else if (isDisperseSuccess(transactionInfo, expectedData, sendValue)) {
             Status.SUCCESS
         } else {
             Status.FAILED
         }
 
-    private fun AssetMultiSendRequest.isSendSuccess(
+    private fun AssetMultiSendRequest.isDisperseSuccess(
         transactionInfo: BlockchainTransactionInfo,
         expectedData: FunctionData,
         sendValue: Balance
