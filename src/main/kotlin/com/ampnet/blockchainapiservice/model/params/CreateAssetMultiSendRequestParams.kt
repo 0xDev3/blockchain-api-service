@@ -16,8 +16,8 @@ data class CreateAssetMultiSendRequestParams(
     val itemNames: List<String?>,
     val assetSenderAddress: WalletAddress?,
     val arbitraryData: JsonNode?,
-    val sendScreenConfig: ScreenConfig,
-    val approveScreenConfig: ScreenConfig
+    val approveScreenConfig: ScreenConfig,
+    val disperseScreenConfig: ScreenConfig
 ) {
     constructor(requestBody: CreateAssetMultiSendRequest) : this(
         redirectUrl = requestBody.redirectUrl,
@@ -28,7 +28,7 @@ data class CreateAssetMultiSendRequestParams(
         itemNames = requestBody.items.map { it.itemName },
         assetSenderAddress = requestBody.senderAddress?.let { WalletAddress(it) },
         arbitraryData = requestBody.arbitraryData,
-        sendScreenConfig = requestBody.sendScreenConfig ?: ScreenConfig.EMPTY,
-        approveScreenConfig = requestBody.approveScreenConfig ?: ScreenConfig.EMPTY
+        approveScreenConfig = requestBody.approveScreenConfig ?: ScreenConfig.EMPTY,
+        disperseScreenConfig = requestBody.disperseScreenConfig ?: ScreenConfig.EMPTY
     )
 }

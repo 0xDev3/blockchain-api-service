@@ -12,5 +12,5 @@ interface AssetMultiSendRequestRepository {
     fun getAllByProjectId(projectId: UUID): List<AssetMultiSendRequest>
     fun getBySender(sender: WalletAddress): List<AssetMultiSendRequest>
     fun setApproveTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean
-    fun setSendTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean
+    fun setDisperseTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean
 }

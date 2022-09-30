@@ -46,10 +46,10 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         private val ARBITRARY_DATA = TestData.EMPTY_JSON_OBJECT
         private const val APPROVE_SCREEN_BEFORE_ACTION_MESSAGE = "approve-screen-before-action-message"
         private const val APPROVE_SCREEN_AFTER_ACTION_MESSAGE = "approve-screen-after-action-message"
-        private const val SEND_SCREEN_BEFORE_ACTION_MESSAGE = "send-screen-before-action-message"
-        private const val SEND_SCREEN_AFTER_ACTION_MESSAGE = "send-screen-after-action-message"
+        private const val DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE = "disperse-screen-before-action-message"
+        private const val DISPERSE_SCREEN_AFTER_ACTION_MESSAGE = "disperse-screen-after-action-message"
         private val APPROVE_TX_HASH = TransactionHash("approve-tx-hash")
-        private val SEND_TX_HASH = TransactionHash("send-tx-hash")
+        private val DISPERSE_TX_HASH = TransactionHash("disperse-tx-hash")
         private val PROJECT_ID = UUID.randomUUID()
         private val OWNER_ID = UUID.randomUUID()
     }
@@ -89,6 +89,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    @Suppress("UNCHECKED_CAST")
     fun mustCorrectlyFetchAssetMultiSendRequestById() {
         val id = UUID.randomUUID()
 
@@ -106,11 +107,11 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                     itemNames = ITEM_NAMES.toTypedArray() as Array<String>,
                     arbitraryData = ARBITRARY_DATA,
                     approveTxHash = APPROVE_TX_HASH,
-                    sendTxHash = SEND_TX_HASH,
+                    disperseTxHash = DISPERSE_TX_HASH,
                     approveScreenBeforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                     approveScreenAfterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE,
-                    sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                    sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                    disperseScreenBeforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                    disperseScreenAfterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE,
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP
                 )
@@ -134,15 +135,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                         assetSenderAddress = ASSET_SENDER_ADDRESS,
                         itemNames = ITEM_NAMES,
                         approveTxHash = APPROVE_TX_HASH,
-                        sendTxHash = SEND_TX_HASH,
+                        disperseTxHash = DISPERSE_TX_HASH,
                         arbitraryData = ARBITRARY_DATA,
                         approveScreenConfig = ScreenConfig(
                             beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
-                        sendScreenConfig = ScreenConfig(
-                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        disperseScreenConfig = ScreenConfig(
+                            beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
                         createdAt = TestData.TIMESTAMP
                     )
@@ -161,6 +162,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    @Suppress("UNCHECKED_CAST")
     fun mustCorrectlyFetchAssetMultiSendRequestsByProject() {
         val otherProjectId = UUID.randomUUID()
 
@@ -191,11 +193,11 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 assetSenderAddress = ASSET_SENDER_ADDRESS,
                 arbitraryData = ARBITRARY_DATA,
                 approveTxHash = APPROVE_TX_HASH,
-                sendTxHash = SEND_TX_HASH,
+                disperseTxHash = DISPERSE_TX_HASH,
                 approveScreenBeforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 approveScreenAfterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE,
-                sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                disperseScreenBeforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                disperseScreenAfterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE,
                 projectId = PROJECT_ID,
                 createdAt = TestData.TIMESTAMP
             ),
@@ -211,11 +213,11 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 assetSenderAddress = null,
                 arbitraryData = ARBITRARY_DATA,
                 approveTxHash = APPROVE_TX_HASH,
-                sendTxHash = SEND_TX_HASH,
+                disperseTxHash = DISPERSE_TX_HASH,
                 approveScreenBeforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 approveScreenAfterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE,
-                sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                disperseScreenBeforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                disperseScreenAfterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE,
                 projectId = PROJECT_ID,
                 createdAt = TestData.TIMESTAMP
             )
@@ -233,11 +235,11 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 assetSenderAddress = ASSET_SENDER_ADDRESS,
                 arbitraryData = ARBITRARY_DATA,
                 approveTxHash = APPROVE_TX_HASH,
-                sendTxHash = SEND_TX_HASH,
+                disperseTxHash = DISPERSE_TX_HASH,
                 approveScreenBeforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 approveScreenAfterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE,
-                sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                disperseScreenBeforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                disperseScreenAfterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE,
                 projectId = otherProjectId,
                 createdAt = TestData.TIMESTAMP
             ),
@@ -253,11 +255,11 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 assetSenderAddress = null,
                 arbitraryData = ARBITRARY_DATA,
                 approveTxHash = APPROVE_TX_HASH,
-                sendTxHash = SEND_TX_HASH,
+                disperseTxHash = DISPERSE_TX_HASH,
                 approveScreenBeforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 approveScreenAfterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE,
-                sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                disperseScreenBeforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                disperseScreenAfterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE,
                 projectId = otherProjectId,
                 createdAt = TestData.TIMESTAMP
             )
@@ -285,15 +287,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                             itemNames = it.itemNames.toList(),
                             assetSenderAddress = it.assetSenderAddress,
                             approveTxHash = it.approveTxHash,
-                            sendTxHash = it.sendTxHash,
+                            disperseTxHash = it.disperseTxHash,
                             arbitraryData = it.arbitraryData,
                             approveScreenConfig = ScreenConfig(
                                 beforeActionMessage = it.approveScreenBeforeActionMessage,
                                 afterActionMessage = it.approveScreenAfterActionMessage
                             ),
-                            sendScreenConfig = ScreenConfig(
-                                beforeActionMessage = it.sendScreenBeforeActionMessage,
-                                afterActionMessage = it.sendScreenAfterActionMessage
+                            disperseScreenConfig = ScreenConfig(
+                                beforeActionMessage = it.disperseScreenBeforeActionMessage,
+                                afterActionMessage = it.disperseScreenAfterActionMessage
                             ),
                             createdAt = it.createdAt
                         )
@@ -303,6 +305,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    @Suppress("UNCHECKED_CAST")
     fun mustCorrectlyFetchAssetMultiSendRequestsBySender() {
         val senderRequests = listOf(
             AssetMultiSendRequestRecord(
@@ -317,11 +320,11 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 assetSenderAddress = ASSET_SENDER_ADDRESS,
                 arbitraryData = ARBITRARY_DATA,
                 approveTxHash = APPROVE_TX_HASH,
-                sendTxHash = SEND_TX_HASH,
+                disperseTxHash = DISPERSE_TX_HASH,
                 approveScreenBeforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 approveScreenAfterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE,
-                sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                disperseScreenBeforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                disperseScreenAfterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE,
                 projectId = PROJECT_ID,
                 createdAt = TestData.TIMESTAMP
             ),
@@ -337,11 +340,11 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 assetSenderAddress = ASSET_SENDER_ADDRESS,
                 arbitraryData = ARBITRARY_DATA,
                 approveTxHash = APPROVE_TX_HASH,
-                sendTxHash = SEND_TX_HASH,
+                disperseTxHash = DISPERSE_TX_HASH,
                 approveScreenBeforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 approveScreenAfterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE,
-                sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                disperseScreenBeforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                disperseScreenAfterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE,
                 projectId = PROJECT_ID,
                 createdAt = TestData.TIMESTAMP
             )
@@ -359,11 +362,11 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 assetSenderAddress = WalletAddress("dead"),
                 arbitraryData = ARBITRARY_DATA,
                 approveTxHash = APPROVE_TX_HASH,
-                sendTxHash = SEND_TX_HASH,
+                disperseTxHash = DISPERSE_TX_HASH,
                 approveScreenBeforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 approveScreenAfterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE,
-                sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                disperseScreenBeforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                disperseScreenAfterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE,
                 projectId = PROJECT_ID,
                 createdAt = TestData.TIMESTAMP
             ),
@@ -379,11 +382,11 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 assetSenderAddress = null,
                 arbitraryData = ARBITRARY_DATA,
                 approveTxHash = APPROVE_TX_HASH,
-                sendTxHash = SEND_TX_HASH,
+                disperseTxHash = DISPERSE_TX_HASH,
                 approveScreenBeforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 approveScreenAfterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE,
-                sendScreenBeforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                sendScreenAfterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE,
+                disperseScreenBeforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                disperseScreenAfterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE,
                 projectId = PROJECT_ID,
                 createdAt = TestData.TIMESTAMP
             )
@@ -411,15 +414,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                             itemNames = it.itemNames.toList(),
                             assetSenderAddress = it.assetSenderAddress,
                             approveTxHash = it.approveTxHash,
-                            sendTxHash = it.sendTxHash,
+                            disperseTxHash = it.disperseTxHash,
                             arbitraryData = it.arbitraryData,
                             approveScreenConfig = ScreenConfig(
                                 beforeActionMessage = it.approveScreenBeforeActionMessage,
                                 afterActionMessage = it.approveScreenAfterActionMessage
                             ),
-                            sendScreenConfig = ScreenConfig(
-                                beforeActionMessage = it.sendScreenBeforeActionMessage,
-                                afterActionMessage = it.sendScreenAfterActionMessage
+                            disperseScreenConfig = ScreenConfig(
+                                beforeActionMessage = it.disperseScreenBeforeActionMessage,
+                                afterActionMessage = it.disperseScreenAfterActionMessage
                             ),
                             createdAt = it.createdAt
                         )
@@ -447,9 +450,9 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -470,15 +473,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
             itemNames = ITEM_NAMES,
             assetSenderAddress = ASSET_SENDER_ADDRESS,
             approveTxHash = null,
-            sendTxHash = null,
+            disperseTxHash = null,
             arbitraryData = ARBITRARY_DATA,
             approveScreenConfig = ScreenConfig(
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -515,9 +518,9 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -548,15 +551,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                         itemNames = ITEM_NAMES,
                         assetSenderAddress = ASSET_SENDER_ADDRESS,
                         approveTxHash = APPROVE_TX_HASH,
-                        sendTxHash = null,
+                        disperseTxHash = null,
                         arbitraryData = ARBITRARY_DATA,
                         approveScreenConfig = ScreenConfig(
                             beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
-                        sendScreenConfig = ScreenConfig(
-                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        disperseScreenConfig = ScreenConfig(
+                            beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
                         createdAt = TestData.TIMESTAMP
                     )
@@ -583,9 +586,9 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -617,15 +620,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                         itemNames = ITEM_NAMES,
                         assetSenderAddress = ASSET_SENDER_ADDRESS,
                         approveTxHash = APPROVE_TX_HASH,
-                        sendTxHash = null,
+                        disperseTxHash = null,
                         arbitraryData = ARBITRARY_DATA,
                         approveScreenConfig = ScreenConfig(
                             beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
-                        sendScreenConfig = ScreenConfig(
-                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        disperseScreenConfig = ScreenConfig(
+                            beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
                         createdAt = TestData.TIMESTAMP
                     )
@@ -652,9 +655,9 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -695,15 +698,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                         itemNames = ITEM_NAMES,
                         assetSenderAddress = ASSET_SENDER_ADDRESS,
                         approveTxHash = APPROVE_TX_HASH,
-                        sendTxHash = null,
+                        disperseTxHash = null,
                         arbitraryData = ARBITRARY_DATA,
                         approveScreenConfig = ScreenConfig(
                             beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
-                        sendScreenConfig = ScreenConfig(
-                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        disperseScreenConfig = ScreenConfig(
+                            beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
                         createdAt = TestData.TIMESTAMP
                     )
@@ -730,9 +733,9 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -768,15 +771,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                         itemNames = ITEM_NAMES,
                         assetSenderAddress = ASSET_SENDER_ADDRESS,
                         approveTxHash = null,
-                        sendTxHash = null,
+                        disperseTxHash = null,
                         arbitraryData = ARBITRARY_DATA,
                         approveScreenConfig = ScreenConfig(
                             beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
-                        sendScreenConfig = ScreenConfig(
-                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        disperseScreenConfig = ScreenConfig(
+                            beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
                         createdAt = TestData.TIMESTAMP
                     )
@@ -785,7 +788,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlySetSendTxInfoForAssetMultiSendRequestWithNullSendTxHash() {
+    fun mustCorrectlySetDisperseTxInfoForAssetMultiSendRequestWithNullDisperseTxHash() {
         val id = UUID.randomUUID()
         val params = StoreAssetMultiSendRequestParams(
             id = id,
@@ -803,9 +806,9 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -819,12 +822,12 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 .isTrue()
         }
 
-        verify("setting send txInfo will succeed") {
-            assertThat(repository.setSendTxInfo(id, SEND_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+        verify("setting disperse txInfo will succeed") {
+            assertThat(repository.setDisperseTxInfo(id, DISPERSE_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
-        verify("send txInfo was correctly set in database") {
+        verify("disperse txInfo was correctly set in database") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
@@ -841,15 +844,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                         itemNames = ITEM_NAMES,
                         assetSenderAddress = ASSET_SENDER_ADDRESS,
                         approveTxHash = APPROVE_TX_HASH,
-                        sendTxHash = SEND_TX_HASH,
+                        disperseTxHash = DISPERSE_TX_HASH,
                         arbitraryData = ARBITRARY_DATA,
                         approveScreenConfig = ScreenConfig(
                             beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
-                        sendScreenConfig = ScreenConfig(
-                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        disperseScreenConfig = ScreenConfig(
+                            beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
                         createdAt = TestData.TIMESTAMP
                     )
@@ -858,7 +861,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustNotUpdateTokenSenderAddressForAssetMultiSendRequestWhenTokenSenderIsAlreadySetForSendTxHash() {
+    fun mustNotUpdateTokenSenderAddressForAssetMultiSendRequestWhenTokenSenderIsAlreadySetForDisperseTxHash() {
         val id = UUID.randomUUID()
         val params = StoreAssetMultiSendRequestParams(
             id = id,
@@ -876,9 +879,9 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -887,13 +890,13 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting send txInfo will succeed") {
+        verify("setting disperse txInfo will succeed") {
             val ignoredTokenSender = WalletAddress("f")
-            assertThat(repository.setSendTxInfo(id, SEND_TX_HASH, ignoredTokenSender)).withMessage()
+            assertThat(repository.setDisperseTxInfo(id, DISPERSE_TX_HASH, ignoredTokenSender)).withMessage()
                 .isTrue()
         }
 
-        verify("send txHash was correctly set while token sender was not updated") {
+        verify("disperse txHash was correctly set while token sender was not updated") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
@@ -910,15 +913,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                         itemNames = ITEM_NAMES,
                         assetSenderAddress = ASSET_SENDER_ADDRESS,
                         approveTxHash = null,
-                        sendTxHash = SEND_TX_HASH,
+                        disperseTxHash = DISPERSE_TX_HASH,
                         arbitraryData = ARBITRARY_DATA,
                         approveScreenConfig = ScreenConfig(
                             beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
-                        sendScreenConfig = ScreenConfig(
-                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        disperseScreenConfig = ScreenConfig(
+                            beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
                         createdAt = TestData.TIMESTAMP
                     )
@@ -927,7 +930,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustNotSetSendTxHashForAssetMultiSendRequestWhenSendTxHashIsAlreadySet() {
+    fun mustNotSetDisperseTxHashForAssetMultiSendRequestWhenDisperseTxHashIsAlreadySet() {
         val id = UUID.randomUUID()
         val params = StoreAssetMultiSendRequestParams(
             id = id,
@@ -945,9 +948,9 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -961,14 +964,14 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 .isTrue()
         }
 
-        verify("setting send txInfo will succeed") {
-            assertThat(repository.setSendTxInfo(id, SEND_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+        verify("setting disperse txInfo will succeed") {
+            assertThat(repository.setDisperseTxInfo(id, DISPERSE_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
                 .isTrue()
         }
 
-        verify("setting another send txInfo will not succeed") {
+        verify("setting another disperse txInfo will not succeed") {
             assertThat(
-                repository.setSendTxInfo(
+                repository.setDisperseTxInfo(
                     id = id,
                     txHash = TransactionHash("different-tx-hash"),
                     caller = ASSET_SENDER_ADDRESS
@@ -976,7 +979,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
             ).withMessage().isFalse()
         }
 
-        verify("first send txHash remains in database") {
+        verify("first disperse txHash remains in database") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
@@ -993,15 +996,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                         itemNames = ITEM_NAMES,
                         assetSenderAddress = ASSET_SENDER_ADDRESS,
                         approveTxHash = APPROVE_TX_HASH,
-                        sendTxHash = SEND_TX_HASH,
+                        disperseTxHash = DISPERSE_TX_HASH,
                         arbitraryData = ARBITRARY_DATA,
                         approveScreenConfig = ScreenConfig(
                             beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
-                        sendScreenConfig = ScreenConfig(
-                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        disperseScreenConfig = ScreenConfig(
+                            beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
                         createdAt = TestData.TIMESTAMP
                     )
@@ -1010,7 +1013,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustNotSetSendTxHashForAssetMultiSendRequestWhenTokenAddressIsNotNullWithNullApproveHash() {
+    fun mustNotSetDisperseTxHashForAssetMultiSendRequestWhenTokenAddressIsNotNullWithNullApproveHash() {
         val id = UUID.randomUUID()
         val params = StoreAssetMultiSendRequestParams(
             id = id,
@@ -1028,9 +1031,9 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
             ),
             createdAt = TestData.TIMESTAMP
         )
@@ -1039,17 +1042,17 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
             repository.store(params)
         }
 
-        verify("setting send txInfo will not succeed") {
+        verify("setting disperse txInfo will not succeed") {
             assertThat(
-                repository.setSendTxInfo(
+                repository.setDisperseTxInfo(
                     id = id,
-                    txHash = SEND_TX_HASH,
+                    txHash = DISPERSE_TX_HASH,
                     caller = ASSET_SENDER_ADDRESS
                 )
             ).withMessage().isFalse()
         }
 
-        verify("approve tx hash is not set in database") {
+        verify("disperse tx hash is not set in database") {
             val result = repository.getById(id)
 
             assertThat(result).withMessage()
@@ -1066,15 +1069,15 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                         itemNames = ITEM_NAMES,
                         assetSenderAddress = ASSET_SENDER_ADDRESS,
                         approveTxHash = null,
-                        sendTxHash = null,
+                        disperseTxHash = null,
                         arbitraryData = ARBITRARY_DATA,
                         approveScreenConfig = ScreenConfig(
                             beforeActionMessage = APPROVE_SCREEN_BEFORE_ACTION_MESSAGE,
                             afterActionMessage = APPROVE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
-                        sendScreenConfig = ScreenConfig(
-                            beforeActionMessage = SEND_SCREEN_BEFORE_ACTION_MESSAGE,
-                            afterActionMessage = SEND_SCREEN_AFTER_ACTION_MESSAGE
+                        disperseScreenConfig = ScreenConfig(
+                            beforeActionMessage = DISPERSE_SCREEN_BEFORE_ACTION_MESSAGE,
+                            afterActionMessage = DISPERSE_SCREEN_AFTER_ACTION_MESSAGE
                         ),
                         createdAt = TestData.TIMESTAMP
                     )
