@@ -6,6 +6,7 @@ contract SimpleERC20 {
     event Transfer(address indexed from, address indexed to, uint256 value);
 
     mapping(address => uint256) private _balances;
+    mapping(address => mapping (address => uint256)) private _approvals;
     address private _ownerAddress;
 
     constructor(address[] memory accounts, uint256[] memory balances, address ownerAddress) {
@@ -22,6 +23,10 @@ contract SimpleERC20 {
         return _balances[account];
     }
 
+    function approve(address spender, uint256 amount) public {
+        _approvals[spender][msg.sender] = amount;
+    }
+
     function transfer(address recipient, uint256 amount) public returns (bool) {
         require(recipient != address(0), "Transfer to the zero address");
         require(_balances[msg.sender] >= amount, "Transfer amount exceeds balance");
@@ -34,31 +39,18 @@ contract SimpleERC20 {
         return true;
     }
 
-    struct AssetCommonState {
-        string flavor;
-        string version;
-        address contractAddress;
-        address owner;
-        string info;
-        string name;
-        string symbol;
-        uint256 totalSupply;
-        uint256 decimals;
-        address issuer;
-    }
+    function transferFrom(address from, address to, uint256 amount) public returns (bool) {
+        require(from != address(0), "Transfer from the zero address");
+        require(to != address(0), "Transfer to the zero address");
+        require(_balances[from] >= amount, "Transfer amount exceeds balance");
+        require(_approvals[msg.sender][from] >= amount, "Not enough approved balance");
 
-    function commonState() external view returns (AssetCommonState memory) {
-        return AssetCommonState(
-            "flavor",
-            "version",
-            address(0),
-            _ownerAddress,
-            "info",
-            "name",
-            "symbol",
-            0,
-            0,
-            address(0)
-        );
+        _balances[from] -= amount;
+        _balances[to] += amount;
+        _approvals[msg.sender][from] -= amount;
+
+        emit Transfer(from, to, amount);
+
+        return true;
     }
 }

@@ -32,6 +32,7 @@ data class AssetMultiSendRequest(
     val disperseScreenConfig: ScreenConfig,
     val createdAt: UtcDateTime
 ) {
+    @Suppress("LongParameterList")
     fun withMultiTransactionData(
         approveStatus: Status?,
         approveData: FunctionData?,
