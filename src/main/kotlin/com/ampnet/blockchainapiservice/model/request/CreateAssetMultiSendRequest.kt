@@ -31,7 +31,7 @@ data class CreateAssetMultiSendRequest(
     @field:Valid
     val approveScreenConfig: ScreenConfig?,
     @field:Valid
-    val sendScreenConfig: ScreenConfig?
+    val disperseScreenConfig: ScreenConfig?
 ) {
     init {
         when (assetType) {

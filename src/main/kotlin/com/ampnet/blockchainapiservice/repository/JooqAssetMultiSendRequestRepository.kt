@@ -35,11 +35,11 @@ class JooqAssetMultiSendRequestRepository(private val dslContext: DSLContext) : 
             assetSenderAddress = params.assetSenderAddress,
             arbitraryData = params.arbitraryData,
             approveTxHash = null,
-            sendTxHash = null,
+            disperseTxHash = null,
             approveScreenBeforeActionMessage = params.approveScreenConfig.beforeActionMessage,
             approveScreenAfterActionMessage = params.approveScreenConfig.afterActionMessage,
-            sendScreenBeforeActionMessage = params.sendScreenConfig.beforeActionMessage,
-            sendScreenAfterActionMessage = params.sendScreenConfig.afterActionMessage,
+            disperseScreenBeforeActionMessage = params.disperseScreenConfig.beforeActionMessage,
+            disperseScreenAfterActionMessage = params.disperseScreenConfig.afterActionMessage,
             projectId = params.projectId,
             createdAt = params.createdAt
         )
@@ -88,10 +88,10 @@ class JooqAssetMultiSendRequestRepository(private val dslContext: DSLContext) : 
             .execute() > 0
     }
 
-    override fun setSendTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
-        logger.info { "Set send txInfo for asset multi-send request, id: $id, txHash: $txHash, caller: $caller" }
+    override fun setDisperseTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
+        logger.info { "Set disperse txInfo for asset multi-send request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(AssetMultiSendRequestTable)
-            .set(AssetMultiSendRequestTable.SEND_TX_HASH, txHash)
+            .set(AssetMultiSendRequestTable.DISPERSE_TX_HASH, txHash)
             .set(
                 AssetMultiSendRequestTable.ASSET_SENDER_ADDRESS,
                 coalesce(AssetMultiSendRequestTable.ASSET_SENDER_ADDRESS, caller)
@@ -99,7 +99,7 @@ class JooqAssetMultiSendRequestRepository(private val dslContext: DSLContext) : 
             .where(
                 DSL.and(
                     AssetMultiSendRequestTable.ID.eq(id),
-                    AssetMultiSendRequestTable.SEND_TX_HASH.isNull(),
+                    AssetMultiSendRequestTable.DISPERSE_TX_HASH.isNull(),
                     DSL.or(
                         AssetMultiSendRequestTable.APPROVE_TX_HASH.isNotNull(),
                         AssetMultiSendRequestTable.TOKEN_ADDRESS.isNull()
@@ -122,15 +122,15 @@ class JooqAssetMultiSendRequestRepository(private val dslContext: DSLContext) : 
             itemNames = itemNames.toList(),
             assetSenderAddress = assetSenderAddress,
             approveTxHash = approveTxHash,
-            sendTxHash = sendTxHash,
+            disperseTxHash = disperseTxHash,
             arbitraryData = arbitraryData,
             approveScreenConfig = ScreenConfig(
                 beforeActionMessage = approveScreenBeforeActionMessage,
                 afterActionMessage = approveScreenAfterActionMessage
             ),
-            sendScreenConfig = ScreenConfig(
-                beforeActionMessage = sendScreenBeforeActionMessage,
-                afterActionMessage = sendScreenAfterActionMessage
+            disperseScreenConfig = ScreenConfig(
+                beforeActionMessage = disperseScreenBeforeActionMessage,
+                afterActionMessage = disperseScreenAfterActionMessage
             ),
             createdAt = createdAt
         )

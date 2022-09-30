@@ -23,7 +23,7 @@ data class StoreAssetMultiSendRequestParams(
     val assetSenderAddress: WalletAddress?,
     val arbitraryData: JsonNode?,
     val approveScreenConfig: ScreenConfig,
-    val sendScreenConfig: ScreenConfig,
+    val disperseScreenConfig: ScreenConfig,
     val createdAt: UtcDateTime
 ) {
     companion object : ParamsFactory<CreateAssetMultiSendRequestParams, StoreAssetMultiSendRequestParams> {
@@ -46,7 +46,7 @@ data class StoreAssetMultiSendRequestParams(
             itemNames = params.itemNames,
             assetSenderAddress = params.assetSenderAddress,
             arbitraryData = params.arbitraryData,
-            sendScreenConfig = params.sendScreenConfig,
+            disperseScreenConfig = params.disperseScreenConfig,
             approveScreenConfig = params.approveScreenConfig,
             createdAt = createdAt
         )

@@ -26,24 +26,24 @@ data class AssetMultiSendRequest(
     val itemNames: List<String?>,
     val assetSenderAddress: WalletAddress?,
     val approveTxHash: TransactionHash?,
-    val sendTxHash: TransactionHash?,
+    val disperseTxHash: TransactionHash?,
     val arbitraryData: JsonNode?,
     val approveScreenConfig: ScreenConfig,
-    val sendScreenConfig: ScreenConfig,
+    val disperseScreenConfig: ScreenConfig,
     val createdAt: UtcDateTime
 ) {
     fun withMultiTransactionData(
-        status: Status,
+        approveStatus: Status?,
         approveData: FunctionData?,
-        approveValue: Balance?,
         approveTransactionInfo: BlockchainTransactionInfo?,
-        sendData: FunctionData?,
-        sendValue: Balance?,
-        sendTransactionInfo: BlockchainTransactionInfo?
+        disperseStatus: Status?,
+        disperseData: FunctionData?,
+        disperseValue: Balance?,
+        disperseTransactionInfo: BlockchainTransactionInfo?
     ): WithMultiTransactionData<AssetMultiSendRequest> =
         WithMultiTransactionData(
             value = this,
-            status = status,
+            approveStatus = approveStatus,
             approveTransactionData = tokenAddress?.let {
                 TransactionData(
                     txHash = this.approveTxHash,
@@ -51,16 +51,19 @@ data class AssetMultiSendRequest(
                     fromAddress = this.assetSenderAddress,
                     toAddress = it,
                     data = approveData,
-                    value = approveValue
+                    value = Balance.ZERO
                 )
             },
-            sendTransactionData = TransactionData(
-                txHash = this.sendTxHash,
-                transactionInfo = sendTransactionInfo,
-                fromAddress = this.assetSenderAddress,
-                toAddress = this.disperseContractAddress,
-                data = sendData,
-                value = sendValue
-            )
+            disperseStatus = disperseStatus,
+            disperseTransactionData = if (disperseStatus != null) {
+                TransactionData(
+                    txHash = this.disperseTxHash,
+                    transactionInfo = disperseTransactionInfo,
+                    fromAddress = this.assetSenderAddress,
+                    toAddress = this.disperseContractAddress,
+                    data = disperseData,
+                    value = disperseValue
+                )
+            } else null
         )
 }

@@ -7,9 +7,10 @@ data class WithTransactionData<T>(val value: T, val status: Status, val transact
 
 data class WithMultiTransactionData<T>(
     val value: T,
-    val status: Status,
+    val approveStatus: Status?,
     val approveTransactionData: TransactionData?,
-    val sendTransactionData: TransactionData
+    val disperseStatus: Status?,
+    val disperseTransactionData: TransactionData?
 )
 
 data class TransactionData(
