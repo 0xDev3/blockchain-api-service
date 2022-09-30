@@ -41,6 +41,16 @@ include::src/docs/asciidoc/send/fetch-by-sender.adoc[]
 include::src/docs/asciidoc/send/fetch-by-recipient.adoc[]
 include::src/docs/asciidoc/send/attach.adoc[]
 
+== Asset Multi-Send Request API
+All endpoints are public and do not require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/multi-send/create.adoc[]
+include::src/docs/asciidoc/multi-send/fetch.adoc[]
+include::src/docs/asciidoc/multi-send/fetch-by-project-id.adoc[]
+include::src/docs/asciidoc/multi-send/fetch-by-sender.adoc[]
+include::src/docs/asciidoc/multi-send/attach-approve.adoc[]
+include::src/docs/asciidoc/multi-send/attach-disperse.adoc[]
+
 == ERC20 Lock Request API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 

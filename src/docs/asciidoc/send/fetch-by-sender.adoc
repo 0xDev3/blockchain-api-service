@@ -1,6 +1,6 @@
 === Fetch Asset Send Requests by Sender Address
 Fetches stored asset send requests with their current status filtered by sender address *which was specified at the
-moment of request creation (if specified) or attached via along with transaction info (if not specified during request
+moment of request creation (if specified) or attached along with transaction info (if not specified during request
 creation)*.
 
 .Request Example
