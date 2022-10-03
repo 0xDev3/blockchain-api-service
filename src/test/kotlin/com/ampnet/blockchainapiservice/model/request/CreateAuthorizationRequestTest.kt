@@ -39,6 +39,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = "invalid",
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = null
             )
@@ -59,6 +61,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = WalletAddress("a").rawValue + "b",
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = null
             )
@@ -79,6 +83,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = "",
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = null
             )
@@ -99,6 +105,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = WalletAddress("a").rawValue,
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = null
             )
@@ -118,6 +126,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = null,
                 redirectUrl = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH + 1),
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = null
             )
@@ -138,6 +148,51 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = null,
                 redirectUrl = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH),
+                messageToSign = null,
+                storeIndefinitely = null,
+                arbitraryData = null,
+                screenConfig = null
+            )
+        }
+
+        verify("request with valid length string is marked as valid") {
+            val violations = validator.validate(requestWithValidLengthString).toList()
+
+            assertThat(violations).withMessage()
+                .isEmpty()
+        }
+    }
+
+    @Test
+    fun mustNotAllowTooLongStringForPayload() {
+        val requestWithTooLongString = suppose("request with too long string is created") {
+            CreateAuthorizationRequest(
+                walletAddress = null,
+                redirectUrl = null,
+                messageToSign = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH + 1),
+                storeIndefinitely = null,
+                arbitraryData = null,
+                screenConfig = null
+            )
+        }
+
+        verify("request with too long string is marked as invalid") {
+            val violations = validator.validate(requestWithTooLongString).toList()
+
+            assertThat(violations.size).withMessage()
+                .isOne()
+            assertThat(violations[0].message).withMessage()
+                .isEqualTo("size must be between 0 and 256")
+            assertThat(violations[0].propertyPath.toString()).withMessage()
+                .isEqualTo("messageToSign")
+        }
+
+        val requestWithValidLengthString = suppose("request with valid length string is created") {
+            CreateAuthorizationRequest(
+                walletAddress = null,
+                redirectUrl = null,
+                messageToSign = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH),
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = null
             )
@@ -158,6 +213,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = null,
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = JsonNodeConverter().from(JSON.valueOf("{\"value\":\"$tooLongValue\"}")),
                 screenConfig = null
             )
@@ -178,6 +235,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = null,
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = null
             )
@@ -197,6 +256,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = null,
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = ScreenConfig(
                     beforeActionMessage = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH + 1),
@@ -220,6 +281,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = null,
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = ScreenConfig(
                     beforeActionMessage = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH),
@@ -242,6 +305,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = null,
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = ScreenConfig(
                     beforeActionMessage = null,
@@ -265,6 +330,8 @@ class CreateAuthorizationRequestTest : TestBase() {
             CreateAuthorizationRequest(
                 walletAddress = null,
                 redirectUrl = null,
+                messageToSign = null,
+                storeIndefinitely = null,
                 arbitraryData = null,
                 screenConfig = ScreenConfig(
                     beforeActionMessage = null,

@@ -60,6 +60,8 @@ class AuthorizationRequestServiceTest : TestBase() {
         val redirectUrl = "redirect-url/\${id}"
         val createParams = CreateAuthorizationRequestParams(
             redirectUrl = redirectUrl,
+            messageToSign = "message-to-sign-override",
+            storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
             arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
@@ -72,6 +74,8 @@ class AuthorizationRequestServiceTest : TestBase() {
             id = uuid,
             projectId = PROJECT.id,
             redirectUrl = fullRedirectUrl,
+            messageToSignOverride = createParams.messageToSign,
+            storeIndefinitely = createParams.storeIndefinitely,
             requestedWalletAddress = createParams.requestedWalletAddress,
             arbitraryData = createParams.arbitraryData,
             screenConfig = createParams.screenConfig,
@@ -81,6 +85,8 @@ class AuthorizationRequestServiceTest : TestBase() {
             id = uuid,
             projectId = PROJECT.id,
             redirectUrl = fullRedirectUrl,
+            messageToSignOverride = createParams.messageToSign,
+            storeIndefinitely = createParams.storeIndefinitely,
             requestedWalletAddress = createParams.requestedWalletAddress,
             actualWalletAddress = null,
             signedMessage = null,
@@ -149,6 +155,8 @@ class AuthorizationRequestServiceTest : TestBase() {
             id = uuid,
             projectId = UUID.randomUUID(),
             redirectUrl = "redirect-url/$uuid",
+            messageToSignOverride = "message-to-sign-override",
+            storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = null,
             signedMessage = null,
@@ -186,6 +194,8 @@ class AuthorizationRequestServiceTest : TestBase() {
                             id = uuid,
                             projectId = authorizationRequest.projectId,
                             redirectUrl = authorizationRequest.redirectUrl,
+                            messageToSignOverride = authorizationRequest.messageToSignOverride,
+                            storeIndefinitely = authorizationRequest.storeIndefinitely,
                             requestedWalletAddress = authorizationRequest.requestedWalletAddress,
                             actualWalletAddress = authorizationRequest.actualWalletAddress,
                             arbitraryData = authorizationRequest.arbitraryData,
@@ -196,6 +206,10 @@ class AuthorizationRequestServiceTest : TestBase() {
                         status = Status.PENDING
                     )
                 )
+
+            verifyMock(authorizationRequestRepository)
+                .getById(uuid)
+            verifyNoMoreInteractions(authorizationRequestRepository)
         }
     }
 
@@ -206,6 +220,8 @@ class AuthorizationRequestServiceTest : TestBase() {
             id = uuid,
             projectId = UUID.randomUUID(),
             redirectUrl = "redirect-url/$uuid",
+            messageToSignOverride = "message-to-sign-override",
+            storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = WalletAddress("fff"),
             signedMessage = null,
@@ -244,6 +260,8 @@ class AuthorizationRequestServiceTest : TestBase() {
                             id = uuid,
                             projectId = authorizationRequest.projectId,
                             redirectUrl = authorizationRequest.redirectUrl,
+                            messageToSignOverride = authorizationRequest.messageToSignOverride,
+                            storeIndefinitely = authorizationRequest.storeIndefinitely,
                             requestedWalletAddress = authorizationRequest.requestedWalletAddress,
                             actualWalletAddress = authorizationRequest.actualWalletAddress,
                             arbitraryData = authorizationRequest.arbitraryData,
@@ -254,6 +272,10 @@ class AuthorizationRequestServiceTest : TestBase() {
                         status = Status.PENDING,
                     )
                 )
+
+            verifyMock(authorizationRequestRepository)
+                .getById(uuid)
+            verifyNoMoreInteractions(authorizationRequestRepository)
         }
     }
 
@@ -264,6 +286,8 @@ class AuthorizationRequestServiceTest : TestBase() {
             id = uuid,
             projectId = UUID.randomUUID(),
             redirectUrl = "redirect-url/$uuid",
+            messageToSignOverride = "message-to-sign-override",
+            storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = WalletAddress("fff"),
             signedMessage = SignedMessage("signed-message"),
@@ -302,6 +326,8 @@ class AuthorizationRequestServiceTest : TestBase() {
                             id = uuid,
                             projectId = authorizationRequest.projectId,
                             redirectUrl = authorizationRequest.redirectUrl,
+                            messageToSignOverride = authorizationRequest.messageToSignOverride,
+                            storeIndefinitely = authorizationRequest.storeIndefinitely,
                             requestedWalletAddress = authorizationRequest.requestedWalletAddress,
                             actualWalletAddress = authorizationRequest.actualWalletAddress,
                             arbitraryData = authorizationRequest.arbitraryData,
@@ -312,6 +338,10 @@ class AuthorizationRequestServiceTest : TestBase() {
                         status = Status.FAILED
                     )
                 )
+
+            verifyMock(authorizationRequestRepository)
+                .getById(uuid)
+            verifyNoMoreInteractions(authorizationRequestRepository)
         }
     }
 
@@ -322,6 +352,8 @@ class AuthorizationRequestServiceTest : TestBase() {
             id = uuid,
             projectId = UUID.randomUUID(),
             redirectUrl = "redirect-url/$uuid",
+            messageToSignOverride = "message-to-sign-override",
+            storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = WalletAddress("def"),
             signedMessage = SignedMessage("signed-message"),
@@ -371,6 +403,8 @@ class AuthorizationRequestServiceTest : TestBase() {
                             id = uuid,
                             projectId = authorizationRequest.projectId,
                             redirectUrl = authorizationRequest.redirectUrl,
+                            messageToSignOverride = authorizationRequest.messageToSignOverride,
+                            storeIndefinitely = authorizationRequest.storeIndefinitely,
                             requestedWalletAddress = authorizationRequest.requestedWalletAddress,
                             actualWalletAddress = authorizationRequest.actualWalletAddress,
                             arbitraryData = authorizationRequest.arbitraryData,
@@ -381,6 +415,10 @@ class AuthorizationRequestServiceTest : TestBase() {
                         status = Status.FAILED
                     )
                 )
+
+            verifyMock(authorizationRequestRepository)
+                .getById(uuid)
+            verifyNoMoreInteractions(authorizationRequestRepository)
         }
     }
 
@@ -391,6 +429,8 @@ class AuthorizationRequestServiceTest : TestBase() {
             id = uuid,
             projectId = UUID.randomUUID(),
             redirectUrl = "redirect-url/$uuid",
+            messageToSignOverride = "message-to-sign-override",
+            storeIndefinitely = true,
             requestedWalletAddress = null,
             actualWalletAddress = WalletAddress("def"),
             signedMessage = SignedMessage("signed-message"),
@@ -440,6 +480,8 @@ class AuthorizationRequestServiceTest : TestBase() {
                             id = uuid,
                             projectId = authorizationRequest.projectId,
                             redirectUrl = authorizationRequest.redirectUrl,
+                            messageToSignOverride = authorizationRequest.messageToSignOverride,
+                            storeIndefinitely = authorizationRequest.storeIndefinitely,
                             requestedWalletAddress = authorizationRequest.requestedWalletAddress,
                             actualWalletAddress = authorizationRequest.actualWalletAddress,
                             arbitraryData = authorizationRequest.arbitraryData,
@@ -450,6 +492,10 @@ class AuthorizationRequestServiceTest : TestBase() {
                         status = Status.SUCCESS
                     )
                 )
+
+            verifyMock(authorizationRequestRepository)
+                .getById(uuid)
+            verifyNoMoreInteractions(authorizationRequestRepository)
         }
     }
 
@@ -460,6 +506,8 @@ class AuthorizationRequestServiceTest : TestBase() {
             id = uuid,
             projectId = UUID.randomUUID(),
             redirectUrl = "redirect-url/$uuid",
+            messageToSignOverride = "message-to-sign-override",
+            storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = WalletAddress("def"),
             signedMessage = SignedMessage("signed-message"),
@@ -509,6 +557,8 @@ class AuthorizationRequestServiceTest : TestBase() {
                             id = uuid,
                             projectId = authorizationRequest.projectId,
                             redirectUrl = authorizationRequest.redirectUrl,
+                            messageToSignOverride = authorizationRequest.messageToSignOverride,
+                            storeIndefinitely = authorizationRequest.storeIndefinitely,
                             requestedWalletAddress = authorizationRequest.requestedWalletAddress,
                             actualWalletAddress = authorizationRequest.actualWalletAddress,
                             arbitraryData = authorizationRequest.arbitraryData,
@@ -519,6 +569,89 @@ class AuthorizationRequestServiceTest : TestBase() {
                         status = Status.SUCCESS
                     )
                 )
+
+            verifyMock(authorizationRequestRepository)
+                .getById(uuid)
+            verifyNoMoreInteractions(authorizationRequestRepository)
+        }
+    }
+
+    @Test
+    fun mustReturnAuthorizationRequestWithSuccessfulStatusAndDeleteItIfItsNotStoredIndefinitely() {
+        val uuid = UUID.randomUUID()
+        val authorizationRequest = AuthorizationRequest(
+            id = uuid,
+            projectId = UUID.randomUUID(),
+            redirectUrl = "redirect-url/$uuid",
+            messageToSignOverride = "message-to-sign-override",
+            storeIndefinitely = false,
+            requestedWalletAddress = WalletAddress("def"),
+            actualWalletAddress = WalletAddress("def"),
+            signedMessage = SignedMessage("signed-message"),
+            arbitraryData = TestData.EMPTY_JSON_OBJECT,
+            screenConfig = ScreenConfig(
+                beforeActionMessage = "before-action-message",
+                afterActionMessage = "after-action-message"
+            ),
+            createdAt = TestData.TIMESTAMP
+        )
+        val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
+
+        suppose("authorization request is returned from database") {
+            given(authorizationRequestRepository.getById(uuid))
+                .willReturn(authorizationRequest)
+        }
+
+        val signatureCheckerService = mock<SignatureCheckerService>()
+
+        suppose("signature checker will return true") {
+            given(
+                signatureCheckerService.signatureMatches(
+                    message = authorizationRequest.messageToSign,
+                    signedMessage = authorizationRequest.signedMessage!!,
+                    signer = authorizationRequest.actualWalletAddress!!
+                )
+            ).willReturn(true)
+        }
+
+        val service = AuthorizationRequestServiceImpl(
+            signatureCheckerService = signatureCheckerService,
+            authorizationRequestRepository = authorizationRequestRepository,
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = mock(),
+                utcDateTimeProvider = mock(),
+                blockchainService = mock()
+            )
+        )
+
+        verify("authorization request with successful status is returned") {
+            val result = service.getAuthorizationRequest(uuid)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    WithStatus(
+                        value = AuthorizationRequest(
+                            id = uuid,
+                            projectId = authorizationRequest.projectId,
+                            redirectUrl = authorizationRequest.redirectUrl,
+                            messageToSignOverride = authorizationRequest.messageToSignOverride,
+                            storeIndefinitely = authorizationRequest.storeIndefinitely,
+                            requestedWalletAddress = authorizationRequest.requestedWalletAddress,
+                            actualWalletAddress = authorizationRequest.actualWalletAddress,
+                            arbitraryData = authorizationRequest.arbitraryData,
+                            screenConfig = authorizationRequest.screenConfig,
+                            signedMessage = authorizationRequest.signedMessage,
+                            createdAt = authorizationRequest.createdAt
+                        ),
+                        status = Status.SUCCESS
+                    )
+                )
+
+            verifyMock(authorizationRequestRepository)
+                .getById(uuid)
+            verifyMock(authorizationRequestRepository)
+                .delete(uuid)
+            verifyNoMoreInteractions(authorizationRequestRepository)
         }
     }
 
@@ -529,6 +662,8 @@ class AuthorizationRequestServiceTest : TestBase() {
             id = uuid,
             projectId = UUID.randomUUID(),
             redirectUrl = "redirect-url/$uuid",
+            messageToSignOverride = "message-to-sign-override",
+            storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
             actualWalletAddress = WalletAddress("def"),
             signedMessage = SignedMessage("signed-message"),
@@ -579,6 +714,8 @@ class AuthorizationRequestServiceTest : TestBase() {
                                 id = uuid,
                                 projectId = authorizationRequest.projectId,
                                 redirectUrl = authorizationRequest.redirectUrl,
+                                messageToSignOverride = authorizationRequest.messageToSignOverride,
+                                storeIndefinitely = authorizationRequest.storeIndefinitely,
                                 requestedWalletAddress = authorizationRequest.requestedWalletAddress,
                                 actualWalletAddress = authorizationRequest.actualWalletAddress,
                                 arbitraryData = authorizationRequest.arbitraryData,

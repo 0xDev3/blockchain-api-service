@@ -41,7 +41,14 @@ class AuthorizationRequestServiceImpl(
             "Authorization request not found for ID: $id"
         )
 
-        return authorizationRequest.determineStatus()
+        val withStatus = authorizationRequest.determineStatus()
+
+        if (withStatus.status == Status.SUCCESS && withStatus.value.storeIndefinitely.not()) {
+            logger.info { "Deleting read-once authorization request with. id: $id" }
+            authorizationRequestRepository.delete(authorizationRequest.id)
+        }
+
+        return withStatus
     }
 
     override fun getAuthorizationRequestsByProjectId(projectId: UUID): List<WithStatus<AuthorizationRequest>> {

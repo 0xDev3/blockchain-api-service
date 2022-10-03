@@ -12,6 +12,9 @@ data class CreateAuthorizationRequest(
     val walletAddress: String?,
     @field:MaxStringSize
     val redirectUrl: String?,
+    @field:MaxStringSize
+    val messageToSign: String?,
+    val storeIndefinitely: Boolean?,
     @field:MaxJsonNodeChars
     val arbitraryData: JsonNode?,
     @field:Valid

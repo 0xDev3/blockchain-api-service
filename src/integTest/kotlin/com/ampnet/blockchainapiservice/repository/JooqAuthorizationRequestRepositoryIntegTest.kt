@@ -34,6 +34,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
 
     companion object {
         private const val REDIRECT_URL = "redirect-url"
+        private const val MESSAGE_TO_SIGN_OVERRIDE = "message-to-sign-override"
+        private const val STORE_INDEFINITELY = true
         private val REQUESTED_WALLET_ADDRESS = WalletAddress("b")
         private val ARBITRARY_DATA = TestData.EMPTY_JSON_OBJECT
         private const val SCREEN_BEFORE_ACTION_MESSAGE = "before-action-message"
@@ -88,6 +90,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     redirectUrl = REDIRECT_URL,
+                    messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+                    storeIndefinitely = STORE_INDEFINITELY,
                     requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
                     arbitraryData = ARBITRARY_DATA,
                     screenBeforeActionMessage = SCREEN_BEFORE_ACTION_MESSAGE,
@@ -108,6 +112,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                         id = id,
                         projectId = PROJECT_ID,
                         redirectUrl = REDIRECT_URL,
+                        messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+                        storeIndefinitely = STORE_INDEFINITELY,
                         requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
                         actualWalletAddress = ACTUAL_WALLET_ADDRESS,
                         signedMessage = SIGNED_MESSAGE,
@@ -126,6 +132,41 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
     fun mustReturnNullWhenFetchingNonExistentAuthorizationById() {
         verify("null is returned when fetching non-existent authorization request") {
             val result = repository.getById(UUID.randomUUID())
+
+            assertThat(result).withMessage()
+                .isNull()
+        }
+    }
+
+    @Test
+    fun mustCorrectlyDeleteAuthorizationRequestById() {
+        val id = UUID.randomUUID()
+
+        suppose("some authorization request exists in database") {
+            dslContext.executeInsert(
+                AuthorizationRequestRecord(
+                    id = id,
+                    projectId = PROJECT_ID,
+                    redirectUrl = REDIRECT_URL,
+                    messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+                    storeIndefinitely = STORE_INDEFINITELY,
+                    requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
+                    arbitraryData = ARBITRARY_DATA,
+                    screenBeforeActionMessage = SCREEN_BEFORE_ACTION_MESSAGE,
+                    screenAfterActionMessage = SCREEN_AFTER_ACTION_MESSAGE,
+                    actualWalletAddress = ACTUAL_WALLET_ADDRESS,
+                    signedMessage = SIGNED_MESSAGE,
+                    createdAt = TestData.TIMESTAMP
+                )
+            )
+        }
+
+        suppose("authorization request is deleted by ID") {
+            repository.delete(id)
+        }
+
+        verify("authorization is correctly deleted by ID") {
+            val result = repository.getById(id)
 
             assertThat(result).withMessage()
                 .isNull()
@@ -155,6 +196,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                 id = UUID.randomUUID(),
                 projectId = PROJECT_ID,
                 redirectUrl = REDIRECT_URL,
+                messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+                storeIndefinitely = STORE_INDEFINITELY,
                 requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SCREEN_BEFORE_ACTION_MESSAGE,
@@ -167,6 +210,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                 id = UUID.randomUUID(),
                 projectId = PROJECT_ID,
                 redirectUrl = REDIRECT_URL,
+                messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+                storeIndefinitely = STORE_INDEFINITELY,
                 requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SCREEN_BEFORE_ACTION_MESSAGE,
@@ -181,6 +226,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                 id = UUID.randomUUID(),
                 projectId = otherProjectId,
                 redirectUrl = REDIRECT_URL,
+                messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+                storeIndefinitely = STORE_INDEFINITELY,
                 requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SCREEN_BEFORE_ACTION_MESSAGE,
@@ -193,6 +240,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                 id = UUID.randomUUID(),
                 projectId = otherProjectId,
                 redirectUrl = REDIRECT_URL,
+                messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+                storeIndefinitely = STORE_INDEFINITELY,
                 requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
                 arbitraryData = ARBITRARY_DATA,
                 screenBeforeActionMessage = SCREEN_BEFORE_ACTION_MESSAGE,
@@ -217,6 +266,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                             id = it.id,
                             projectId = it.projectId,
                             redirectUrl = it.redirectUrl,
+                            messageToSignOverride = it.messageToSignOverride,
+                            storeIndefinitely = it.storeIndefinitely,
                             requestedWalletAddress = it.requestedWalletAddress,
                             actualWalletAddress = it.actualWalletAddress,
                             signedMessage = it.signedMessage,
@@ -239,6 +290,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
             id = id,
             projectId = PROJECT_ID,
             redirectUrl = REDIRECT_URL,
+            messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+            storeIndefinitely = STORE_INDEFINITELY,
             requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
             arbitraryData = ARBITRARY_DATA,
             screenConfig = ScreenConfig(
@@ -256,6 +309,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
             id = id,
             projectId = PROJECT_ID,
             redirectUrl = REDIRECT_URL,
+            messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+            storeIndefinitely = STORE_INDEFINITELY,
             requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
             actualWalletAddress = null,
             signedMessage = null,
@@ -287,6 +342,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
             id = id,
             projectId = PROJECT_ID,
             redirectUrl = REDIRECT_URL,
+            messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+            storeIndefinitely = STORE_INDEFINITELY,
             requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
             arbitraryData = ARBITRARY_DATA,
             screenConfig = ScreenConfig(
@@ -314,6 +371,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                         id = id,
                         projectId = PROJECT_ID,
                         redirectUrl = REDIRECT_URL,
+                        messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+                        storeIndefinitely = STORE_INDEFINITELY,
                         requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
                         actualWalletAddress = ACTUAL_WALLET_ADDRESS,
                         signedMessage = SIGNED_MESSAGE,
@@ -335,6 +394,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
             id = id,
             projectId = PROJECT_ID,
             redirectUrl = REDIRECT_URL,
+            messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+            storeIndefinitely = STORE_INDEFINITELY,
             requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
             arbitraryData = ARBITRARY_DATA,
             screenConfig = ScreenConfig(
@@ -368,6 +429,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                         id = id,
                         projectId = PROJECT_ID,
                         redirectUrl = REDIRECT_URL,
+                        messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
+                        storeIndefinitely = STORE_INDEFINITELY,
                         requestedWalletAddress = REQUESTED_WALLET_ADDRESS,
                         actualWalletAddress = ACTUAL_WALLET_ADDRESS,
                         signedMessage = SIGNED_MESSAGE,
