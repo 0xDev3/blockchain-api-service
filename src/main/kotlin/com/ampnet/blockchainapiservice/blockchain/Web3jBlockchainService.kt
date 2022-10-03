@@ -38,7 +38,6 @@ import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.protocol.core.methods.response.EthBlock
 import org.web3j.tx.ReadonlyTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
-import java.io.IOException
 import java.math.BigInteger
 import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
@@ -355,7 +354,7 @@ class Web3jBlockchainService(
         }
     }
 
-    @Suppress("ReturnCount")
+    @Suppress("ReturnCount", "TooGenericExceptionCaught")
     private fun <S, T : Response<*>?> Request<S, T>.sendSafely(): T? {
         try {
             val value = this.send()
@@ -364,7 +363,7 @@ class Web3jBlockchainService(
                 return null
             }
             return value
-        } catch (ex: IOException) {
+        } catch (ex: Exception) {
             logger.warn("Failed blockchain call", ex)
             return null
         }

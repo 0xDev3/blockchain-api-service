@@ -11,6 +11,8 @@ data class AuthorizationRequest(
     val id: UUID,
     val projectId: UUID,
     val redirectUrl: String,
+    val messageToSignOverride: String?,
+    val storeIndefinitely: Boolean,
     val requestedWalletAddress: WalletAddress?,
     val actualWalletAddress: WalletAddress?,
     val signedMessage: SignedMessage?,
@@ -19,5 +21,5 @@ data class AuthorizationRequest(
     val createdAt: UtcDateTime
 ) {
     val messageToSign: String
-        get() = "Authorization message ID to sign: $id"
+        get() = messageToSignOverride ?: "Authorization message ID to sign: $id"
 }

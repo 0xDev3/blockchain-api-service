@@ -24,6 +24,8 @@ class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : A
             id = params.id,
             projectId = params.projectId,
             redirectUrl = params.redirectUrl,
+            messageToSignOverride = params.messageToSignOverride,
+            storeIndefinitely = params.storeIndefinitely,
             requestedWalletAddress = params.requestedWalletAddress,
             arbitraryData = params.arbitraryData,
             screenBeforeActionMessage = params.screenConfig.beforeActionMessage,
@@ -34,6 +36,13 @@ class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : A
         )
         dslContext.executeInsert(record)
         return record.toModel()
+    }
+
+    override fun delete(id: UUID) {
+        logger.info { "Deleting authorization request, id: $id" }
+        dslContext.deleteFrom(AuthorizationRequestTable)
+            .where(AuthorizationRequestTable.ID.eq(id))
+            .execute()
     }
 
     override fun getById(id: UUID): AuthorizationRequest? {
@@ -74,6 +83,8 @@ class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : A
             id = id,
             projectId = projectId,
             redirectUrl = redirectUrl,
+            messageToSignOverride = messageToSignOverride,
+            storeIndefinitely = storeIndefinitely,
             requestedWalletAddress = requestedWalletAddress,
             actualWalletAddress = actualWalletAddress,
             signedMessage = signedMessage,

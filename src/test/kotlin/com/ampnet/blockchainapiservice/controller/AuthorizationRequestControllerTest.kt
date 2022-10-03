@@ -35,6 +35,8 @@ class AuthorizationRequestControllerTest : TestBase() {
         val params = CreateAuthorizationRequestParams(
             redirectUrl = "redirect-url",
             requestedWalletAddress = WalletAddress("b"),
+            messageToSign = "message-to-sign-override",
+            storeIndefinitely = true,
             arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
                 beforeActionMessage = "before-action-message",
@@ -45,6 +47,8 @@ class AuthorizationRequestControllerTest : TestBase() {
             id = UUID.randomUUID(),
             projectId = UUID.randomUUID(),
             redirectUrl = params.redirectUrl!!,
+            messageToSignOverride = params.messageToSign,
+            storeIndefinitely = params.storeIndefinitely,
             requestedWalletAddress = params.requestedWalletAddress,
             actualWalletAddress = null,
             signedMessage = null,
@@ -73,6 +77,8 @@ class AuthorizationRequestControllerTest : TestBase() {
         verify("controller returns correct response") {
             val request = CreateAuthorizationRequest(
                 redirectUrl = params.redirectUrl,
+                messageToSign = params.messageToSign,
+                storeIndefinitely = params.storeIndefinitely,
                 walletAddress = params.requestedWalletAddress?.rawValue,
                 arbitraryData = params.arbitraryData,
                 screenConfig = params.screenConfig
@@ -111,6 +117,8 @@ class AuthorizationRequestControllerTest : TestBase() {
                 id = id,
                 projectId = UUID.randomUUID(),
                 redirectUrl = "redirect-url",
+                messageToSignOverride = "message-to-sign-override",
+                storeIndefinitely = true,
                 requestedWalletAddress = WalletAddress("def"),
                 actualWalletAddress = WalletAddress("def"),
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
@@ -167,6 +175,8 @@ class AuthorizationRequestControllerTest : TestBase() {
                     id = id,
                     projectId = projectId,
                     redirectUrl = "redirect-url",
+                    messageToSignOverride = "message-to-sign-override",
+                    storeIndefinitely = true,
                     requestedWalletAddress = WalletAddress("def"),
                     actualWalletAddress = WalletAddress("def"),
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,
