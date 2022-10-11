@@ -15,6 +15,13 @@ data class ManifestJson(
 )
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
+data class InterfaceManifestJson(
+    val eventDecorators: List<EventDecorator>,
+    val constructorDecorators: List<ConstructorDecorator>,
+    val functionDecorators: List<FunctionDecorator>
+)
+
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class TypeDecorator(
     val name: String,
     val description: String,

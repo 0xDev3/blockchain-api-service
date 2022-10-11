@@ -22,21 +22,21 @@ class ContractDecoratorFileWatcherConfig {
         objectMapper: ObjectMapper,
         properties: ApplicationProperties,
     ): FileSystemWatcher? {
-        val rootDir = properties.contractDecorators.rootDirectory
+        val contractsDir = properties.contractDecorators.contractsDirectory
 
-        if (rootDir == null) {
-            logger.warn { "Contract decorator root directory not set, no contract decorators will be loaded" }
+        if (contractsDir == null) {
+            logger.warn { "Contract decorator contracts directory not set, no contract decorators will be loaded" }
             return null
         }
 
-        logger.info { "Watching for contract decorator changes in $rootDir" }
+        logger.info { "Watching for contract decorator changes in $contractsDir" }
 
         val listener = ContractDecoratorFileChangeListener(
             uuidProvider = uuidProvider,
             contractDecoratorRepository = contractDecoratorRepository,
             contractMetadataRepository = contractMetadataRepository,
             objectMapper = objectMapper,
-            rootDir = rootDir,
+            contractsDir = contractsDir,
             ignoredDirs = properties.contractDecorators.ignoredDirs
         )
 
@@ -45,7 +45,7 @@ class ContractDecoratorFileWatcherConfig {
             properties.contractDecorators.fillChangePollInterval,
             properties.contractDecorators.fileChangeQuietInterval
         ).apply {
-            addSourceDirectory(rootDir.toFile())
+            addSourceDirectory(contractsDir.toFile())
             addListener(listener)
             start()
         }
