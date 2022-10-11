@@ -18,6 +18,7 @@ import org.springframework.boot.devtools.filewatch.FileChangeListener
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.reflect.KClass
@@ -28,20 +29,20 @@ class ContractDecoratorFileChangeListener(
     private val contractDecoratorRepository: ContractDecoratorRepository,
     private val contractMetadataRepository: ContractMetadataRepository,
     private val objectMapper: ObjectMapper,
-    private val rootDir: Path,
+    private val contractsDir: Path,
     private val ignoredDirs: List<String>
 ) : FileChangeListener {
 
     companion object : KLogging()
 
     init {
-        rootDir.listDirectoryEntries()
+        contractsDir.listDirectoryEntries()
             .filter { it.filterDirs() }
             .forEach { set ->
                 logger.info { "Processing contract decorators in ${set.name}..." }
                 set.listDirectoryEntries()
-                    .filter { decorator -> decorator.filterDirs() }
-                    .forEach { decorator -> processContractDecorator(decorator, set.name) }
+                    .filter { entry -> entry.filterDirs() }
+                    .forEach { dir -> processNestedDecorators(dir, emptyList(), set.name) }
             }
     }
 
@@ -52,24 +53,34 @@ class ContractDecoratorFileChangeListener(
         val changedDirs = changeSet.flatMap {
             it.files.mapNotNull { file ->
                 file.relativeName.split('/')
-                    .takeIf { elems -> elems.size == 3 }
-                    ?.let { elems -> Pair(elems.take(2).joinToString("/"), file.type) }
+                    .let { elems -> Pair(elems.dropLast(1), file.type) }
             }
         }.distinct()
 
         logger.info { "Detected contract directory changes: $changedDirs" }
 
         changedDirs.forEach {
-            val (setName, decorator) = it.first.split('/', limit = 2)
-            val contractDecoratorDir = rootDir.resolve(setName).resolve(decorator)
-            processContractDecorator(contractDecoratorDir, setName)
+            val setName = it.first.first()
+            val parts = it.first.drop(1).dropLast(1)
+            val decorator = it.first.last()
+            val contractDecoratorDir = contractsDir.resolve(setName).resolve(parts.joinToString("/")).resolve(decorator)
+            processContractDecorator(contractDecoratorDir, parts, setName)
         }
     }
 
     private fun Path.filterDirs(): Boolean = this.isDirectory() && !ignoredDirs.contains(this.name)
 
-    private fun processContractDecorator(contractDecoratorDir: Path, setName: String) {
-        val id = ContractId("$setName/${contractDecoratorDir.name}")
+    private fun processNestedDecorators(dir: Path, parts: List<String>, setName: String) {
+        if (dir.resolve("artifact.json").isRegularFile() || dir.resolve("manifest.json").isRegularFile()) {
+            processContractDecorator(dir, parts, setName)
+        } else {
+            dir.listDirectoryEntries().forEach { processNestedDecorators(it, parts + dir.name, setName) }
+        }
+    }
+
+    private fun processContractDecorator(contractDecoratorDir: Path, parts: List<String>, setName: String) {
+        val nestedParts = parts.joinToString("/")
+        val id = ContractId("$setName/$nestedParts/${contractDecoratorDir.name}".replace("//", "/"))
         logger.info { "Processing contract decorator $id..." }
 
         val artifact = contractDecoratorDir.resolve("artifact.json").toFile()

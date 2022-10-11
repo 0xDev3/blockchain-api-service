@@ -194,19 +194,19 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 contractDecoratorRepository = contractDecoratorRepository,
                 contractMetadataRepository = contractMetadataRepository,
                 objectMapper = JsonConfig().objectMapper(),
-                rootDir = parsableRootDir,
+                contractsDir = parsableRootDir,
                 ignoredDirs = ignoredDirs
             )
         }
 
         val dummyContractId = ContractId("DummyContractSet/DummyContract")
+        val deeplyNestedContractId = ContractId("DummyContractSet/Deeply/Nested/Contract")
         val anotherContractId = ContractId("AnotherContractSet/AnotherContract")
         val contractWithoutArtifactId = ContractId("DummyContractSet/ContractWithoutArtifact")
         val contractWithoutManifestId = ContractId("DummyContractSet/ContractWithoutManifest")
         val ignoredContractId = ContractId("AnotherContractSet/IgnoredContract")
 
         verify("correct contract decorators have been loaded") {
-
             assertThat(contractDecoratorRepository.getById(dummyContractId)).withMessage()
                 .isEqualTo(
                     ContractDecorator(
@@ -214,6 +214,21 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         name = "name",
                         description = "description",
                         binary = ContractBinaryData("0x0"),
+                        tags = listOf(ContractTag("tag.example")),
+                        implements = listOf(ContractTrait("trait.example")),
+                        constructors = CONSTRUCTORS,
+                        functions = FUNCTIONS,
+                        events = EVENTS
+                    )
+                )
+
+            assertThat(contractDecoratorRepository.getById(deeplyNestedContractId)).withMessage()
+                .isEqualTo(
+                    ContractDecorator(
+                        id = deeplyNestedContractId,
+                        name = "name",
+                        description = "description",
+                        binary = ContractBinaryData("0x0123456"),
                         tags = listOf(ContractTag("tag.example")),
                         implements = listOf(ContractTrait("trait.example")),
                         constructors = CONSTRUCTORS,
@@ -249,6 +264,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         verify("correct contract metadata exists in the database") {
             assertThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID)).withMessage()
                 .isTrue()
+            assertThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID)).withMessage()
+                .isTrue()
             assertThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID)).withMessage()
                 .isTrue()
 
@@ -271,16 +288,18 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 contractDecoratorRepository = contractDecoratorRepository,
                 contractMetadataRepository = contractMetadataRepository,
                 objectMapper = JsonConfig().objectMapper(),
-                rootDir = parsableRootDir,
+                contractsDir = parsableRootDir,
                 ignoredDirs = ignoredDirs
             )
         }
 
         val dummyContractId = ContractId("DummyContractSet/DummyContract")
+        val deeplyNestedContractId = ContractId("DummyContractSet/Deeply/Nested/Contract")
         val anotherContractId = ContractId("AnotherContractSet/AnotherContract")
 
         suppose("existing contracts will be removed from repository") {
             contractDecoratorRepository.delete(dummyContractId)
+            contractDecoratorRepository.delete(deeplyNestedContractId)
             contractDecoratorRepository.delete(anotherContractId)
         }
 
@@ -329,6 +348,12 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                             ),
                             ChangedFile(
                                 parsableRootDir.toFile(),
+                                parsableRootDir.resolve("DummyContractSet/Deeply/Nested/Contract/artifact.json")
+                                    .toFile(),
+                                ChangedFile.Type.ADD
+                            ),
+                            ChangedFile(
+                                parsableRootDir.toFile(),
                                 parsableRootDir.resolve("DummyContractSet/ContractWithoutArtifact/artifact.json")
                                     .toFile(),
                                 ChangedFile.Type.DELETE
@@ -356,6 +381,20 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         events = EVENTS
                     )
                 )
+            assertThat(contractDecoratorRepository.getById(deeplyNestedContractId)).withMessage()
+                .isEqualTo(
+                    ContractDecorator(
+                        id = deeplyNestedContractId,
+                        name = "name",
+                        description = "description",
+                        binary = ContractBinaryData("0x0123456"),
+                        tags = listOf(ContractTag("tag.example")),
+                        implements = listOf(ContractTrait("trait.example")),
+                        constructors = CONSTRUCTORS,
+                        functions = FUNCTIONS,
+                        events = EVENTS
+                    )
+                )
 
             assertThat(contractDecoratorRepository.getById(contractWithoutArtifactId)).withMessage()
                 .isNull()
@@ -370,6 +409,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
 
         verify("correct contract metadata exists in the database") {
             assertThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID)).withMessage()
+                .isTrue()
+            assertThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID)).withMessage()
                 .isTrue()
             assertThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID)).withMessage()
                 .isTrue()
@@ -393,7 +434,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 contractDecoratorRepository = contractDecoratorRepository,
                 contractMetadataRepository = contractMetadataRepository,
                 objectMapper = JsonConfig().objectMapper(),
-                rootDir = unparsableRootDir,
+                contractsDir = unparsableRootDir,
                 ignoredDirs = ignoredDirs
             )
         }
