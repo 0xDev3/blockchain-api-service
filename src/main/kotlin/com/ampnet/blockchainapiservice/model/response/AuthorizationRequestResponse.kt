@@ -25,7 +25,7 @@ data class AuthorizationRequestResponse(
         projectId = balanceRequest.projectId,
         status = Status.PENDING,
         redirectUrl = balanceRequest.redirectUrl,
-        walletAddress = balanceRequest.requestedWalletAddress?.rawValue,
+        walletAddress = balanceRequest.requestedWalletAddress?.rawValue ?: balanceRequest.actualWalletAddress?.rawValue,
         arbitraryData = balanceRequest.arbitraryData,
         screenConfig = balanceRequest.screenConfig.orEmpty(),
         messageToSign = balanceRequest.messageToSign,
@@ -38,7 +38,8 @@ data class AuthorizationRequestResponse(
         projectId = balanceRequest.value.projectId,
         status = balanceRequest.status,
         redirectUrl = balanceRequest.value.redirectUrl,
-        walletAddress = balanceRequest.value.requestedWalletAddress?.rawValue,
+        walletAddress = balanceRequest.value.requestedWalletAddress?.rawValue
+            ?: balanceRequest.value.actualWalletAddress?.rawValue,
         arbitraryData = balanceRequest.value.arbitraryData,
         screenConfig = balanceRequest.value.screenConfig.orEmpty(),
         messageToSign = balanceRequest.value.messageToSign,
