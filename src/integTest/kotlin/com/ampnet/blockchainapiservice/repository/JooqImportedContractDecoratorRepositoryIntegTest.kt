@@ -131,7 +131,12 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
             repository.store(id, PROJECT_ID_1, contractId, manifestJson, artifactJson, infoMarkdown, TestData.TIMESTAMP)
         }
 
-        val expectedDecorator = ContractDecorator(contractId, artifactJson, manifestJson)
+        val expectedDecorator = ContractDecorator(
+            id = contractId,
+            artifact = artifactJson,
+            manifest = manifestJson,
+            interfacesProvider = null
+        )
 
         verify("storing imported contract decorator returns correct result") {
             assertThat(storedContractDecorator).withMessage()
@@ -402,7 +407,8 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         decorator = ContractDecorator(
             id = testData.contractId,
             artifact = testData.artifact,
-            manifest = testData.manifest
+            manifest = testData.manifest,
+            interfacesProvider = null
         ),
         manifest = testData.manifest,
         artifact = testData.artifact,

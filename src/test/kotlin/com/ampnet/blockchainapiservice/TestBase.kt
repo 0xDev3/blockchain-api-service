@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice
 import org.assertj.core.api.Assert
 import org.assertj.core.api.Assertions.within
 import org.assertj.core.data.TemporalUnitOffset
+import org.mockito.kotlin.argThat
 import org.springframework.test.context.ActiveProfiles
 import java.time.temporal.ChronoUnit
 
@@ -26,5 +27,11 @@ abstract class TestBase {
 
     protected fun verify(description: String, function: VerifyMessage.() -> Unit) {
         function.invoke(VerifyMessage(description))
+    }
+
+    // https://github.com/mockito/mockito-kotlin/issues/309
+    protected inline fun <reified T : Any> anyValueClass(unitValue: T): T {
+        argThat<T> { true }
+        return unitValue
     }
 }
