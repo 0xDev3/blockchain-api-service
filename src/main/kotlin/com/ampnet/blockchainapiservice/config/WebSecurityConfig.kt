@@ -47,6 +47,7 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) : WebSecurityCon
             HttpMethod.GET.name,
             HttpMethod.POST.name,
             HttpMethod.PUT.name,
+            HttpMethod.PATCH.name,
             HttpMethod.OPTIONS.name,
             HttpMethod.DELETE.name
         )
