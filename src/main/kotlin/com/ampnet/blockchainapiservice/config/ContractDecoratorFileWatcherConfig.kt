@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.config
 
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
+import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
 import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.service.UuidProvider
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -15,9 +16,11 @@ class ContractDecoratorFileWatcherConfig {
     companion object : KLogging()
 
     @Bean
+    @Suppress("LongParameterList")
     fun setUpContractDecoratorFileWatcher(
         uuidProvider: UuidProvider,
         contractDecoratorRepository: ContractDecoratorRepository,
+        contractInterfacesRepository: ContractInterfacesRepository,
         contractMetadataRepository: ContractMetadataRepository,
         objectMapper: ObjectMapper,
         properties: ApplicationProperties,
@@ -34,6 +37,7 @@ class ContractDecoratorFileWatcherConfig {
         val listener = ContractDecoratorFileChangeListener(
             uuidProvider = uuidProvider,
             contractDecoratorRepository = contractDecoratorRepository,
+            contractInterfacesRepository = contractInterfacesRepository,
             contractMetadataRepository = contractMetadataRepository,
             objectMapper = objectMapper,
             contractsDir = contractsDir,

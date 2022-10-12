@@ -6,6 +6,7 @@ import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator.Companion.ContractDecoratorException
 import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
+import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
 import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.service.UuidProvider
 import com.ampnet.blockchainapiservice.util.Constants
@@ -27,6 +28,7 @@ import kotlin.reflect.KClass
 class ContractDecoratorFileChangeListener(
     private val uuidProvider: UuidProvider,
     private val contractDecoratorRepository: ContractDecoratorRepository,
+    private val contractInterfacesRepository: ContractInterfacesRepository,
     private val contractMetadataRepository: ContractMetadataRepository,
     private val objectMapper: ObjectMapper,
     private val contractsDir: Path,
@@ -95,8 +97,10 @@ class ContractDecoratorFileChangeListener(
                 val decorator = ContractDecorator(
                     id = id,
                     artifact = artifactJson,
-                    manifest = manifestJson
+                    manifest = manifestJson,
+                    interfacesProvider = contractInterfacesRepository::getById
                 )
+
                 contractDecoratorRepository.store(decorator)
                 contractDecoratorRepository.store(decorator.id, manifestJson)
                 contractDecoratorRepository.store(decorator.id, artifactJson)

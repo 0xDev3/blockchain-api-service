@@ -29,27 +29,31 @@ data class TypeDecorator(
     val parameters: List<TypeDecorator>?
 )
 
+interface OverridableDecorator {
+    val signature: String
+}
+
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class EventDecorator(
-    val signature: String,
+    override val signature: String,
     val name: String,
     val description: String,
     val parameterDecorators: List<TypeDecorator>
-)
+) : OverridableDecorator
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class ConstructorDecorator(
-    val signature: String,
+    override val signature: String,
     val description: String,
     val parameterDecorators: List<TypeDecorator>
-)
+) : OverridableDecorator
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class FunctionDecorator(
-    val signature: String,
+    override val signature: String,
     val name: String,
     val description: String,
     val parameterDecorators: List<TypeDecorator>,
     val returnDecorators: List<TypeDecorator>,
     val emittableEvents: List<String>
-)
+) : OverridableDecorator

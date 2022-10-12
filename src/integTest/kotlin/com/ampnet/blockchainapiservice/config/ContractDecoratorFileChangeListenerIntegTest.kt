@@ -1,13 +1,16 @@
 package com.ampnet.blockchainapiservice.config
 
 import com.ampnet.blockchainapiservice.TestBase
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
 import com.ampnet.blockchainapiservice.model.result.ContractConstructor
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractEvent
 import com.ampnet.blockchainapiservice.model.result.ContractFunction
 import com.ampnet.blockchainapiservice.model.result.ContractParameter
+import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
 import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.InMemoryContractDecoratorRepository
+import com.ampnet.blockchainapiservice.repository.InMemoryContractInterfacesRepository
 import com.ampnet.blockchainapiservice.repository.JooqContractMetadataRepository
 import com.ampnet.blockchainapiservice.service.RandomUuidProvider
 import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
@@ -21,6 +24,8 @@ import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.mockito.kotlin.given
+import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.devtools.filewatch.ChangedFile
 import org.springframework.boot.devtools.filewatch.ChangedFiles
@@ -187,11 +192,24 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
     @Test
     fun mustCorrectlyLoadInitialContractDecorators() {
         val contractDecoratorRepository = InMemoryContractDecoratorRepository()
+        val contractInterfacesRepository = mock<ContractInterfacesRepository>()
+
+        suppose("mock contract interfaces will be returned") {
+            given(contractInterfacesRepository.getById(anyValueClass(ContractId(""))))
+                .willReturn(
+                    InterfaceManifestJson(
+                        eventDecorators = emptyList(),
+                        constructorDecorators = emptyList(),
+                        functionDecorators = emptyList()
+                    )
+                )
+        }
 
         suppose("initial contract decorators will be loaded from file system") {
             ContractDecoratorFileChangeListener(
                 uuidProvider = RandomUuidProvider(),
                 contractDecoratorRepository = contractDecoratorRepository,
+                contractInterfacesRepository = contractInterfacesRepository,
                 contractMetadataRepository = contractMetadataRepository,
                 objectMapper = JsonConfig().objectMapper(),
                 contractsDir = parsableRootDir,
@@ -281,11 +299,24 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
     @Test
     fun mustCorrectlyReloadContractsAfterSomeFileChangesHaveBeenDetected() {
         val contractDecoratorRepository = InMemoryContractDecoratorRepository()
+        val contractInterfacesRepository = mock<ContractInterfacesRepository>()
+
+        suppose("mock contract interfaces will be returned") {
+            given(contractInterfacesRepository.getById(anyValueClass(ContractId(""))))
+                .willReturn(
+                    InterfaceManifestJson(
+                        eventDecorators = emptyList(),
+                        constructorDecorators = emptyList(),
+                        functionDecorators = emptyList()
+                    )
+                )
+        }
 
         val listener = suppose("initial contract decorators will be loaded from file system") {
             ContractDecoratorFileChangeListener(
                 uuidProvider = RandomUuidProvider(),
                 contractDecoratorRepository = contractDecoratorRepository,
+                contractInterfacesRepository = contractInterfacesRepository,
                 contractMetadataRepository = contractMetadataRepository,
                 objectMapper = JsonConfig().objectMapper(),
                 contractsDir = parsableRootDir,
@@ -427,11 +458,13 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
     @Test
     fun mustSkipUnparsableContractDecorators() {
         val contractDecoratorRepository = InMemoryContractDecoratorRepository()
+        val contractInterfacesRepository = InMemoryContractInterfacesRepository()
 
         suppose("initial contract decorators will be loaded from file system") {
             ContractDecoratorFileChangeListener(
                 uuidProvider = RandomUuidProvider(),
                 contractDecoratorRepository = contractDecoratorRepository,
+                contractInterfacesRepository = contractInterfacesRepository,
                 contractMetadataRepository = contractMetadataRepository,
                 objectMapper = JsonConfig().objectMapper(),
                 contractsDir = unparsableRootDir,
