@@ -32,6 +32,7 @@ import org.springframework.boot.devtools.filewatch.ChangedFiles
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import java.nio.file.Paths
+import org.mockito.kotlin.verify as verifyMock
 
 @JooqTest
 @Import(JooqContractMetadataRepository::class)
@@ -169,10 +170,12 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 )
             )
         )
+        private val EMPTY_CONTRACT_INTERFACE = InterfaceManifestJson(emptyList(), emptyList(), emptyList())
     }
 
-    private val parsableRootDir = Paths.get(javaClass.classLoader.getResource("dummyContracts")!!.path)
-    private val unparsableRootDir = Paths.get(javaClass.classLoader.getResource("unparsableContracts")!!.path)
+    private val interfacesDir = Paths.get(javaClass.classLoader.getResource("dummyInterfaces")!!.path)
+    private val parsableContractsDir = Paths.get(javaClass.classLoader.getResource("dummyContracts")!!.path)
+    private val unparsableContractsDir = Paths.get(javaClass.classLoader.getResource("unparsableContracts")!!.path)
     private val ignoredDirs = listOf("IgnoredContract")
 
     @Suppress("unused")
@@ -190,7 +193,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyLoadInitialContractDecorators() {
+    fun mustCorrectlyLoadInitialContractDecoratorsAndInterfaces() {
         val contractDecoratorRepository = InMemoryContractDecoratorRepository()
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
@@ -205,16 +208,38 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 )
         }
 
-        suppose("initial contract decorators will be loaded from file system") {
+        suppose("initial contract decorators and interfaces will be loaded from file system") {
             ContractDecoratorFileChangeListener(
                 uuidProvider = RandomUuidProvider(),
                 contractDecoratorRepository = contractDecoratorRepository,
                 contractInterfacesRepository = contractInterfacesRepository,
                 contractMetadataRepository = contractMetadataRepository,
                 objectMapper = JsonConfig().objectMapper(),
-                contractsDir = parsableRootDir,
+                contractsDir = parsableContractsDir,
+                interfacesDir = interfacesDir,
                 ignoredDirs = ignoredDirs
             )
+        }
+
+        val exampleInterfaceId = ContractId("example")
+        val nestedInterfaceId = ContractId("nested")
+        val otherNestedInterfaceId = ContractId("nested/other")
+
+        verify("correct contract interfaces have been loaded") {
+            verifyMock(contractInterfacesRepository)
+                .store(exampleInterfaceId, EMPTY_CONTRACT_INTERFACE)
+            verifyMock(contractInterfacesRepository)
+                .store(exampleInterfaceId, "")
+
+            verifyMock(contractInterfacesRepository)
+                .store(nestedInterfaceId, EMPTY_CONTRACT_INTERFACE)
+            verifyMock(contractInterfacesRepository)
+                .store(nestedInterfaceId, "")
+
+            verifyMock(contractInterfacesRepository)
+                .store(otherNestedInterfaceId, EMPTY_CONTRACT_INTERFACE)
+            verifyMock(contractInterfacesRepository)
+                .store(otherNestedInterfaceId, "")
         }
 
         val dummyContractId = ContractId("DummyContractSet/DummyContract")
@@ -297,7 +322,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyReloadContractsAfterSomeFileChangesHaveBeenDetected() {
+    fun mustCorrectlyReloadContractsAndInterfacesAfterSomeFileChangesHaveBeenDetected() {
         val contractDecoratorRepository = InMemoryContractDecoratorRepository()
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
@@ -319,7 +344,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 contractInterfacesRepository = contractInterfacesRepository,
                 contractMetadataRepository = contractMetadataRepository,
                 objectMapper = JsonConfig().objectMapper(),
-                contractsDir = parsableRootDir,
+                contractsDir = parsableContractsDir,
+                interfacesDir = interfacesDir,
                 ignoredDirs = ignoredDirs
             )
         }
@@ -370,29 +396,60 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             listener.onChange(
                 setOf(
                     ChangedFiles(
-                        parsableRootDir.toFile(),
+                        parsableContractsDir.toFile(),
                         setOf(
                             ChangedFile(
-                                parsableRootDir.toFile(),
-                                parsableRootDir.resolve("DummyContractSet/DummyContract/artifact.json").toFile(),
+                                parsableContractsDir.toFile(),
+                                parsableContractsDir.resolve("DummyContractSet/DummyContract/artifact.json").toFile(),
                                 ChangedFile.Type.ADD
                             ),
                             ChangedFile(
-                                parsableRootDir.toFile(),
-                                parsableRootDir.resolve("DummyContractSet/Deeply/Nested/Contract/artifact.json")
+                                parsableContractsDir.toFile(),
+                                parsableContractsDir.resolve("DummyContractSet/Deeply/Nested/Contract/artifact.json")
                                     .toFile(),
                                 ChangedFile.Type.ADD
                             ),
                             ChangedFile(
-                                parsableRootDir.toFile(),
-                                parsableRootDir.resolve("DummyContractSet/ContractWithoutArtifact/artifact.json")
+                                parsableContractsDir.toFile(),
+                                parsableContractsDir.resolve("DummyContractSet/ContractWithoutArtifact/artifact.json")
                                     .toFile(),
+                                ChangedFile.Type.DELETE
+                            )
+                        )
+                    ),
+                    ChangedFiles(
+                        interfacesDir.toFile(),
+                        setOf(
+                            ChangedFile(
+                                interfacesDir.toFile(),
+                                interfacesDir.resolve("NonExistentInterface/manifest.json").toFile(),
+                                ChangedFile.Type.DELETE
+                            ),
+                            ChangedFile(
+                                interfacesDir.toFile(),
+                                interfacesDir.resolve("AnotherNonExistentInterface/info.md").toFile(),
+                                ChangedFile.Type.DELETE
+                            ),
+                            ChangedFile(
+                                interfacesDir.toFile(),
+                                interfacesDir.resolve("AnotherNonExistentInterface/example.info.md").toFile(),
                                 ChangedFile.Type.DELETE
                             )
                         )
                     )
                 )
             )
+        }
+
+        verify("correct contract have been updated in database") {
+            verifyMock(contractInterfacesRepository)
+                .delete(ContractId("NonExistentInterface"))
+
+            verifyMock(contractInterfacesRepository)
+                .delete(ContractId("AnotherNonExistentInterface"))
+
+            verifyMock(contractInterfacesRepository)
+                .delete(ContractId("AnotherNonExistentInterface/example"))
         }
 
         val ignoredContractId = ContractId("AnotherContractSet/IgnoredContract")
@@ -467,7 +524,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 contractInterfacesRepository = contractInterfacesRepository,
                 contractMetadataRepository = contractMetadataRepository,
                 objectMapper = JsonConfig().objectMapper(),
-                contractsDir = unparsableRootDir,
+                contractsDir = unparsableContractsDir,
+                interfacesDir = interfacesDir,
                 ignoredDirs = ignoredDirs
             )
         }

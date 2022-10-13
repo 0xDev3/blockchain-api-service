@@ -1,6 +1,7 @@
 package com.ampnet.blockchainapiservice.config
 
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
 import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator.Companion.ContractDecoratorException
@@ -22,6 +23,7 @@ import kotlin.io.path.isDirectory
 import kotlin.io.path.isRegularFile
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
+import kotlin.io.path.relativeTo
 import kotlin.reflect.KClass
 
 @Suppress("TooManyFunctions")
@@ -32,12 +34,15 @@ class ContractDecoratorFileChangeListener(
     private val contractMetadataRepository: ContractMetadataRepository,
     private val objectMapper: ObjectMapper,
     private val contractsDir: Path,
+    private val interfacesDir: Path,
     private val ignoredDirs: List<String>
 ) : FileChangeListener {
 
     companion object : KLogging()
 
     init {
+        processNestedInterfaces(interfacesDir)
+
         contractsDir.listDirectoryEntries()
             .filter { it.filterDirs() }
             .forEach { set ->
@@ -50,27 +55,77 @@ class ContractDecoratorFileChangeListener(
 
     @Suppress("MagicNumber")
     override fun onChange(changeSet: Set<ChangedFiles>) {
+        val (decoratorChanges, interfaceChanges) = changeSet.partition { it.sourceDirectory.toPath() == contractsDir }
+
+        onContractDecoratorChange(decoratorChanges)
+        onContractInterfaceChange(interfaceChanges)
+    }
+
+    private fun onContractDecoratorChange(changeSet: List<ChangedFiles>) {
         logger.info { "Detected contract decorator changes: $changeSet" }
 
         val changedDirs = changeSet.flatMap {
-            it.files.mapNotNull { file ->
-                file.relativeName.split('/')
-                    .let { elems -> Pair(elems.dropLast(1), file.type) }
-            }
+            it.files.mapNotNull { file -> file.relativeName.split('/').dropLast(1) }
         }.distinct()
 
         logger.info { "Detected contract directory changes: $changedDirs" }
 
         changedDirs.forEach {
-            val setName = it.first.first()
-            val parts = it.first.drop(1).dropLast(1)
-            val decorator = it.first.last()
+            val setName = it.first()
+            val parts = it.drop(1).dropLast(1)
+            val decorator = it.last()
             val contractDecoratorDir = contractsDir.resolve(setName).resolve(parts.joinToString("/")).resolve(decorator)
             processContractDecorator(contractDecoratorDir, parts, setName)
         }
     }
 
+    private fun onContractInterfaceChange(changeSet: List<ChangedFiles>) {
+        logger.info { "Detected contract interface changes: $changeSet" }
+
+        changeSet.flatMap { it.files }
+            .map {
+                val changedPath = it.file.toPath()
+
+                if (changedPath.name.endsWith("info.md")) {
+                    changedPath.parent.resolve(changedPath.name.removeSuffix("info.md") + "manifest.json")
+                } else {
+                    changedPath
+                }
+            }
+            .forEach { processContractInterface(it) }
+    }
+
+    private fun Path.filterManifestFiles(): Boolean = this.isRegularFile() && this.name.endsWith("manifest.json")
+
     private fun Path.filterDirs(): Boolean = this.isDirectory() && !ignoredDirs.contains(this.name)
+
+    private fun processNestedInterfaces(dir: Path) {
+        dir.listDirectoryEntries()
+            .forEach {
+                if (it.filterManifestFiles()) {
+                    processContractInterface(it)
+                } else {
+                    processNestedInterfaces(it)
+                }
+            }
+    }
+
+    private fun processContractInterface(manifest: Path) {
+        val relativePath = manifest.relativeTo(interfacesDir)
+        val id = ContractId(relativePath.toString().removeSuffix("manifest.json").removeSuffix(".").removeSuffix("/"))
+        logger.info { "Processing contract interface $id..." }
+
+        val infoMd = manifest.parent.resolve(manifest.name.removeSuffix("manifest.json") + "info.md").toFile()
+        val infoMarkdown = infoMd.takeIf { it.isFile }?.readText() ?: ""
+        val manifestJson = objectMapper.tryParse(id, "interface", manifest.toFile(), InterfaceManifestJson::class)
+
+        if (manifestJson != null) {
+            contractInterfacesRepository.store(id, manifestJson)
+            contractInterfacesRepository.store(id, infoMarkdown)
+        } else {
+            contractInterfacesRepository.delete(id)
+        }
+    }
 
     private fun processNestedDecorators(dir: Path, parts: List<String>, setName: String) {
         if (dir.resolve("artifact.json").isRegularFile() || dir.resolve("manifest.json").isRegularFile()) {
@@ -88,8 +143,8 @@ class ContractDecoratorFileChangeListener(
         val artifact = contractDecoratorDir.resolve("artifact.json").toFile()
         val manifest = contractDecoratorDir.resolve("manifest.json").toFile()
         val infoMd = contractDecoratorDir.resolve("info.md").toFile()
-        val artifactJson = objectMapper.tryParse(id, artifact, ArtifactJson::class)
-        val manifestJson = objectMapper.tryParse(id, manifest, ManifestJson::class)
+        val artifactJson = objectMapper.tryParse(id, "decorator", artifact, ArtifactJson::class)
+        val manifestJson = objectMapper.tryParse(id, "decorator", manifest, ManifestJson::class)
         val infoMarkdown = infoMd.takeIf { it.isFile }?.readText() ?: ""
 
         if (artifactJson != null && manifestJson != null) {
@@ -125,16 +180,16 @@ class ContractDecoratorFileChangeListener(
         }
     }
 
-    private fun <T : Any> ObjectMapper.tryParse(id: ContractId, file: File, valueType: KClass<T>): T? =
+    private fun <T : Any> ObjectMapper.tryParse(id: ContractId, type: String, file: File, valueType: KClass<T>): T? =
         if (file.isFile) {
             try {
                 readValue(file, valueType.java)
             } catch (e: DatabindException) {
-                logger.warn(e) { "Unable to parse ${file.name} for contract decorator: $id, skipping..." }
+                logger.warn(e) { "Unable to parse ${file.name} for contract $type: $id, skipping..." }
                 null
             }
         } else {
-            logger.warn { "${file.name} is missing for contract decorator: $id, skipping..." }
+            logger.warn { "${file.name} is missing for contract $type: $id, skipping..." }
             null
         }
 }
