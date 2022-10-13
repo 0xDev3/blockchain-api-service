@@ -139,7 +139,8 @@ class ContractImportServiceTest : TestBase() {
         private val CONTRACT_DECORATOR = ContractDecorator(
             id = CONTRACT_ID,
             artifact = ARTIFACT_JSON,
-            manifest = MANIFEST_JSON
+            manifest = MANIFEST_JSON,
+            interfacesProvider = null
         )
         private val CONTRACT_DEPLOYMENT_TRANSACTION_INFO = ContractDeploymentTransactionInfo(
             hash = TransactionHash("tx-hash"),
