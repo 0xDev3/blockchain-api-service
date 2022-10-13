@@ -3,7 +3,12 @@ package com.ampnet.blockchainapiservice.model.result
 import com.ampnet.blockchainapiservice.model.json.AbiInputOutput
 import com.ampnet.blockchainapiservice.model.json.AbiObject
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
+import com.ampnet.blockchainapiservice.model.json.ConstructorDecorator
+import com.ampnet.blockchainapiservice.model.json.EventDecorator
+import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
 import com.ampnet.blockchainapiservice.model.json.ManifestJson
+import com.ampnet.blockchainapiservice.model.json.OverridableDecorator
 import com.ampnet.blockchainapiservice.model.json.TypeDecorator
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
@@ -28,22 +33,46 @@ data class ContractDecorator(
             }
         }
 
-        operator fun invoke(id: ContractId, artifact: ArtifactJson, manifest: ManifestJson) = ContractDecorator(
-            id = id,
-            name = manifest.name,
-            description = manifest.description,
-            binary = ContractBinaryData(artifact.bytecode),
-            tags = manifest.tags.map { ContractTag(it) },
-            implements = manifest.implements.map { ContractTrait(it) },
-            constructors = decorateConstructors(artifact, manifest),
-            functions = decorateFunctions(artifact, manifest),
-            events = decorateEvents(artifact, manifest)
-        )
+        operator fun invoke(
+            id: ContractId,
+            artifact: ArtifactJson,
+            manifest: ManifestJson,
+            interfacesProvider: ((ContractId) -> InterfaceManifestJson?)?
+        ): ContractDecorator {
+            val manifestInterfaces = interfacesProvider?.let { provider ->
+                manifest.implements.map { interfaceName ->
+                    provider(ContractId(interfaceName))
+                        ?: throw ContractDecoratorException("Contract interface does not exist: $interfaceName")
+                }
+            }.orEmpty()
 
-        private fun decorateConstructors(artifact: ArtifactJson, manifest: ManifestJson): List<ContractConstructor> {
+            val interfaceConstructors = manifestInterfaces.flatMap { it.constructorDecorators }.resolveOverrides()
+            val interfaceFunctions = manifestInterfaces.flatMap { it.functionDecorators }.resolveOverrides()
+            val interfaceEvents = manifestInterfaces.flatMap { it.eventDecorators }.resolveOverrides()
+
+            return ContractDecorator(
+                id = id,
+                name = manifest.name,
+                description = manifest.description,
+                binary = ContractBinaryData(artifact.bytecode),
+                tags = manifest.tags.map { ContractTag(it) },
+                implements = manifest.implements.map { ContractTrait(it) },
+                constructors = decorateConstructors(artifact, manifest, interfaceConstructors),
+                functions = decorateFunctions(artifact, manifest, interfaceFunctions),
+                events = decorateEvents(artifact, manifest, interfaceEvents)
+            )
+        }
+
+        private fun decorateConstructors(
+            artifact: ArtifactJson,
+            manifest: ManifestJson,
+            interfaceConstructors: List<ConstructorDecorator>
+        ): List<ContractConstructor> {
             val constructors = artifact.abi.filter { it.type == "constructor" }
                 .associateBy { "constructor(${it.inputs.orEmpty().toTypeList()})" }
-            return manifest.constructorDecorators.map {
+            val decorators = (manifest.constructorDecorators + interfaceConstructors).resolveOverrides()
+
+            return decorators.map {
                 val artifactConstructor = constructors.getAbiObjectBySignature(it.signature)
 
                 ContractConstructor(
@@ -54,10 +83,16 @@ data class ContractDecorator(
             }
         }
 
-        private fun decorateFunctions(artifact: ArtifactJson, manifest: ManifestJson): List<ContractFunction> {
+        private fun decorateFunctions(
+            artifact: ArtifactJson,
+            manifest: ManifestJson,
+            interfaceFunctions: List<FunctionDecorator>
+        ): List<ContractFunction> {
             val functions = artifact.abi.filter { it.type == "function" }
                 .associateBy { "${it.name}(${it.inputs.orEmpty().toTypeList()})" }
-            return manifest.functionDecorators.map {
+            val decorators = (manifest.functionDecorators + interfaceFunctions).resolveOverrides()
+
+            return decorators.map {
                 val artifactFunction = functions.getAbiObjectBySignature(it.signature)
 
                 ContractFunction(
@@ -78,10 +113,16 @@ data class ContractDecorator(
             }
         }
 
-        private fun decorateEvents(artifact: ArtifactJson, manifest: ManifestJson): List<ContractEvent> {
+        private fun decorateEvents(
+            artifact: ArtifactJson,
+            manifest: ManifestJson,
+            interfaceEvents: List<EventDecorator>
+        ): List<ContractEvent> {
             val events = artifact.abi.filter { it.type == "event" }
                 .associateBy { "${it.name}(${it.inputs.orEmpty().toTypeList()})" }
-            return manifest.eventDecorators.map {
+            val decorators = (manifest.eventDecorators + interfaceEvents).resolveOverrides()
+
+            return decorators.map {
                 val artifactEvent = events.getAbiObjectBySignature(it.signature)
 
                 ContractEvent(
@@ -119,6 +160,9 @@ data class ContractDecorator(
                     parameters = it.first.parameters?.toContractParameters(it.second.components ?: emptyList())
                 )
             }
+
+        private fun <T : OverridableDecorator> List<T>.resolveOverrides(): List<T> =
+            distinctBy { it.signature }
     }
 }
 

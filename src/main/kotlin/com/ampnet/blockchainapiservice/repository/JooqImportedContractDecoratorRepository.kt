@@ -37,6 +37,7 @@ class JooqImportedContractDecoratorRepository(
         importedAt: UtcDateTime
     ): ContractDecorator {
         logger.info { "Store imported contract decorator, id: $id, projectId: $projectId, contractId: $contractId" }
+
         val record = ImportedContractDecoratorRecord(
             id = id,
             projectId = projectId,
@@ -48,8 +49,15 @@ class JooqImportedContractDecoratorRepository(
             contractImplements = manifestJson.implements.toTypedArray(),
             importedAt = importedAt
         )
+
         dslContext.executeInsert(record)
-        return ContractDecorator(contractId, artifactJson, manifestJson)
+
+        return ContractDecorator(
+            id = contractId,
+            artifact = artifactJson,
+            manifest = manifestJson,
+            interfacesProvider = null
+        )
     }
 
     override fun getByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ContractDecorator? {
@@ -66,7 +74,8 @@ class JooqImportedContractDecoratorRepository(
                 ContractDecorator(
                     id = it.contractId,
                     artifact = it.artifactJson,
-                    manifest = it.manifestJson
+                    manifest = it.manifestJson,
+                    interfacesProvider = null
                 )
             }
     }
@@ -122,7 +131,8 @@ class JooqImportedContractDecoratorRepository(
                 ContractDecorator(
                     id = it.contractId,
                     artifact = it.artifactJson,
-                    manifest = it.manifestJson
+                    manifest = it.manifestJson,
+                    interfacesProvider = null
                 )
             }
     }

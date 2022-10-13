@@ -46,7 +46,8 @@ class ChainProperties {
 
 @Suppress("MagicNumber")
 class ContractDecoratorProperties {
-    var rootDirectory: Path? = null
+    var contractsDirectory: Path? = null
+    var interfacesDirectory: Path? = null
     var ignoredDirs: List<String> = listOf(".git")
     var fillChangePollInterval: Duration = Duration.ofMinutes(1L)
     var fileChangeQuietInterval: Duration = Duration.ofSeconds(30L)
