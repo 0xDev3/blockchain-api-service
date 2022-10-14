@@ -4,14 +4,18 @@ import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.model.ScreenConfig
+import com.ampnet.blockchainapiservice.model.json.PartiallyMatchingInterfaceManifest
 import com.ampnet.blockchainapiservice.model.params.ImportContractParams
 import com.ampnet.blockchainapiservice.model.request.ImportContractRequest
 import com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestResponse
+import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestResponse
+import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.ContractDeploymentRequestService
 import com.ampnet.blockchainapiservice.service.ContractImportService
+import com.ampnet.blockchainapiservice.service.ContractInterfacesService
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.BaseUrl
 import com.ampnet.blockchainapiservice.util.ChainId
@@ -110,7 +114,7 @@ class ImportContractControllerTest : TestBase() {
                 .willReturn(result)
         }
 
-        val controller = ImportContractController(importService, deploymentService)
+        val controller = ImportContractController(importService, deploymentService, mock())
 
         verify("controller returns correct response") {
             val request = ImportContractRequest(
@@ -162,6 +166,44 @@ class ImportContractControllerTest : TestBase() {
                                 timestamp = result.transactionData.timestamp?.value
                             ),
                             imported = result.value.imported
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlySuggestInterfacesForSmartContract() {
+        val id = UUID.randomUUID()
+        val result = PartiallyMatchingInterfaceManifest(
+            id = ContractId("contract-id"),
+            name = "name",
+            description = "description",
+            eventDecorators = emptyList(),
+            functionDecorators = emptyList()
+        )
+
+        val contractInterfacesService = mock<ContractInterfacesService>()
+
+        suppose("some interfaces are suggested") {
+            given(contractInterfacesService.getSuggestedInterfacesForImportedSmartContract(id))
+                .willReturn(listOf(result))
+        }
+
+        val controller = ImportContractController(mock(), mock(), contractInterfacesService)
+
+        verify("controller returns correct response") {
+            val response = controller.getSuggestedInterfacesForImportedSmartContract(id)
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ResponseEntity.ok(
+                        ContractInterfaceManifestsResponse(
+                            listOf(
+                                ContractInterfaceManifestResponse(result)
+                            )
                         )
                     )
                 )
