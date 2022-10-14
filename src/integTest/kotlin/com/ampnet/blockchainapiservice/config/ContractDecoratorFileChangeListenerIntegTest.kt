@@ -170,7 +170,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 )
             )
         )
-        private val EMPTY_CONTRACT_INTERFACE = InterfaceManifestJson(emptyList(), emptyList(), emptyList())
+        private val EMPTY_CONTRACT_INTERFACE = InterfaceManifestJson(null, null, emptyList(), emptyList())
     }
 
     private val interfacesDir = Paths.get(javaClass.classLoader.getResource("dummyInterfaces")!!.path)
@@ -201,8 +201,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             given(contractInterfacesRepository.getById(anyValueClass(ContractId(""))))
                 .willReturn(
                     InterfaceManifestJson(
+                        name = null,
+                        description = null,
                         eventDecorators = emptyList(),
-                        constructorDecorators = emptyList(),
                         functionDecorators = emptyList()
                     )
                 )
@@ -330,8 +331,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             given(contractInterfacesRepository.getById(anyValueClass(ContractId(""))))
                 .willReturn(
                     InterfaceManifestJson(
+                        name = null,
+                        description = null,
                         eventDecorators = emptyList(),
-                        constructorDecorators = emptyList(),
                         functionDecorators = emptyList()
                     )
                 )
