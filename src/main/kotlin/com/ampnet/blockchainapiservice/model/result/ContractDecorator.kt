@@ -3,7 +3,6 @@ package com.ampnet.blockchainapiservice.model.result
 import com.ampnet.blockchainapiservice.model.json.AbiInputOutput
 import com.ampnet.blockchainapiservice.model.json.AbiObject
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
-import com.ampnet.blockchainapiservice.model.json.ConstructorDecorator
 import com.ampnet.blockchainapiservice.model.json.EventDecorator
 import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
@@ -46,7 +45,6 @@ data class ContractDecorator(
                 }
             }.orEmpty()
 
-            val interfaceConstructors = manifestInterfaces.flatMap { it.constructorDecorators }.resolveOverrides()
             val interfaceFunctions = manifestInterfaces.flatMap { it.functionDecorators }.resolveOverrides()
             val interfaceEvents = manifestInterfaces.flatMap { it.eventDecorators }.resolveOverrides()
 
@@ -57,22 +55,17 @@ data class ContractDecorator(
                 binary = ContractBinaryData(artifact.bytecode),
                 tags = manifest.tags.map { ContractTag(it) },
                 implements = manifest.implements.map { ContractTrait(it) },
-                constructors = decorateConstructors(artifact, manifest, interfaceConstructors),
+                constructors = decorateConstructors(artifact, manifest),
                 functions = decorateFunctions(artifact, manifest, interfaceFunctions),
                 events = decorateEvents(artifact, manifest, interfaceEvents)
             )
         }
 
-        private fun decorateConstructors(
-            artifact: ArtifactJson,
-            manifest: ManifestJson,
-            interfaceConstructors: List<ConstructorDecorator>
-        ): List<ContractConstructor> {
+        private fun decorateConstructors(artifact: ArtifactJson, manifest: ManifestJson): List<ContractConstructor> {
             val constructors = artifact.abi.filter { it.type == "constructor" }
                 .associateBy { "constructor(${it.inputs.orEmpty().toTypeList()})" }
-            val decorators = (manifest.constructorDecorators + interfaceConstructors).resolveOverrides()
 
-            return decorators.map {
+            return manifest.constructorDecorators.map {
                 val artifactConstructor = constructors.getAbiObjectBySignature(it.signature)
 
                 ContractConstructor(

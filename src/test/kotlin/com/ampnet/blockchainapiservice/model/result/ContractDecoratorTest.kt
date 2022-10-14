@@ -4,7 +4,6 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.model.json.AbiInputOutput
 import com.ampnet.blockchainapiservice.model.json.AbiObject
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
-import com.ampnet.blockchainapiservice.model.json.ConstructorDecorator
 import com.ampnet.blockchainapiservice.model.json.EventDecorator
 import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
@@ -50,21 +49,17 @@ class ContractDecoratorTest : TestBase() {
             eventDecorators = listOf(
                 eventDecorator("FromDecorator", "string", "not-overridden-1")
             ),
-            constructorDecorators = listOf(
-                constructorDecorator("string", "not-overridden-1")
-            ),
+            constructorDecorators = emptyList(),
             functionDecorators = listOf(
                 functionDecorator("fromDecorator", "string", "not-overridden-1")
             )
         )
         private val INTERFACE_MANIFEST_OVERRIDE_1 = InterfaceManifestJson(
+            name = "name",
+            description = "description",
             eventDecorators = listOf(
                 eventDecorator("FromDecorator", "string", "overridden-1-1"),
                 eventDecorator("FromOverride1", "uint", "overridden-1-2")
-            ),
-            constructorDecorators = listOf(
-                constructorDecorator("string", "overridden-1-1"),
-                constructorDecorator("uint", "overridden-1-2")
             ),
             functionDecorators = listOf(
                 functionDecorator("fromDecorator", "string", "overridden-1-1"),
@@ -72,15 +67,12 @@ class ContractDecoratorTest : TestBase() {
             )
         )
         private val INTERFACE_MANIFEST_OVERRIDE_2 = InterfaceManifestJson(
+            name = "name",
+            description = "description",
             eventDecorators = listOf(
                 eventDecorator("FromDecorator", "string", "overridden-2-1"),
                 eventDecorator("FromOverride1", "uint", "overridden-2-2"),
                 eventDecorator("FromOverride2", "int", "overridden-2-3")
-            ),
-            constructorDecorators = listOf(
-                constructorDecorator("string", "overridden-2-1"),
-                constructorDecorator("uint", "overridden-2-2"),
-                constructorDecorator("int", "overridden-2-3")
             ),
             functionDecorators = listOf(
                 functionDecorator("fromDecorator", "string", "overridden-2-1"),
@@ -89,17 +81,13 @@ class ContractDecoratorTest : TestBase() {
             )
         )
         private val INTERFACE_MANIFEST_EXTRA = InterfaceManifestJson(
+            name = "name",
+            description = "description",
             eventDecorators = listOf(
                 eventDecorator("FromDecorator", "string", "extra-1"),
                 eventDecorator("FromOverride1", "uint", "extra-2"),
                 eventDecorator("FromOverride2", "int", "extra-3"),
                 eventDecorator("ExtraEvent", "bool", "extra-4")
-            ),
-            constructorDecorators = listOf(
-                constructorDecorator("string", "extra-1"),
-                constructorDecorator("uint", "extra-2"),
-                constructorDecorator("int", "extra-3"),
-                constructorDecorator("bool", "extra-4")
             ),
             functionDecorators = listOf(
                 functionDecorator("fromDecorator", "string", "extra-1"),
@@ -163,20 +151,6 @@ class ContractDecoratorTest : TestBase() {
                 type = "event"
             )
 
-        private fun constructorDecorator(argType: String, description: String) =
-            ConstructorDecorator(
-                signature = "constructor($argType)",
-                description = description,
-                parameterDecorators = listOf(
-                    TypeDecorator(
-                        name = "Arg1",
-                        description = "Arg1",
-                        recommendedTypes = emptyList(),
-                        parameters = null
-                    )
-                )
-            )
-
         private fun functionDecorator(name: String, argType: String, description: String) =
             FunctionDecorator(
                 signature = "$name($argType)",
@@ -211,7 +185,7 @@ class ContractDecoratorTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyOverrideConstructorsFunctionsAndEvents() {
+    fun mustCorrectlyOverrideFunctionsAndEvents() {
         val map = mapOf(
             ContractId("override-1") to INTERFACE_MANIFEST_OVERRIDE_1,
             ContractId("override-2") to INTERFACE_MANIFEST_OVERRIDE_2,
@@ -219,7 +193,7 @@ class ContractDecoratorTest : TestBase() {
         )
         val interfacesProvider: (ContractId) -> InterfaceManifestJson? = { id -> map[id] }
 
-        verify("constructors, functions and events are correctly overridden") {
+        verify("functions and events are correctly overridden") {
             val id = ContractId("contract-id")
             val result = ContractDecorator(
                 id = id,
@@ -237,64 +211,7 @@ class ContractDecoratorTest : TestBase() {
                         binary = ContractBinaryData(ARTIFACT_JSON.bytecode),
                         tags = MANIFEST_JSON.tags.map { ContractTag(it) },
                         implements = MANIFEST_JSON.implements.map { ContractTrait(it) },
-                        constructors = listOf(
-                            ContractConstructor(
-                                inputs = listOf(
-                                    ContractParameter(
-                                        name = "Arg1",
-                                        description = "Arg1",
-                                        solidityType = "string",
-                                        solidityName = "arg1",
-                                        recommendedTypes = emptyList(),
-                                        parameters = null
-                                    )
-                                ),
-                                description = "not-overridden-1",
-                                payable = false
-                            ),
-                            ContractConstructor(
-                                inputs = listOf(
-                                    ContractParameter(
-                                        name = "Arg1",
-                                        description = "Arg1",
-                                        solidityType = "uint",
-                                        solidityName = "arg1",
-                                        recommendedTypes = emptyList(),
-                                        parameters = null
-                                    )
-                                ),
-                                description = "overridden-1-2",
-                                payable = false
-                            ),
-                            ContractConstructor(
-                                inputs = listOf(
-                                    ContractParameter(
-                                        name = "Arg1",
-                                        description = "Arg1",
-                                        solidityType = "int",
-                                        solidityName = "arg1",
-                                        recommendedTypes = emptyList(),
-                                        parameters = null
-                                    )
-                                ),
-                                description = "overridden-2-3",
-                                payable = false
-                            ),
-                            ContractConstructor(
-                                inputs = listOf(
-                                    ContractParameter(
-                                        name = "Arg1",
-                                        description = "Arg1",
-                                        solidityType = "bool",
-                                        solidityName = "arg1",
-                                        recommendedTypes = emptyList(),
-                                        parameters = null
-                                    )
-                                ),
-                                description = "extra-4",
-                                payable = false
-                            )
-                        ),
+                        constructors = emptyList(),
                         functions = listOf(
                             ContractFunction(
                                 name = "not-overridden-1",

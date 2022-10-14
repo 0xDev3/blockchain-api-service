@@ -1,7 +1,6 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.model.json.ConstructorDecorator
 import com.ampnet.blockchainapiservice.model.json.EventDecorator
 import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
@@ -17,8 +16,9 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val repository = InMemoryContractInterfacesRepository()
         val id = ContractId("id")
         val interfaceManifest = InterfaceManifestJson(
+            name = "name",
+            description = "description",
             eventDecorators = emptyList(),
-            constructorDecorators = emptyList(),
             functionDecorators = emptyList()
         )
 
@@ -57,8 +57,9 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val repository = InMemoryContractInterfacesRepository()
         val id = ContractId("id")
         val interfaceManifest = InterfaceManifestJson(
+            name = "name",
+            description = "description",
             eventDecorators = emptyList(),
-            constructorDecorators = emptyList(),
             functionDecorators = emptyList()
         )
 
@@ -100,21 +101,17 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
 
         val id1 = ContractId("id-1")
         val interfaceManifest1 = InterfaceManifestJson(
+            name = "name-1",
+            description = "description-1",
             eventDecorators = emptyList(),
-            constructorDecorators = emptyList(),
             functionDecorators = emptyList()
         )
 
         val id2 = ContractId("id-2")
         val interfaceManifest2 = InterfaceManifestJson(
+            name = "name-2",
+            description = "description-2",
             eventDecorators = emptyList(),
-            constructorDecorators = listOf(
-                ConstructorDecorator(
-                    signature = "constructor()",
-                    description = "description",
-                    parameterDecorators = emptyList()
-                )
-            ),
             functionDecorators = emptyList()
         )
 
@@ -135,10 +132,11 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
 
         val id1 = ContractId("id-1")
         val interfaceManifest1 = InterfaceManifestJson(
+            name = "name-1",
+            description = "description-1",
             eventDecorators = listOf(
                 simpleEventDecorator("Event(string)")
             ),
-            constructorDecorators = emptyList(),
             functionDecorators = listOf(
                 simpleFunctionDecorator("function(string)")
             )
@@ -146,10 +144,11 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
 
         val id2 = ContractId("id-2")
         val interfaceManifest2 = InterfaceManifestJson(
+            name = "name-2",
+            description = "description-2",
             eventDecorators = listOf(
                 simpleEventDecorator("NonMatchingEvent(string)")
             ),
-            constructorDecorators = emptyList(),
             functionDecorators = listOf(
                 simpleFunctionDecorator("nonMatchingFunction(string)")
             )
@@ -171,6 +170,8 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
                     listOf(
                         PartiallyMatchingInterfaceManifest(
                             id = id1,
+                            name = "name-1",
+                            description = "description-1",
                             eventDecorators = interfaceManifest1.eventDecorators,
                             functionDecorators = interfaceManifest1.functionDecorators
                         )
@@ -185,10 +186,11 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
 
         val id1 = ContractId("id-1")
         val interfaceManifest1 = InterfaceManifestJson(
+            name = "name-1",
+            description = "description-1",
             eventDecorators = listOf(
                 simpleEventDecorator("Event(string)")
             ),
-            constructorDecorators = emptyList(),
             functionDecorators = listOf(
                 simpleFunctionDecorator("function(string)")
             )
@@ -196,10 +198,11 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
 
         val id2 = ContractId("id-2")
         val interfaceManifest2 = InterfaceManifestJson(
+            name = "name-2",
+            description = "description-2",
             eventDecorators = listOf(
                 simpleEventDecorator("NonMatchingEvent(string)")
             ),
-            constructorDecorators = emptyList(),
             functionDecorators = listOf(
                 simpleFunctionDecorator("nonMatchingFunction(string)")
             )
@@ -221,6 +224,8 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
                     listOf(
                         PartiallyMatchingInterfaceManifest(
                             id = id1,
+                            name = "name-1",
+                            description = "description-1",
                             eventDecorators = interfaceManifest1.eventDecorators,
                             functionDecorators = interfaceManifest1.functionDecorators
                         )
@@ -235,10 +240,11 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
 
         val id1 = ContractId("id-1")
         val interfaceManifest1 = InterfaceManifestJson(
+            name = "name-1",
+            description = "description-1",
             eventDecorators = listOf(
                 simpleEventDecorator("Event(string)")
             ),
-            constructorDecorators = emptyList(),
             functionDecorators = listOf(
                 simpleFunctionDecorator("function(string)")
             )
@@ -246,10 +252,11 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
 
         val id2 = ContractId("id-2")
         val interfaceManifest2 = InterfaceManifestJson(
+            name = "name-2",
+            description = "description-2",
             eventDecorators = listOf(
                 simpleEventDecorator("NonMatchingEvent(string)")
             ),
-            constructorDecorators = emptyList(),
             functionDecorators = listOf(
                 simpleFunctionDecorator("nonMatchingFunction(string)")
             )

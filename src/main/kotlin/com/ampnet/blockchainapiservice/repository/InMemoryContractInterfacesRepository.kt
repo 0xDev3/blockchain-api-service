@@ -56,13 +56,16 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
         logger.debug { "Get all partially matching contract interfaces" }
         return storage.entries.mapNotNull {
             val id = it.key
-            val matchingFunctions = findMatches(it.value.functionDecorators, abiFunctionSignatures)
-            val matchingEvents = findMatches(it.value.eventDecorators, abiEventSignatures)
+            val interfaceDecorator = it.value
+            val matchingFunctions = findMatches(interfaceDecorator.functionDecorators, abiFunctionSignatures)
+            val matchingEvents = findMatches(interfaceDecorator.eventDecorators, abiEventSignatures)
 
             matchingFunctions?.let {
                 matchingEvents?.let {
                     PartiallyMatchingInterfaceManifest(
                         id = id,
+                        name = interfaceDecorator.name,
+                        description = interfaceDecorator.description,
                         eventDecorators = matchingEvents,
                         functionDecorators = matchingFunctions
                     )
