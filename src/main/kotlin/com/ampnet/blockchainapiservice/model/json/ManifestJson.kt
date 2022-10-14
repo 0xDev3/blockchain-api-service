@@ -1,5 +1,6 @@
 package com.ampnet.blockchainapiservice.model.json
 
+import com.ampnet.blockchainapiservice.util.ContractId
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 
@@ -18,6 +19,12 @@ data class ManifestJson(
 data class InterfaceManifestJson(
     val eventDecorators: List<EventDecorator>,
     val constructorDecorators: List<ConstructorDecorator>,
+    val functionDecorators: List<FunctionDecorator>
+)
+
+data class PartiallyMatchingInterfaceManifest(
+    val id: ContractId,
+    val eventDecorators: List<EventDecorator>,
     val functionDecorators: List<FunctionDecorator>
 )
 

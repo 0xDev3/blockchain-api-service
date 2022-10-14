@@ -1,6 +1,8 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
+import com.ampnet.blockchainapiservice.model.json.OverridableDecorator
+import com.ampnet.blockchainapiservice.model.json.PartiallyMatchingInterfaceManifest
 import com.ampnet.blockchainapiservice.util.ContractId
 import mu.KLogging
 import org.springframework.stereotype.Repository
@@ -45,5 +47,35 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
     override fun getAll(): List<InterfaceManifestJson> {
         logger.debug { "Get all contract interfaces" }
         return storage.values.toList()
+    }
+
+    override fun getAllWithPartiallyMatchingInterfaces(
+        abiFunctionSignatures: Set<String>,
+        abiEventSignatures: Set<String>
+    ): List<PartiallyMatchingInterfaceManifest> {
+        logger.debug { "Get all partially matching contract interfaces" }
+        return storage.entries.mapNotNull {
+            val id = it.key
+            val matchingFunctions = findMatches(it.value.functionDecorators, abiFunctionSignatures)
+            val matchingEvents = findMatches(it.value.eventDecorators, abiEventSignatures)
+
+            matchingFunctions?.let {
+                matchingEvents?.let {
+                    PartiallyMatchingInterfaceManifest(
+                        id = id,
+                        eventDecorators = matchingEvents,
+                        functionDecorators = matchingFunctions
+                    )
+                }
+            }
+        }
+    }
+
+    private fun <T : OverridableDecorator> findMatches(
+        interfaceDecorators: List<T>,
+        abiSignatures: Set<String>
+    ): List<T>? {
+        val interfaceDecoratorSignatures = interfaceDecorators.map { it.signature }.toSet()
+        return interfaceDecorators.takeIf { abiSignatures.containsAll(interfaceDecoratorSignatures) }
     }
 }
