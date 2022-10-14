@@ -12,7 +12,12 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMet
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import com.ampnet.blockchainapiservice.model.ScreenConfig
+import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
+import com.ampnet.blockchainapiservice.model.json.TypeDecorator
 import com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestResponse
+import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestResponse
+import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import com.ampnet.blockchainapiservice.model.response.TransactionResponse
 import com.ampnet.blockchainapiservice.model.result.ContractConstructor
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
@@ -22,6 +27,7 @@ import com.ampnet.blockchainapiservice.model.result.ContractParameter
 import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
+import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
 import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import com.ampnet.blockchainapiservice.service.ContractImportServiceImpl.Companion.TypeAndValue
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
@@ -110,6 +116,43 @@ class ImportContractControllerApiTest : ControllerTestBase() {
             ),
             events = listOf()
         )
+        private val CONTRACT_INTERFACE = InterfaceManifestJson(
+            name = "Example Interface",
+            description = "Example smart contract interface",
+            eventDecorators = emptyList(),
+            functionDecorators = listOf(
+                FunctionDecorator(
+                    signature = "setOwner(address)",
+                    name = "Set owner",
+                    description = "Set contract owner",
+                    parameterDecorators = listOf(
+                        TypeDecorator(
+                            name = "New owner",
+                            description = "New owner of the cotnract",
+                            recommendedTypes = emptyList(),
+                            parameters = emptyList()
+                        )
+                    ),
+                    returnDecorators = emptyList(),
+                    emittableEvents = emptyList()
+                ),
+                FunctionDecorator(
+                    signature = "getOwner()",
+                    name = "Get owner",
+                    description = "Get current contract owner",
+                    parameterDecorators = emptyList(),
+                    returnDecorators = listOf(
+                        TypeDecorator(
+                            name = "Current owner",
+                            description = "Current owner of the cotnract",
+                            recommendedTypes = emptyList(),
+                            parameters = emptyList()
+                        )
+                    ),
+                    emittableEvents = emptyList()
+                )
+            )
+        )
     }
 
     private val accounts = HardhatTestContainer.ACCOUNTS
@@ -125,6 +168,9 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
     @Autowired
     private lateinit var importedContractDecoratorRepository: ImportedContractDecoratorRepository
+
+    @Autowired
+    private lateinit var contractInterfacesRepository: ContractInterfacesRepository
 
     @Autowired
     private lateinit var dslContext: DSLContext
@@ -604,6 +650,81 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andReturn()
 
             verifyResponseErrorCode(response, ErrorCode.CONTRACT_BINARY_MISMATCH)
+        }
+    }
+
+    @Test
+    fun mustCorrectlySuggestInterfacesForImportedSmartContractWhenContractDecoratorIsNotSpecified() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val mainAccount = accounts[0]
+        val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        val alias = "alias"
+
+        val importResponse = suppose("request to import smart contract is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/import-smart-contract")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_address": "${contract.contractAddress}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val contractId = ContractId("example.ownable")
+
+        suppose("some contract interface is in the repository") {
+            contractInterfacesRepository.store(contractId, CONTRACT_INTERFACE)
+        }
+
+        val suggestedInterfacesResponse = suppose("suggested imported smart contract interfaces are fetched") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/import-smart-contract/${importResponse.id}/suggested-interfaces")
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractInterfaceManifestsResponse::class.java)
+        }
+
+        verify("correct interface manifests are returned") {
+            assertThat(suggestedInterfacesResponse).withMessage()
+                .isEqualTo(
+                    ContractInterfaceManifestsResponse(
+                        listOf(
+                            ContractInterfaceManifestResponse(contractId, CONTRACT_INTERFACE)
+                        )
+                    )
+                )
         }
     }
 }

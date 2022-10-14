@@ -11,7 +11,7 @@ Version {version}, {date}
 == Introduction
 This document contains generated documentation for `AMPnet blockchain-api-service`. Blockchain API service provides
 endpoints to verify user wallet ownership as well as endpoints to fetch data from blockchain for verified wallets.
-Source code is available on https://github.com/AMPnet/blockchain-api-service[Github].
+Source code is available on https://github.com/0xDev3/blockchain-api-service[Github].
 
 include::src/docs/asciidoc/base-url.adoc[]
 
@@ -76,6 +76,7 @@ All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
 include::src/docs/asciidoc/deploy/create.adoc[]
 include::src/docs/asciidoc/deploy/import.adoc[]
+include::src/docs/asciidoc/deploy/suggest-interfaces.adoc[]
 include::src/docs/asciidoc/deploy/fetch-by-id.adoc[]
 include::src/docs/asciidoc/deploy/fetch-by-project-id-alias.adoc[]
 include::src/docs/asciidoc/deploy/fetch-by-project-id.adoc[]
