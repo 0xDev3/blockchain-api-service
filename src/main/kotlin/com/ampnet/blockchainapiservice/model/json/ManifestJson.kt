@@ -17,13 +17,16 @@ data class ManifestJson(
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class InterfaceManifestJson(
+    val name: String?,
+    val description: String?,
     val eventDecorators: List<EventDecorator>,
-    val constructorDecorators: List<ConstructorDecorator>,
     val functionDecorators: List<FunctionDecorator>
 )
 
 data class PartiallyMatchingInterfaceManifest(
     val id: ContractId,
+    val name: String?,
+    val description: String?,
     val eventDecorators: List<EventDecorator>,
     val functionDecorators: List<FunctionDecorator>
 )
@@ -50,10 +53,10 @@ data class EventDecorator(
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class ConstructorDecorator(
-    override val signature: String,
+    val signature: String,
     val description: String,
     val parameterDecorators: List<TypeDecorator>
-) : OverridableDecorator
+)
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class FunctionDecorator(
