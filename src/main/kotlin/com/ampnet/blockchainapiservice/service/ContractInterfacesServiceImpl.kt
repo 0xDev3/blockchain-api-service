@@ -19,6 +19,8 @@ class ContractInterfacesServiceImpl(
     companion object : KLogging()
 
     override fun getSuggestedInterfacesForImportedSmartContract(id: UUID): List<PartiallyMatchingInterfaceManifest> {
+        logger.debug { "Fetching suggested interface for contract with id: $id" }
+
         val contractDeploymentRequest = contractDeploymentRequestRepository.getById(id)?.takeIf { it.imported }
             ?: throw ResourceNotFoundException("Imported contract deployment request not found for ID: $id")
 
