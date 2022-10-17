@@ -4,7 +4,7 @@ import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.json.PartiallyMatchingInterfaceManifest
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import com.ampnet.blockchainapiservice.model.params.ImportContractParams
 import com.ampnet.blockchainapiservice.model.request.ImportContractRequest
 import com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestResponse
@@ -175,7 +175,7 @@ class ImportContractControllerTest : TestBase() {
     @Test
     fun mustCorrectlySuggestInterfacesForSmartContract() {
         val id = UUID.randomUUID()
-        val result = PartiallyMatchingInterfaceManifest(
+        val result = InterfaceManifestJsonWithId(
             id = ContractId("contract-id"),
             name = "name",
             description = "description",

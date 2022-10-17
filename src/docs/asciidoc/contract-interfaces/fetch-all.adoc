@@ -1,0 +1,16 @@
+=== Fetch List of Contract Interfaces
+Fetches list of contract interfaces.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/ContractInterfacesControllerApiTest/mustCorrectlyFetchContractInterfaces/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/ContractInterfacesControllerApiTest/mustCorrectlyFetchContractInterfaces/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse.adoc[]

@@ -7,8 +7,8 @@ import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.json.EventDecorator
 import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import com.ampnet.blockchainapiservice.model.json.ManifestJson
-import com.ampnet.blockchainapiservice.model.json.PartiallyMatchingInterfaceManifest
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
@@ -108,14 +108,14 @@ class ContractInterfacesServiceTest : TestBase() {
             )
                 .willReturn(
                     listOf(
-                        PartiallyMatchingInterfaceManifest(
+                        InterfaceManifestJsonWithId(
                             id = ContractId("already-implemented"),
                             name = "Already Implemented",
                             description = "Already Implemented",
                             eventDecorators = MANIFEST_JSON.eventDecorators,
                             functionDecorators = emptyList()
                         ),
-                        PartiallyMatchingInterfaceManifest(
+                        InterfaceManifestJsonWithId(
                             id = ContractId("not-yet-implemented"),
                             name = "Not Yet Implemented",
                             description = "Not Yet Implemented",
@@ -136,7 +136,7 @@ class ContractInterfacesServiceTest : TestBase() {
             assertThat(service.getSuggestedInterfacesForImportedSmartContract(ID)).withMessage()
                 .isEqualTo(
                     listOf(
-                        PartiallyMatchingInterfaceManifest(
+                        InterfaceManifestJsonWithId(
                             id = ContractId("not-yet-implemented"),
                             name = "Not Yet Implemented",
                             description = "Not Yet Implemented",

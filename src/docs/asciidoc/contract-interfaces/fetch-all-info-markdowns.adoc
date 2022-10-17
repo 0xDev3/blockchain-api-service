@@ -1,0 +1,16 @@
+=== Fetch List of Contract Interface `info.md` Files
+Fetches list of contract interface `info.md` files.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/ContractInterfacesControllerApiTest/mustCorrectlyFetchContractInterfaceInfoMarkdowns/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/ContractInterfacesControllerApiTest/mustCorrectlyFetchContractInterfaceInfoMarkdowns/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse.adoc[]

@@ -3,7 +3,7 @@ package com.ampnet.blockchainapiservice.model.response
 import com.ampnet.blockchainapiservice.model.json.EventDecorator
 import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
-import com.ampnet.blockchainapiservice.model.json.PartiallyMatchingInterfaceManifest
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import com.ampnet.blockchainapiservice.util.ContractId
 
 data class ContractInterfaceManifestResponse(
@@ -13,7 +13,7 @@ data class ContractInterfaceManifestResponse(
     val eventDecorators: List<EventDecorator>,
     val functionDecorators: List<FunctionDecorator>
 ) {
-    constructor(manifest: PartiallyMatchingInterfaceManifest) : this(
+    constructor(manifest: InterfaceManifestJsonWithId) : this(
         id = manifest.id.value,
         name = manifest.name,
         description = manifest.description,
