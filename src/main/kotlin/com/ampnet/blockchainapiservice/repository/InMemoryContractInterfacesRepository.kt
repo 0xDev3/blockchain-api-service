@@ -1,8 +1,8 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import com.ampnet.blockchainapiservice.model.json.OverridableDecorator
-import com.ampnet.blockchainapiservice.model.json.PartiallyMatchingInterfaceManifest
 import com.ampnet.blockchainapiservice.util.ContractId
 import mu.KLogging
 import org.springframework.stereotype.Repository
@@ -44,15 +44,28 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
         return infoMarkdownStorage[id]
     }
 
-    override fun getAll(): List<InterfaceManifestJson> {
+    override fun getAll(): List<InterfaceManifestJsonWithId> {
         logger.debug { "Get all contract interfaces" }
-        return storage.values.toList()
+        return storage.entries.map {
+            InterfaceManifestJsonWithId(
+                id = it.key,
+                name = it.value.name,
+                description = it.value.description,
+                eventDecorators = it.value.eventDecorators,
+                functionDecorators = it.value.functionDecorators
+            )
+        }
+    }
+
+    override fun getAllInfoMarkdownFiles(): List<String> {
+        logger.debug { "Get all contract interface info.md files" }
+        return infoMarkdownStorage.values.toList()
     }
 
     override fun getAllWithPartiallyMatchingInterfaces(
         abiFunctionSignatures: Set<String>,
         abiEventSignatures: Set<String>
-    ): List<PartiallyMatchingInterfaceManifest> {
+    ): List<InterfaceManifestJsonWithId> {
         logger.debug { "Get all partially matching contract interfaces" }
         return storage.entries.mapNotNull {
             val id = it.key
@@ -62,7 +75,7 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
 
             matchingFunctions?.let {
                 matchingEvents?.let {
-                    PartiallyMatchingInterfaceManifest(
+                    InterfaceManifestJsonWithId(
                         id = id,
                         name = interfaceDecorator.name,
                         description = interfaceDecorator.description,

@@ -4,7 +4,7 @@ import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.model.json.EventDecorator
 import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
-import com.ampnet.blockchainapiservice.model.json.PartiallyMatchingInterfaceManifest
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import com.ampnet.blockchainapiservice.util.ContractId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -122,7 +122,45 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
 
         verify("correct contract interfaces are returned") {
             assertThat(repository.getAll()).withMessage()
-                .containsExactlyInAnyOrderElementsOf(listOf(interfaceManifest1, interfaceManifest2))
+                .containsExactlyInAnyOrderElementsOf(
+                    listOf(
+                        InterfaceManifestJsonWithId(
+                            id = id1,
+                            name = interfaceManifest1.name,
+                            description = interfaceManifest1.description,
+                            eventDecorators = interfaceManifest1.eventDecorators,
+                            functionDecorators = interfaceManifest1.functionDecorators
+                        ),
+                        InterfaceManifestJsonWithId(
+                            id = id2,
+                            name = interfaceManifest2.name,
+                            description = interfaceManifest2.description,
+                            eventDecorators = interfaceManifest2.eventDecorators,
+                            functionDecorators = interfaceManifest2.functionDecorators
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyGetAllContractInterfaceInfoMarkdownFiles() {
+        val repository = InMemoryContractInterfacesRepository()
+
+        val id1 = ContractId("id-1")
+        val infoMd1 = "info-md-1"
+
+        val id2 = ContractId("id-2")
+        val infoMd2 = "info-md-2"
+
+        suppose("some contract interface info.md files are stored") {
+            repository.store(id1, infoMd1)
+            repository.store(id2, infoMd2)
+        }
+
+        verify("correct contract interfaces are returned") {
+            assertThat(repository.getAllInfoMarkdownFiles()).withMessage()
+                .containsExactlyInAnyOrderElementsOf(listOf(infoMd1, infoMd2))
         }
     }
 
@@ -168,7 +206,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
             ).withMessage()
                 .containsExactlyInAnyOrderElementsOf(
                     listOf(
-                        PartiallyMatchingInterfaceManifest(
+                        InterfaceManifestJsonWithId(
                             id = id1,
                             name = "name-1",
                             description = "description-1",
@@ -222,7 +260,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
             ).withMessage()
                 .containsExactlyInAnyOrderElementsOf(
                     listOf(
-                        PartiallyMatchingInterfaceManifest(
+                        InterfaceManifestJsonWithId(
                             id = id1,
                             name = "name-1",
                             description = "description-1",

@@ -1,4 +1,4 @@
-=== Fetch List of Deployable Contract `artifact.json` files
+=== Fetch List of Deployable Contract `artifact.json` Files
 Fetches list of deployable contract `artifact.json` files with specified filters.
 
 .Query Parameters

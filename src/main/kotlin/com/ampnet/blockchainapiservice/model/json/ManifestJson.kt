@@ -23,7 +23,8 @@ data class InterfaceManifestJson(
     val functionDecorators: List<FunctionDecorator>
 )
 
-data class PartiallyMatchingInterfaceManifest(
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
+data class InterfaceManifestJsonWithId(
     val id: ContractId,
     val name: String?,
     val description: String?,

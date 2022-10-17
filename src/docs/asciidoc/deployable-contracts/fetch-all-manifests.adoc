@@ -1,4 +1,4 @@
-=== Fetch List of Deployable Contract `manifest.json` files
+=== Fetch List of Deployable Contract `manifest.json` Files
 Fetches list of deployable contract `manifest.json` files with specified filters.
 
 .Query Parameters

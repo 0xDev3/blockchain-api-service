@@ -1,7 +1,7 @@
 package com.ampnet.blockchainapiservice.repository
 
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
-import com.ampnet.blockchainapiservice.model.json.PartiallyMatchingInterfaceManifest
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import com.ampnet.blockchainapiservice.util.ContractId
 
 interface ContractInterfacesRepository {
@@ -10,9 +10,10 @@ interface ContractInterfacesRepository {
     fun delete(id: ContractId): Boolean
     fun getById(id: ContractId): InterfaceManifestJson?
     fun getInfoMarkdownById(id: ContractId): String?
-    fun getAll(): List<InterfaceManifestJson>
+    fun getAll(): List<InterfaceManifestJsonWithId>
+    fun getAllInfoMarkdownFiles(): List<String>
     fun getAllWithPartiallyMatchingInterfaces(
         abiFunctionSignatures: Set<String>,
         abiEventSignatures: Set<String>
-    ): List<PartiallyMatchingInterfaceManifest>
+    ): List<InterfaceManifestJsonWithId>
 }

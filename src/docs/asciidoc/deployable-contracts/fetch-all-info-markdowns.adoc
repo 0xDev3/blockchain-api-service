@@ -1,4 +1,4 @@
-=== Fetch List of Deployable Contract `info.md` files
+=== Fetch List of Deployable Contract `info.md` Files
 Fetches list of deployable contract `info.md` files with specified filters.
 
 .Query Parameters

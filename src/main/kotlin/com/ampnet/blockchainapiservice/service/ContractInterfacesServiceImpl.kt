@@ -1,7 +1,7 @@
 package com.ampnet.blockchainapiservice.service
 
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.json.PartiallyMatchingInterfaceManifest
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
 import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepository
@@ -18,7 +18,7 @@ class ContractInterfacesServiceImpl(
 
     companion object : KLogging()
 
-    override fun getSuggestedInterfacesForImportedSmartContract(id: UUID): List<PartiallyMatchingInterfaceManifest> {
+    override fun getSuggestedInterfacesForImportedSmartContract(id: UUID): List<InterfaceManifestJsonWithId> {
         logger.debug { "Fetching suggested interface for contract with id: $id" }
 
         val contractDeploymentRequest = contractDeploymentRequestRepository.getById(id)?.takeIf { it.imported }
