@@ -211,3 +211,13 @@ class ContractDecompilationTemporarilyUnavailableException : ServiceException(
         private const val serialVersionUID: Long = 4124559311239162111L
     }
 }
+
+class ContractDecoratorException(reason: String) : ServiceException(
+    errorCode = ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Contract decorator incompatible: $reason"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -4648452291836117997L
+    }
+}

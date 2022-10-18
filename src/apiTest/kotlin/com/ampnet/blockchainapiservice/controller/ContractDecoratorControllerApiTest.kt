@@ -84,8 +84,8 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
         private val MANIFEST_JSON = ManifestJson(
             name = "name",
             description = "description",
-            tags = listOf("example", "simple"),
-            implements = listOf("traits.example", "traits.exampleOwnable"),
+            tags = setOf("example", "simple"),
+            implements = setOf("traits.example", "traits.exampleOwnable"),
             eventDecorators = emptyList(),
             constructorDecorators = listOf(
                 ConstructorDecorator(

@@ -227,8 +227,8 @@ class ContractDecoratorControllerTest : TestBase() {
         val result = ManifestJson(
             name = "name",
             description = "description",
-            tags = emptyList(),
-            implements = emptyList(),
+            tags = emptySet(),
+            implements = emptySet(),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()
@@ -266,8 +266,8 @@ class ContractDecoratorControllerTest : TestBase() {
         val result = ManifestJson(
             name = "name",
             description = "description",
-            tags = emptyList(),
-            implements = emptyList(),
+            tags = emptySet(),
+            implements = emptySet(),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()
@@ -631,8 +631,8 @@ class ContractDecoratorControllerTest : TestBase() {
         val result = ManifestJson(
             name = "name",
             description = "description",
-            tags = emptyList(),
-            implements = emptyList(),
+            tags = emptySet(),
+            implements = emptySet(),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()
@@ -664,8 +664,8 @@ class ContractDecoratorControllerTest : TestBase() {
         val result = ManifestJson(
             name = "name",
             description = "description",
-            tags = emptyList(),
-            implements = emptyList(),
+            tags = emptySet(),
+            implements = emptySet(),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()

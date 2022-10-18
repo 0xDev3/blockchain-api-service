@@ -129,8 +129,8 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         val manifestJson = ManifestJson(
             name = "name",
             description = "description",
-            tags = listOf("tag-1"),
-            implements = listOf("trait-1"),
+            tags = setOf("tag-1"),
+            implements = setOf("trait-1"),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()
@@ -184,8 +184,8 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         val manifestJson = ManifestJson(
             name = "name",
             description = "description",
-            tags = listOf("tag-1"),
-            implements = listOf("trait-1"),
+            tags = setOf("tag-1"),
+            implements = setOf("trait-1"),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()
@@ -211,7 +211,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
             repository.updateInterfaces(contractId, PROJECT_ID_1, newInterfaces, manifestJson)
         }
 
-        val expectedManifest = manifestJson.copy(implements = newInterfaces.map { it.value })
+        val expectedManifest = manifestJson.copy(implements = newInterfaces.map { it.value }.toSet())
         val expectedDecorator = ContractDecorator(
             id = contractId,
             artifact = artifactJson,
@@ -460,8 +460,8 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         manifest = ManifestJson(
             name = "name-${contractId.value}",
             description = "description",
-            tags = tags,
-            implements = traits,
+            tags = tags.toSet(),
+            implements = traits.toSet(),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()
