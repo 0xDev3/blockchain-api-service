@@ -73,7 +73,10 @@ class JooqImportedContractDecoratorRepository(
         }
         return dslContext.update(ImportedContractDecoratorTable)
             .set(ImportedContractDecoratorTable.CONTRACT_IMPLEMENTS, interfaces.map { it.value }.toTypedArray())
-            .set(ImportedContractDecoratorTable.MANIFEST_JSON, manifest.copy(implements = interfaces.map { it.value }))
+            .set(
+                ImportedContractDecoratorTable.MANIFEST_JSON,
+                manifest.copy(implements = interfaces.map { it.value }.toSet())
+            )
             .where(
                 DSL.and(
                     ImportedContractDecoratorTable.CONTRACT_ID.eq(contractId),

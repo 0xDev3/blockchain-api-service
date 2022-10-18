@@ -71,5 +71,8 @@ enum class ErrorCode {
     CANNOT_DECOMPILE_CONTRACT_BINARY,
 
     @Description("Decompilation of contract binary is currently unavailable and should be tried at a later time")
-    CONTRACT_DECOMPILATION_TEMPORARILY_UNAVAILABLE
+    CONTRACT_DECOMPILATION_TEMPORARILY_UNAVAILABLE,
+
+    @Description("Contract decorator is incompatible with contract ABI specification")
+    CONTRACT_DECORATOR_INCOMPATIBLE
 }

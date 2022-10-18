@@ -50,8 +50,8 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val manifestJson = ManifestJson(
             name = "name",
             description = "description",
-            tags = emptyList(),
-            implements = emptyList(),
+            tags = emptySet(),
+            implements = emptySet(),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()
@@ -141,8 +141,8 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val manifestJson = ManifestJson(
             name = "name",
             description = "description",
-            tags = emptyList(),
-            implements = emptyList(),
+            tags = emptySet(),
+            implements = emptySet(),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()
@@ -576,8 +576,8 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         ManifestJson(
             name = "name",
             description = "description",
-            tags = tags.map { it.value },
-            implements = implements.map { it.value },
+            tags = tags.map { it.value }.toSet(),
+            implements = implements.map { it.value }.toSet(),
             eventDecorators = emptyList(),
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()

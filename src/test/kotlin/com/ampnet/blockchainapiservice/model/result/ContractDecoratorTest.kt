@@ -44,8 +44,8 @@ class ContractDecoratorTest : TestBase() {
         private val MANIFEST_JSON = ManifestJson(
             name = "name",
             description = "description",
-            tags = emptyList(),
-            implements = listOf("override-1", "override-2", "extra"),
+            tags = emptySet(),
+            implements = setOf("override-1", "override-2", "extra"),
             eventDecorators = listOf(
                 eventDecorator("FromDecorator", "string", "not-overridden-1")
             ),

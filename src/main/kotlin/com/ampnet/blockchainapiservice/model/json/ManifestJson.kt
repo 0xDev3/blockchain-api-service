@@ -2,14 +2,17 @@ package com.ampnet.blockchainapiservice.model.json
 
 import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class ManifestJson(
     val name: String?,
     val description: String?,
-    val tags: List<String>,
-    val implements: List<String>,
+    @JsonDeserialize(`as` = LinkedHashSet::class)
+    val tags: Set<String>,
+    @JsonDeserialize(`as` = LinkedHashSet::class)
+    val implements: Set<String>,
     val eventDecorators: List<EventDecorator>,
     val constructorDecorators: List<ConstructorDecorator>,
     val functionDecorators: List<FunctionDecorator>

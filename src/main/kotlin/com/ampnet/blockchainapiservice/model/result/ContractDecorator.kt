@@ -1,5 +1,7 @@
 package com.ampnet.blockchainapiservice.model.result
 
+import com.ampnet.blockchainapiservice.exception.ContractDecoratorException
+import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.json.AbiInputOutput
 import com.ampnet.blockchainapiservice.model.json.AbiObject
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
@@ -26,12 +28,6 @@ data class ContractDecorator(
     val events: List<ContractEvent>
 ) {
     companion object {
-        class ContractDecoratorException(override val message: String) : RuntimeException() {
-            companion object {
-                private const val serialVersionUID: Long = -4648452291836117997L
-            }
-        }
-
         operator fun invoke(
             id: ContractId,
             artifact: ArtifactJson,
@@ -41,7 +37,7 @@ data class ContractDecorator(
             val manifestInterfaces = interfacesProvider?.let { provider ->
                 manifest.implements.map { interfaceName ->
                     provider(InterfaceId(interfaceName))
-                        ?: throw ContractDecoratorException("Contract interface does not exist: $interfaceName")
+                        ?: throw ResourceNotFoundException("Contract interface does not exist: $interfaceName")
                 }
             }.orEmpty()
 
