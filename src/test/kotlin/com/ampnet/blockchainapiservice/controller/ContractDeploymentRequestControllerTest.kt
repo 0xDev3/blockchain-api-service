@@ -23,7 +23,7 @@ import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
 import com.ampnet.blockchainapiservice.util.Status
@@ -68,7 +68,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             contractData = ContractBinaryData("00"),
             constructorParams = TestData.EMPTY_JSON_ARRAY,
             contractTags = listOf(ContractTag("contract-tag")),
-            contractImplements = listOf(ContractTrait("contract-trait")),
+            contractImplements = listOf(InterfaceId("contract-trait")),
             initialEthAmount = params.initialEthAmount,
             chainId = ChainId(1337),
             redirectUrl = params.redirectUrl!!,
@@ -193,7 +193,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 contractData = ContractBinaryData("00"),
                 constructorParams = TestData.EMPTY_JSON_ARRAY,
                 contractTags = listOf(ContractTag("contract-tag")),
-                contractImplements = listOf(ContractTrait("contract-trait")),
+                contractImplements = listOf(InterfaceId("contract-trait")),
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
@@ -287,7 +287,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 contractData = ContractBinaryData("00"),
                 constructorParams = TestData.EMPTY_JSON_ARRAY,
                 contractTags = listOf(ContractTag("contract-tag")),
-                contractImplements = listOf(ContractTrait("contract-trait")),
+                contractImplements = listOf(InterfaceId("contract-trait")),
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
@@ -318,7 +318,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         val filters = ContractDeploymentRequestFilters(
             contractIds = OrList(ContractId("contract-id")),
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
-            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2"))),
+            contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2"))),
             deployedOnly = true
         )
 
@@ -399,7 +399,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 contractData = ContractBinaryData("00"),
                 constructorParams = TestData.EMPTY_JSON_ARRAY,
                 contractTags = listOf(ContractTag("contract-tag")),
-                contractImplements = listOf(ContractTrait("contract-trait")),
+                contractImplements = listOf(InterfaceId("contract-trait")),
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",

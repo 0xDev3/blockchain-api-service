@@ -9,7 +9,7 @@ import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestR
 import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse
 import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
-import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -23,7 +23,7 @@ class ContractInterfacesControllerTest : TestBase() {
     fun mustCorrectlyFetchContractInterfaces() {
         val repository = mock<ContractInterfacesRepository>()
         val result = InterfaceManifestJsonWithId(
-            id = ContractId("contract-id"),
+            id = InterfaceId("interface-id"),
             name = "name",
             description = "description",
             eventDecorators = emptyList(),
@@ -85,7 +85,7 @@ class ContractInterfacesControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractInterface() {
-        val id = ContractId("example")
+        val id = InterfaceId("example")
         val repository = mock<ContractInterfacesRepository>()
         val result = InterfaceManifestJson(
             name = "name",
@@ -124,7 +124,7 @@ class ContractInterfacesControllerTest : TestBase() {
     @Test
     fun mustThrowResourceNotFoundExceptionWhenContractInterfaceIsNotFound() {
         val repository = mock<ContractInterfacesRepository>()
-        val id = ContractId("example")
+        val id = InterfaceId("example")
 
         suppose("null will be returned from the repository") {
             given(repository.getById(id))
@@ -142,7 +142,7 @@ class ContractInterfacesControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractInterfaceInfoMarkdown() {
-        val id = ContractId("example")
+        val id = InterfaceId("example")
         val repository = mock<ContractInterfacesRepository>()
         val result = "info-md"
 
@@ -164,7 +164,7 @@ class ContractInterfacesControllerTest : TestBase() {
     @Test
     fun mustThrowResourceNotFoundExceptionWhenContractInterfaceInfoMarkdownIsNotFound() {
         val repository = mock<ContractInterfacesRepository>()
-        val id = ContractId("example")
+        val id = InterfaceId("example")
 
         suppose("null will be returned from the repository") {
             given(repository.getInfoMarkdownById(id))

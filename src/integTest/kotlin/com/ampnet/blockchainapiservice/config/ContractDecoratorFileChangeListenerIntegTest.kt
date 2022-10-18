@@ -18,7 +18,7 @@ import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -198,7 +198,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
         suppose("mock contract interfaces will be returned") {
-            given(contractInterfacesRepository.getById(anyValueClass(ContractId(""))))
+            given(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
                 .willReturn(
                     InterfaceManifestJson(
                         name = null,
@@ -222,9 +222,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             )
         }
 
-        val exampleInterfaceId = ContractId("example")
-        val nestedInterfaceId = ContractId("nested")
-        val otherNestedInterfaceId = ContractId("nested/other")
+        val exampleInterfaceId = InterfaceId("example")
+        val nestedInterfaceId = InterfaceId("nested")
+        val otherNestedInterfaceId = InterfaceId("nested/other")
 
         verify("correct contract interfaces have been loaded") {
             verifyMock(contractInterfacesRepository)
@@ -259,7 +259,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "description",
                         binary = ContractBinaryData("0x0"),
                         tags = listOf(ContractTag("tag.example")),
-                        implements = listOf(ContractTrait("trait.example")),
+                        implements = listOf(InterfaceId("trait.example")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
                         events = EVENTS
@@ -274,7 +274,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "description",
                         binary = ContractBinaryData("0x0123456"),
                         tags = listOf(ContractTag("tag.example")),
-                        implements = listOf(ContractTrait("trait.example")),
+                        implements = listOf(InterfaceId("trait.example")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
                         events = EVENTS
@@ -294,7 +294,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "description",
                         binary = ContractBinaryData("0x2"),
                         tags = listOf(ContractTag("tag.another")),
-                        implements = listOf(ContractTrait("trait.another")),
+                        implements = listOf(InterfaceId("trait.another")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
                         events = EVENTS
@@ -328,7 +328,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
         suppose("mock contract interfaces will be returned") {
-            given(contractInterfacesRepository.getById(anyValueClass(ContractId(""))))
+            given(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
                 .willReturn(
                     InterfaceManifestJson(
                         name = null,
@@ -371,7 +371,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             description = "description",
             binary = ContractBinaryData("0x1"),
             tags = listOf(ContractTag("tag.no.manifest")),
-            implements = listOf(ContractTrait("trait.no.manifest")),
+            implements = listOf(InterfaceId("trait.no.manifest")),
             constructors = CONSTRUCTORS,
             functions = FUNCTIONS,
             events = EVENTS
@@ -385,7 +385,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     description = "description",
                     binary = ContractBinaryData("0x4"),
                     tags = listOf(ContractTag("tag.no.artifact")),
-                    implements = listOf(ContractTrait("trait.no.artifact")),
+                    implements = listOf(InterfaceId("trait.no.artifact")),
                     constructors = CONSTRUCTORS,
                     functions = FUNCTIONS,
                     events = EVENTS
@@ -445,13 +445,13 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
 
         verify("correct contract have been updated in database") {
             verifyMock(contractInterfacesRepository)
-                .delete(ContractId("NonExistentInterface"))
+                .delete(InterfaceId("NonExistentInterface"))
 
             verifyMock(contractInterfacesRepository)
-                .delete(ContractId("AnotherNonExistentInterface"))
+                .delete(InterfaceId("AnotherNonExistentInterface"))
 
             verifyMock(contractInterfacesRepository)
-                .delete(ContractId("AnotherNonExistentInterface/example"))
+                .delete(InterfaceId("AnotherNonExistentInterface/example"))
         }
 
         val ignoredContractId = ContractId("AnotherContractSet/IgnoredContract")
@@ -465,7 +465,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "description",
                         binary = ContractBinaryData("0x0"),
                         tags = listOf(ContractTag("tag.example")),
-                        implements = listOf(ContractTrait("trait.example")),
+                        implements = listOf(InterfaceId("trait.example")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
                         events = EVENTS
@@ -479,7 +479,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         description = "description",
                         binary = ContractBinaryData("0x0123456"),
                         tags = listOf(ContractTag("tag.example")),
-                        implements = listOf(ContractTrait("trait.example")),
+                        implements = listOf(InterfaceId("trait.example")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
                         events = EVENTS

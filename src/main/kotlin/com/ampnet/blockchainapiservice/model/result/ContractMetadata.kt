@@ -2,7 +2,7 @@ package com.ampnet.blockchainapiservice.model.result
 
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import java.util.UUID
 
 data class ContractMetadata(
@@ -11,6 +11,6 @@ data class ContractMetadata(
     val description: String?,
     val contractId: ContractId,
     val contractTags: List<ContractTag>,
-    val contractImplements: List<ContractTrait>,
+    val contractImplements: List<InterfaceId>,
     val projectId: UUID
 )

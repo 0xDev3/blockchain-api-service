@@ -7,7 +7,7 @@ import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -46,7 +46,7 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         val description = "description"
         val contractId = ContractId("cid")
         val contractTags = listOf(ContractTag("tag"))
-        val contractImplements = listOf(ContractTrait("trait"))
+        val contractImplements = listOf(InterfaceId("trait"))
         val projectId = UUID.randomUUID()
 
         suppose("contract metadata is stored into the database") {
@@ -90,7 +90,7 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         val description = "description"
         val contractId = ContractId("cid")
         val contractTags = listOf(ContractTag("tag"))
-        val contractImplements = listOf(ContractTrait("trait"))
+        val contractImplements = listOf(InterfaceId("trait"))
         val projectId = UUID.randomUUID()
 
         suppose("contract metadata is stored into the database") {
@@ -111,7 +111,7 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         val otherName = "name"
         val otherDescription = "description"
         val otherTags = listOf(ContractTag("other-tag-1"), ContractTag("other-tag-2"))
-        val otherImplements = listOf(ContractTrait("other-trait-1"), ContractTrait("other-trait-2"))
+        val otherImplements = listOf(InterfaceId("other-trait-1"), InterfaceId("other-trait-2"))
 
         suppose("contract metadata is stored into the database with different data") {
             repository.createOrUpdate(
@@ -163,7 +163,7 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         val description = "description"
         val contractId = ContractId("cid")
         val contractTags = listOf(ContractTag("tag"))
-        val contractImplements = listOf(ContractTrait("trait"))
+        val contractImplements = listOf(InterfaceId("trait"))
         val projectId = UUID.randomUUID()
 
         suppose("contract metadata is stored into the database") {

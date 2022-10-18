@@ -10,7 +10,7 @@ import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -245,21 +245,21 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     @Test
     fun mustCorrectlyGetAllContractDecoratorsWithSomeImplementsFilters() {
         val matching = listOf(
-            decorator(implements = listOf(ContractTrait("1"), ContractTrait("2"))),
-            decorator(implements = listOf(ContractTrait("3"))),
-            decorator(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("3"))),
-            decorator(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("extra"))),
-            decorator(implements = listOf(ContractTrait("3"), ContractTrait("tag"))),
+            decorator(implements = listOf(InterfaceId("1"), InterfaceId("2"))),
+            decorator(implements = listOf(InterfaceId("3"))),
+            decorator(implements = listOf(InterfaceId("1"), InterfaceId("2"), InterfaceId("3"))),
+            decorator(implements = listOf(InterfaceId("1"), InterfaceId("2"), InterfaceId("extra"))),
+            decorator(implements = listOf(InterfaceId("3"), InterfaceId("tag"))),
             decorator(
                 implements = listOf(
-                    ContractTrait("1"), ContractTrait("2"), ContractTrait("3"), ContractTrait("extra")
+                    InterfaceId("1"), InterfaceId("2"), InterfaceId("3"), InterfaceId("extra")
                 )
             )
         )
         val nonMatching = listOf(
-            decorator(implements = listOf(ContractTrait("1"))),
-            decorator(implements = listOf(ContractTrait("2"))),
-            decorator(implements = listOf(ContractTrait("extra")))
+            decorator(implements = listOf(InterfaceId("1"))),
+            decorator(implements = listOf(InterfaceId("2"))),
+            decorator(implements = listOf(InterfaceId("extra")))
         )
         val all = matching + nonMatching
 
@@ -272,8 +272,8 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val filters = ContractDecoratorFilters(
             contractTags = OrList(),
             contractImplements = OrList(
-                AndList(ContractTrait("1"), ContractTrait("2")),
-                AndList(ContractTrait("3"))
+                AndList(InterfaceId("1"), InterfaceId("2")),
+                AndList(InterfaceId("3"))
             )
         )
 
@@ -332,21 +332,21 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     @Test
     fun mustCorrectlyGetAllContractManifestJsonsWithSomeImplementsFilters() {
         val matching = listOf(
-            decoratorAndManifest(implements = listOf(ContractTrait("1"), ContractTrait("2"))),
-            decoratorAndManifest(implements = listOf(ContractTrait("3"))),
-            decoratorAndManifest(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("3"))),
-            decoratorAndManifest(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("extra"))),
-            decoratorAndManifest(implements = listOf(ContractTrait("3"), ContractTrait("tag"))),
+            decoratorAndManifest(implements = listOf(InterfaceId("1"), InterfaceId("2"))),
+            decoratorAndManifest(implements = listOf(InterfaceId("3"))),
+            decoratorAndManifest(implements = listOf(InterfaceId("1"), InterfaceId("2"), InterfaceId("3"))),
+            decoratorAndManifest(implements = listOf(InterfaceId("1"), InterfaceId("2"), InterfaceId("extra"))),
+            decoratorAndManifest(implements = listOf(InterfaceId("3"), InterfaceId("tag"))),
             decoratorAndManifest(
                 implements = listOf(
-                    ContractTrait("1"), ContractTrait("2"), ContractTrait("3"), ContractTrait("extra")
+                    InterfaceId("1"), InterfaceId("2"), InterfaceId("3"), InterfaceId("extra")
                 )
             )
         )
         val nonMatching = listOf(
-            decoratorAndManifest(implements = listOf(ContractTrait("1"))),
-            decoratorAndManifest(implements = listOf(ContractTrait("2"))),
-            decoratorAndManifest(implements = listOf(ContractTrait("extra")))
+            decoratorAndManifest(implements = listOf(InterfaceId("1"))),
+            decoratorAndManifest(implements = listOf(InterfaceId("2"))),
+            decoratorAndManifest(implements = listOf(InterfaceId("extra")))
         )
         val all = matching + nonMatching
 
@@ -362,8 +362,8 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val filters = ContractDecoratorFilters(
             contractTags = OrList(),
             contractImplements = OrList(
-                AndList(ContractTrait("1"), ContractTrait("2")),
-                AndList(ContractTrait("3"))
+                AndList(InterfaceId("1"), InterfaceId("2")),
+                AndList(InterfaceId("3"))
             )
         )
 
@@ -422,21 +422,21 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     @Test
     fun mustCorrectlyGetAllContractArtifactJsonsWithSomeImplementsFilters() {
         val matching = listOf(
-            decoratorAndArtifact(implements = listOf(ContractTrait("1"), ContractTrait("2"))),
-            decoratorAndArtifact(implements = listOf(ContractTrait("3"))),
-            decoratorAndArtifact(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("3"))),
-            decoratorAndArtifact(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("extra"))),
-            decoratorAndArtifact(implements = listOf(ContractTrait("3"), ContractTrait("tag"))),
+            decoratorAndArtifact(implements = listOf(InterfaceId("1"), InterfaceId("2"))),
+            decoratorAndArtifact(implements = listOf(InterfaceId("3"))),
+            decoratorAndArtifact(implements = listOf(InterfaceId("1"), InterfaceId("2"), InterfaceId("3"))),
+            decoratorAndArtifact(implements = listOf(InterfaceId("1"), InterfaceId("2"), InterfaceId("extra"))),
+            decoratorAndArtifact(implements = listOf(InterfaceId("3"), InterfaceId("tag"))),
             decoratorAndArtifact(
                 implements = listOf(
-                    ContractTrait("1"), ContractTrait("2"), ContractTrait("3"), ContractTrait("extra")
+                    InterfaceId("1"), InterfaceId("2"), InterfaceId("3"), InterfaceId("extra")
                 )
             )
         )
         val nonMatching = listOf(
-            decoratorAndArtifact(implements = listOf(ContractTrait("1"))),
-            decoratorAndArtifact(implements = listOf(ContractTrait("2"))),
-            decoratorAndArtifact(implements = listOf(ContractTrait("extra")))
+            decoratorAndArtifact(implements = listOf(InterfaceId("1"))),
+            decoratorAndArtifact(implements = listOf(InterfaceId("2"))),
+            decoratorAndArtifact(implements = listOf(InterfaceId("extra")))
         )
         val all = matching + nonMatching
 
@@ -452,8 +452,8 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val filters = ContractDecoratorFilters(
             contractTags = OrList(),
             contractImplements = OrList(
-                AndList(ContractTrait("1"), ContractTrait("2")),
-                AndList(ContractTrait("3"))
+                AndList(InterfaceId("1"), InterfaceId("2")),
+                AndList(InterfaceId("3"))
             )
         )
 
@@ -512,21 +512,21 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
     @Test
     fun mustCorrectlyGetAllContractInfoMarkdownsWithSomeImplementsFilters() {
         val matching = listOf(
-            decoratorAndInfoMd(implements = listOf(ContractTrait("1"), ContractTrait("2"))),
-            decoratorAndInfoMd(implements = listOf(ContractTrait("3"))),
-            decoratorAndInfoMd(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("3"))),
-            decoratorAndInfoMd(implements = listOf(ContractTrait("1"), ContractTrait("2"), ContractTrait("extra"))),
-            decoratorAndInfoMd(implements = listOf(ContractTrait("3"), ContractTrait("tag"))),
+            decoratorAndInfoMd(implements = listOf(InterfaceId("1"), InterfaceId("2"))),
+            decoratorAndInfoMd(implements = listOf(InterfaceId("3"))),
+            decoratorAndInfoMd(implements = listOf(InterfaceId("1"), InterfaceId("2"), InterfaceId("3"))),
+            decoratorAndInfoMd(implements = listOf(InterfaceId("1"), InterfaceId("2"), InterfaceId("extra"))),
+            decoratorAndInfoMd(implements = listOf(InterfaceId("3"), InterfaceId("tag"))),
             decoratorAndInfoMd(
                 implements = listOf(
-                    ContractTrait("1"), ContractTrait("2"), ContractTrait("3"), ContractTrait("extra")
+                    InterfaceId("1"), InterfaceId("2"), InterfaceId("3"), InterfaceId("extra")
                 )
             )
         )
         val nonMatching = listOf(
-            decoratorAndInfoMd(implements = listOf(ContractTrait("1"))),
-            decoratorAndInfoMd(implements = listOf(ContractTrait("2"))),
-            decoratorAndInfoMd(implements = listOf(ContractTrait("extra")))
+            decoratorAndInfoMd(implements = listOf(InterfaceId("1"))),
+            decoratorAndInfoMd(implements = listOf(InterfaceId("2"))),
+            decoratorAndInfoMd(implements = listOf(InterfaceId("extra")))
         )
         val all = matching + nonMatching
 
@@ -542,8 +542,8 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         val filters = ContractDecoratorFilters(
             contractTags = OrList(),
             contractImplements = OrList(
-                AndList(ContractTrait("1"), ContractTrait("2")),
-                AndList(ContractTrait("3"))
+                AndList(InterfaceId("1"), InterfaceId("2")),
+                AndList(InterfaceId("3"))
             )
         )
 
@@ -555,7 +555,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
     }
 
-    private fun decorator(tags: List<ContractTag> = emptyList(), implements: List<ContractTrait> = emptyList()) =
+    private fun decorator(tags: List<ContractTag> = emptyList(), implements: List<InterfaceId> = emptyList()) =
         ContractDecorator(
             id = ContractId(UUID.randomUUID().toString()),
             name = "name",
@@ -570,7 +570,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
 
     private fun decoratorAndManifest(
         tags: List<ContractTag> = emptyList(),
-        implements: List<ContractTrait> = emptyList()
+        implements: List<InterfaceId> = emptyList()
     ) = Pair(
         decorator(tags, implements),
         ManifestJson(
@@ -586,7 +586,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
 
     private fun decoratorAndArtifact(
         tags: List<ContractTag> = emptyList(),
-        implements: List<ContractTrait> = emptyList()
+        implements: List<InterfaceId> = emptyList()
     ) = Pair(
         decorator(tags, implements),
         ArtifactJson(
@@ -602,7 +602,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
 
     private fun decoratorAndInfoMd(
         tags: List<ContractTag> = emptyList(),
-        implements: List<ContractTrait> = emptyList()
+        implements: List<InterfaceId> = emptyList()
     ) = Pair(
         decorator(tags, implements),
         "info-md-${UUID.randomUUID()}"

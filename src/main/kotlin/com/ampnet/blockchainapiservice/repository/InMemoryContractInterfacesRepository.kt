@@ -3,7 +3,7 @@ package com.ampnet.blockchainapiservice.repository
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import com.ampnet.blockchainapiservice.model.json.OverridableDecorator
-import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import mu.KLogging
 import org.springframework.stereotype.Repository
 import java.util.concurrent.ConcurrentHashMap
@@ -13,33 +13,33 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
 
     companion object : KLogging()
 
-    private val storage = ConcurrentHashMap<ContractId, InterfaceManifestJson>()
-    private val infoMarkdownStorage = ConcurrentHashMap<ContractId, String>()
+    private val storage = ConcurrentHashMap<InterfaceId, InterfaceManifestJson>()
+    private val infoMarkdownStorage = ConcurrentHashMap<InterfaceId, String>()
 
-    override fun store(id: ContractId, interfaceManifestJson: InterfaceManifestJson): InterfaceManifestJson {
+    override fun store(id: InterfaceId, interfaceManifestJson: InterfaceManifestJson): InterfaceManifestJson {
         logger.info { "Storing contract interface with ID: $id" }
         storage[id] = interfaceManifestJson
         return interfaceManifestJson
     }
 
-    override fun store(id: ContractId, infoMd: String): String {
+    override fun store(id: InterfaceId, infoMd: String): String {
         logger.info { "Storing contract interface info.md with ID: $id" }
         infoMarkdownStorage[id] = infoMd
         return infoMd
     }
 
-    override fun delete(id: ContractId): Boolean {
+    override fun delete(id: InterfaceId): Boolean {
         logger.info { "Deleting contract interface with ID: $id" }
         infoMarkdownStorage.remove(id)
         return storage.remove(id) != null
     }
 
-    override fun getById(id: ContractId): InterfaceManifestJson? {
+    override fun getById(id: InterfaceId): InterfaceManifestJson? {
         logger.debug { "Get contract interface by ID: $id" }
         return storage[id]
     }
 
-    override fun getInfoMarkdownById(id: ContractId): String? {
+    override fun getInfoMarkdownById(id: InterfaceId): String? {
         logger.debug { "Get contract interface info.md by ID: $id" }
         return infoMarkdownStorage[id]
     }

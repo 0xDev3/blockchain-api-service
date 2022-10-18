@@ -14,7 +14,7 @@ import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.ContractDeploymentRequestService
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
@@ -89,7 +89,7 @@ class ContractDeploymentRequestController(
                 filters = ContractDeploymentRequestFilters(
                     contractIds = OrList(contractIds.orEmpty().map { ContractId(it) }),
                     contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
-                    contractImplements = contractImplements.parseOrListWithNestedAndLists { ContractTrait(it) },
+                    contractImplements = contractImplements.parseOrListWithNestedAndLists { InterfaceId(it) },
                     deployedOnly = deployedOnly
                 )
             )

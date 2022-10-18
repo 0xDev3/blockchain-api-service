@@ -23,8 +23,8 @@ import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
 import com.ampnet.blockchainapiservice.util.FunctionData
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionData
 import com.ampnet.blockchainapiservice.util.TransactionHash
@@ -54,7 +54,7 @@ class ImportContractControllerTest : TestBase() {
                 contractData = ContractBinaryData("00"),
                 constructorParams = TestData.EMPTY_JSON_ARRAY,
                 contractTags = listOf(ContractTag("contract-tag")),
-                contractImplements = listOf(ContractTrait("contract-trait")),
+                contractImplements = listOf(InterfaceId("contract-trait")),
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
@@ -176,7 +176,7 @@ class ImportContractControllerTest : TestBase() {
     fun mustCorrectlySuggestInterfacesForSmartContract() {
         val id = UUID.randomUUID()
         val result = InterfaceManifestJsonWithId(
-            id = ContractId("contract-id"),
+            id = InterfaceId("interface-id"),
             name = "name",
             description = "description",
             eventDecorators = emptyList(),

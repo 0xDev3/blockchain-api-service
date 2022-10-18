@@ -17,6 +17,7 @@ import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
@@ -109,14 +110,14 @@ class ContractInterfacesServiceTest : TestBase() {
                 .willReturn(
                     listOf(
                         InterfaceManifestJsonWithId(
-                            id = ContractId("already-implemented"),
+                            id = InterfaceId("already-implemented"),
                             name = "Already Implemented",
                             description = "Already Implemented",
                             eventDecorators = MANIFEST_JSON.eventDecorators,
                             functionDecorators = emptyList()
                         ),
                         InterfaceManifestJsonWithId(
-                            id = ContractId("not-yet-implemented"),
+                            id = InterfaceId("not-yet-implemented"),
                             name = "Not Yet Implemented",
                             description = "Not Yet Implemented",
                             eventDecorators = emptyList(),
@@ -137,7 +138,7 @@ class ContractInterfacesServiceTest : TestBase() {
                 .isEqualTo(
                     listOf(
                         InterfaceManifestJsonWithId(
-                            id = ContractId("not-yet-implemented"),
+                            id = InterfaceId("not-yet-implemented"),
                             name = "Not Yet Implemented",
                             description = "Not Yet Implemented",
                             eventDecorators = emptyList(),
