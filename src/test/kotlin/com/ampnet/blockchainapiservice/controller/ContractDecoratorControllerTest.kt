@@ -23,7 +23,7 @@ import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepos
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -43,7 +43,7 @@ class ContractDecoratorControllerTest : TestBase() {
             description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
-            implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
+            implements = listOf(InterfaceId("traits.example"), InterfaceId("traits.exampleOwnable")),
             constructors = listOf(
                 ContractConstructor(
                     inputs = listOf(
@@ -85,7 +85,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
         val filters = ContractDecoratorFilters(
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
-            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+            contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
 
         suppose("some contract decorators will be fetched with filters") {
@@ -136,7 +136,7 @@ class ContractDecoratorControllerTest : TestBase() {
             description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
-            implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
+            implements = listOf(InterfaceId("traits.example"), InterfaceId("traits.exampleOwnable")),
             constructors = listOf(
                 ContractConstructor(
                     inputs = listOf(
@@ -178,7 +178,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
         val filters = ContractDecoratorFilters(
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
-            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+            contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
         val projectId = UUID.randomUUID()
 
@@ -236,7 +236,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
         val filters = ContractDecoratorFilters(
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
-            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+            contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
 
         suppose("some contract manifest.json files will be fetched with filters") {
@@ -275,7 +275,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
         val filters = ContractDecoratorFilters(
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
-            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+            contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
         val projectId = UUID.randomUUID()
 
@@ -315,7 +315,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
         val filters = ContractDecoratorFilters(
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
-            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+            contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
 
         suppose("some contract artifact.json files will be fetched with filters") {
@@ -354,7 +354,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
         val filters = ContractDecoratorFilters(
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
-            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+            contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
         val projectId = UUID.randomUUID()
 
@@ -386,7 +386,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
         val filters = ContractDecoratorFilters(
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
-            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+            contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
 
         suppose("some contract info.md files will be fetched with filters") {
@@ -417,7 +417,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
         val filters = ContractDecoratorFilters(
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
-            contractImplements = OrList(AndList(ContractTrait("trait-1"), ContractTrait("trait-2")))
+            contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
         val projectId = UUID.randomUUID()
 
@@ -452,7 +452,7 @@ class ContractDecoratorControllerTest : TestBase() {
             description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
-            implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
+            implements = listOf(InterfaceId("traits.example"), InterfaceId("traits.exampleOwnable")),
             constructors = listOf(
                 ContractConstructor(
                     inputs = listOf(
@@ -533,7 +533,7 @@ class ContractDecoratorControllerTest : TestBase() {
             description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
-            implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
+            implements = listOf(InterfaceId("traits.example"), InterfaceId("traits.exampleOwnable")),
             constructors = listOf(
                 ContractConstructor(
                     inputs = listOf(

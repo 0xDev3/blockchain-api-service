@@ -171,8 +171,8 @@ value class ContractTag private constructor(val value: String) {
 }
 
 @JvmInline
-value class ContractTrait private constructor(val value: String) {
+value class InterfaceId private constructor(val value: String) {
     companion object {
-        operator fun invoke(value: String) = ContractTrait(value.replace('/', '.').lowercase())
+        operator fun invoke(value: String) = InterfaceId(value.replace('/', '.').lowercase())
     }
 }

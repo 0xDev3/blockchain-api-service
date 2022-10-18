@@ -4,7 +4,7 @@ import com.ampnet.blockchainapiservice.model.json.EventDecorator
 import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
-import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 
 data class ContractInterfaceManifestResponse(
     val id: String,
@@ -21,7 +21,7 @@ data class ContractInterfaceManifestResponse(
         functionDecorators = manifest.functionDecorators
     )
 
-    constructor(id: ContractId, manifest: InterfaceManifestJson) : this(
+    constructor(id: InterfaceId, manifest: InterfaceManifestJson) : this(
         id = id.value,
         name = manifest.name,
         description = manifest.description,

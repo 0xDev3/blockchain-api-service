@@ -10,6 +10,7 @@ import com.ampnet.blockchainapiservice.model.filters.AndList
 import com.ampnet.blockchainapiservice.model.filters.ContractDecoratorFilters
 import com.ampnet.blockchainapiservice.model.filters.OrList
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
+import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
 import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
@@ -18,7 +19,7 @@ import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -31,7 +32,7 @@ import org.springframework.test.annotation.DirtiesContext
 import java.util.UUID
 
 @JooqTest
-@Import(JooqImportedContractDecoratorRepository::class)
+@Import(JooqImportedContractDecoratorRepository::class, InMemoryContractInterfacesRepository::class)
 @DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
@@ -40,6 +41,12 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         private val PROJECT_ID_1 = UUID.randomUUID()
         private val PROJECT_ID_2 = UUID.randomUUID()
         private val OWNER_ID = UUID.randomUUID()
+        private val EMPTY_INTERFACE_MANIFEST = InterfaceManifestJson(
+            name = null,
+            description = null,
+            eventDecorators = emptyList(),
+            functionDecorators = emptyList()
+        )
 
         private data class DecoratorTestData(
             val contractId: ContractId,
@@ -64,11 +71,23 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
     private lateinit var repository: JooqImportedContractDecoratorRepository
 
     @Autowired
+    private lateinit var interfacesRepository: InMemoryContractInterfacesRepository
+
+    @Autowired
     private lateinit var dslContext: DSLContext
 
     @BeforeEach
     fun beforeEach() {
         postgresContainer.cleanAllDatabaseTables(dslContext)
+        interfacesRepository.getAll().forEach {
+            interfacesRepository.delete(it.id)
+        }
+
+        interfacesRepository.store(InterfaceId("trait-1"), EMPTY_INTERFACE_MANIFEST)
+        interfacesRepository.store(InterfaceId("trait-2"), EMPTY_INTERFACE_MANIFEST)
+        interfacesRepository.store(InterfaceId("trait-3"), EMPTY_INTERFACE_MANIFEST)
+        interfacesRepository.store(InterfaceId("ignored-trait"), EMPTY_INTERFACE_MANIFEST)
+        interfacesRepository.store(InterfaceId("new-interface"), EMPTY_INTERFACE_MANIFEST)
 
         dslContext.executeInsert(
             UserIdentifierRecord(
@@ -148,6 +167,63 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
                 .isEqualTo(expectedDecorator)
             assertThat(repository.getManifestJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
                 .isEqualTo(manifestJson)
+            assertThat(
+                repository.getArtifactJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)
+                    ?.copy(linkReferences = null, deployedLinkReferences = null)
+            ).withMessage()
+                .isEqualTo(artifactJson)
+            assertThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+                .isEqualTo(infoMarkdown)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyUpdateImportedContractDecoratorInterfaces() {
+        val id = UUID.randomUUID()
+        val contractId = ContractId("imported-contract")
+        val manifestJson = ManifestJson(
+            name = "name",
+            description = "description",
+            tags = listOf("tag-1"),
+            implements = listOf("trait-1"),
+            eventDecorators = emptyList(),
+            constructorDecorators = emptyList(),
+            functionDecorators = emptyList()
+        )
+        val artifactJson = ArtifactJson(
+            contractName = "imported-contract",
+            sourceName = "imported.sol",
+            abi = emptyList(),
+            bytecode = "0x0",
+            deployedBytecode = "0x0",
+            linkReferences = null,
+            deployedLinkReferences = null
+        )
+        val infoMarkdown = "markdown"
+
+        suppose("imported contract decorator will be stored into the database") {
+            repository.store(id, PROJECT_ID_1, contractId, manifestJson, artifactJson, infoMarkdown, TestData.TIMESTAMP)
+        }
+
+        val newInterfaces = listOf(InterfaceId("new-interface"))
+
+        suppose("imported contract decorator interfaces are updated") {
+            repository.updateInterfaces(contractId, PROJECT_ID_1, newInterfaces, manifestJson)
+        }
+
+        val expectedManifest = manifestJson.copy(implements = newInterfaces.map { it.value })
+        val expectedDecorator = ContractDecorator(
+            id = contractId,
+            artifact = artifactJson,
+            manifest = expectedManifest,
+            interfacesProvider = null
+        )
+
+        verify("imported contract decorator was correctly updated in the database") {
+            assertThat(repository.getByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+                .isEqualTo(expectedDecorator)
+            assertThat(repository.getManifestJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+                .isEqualTo(expectedManifest)
             assertThat(
                 repository.getArtifactJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)
                     ?.copy(linkReferences = null, deployedLinkReferences = null)
@@ -320,8 +396,8 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
             val filters = ContractDecoratorFilters(
                 contractTags = OrList(),
                 contractImplements = OrList(
-                    AndList(ContractTrait("trait-1")),
-                    AndList(ContractTrait("trait-2"))
+                    AndList(InterfaceId("trait-1")),
+                    AndList(InterfaceId("trait-2"))
                 )
             )
             assertThat(repository.getAll(PROJECT_ID_1, filters)).withMessage()
@@ -350,8 +426,8 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
                     AndList(ContractTag("tag-3"))
                 ),
                 contractImplements = OrList(
-                    AndList(ContractTrait("trait-1"), ContractTrait("trait-2")),
-                    AndList(ContractTrait("trait-3"))
+                    AndList(InterfaceId("trait-1"), InterfaceId("trait-2")),
+                    AndList(InterfaceId("trait-3"))
                 )
             )
 

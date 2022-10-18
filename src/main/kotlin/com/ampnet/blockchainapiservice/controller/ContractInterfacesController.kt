@@ -5,7 +5,7 @@ import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestR
 import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse
 import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
-import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -39,10 +39,10 @@ class ContractInterfacesController(
     fun getContractInterface(
         @PathVariable("id") id: String
     ): ResponseEntity<ContractInterfaceManifestResponse> {
-        val contractId = ContractId(id)
-        val contractInterface = contractInterfacesRepository.getById(contractId)
-            ?: throw ResourceNotFoundException("Contract interface not found for itnerface ID: $id")
-        return ResponseEntity.ok(ContractInterfaceManifestResponse(contractId, contractInterface))
+        val interfaceId = InterfaceId(id)
+        val contractInterface = contractInterfacesRepository.getById(interfaceId)
+            ?: throw ResourceNotFoundException("Contract interface not found for interface ID: $id")
+        return ResponseEntity.ok(ContractInterfaceManifestResponse(interfaceId, contractInterface))
     }
 
     @GetMapping(
@@ -52,8 +52,8 @@ class ContractInterfacesController(
     fun getContractInterfaceInfoMarkdown(
         @PathVariable("id") id: String
     ): ResponseEntity<String> {
-        val contractId = ContractId(id)
-        val infoMarkdown = contractInterfacesRepository.getInfoMarkdownById(contractId)
+        val interfaceId = InterfaceId(id)
+        val infoMarkdown = contractInterfacesRepository.getInfoMarkdownById(interfaceId)
             ?: throw ResourceNotFoundException("Contract interface info.md not found for interface ID: $id")
         return ResponseEntity.ok(infoMarkdown)
     }

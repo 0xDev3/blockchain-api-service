@@ -1,6 +1,6 @@
 package com.ampnet.blockchainapiservice.model.json
 
-import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 
@@ -25,7 +25,7 @@ data class InterfaceManifestJson(
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class InterfaceManifestJsonWithId(
-    val id: ContractId,
+    val id: InterfaceId,
     val name: String?,
     val description: String?,
     val eventDecorators: List<EventDecorator>,
