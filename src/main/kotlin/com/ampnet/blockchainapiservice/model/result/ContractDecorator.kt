@@ -1,7 +1,7 @@
 package com.ampnet.blockchainapiservice.model.result
 
 import com.ampnet.blockchainapiservice.exception.ContractDecoratorException
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
+import com.ampnet.blockchainapiservice.exception.ContractInterfaceNotFoundException
 import com.ampnet.blockchainapiservice.model.json.AbiInputOutput
 import com.ampnet.blockchainapiservice.model.json.AbiObject
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
@@ -35,9 +35,8 @@ data class ContractDecorator(
             interfacesProvider: ((InterfaceId) -> InterfaceManifestJson?)?
         ): ContractDecorator {
             val manifestInterfaces = interfacesProvider?.let { provider ->
-                manifest.implements.map { interfaceName ->
-                    provider(InterfaceId(interfaceName))
-                        ?: throw ResourceNotFoundException("Contract interface does not exist: $interfaceName")
+                manifest.implements.map(InterfaceId::invoke).map { id ->
+                    provider(id) ?: throw ContractInterfaceNotFoundException(id)
                 }
             }.orEmpty()
 

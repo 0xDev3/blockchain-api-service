@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.service
 import com.ampnet.blockchainapiservice.TestBase
 import com.ampnet.blockchainapiservice.TestData
 import com.ampnet.blockchainapiservice.blockchain.properties.Chain
+import com.ampnet.blockchainapiservice.exception.ContractInterfaceNotFoundException
 import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
 import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.ampnet.blockchainapiservice.model.json.AbiInputOutput
@@ -16,6 +17,7 @@ import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
+import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
@@ -178,7 +180,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = contractInterfacesRepository
+            contractInterfacesRepository = contractInterfacesRepository,
+            contractMetadataRepository = mock()
         )
 
         verify("correct interfaces are suggested") {
@@ -209,7 +212,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -231,7 +235,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -260,7 +265,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -298,10 +304,13 @@ class ContractInterfacesServiceTest : TestBase() {
                 .willReturn(EMPTY_CONTRACT_INTERFACE)
         }
 
+        val contractMetadataRepository = mock<ContractMetadataRepository>()
+
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = contractInterfacesRepository
+            contractInterfacesRepository = contractInterfacesRepository,
+            contractMetadataRepository = contractMetadataRepository
         )
 
         val newInterface = listOf(InterfaceId("new-interface"))
@@ -319,6 +328,13 @@ class ContractInterfacesServiceTest : TestBase() {
                     interfaces = newInterfaces.map { InterfaceId(it) }.toList(),
                     manifest = MANIFEST_JSON.copy(implements = newInterfaces)
                 )
+
+            verifyMock(contractMetadataRepository)
+                .updateInterfaces(
+                    contractId = CONTRACT_ID,
+                    projectId = PROJECT_ID,
+                    interfaces = newInterfaces.map { InterfaceId(it) }.toList()
+                )
         }
     }
 
@@ -334,7 +350,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -356,7 +373,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -378,7 +396,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -407,7 +426,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -418,7 +438,7 @@ class ContractInterfacesServiceTest : TestBase() {
     }
 
     @Test
-    fun mustThrowResourceNotFoundExceptionWhenAddingNonExistentContractInterfaces() {
+    fun mustThrowContractInterfaceNotFoundExceptionWhenAddingNonExistentContractInterfaces() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
@@ -441,11 +461,12 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
-        verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+        verify("ContractInterfaceNotFoundException is thrown") {
+            assertThrows<ContractInterfaceNotFoundException>(message) {
                 service.addInterfacesToImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -479,10 +500,13 @@ class ContractInterfacesServiceTest : TestBase() {
                 .willReturn(EMPTY_CONTRACT_INTERFACE)
         }
 
+        val contractMetadataRepository = mock<ContractMetadataRepository>()
+
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = contractInterfacesRepository
+            contractInterfacesRepository = contractInterfacesRepository,
+            contractMetadataRepository = contractMetadataRepository
         )
 
         suppose("interface is removed") {
@@ -501,6 +525,13 @@ class ContractInterfacesServiceTest : TestBase() {
                     interfaces = emptyList(),
                     manifest = MANIFEST_JSON.copy(implements = emptySet())
                 )
+
+            verifyMock(contractMetadataRepository)
+                .updateInterfaces(
+                    contractId = CONTRACT_ID,
+                    projectId = PROJECT_ID,
+                    interfaces = emptyList()
+                )
         }
     }
 
@@ -516,7 +547,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -538,7 +570,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -560,7 +593,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -589,7 +623,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -627,10 +662,13 @@ class ContractInterfacesServiceTest : TestBase() {
                 .willReturn(EMPTY_CONTRACT_INTERFACE)
         }
 
+        val contractMetadataRepository = mock<ContractMetadataRepository>()
+
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = contractInterfacesRepository
+            contractInterfacesRepository = contractInterfacesRepository,
+            contractMetadataRepository = contractMetadataRepository
         )
 
         val newInterfaces = listOf(InterfaceId("new-interface"))
@@ -647,6 +685,13 @@ class ContractInterfacesServiceTest : TestBase() {
                     interfaces = newInterfaces,
                     manifest = MANIFEST_JSON.copy(implements = newInterfaces.map { it.value }.toSet())
                 )
+
+            verifyMock(contractMetadataRepository)
+                .updateInterfaces(
+                    contractId = CONTRACT_ID,
+                    projectId = PROJECT_ID,
+                    interfaces = newInterfaces
+                )
         }
     }
 
@@ -662,7 +707,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -684,7 +730,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -706,7 +753,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = mock(),
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -735,7 +783,8 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -746,7 +795,7 @@ class ContractInterfacesServiceTest : TestBase() {
     }
 
     @Test
-    fun mustThrowResourceNotFoundExceptionWhenSettingNonExistentContractInterfaces() {
+    fun mustThrowContractInterfaceNotFoundExceptionWhenSettingNonExistentContractInterfaces() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
@@ -769,11 +818,12 @@ class ContractInterfacesServiceTest : TestBase() {
         val service = ContractInterfacesServiceImpl(
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             importedContractDecoratorRepository = importedContractDecoratorRepository,
-            contractInterfacesRepository = mock()
+            contractInterfacesRepository = mock(),
+            contractMetadataRepository = mock()
         )
 
-        verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+        verify("ContractInterfaceNotFoundException is thrown") {
+            assertThrows<ContractInterfaceNotFoundException>(message) {
                 service.setImportedContractInterfaces(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }

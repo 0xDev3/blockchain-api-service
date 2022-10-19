@@ -28,6 +28,7 @@ import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
+import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import com.ampnet.blockchainapiservice.service.ContractImportServiceImpl.Companion.TypeAndValue
 import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
@@ -153,6 +154,21 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 )
             )
         )
+        private val INCOMPATIBLE_INTERFACE = InterfaceManifestJson(
+            name = "Incomaptible Interface",
+            description = "Incomaptible smart contract interface",
+            eventDecorators = emptyList(),
+            functionDecorators = listOf(
+                FunctionDecorator(
+                    signature = "nonExistent()",
+                    name = "",
+                    description = "",
+                    parameterDecorators = emptyList(),
+                    returnDecorators = emptyList(),
+                    emittableEvents = emptyList()
+                )
+            )
+        )
     }
 
     private val accounts = HardhatTestContainer.ACCOUNTS
@@ -171,6 +187,9 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
     @Autowired
     private lateinit var contractInterfacesRepository: ContractInterfacesRepository
+
+    @Autowired
+    private lateinit var contractMetadataRepository: ContractMetadataRepository
 
     @Autowired
     private lateinit var dslContext: DSLContext
@@ -700,10 +719,10 @@ class ImportContractControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
         }
 
-        val contractId = InterfaceId("example.ownable")
+        val interfaceId = InterfaceId("example.ownable")
 
         suppose("some contract interface is in the repository") {
-            contractInterfacesRepository.store(contractId, CONTRACT_INTERFACE)
+            contractInterfacesRepository.store(interfaceId, CONTRACT_INTERFACE)
         }
 
         val suggestedInterfacesResponse = suppose("suggested imported smart contract interfaces are fetched") {
@@ -721,10 +740,681 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     ContractInterfaceManifestsResponse(
                         listOf(
-                            ContractInterfaceManifestResponse(contractId, CONTRACT_INTERFACE)
+                            ContractInterfaceManifestResponse(interfaceId, CONTRACT_INTERFACE)
                         )
                     )
                 )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyAddInterfacesToImportedSmartContractWhenContractDecoratorIsNotSpecified() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val mainAccount = accounts[0]
+        val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        val alias = "alias"
+
+        val importResponse = suppose("request to import smart contract is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/import-smart-contract")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_address": "${contract.contractAddress}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val interfaceId = InterfaceId("example.ownable")
+
+        suppose("some contract interface is in the repository") {
+            contractInterfacesRepository.store(interfaceId, CONTRACT_INTERFACE)
+        }
+
+        val interfacesResponse = suppose("interface is added to imported smart contract") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/add-interfaces")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "interfaces": ["${interfaceId.value}"]
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val deployerAddress = WalletAddress(mainAccount.address).rawValue
+        val constructorParams = listOf(
+            TypeAndValue(
+                type = "bytes32",
+                value = ownerAddress.rawValue.removePrefix("0x").padStart(64, '0')
+                    .chunked(2).map { it.toUByte(16).toByte() }
+            )
+        )
+        val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
+
+        verify("correct response is returned") {
+            assertThat(interfacesResponse).withMessage()
+                .isEqualTo(
+                    ContractDeploymentRequestResponse(
+                        id = interfacesResponse.id,
+                        alias = alias,
+                        name = "Imported Contract",
+                        description = "Imported smart contract.",
+                        status = Status.SUCCESS,
+                        contractId = importedContractId.value,
+                        contractDeploymentData = interfacesResponse.contractDeploymentData,
+                        constructorParams = objectMapper.valueToTree(constructorParams),
+                        contractTags = emptyList(),
+                        contractImplements = listOf(interfaceId.value),
+                        initialEthAmount = BigInteger.ZERO,
+                        chainId = PROJECT.chainId.value,
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${interfacesResponse.id}/action",
+                        projectId = PROJECT_ID,
+                        createdAt = interfacesResponse.createdAt,
+                        arbitraryData = interfacesResponse.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        contractAddress = ContractAddress(contract.contractAddress).rawValue,
+                        deployerAddress = deployerAddress,
+                        deployTx = TransactionResponse(
+                            txHash = TransactionHash(contract.transactionReceipt.get().transactionHash).value,
+                            from = deployerAddress,
+                            to = ZeroAddress.rawValue,
+                            data = interfacesResponse.deployTx.data,
+                            value = BigInteger.ZERO,
+                            blockConfirmations = interfacesResponse.deployTx.blockConfirmations,
+                            timestamp = interfacesResponse.deployTx.timestamp
+                        ),
+                        imported = true
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustReturn400BadRequestWhenAddingNonExistentContractInterface() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val mainAccount = accounts[0]
+        val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        val alias = "alias"
+
+        val importResponse = suppose("request to import smart contract is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/import-smart-contract")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_address": "${contract.contractAddress}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val interfaceId = InterfaceId("non-existent")
+
+        verify("400 is returned for non-existent smart contract interface") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/add-interfaces")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "interfaces": ["${interfaceId.value}"]
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
+        }
+    }
+
+    @Test
+    fun mustReturn400BadRequestWhenAddingIncompatibleContractInterface() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val mainAccount = accounts[0]
+        val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        val alias = "alias"
+
+        val importResponse = suppose("request to import smart contract is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/import-smart-contract")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_address": "${contract.contractAddress}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val interfaceId = InterfaceId("example.incompatible")
+
+        suppose("some incompatible contract interface is in the repository") {
+            contractInterfacesRepository.store(interfaceId, INCOMPATIBLE_INTERFACE)
+        }
+
+        verify("400 is returned for incompatible smart contract interface") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/add-interfaces")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "interfaces": ["${interfaceId.value}"]
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyRemoveInterfacesFromImportedSmartContractWhenContractDecoratorIsNotSpecified() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val mainAccount = accounts[0]
+        val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        val alias = "alias"
+
+        val importResponse = suppose("request to import smart contract is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/import-smart-contract")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_address": "${contract.contractAddress}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val interfaceId = InterfaceId("example.ownable")
+
+        suppose("some contract interface is in the repository") {
+            contractInterfacesRepository.store(interfaceId, CONTRACT_INTERFACE)
+        }
+
+        suppose("some smart contract interface is added to imported smart contract") {
+            importedContractDecoratorRepository.updateInterfaces(
+                contractId = ContractId(importResponse.contractId),
+                projectId = importResponse.projectId,
+                interfaces = listOf(interfaceId),
+                manifest = importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(
+                    contractId = ContractId(importResponse.contractId),
+                    projectId = importResponse.projectId
+                )!!.copy(implements = setOf(interfaceId.value))
+            )
+
+            contractMetadataRepository.updateInterfaces(
+                contractId = ContractId(importResponse.contractId),
+                projectId = importResponse.projectId,
+                interfaces = listOf(interfaceId)
+            )
+        }
+
+        val interfacesResponse = suppose("interface is removed from imported smart contract") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/remove-interfaces")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "interfaces": ["${interfaceId.value}"]
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val deployerAddress = WalletAddress(mainAccount.address).rawValue
+        val constructorParams = listOf(
+            TypeAndValue(
+                type = "bytes32",
+                value = ownerAddress.rawValue.removePrefix("0x").padStart(64, '0')
+                    .chunked(2).map { it.toUByte(16).toByte() }
+            )
+        )
+        val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
+
+        verify("correct response is returned") {
+            assertThat(interfacesResponse).withMessage()
+                .isEqualTo(
+                    ContractDeploymentRequestResponse(
+                        id = interfacesResponse.id,
+                        alias = alias,
+                        name = "Imported Contract",
+                        description = "Imported smart contract.",
+                        status = Status.SUCCESS,
+                        contractId = importedContractId.value,
+                        contractDeploymentData = interfacesResponse.contractDeploymentData,
+                        constructorParams = objectMapper.valueToTree(constructorParams),
+                        contractTags = emptyList(),
+                        contractImplements = emptyList(),
+                        initialEthAmount = BigInteger.ZERO,
+                        chainId = PROJECT.chainId.value,
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${interfacesResponse.id}/action",
+                        projectId = PROJECT_ID,
+                        createdAt = interfacesResponse.createdAt,
+                        arbitraryData = interfacesResponse.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        contractAddress = ContractAddress(contract.contractAddress).rawValue,
+                        deployerAddress = deployerAddress,
+                        deployTx = TransactionResponse(
+                            txHash = TransactionHash(contract.transactionReceipt.get().transactionHash).value,
+                            from = deployerAddress,
+                            to = ZeroAddress.rawValue,
+                            data = interfacesResponse.deployTx.data,
+                            value = BigInteger.ZERO,
+                            blockConfirmations = interfacesResponse.deployTx.blockConfirmations,
+                            timestamp = interfacesResponse.deployTx.timestamp
+                        ),
+                        imported = true
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlySetInterfacesForImportedSmartContractWhenContractDecoratorIsNotSpecified() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val mainAccount = accounts[0]
+        val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        val alias = "alias"
+
+        val importResponse = suppose("request to import smart contract is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/import-smart-contract")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_address": "${contract.contractAddress}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val interfaceId = InterfaceId("example.ownable")
+
+        suppose("some contract interface is in the repository") {
+            contractInterfacesRepository.store(interfaceId, CONTRACT_INTERFACE)
+        }
+
+        val interfacesResponse = suppose("interface is added to imported smart contract") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/set-interfaces")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "interfaces": ["${interfaceId.value}"]
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val deployerAddress = WalletAddress(mainAccount.address).rawValue
+        val constructorParams = listOf(
+            TypeAndValue(
+                type = "bytes32",
+                value = ownerAddress.rawValue.removePrefix("0x").padStart(64, '0')
+                    .chunked(2).map { it.toUByte(16).toByte() }
+            )
+        )
+        val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
+
+        verify("correct response is returned") {
+            assertThat(interfacesResponse).withMessage()
+                .isEqualTo(
+                    ContractDeploymentRequestResponse(
+                        id = interfacesResponse.id,
+                        alias = alias,
+                        name = "Imported Contract",
+                        description = "Imported smart contract.",
+                        status = Status.SUCCESS,
+                        contractId = importedContractId.value,
+                        contractDeploymentData = interfacesResponse.contractDeploymentData,
+                        constructorParams = objectMapper.valueToTree(constructorParams),
+                        contractTags = emptyList(),
+                        contractImplements = listOf(interfaceId.value),
+                        initialEthAmount = BigInteger.ZERO,
+                        chainId = PROJECT.chainId.value,
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${interfacesResponse.id}/action",
+                        projectId = PROJECT_ID,
+                        createdAt = interfacesResponse.createdAt,
+                        arbitraryData = interfacesResponse.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        contractAddress = ContractAddress(contract.contractAddress).rawValue,
+                        deployerAddress = deployerAddress,
+                        deployTx = TransactionResponse(
+                            txHash = TransactionHash(contract.transactionReceipt.get().transactionHash).value,
+                            from = deployerAddress,
+                            to = ZeroAddress.rawValue,
+                            data = interfacesResponse.deployTx.data,
+                            value = BigInteger.ZERO,
+                            blockConfirmations = interfacesResponse.deployTx.blockConfirmations,
+                            timestamp = interfacesResponse.deployTx.timestamp
+                        ),
+                        imported = true
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustReturn400BadRequestWhenSettingNonExistentContractInterface() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val mainAccount = accounts[0]
+        val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        val alias = "alias"
+
+        val importResponse = suppose("request to import smart contract is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/import-smart-contract")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_address": "${contract.contractAddress}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val interfaceId = InterfaceId("non-existent")
+
+        verify("400 is returned for non-existent smart contract interface") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/set-interfaces")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "interfaces": ["${interfaceId.value}"]
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
+        }
+    }
+
+    @Test
+    fun mustReturn400BadRequestWhenSettingIncompatibleContractInterface() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val mainAccount = accounts[0]
+        val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        val alias = "alias"
+
+        val importResponse = suppose("request to import smart contract is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/import-smart-contract")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_address": "${contract.contractAddress}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        val interfaceId = InterfaceId("example.incompatible")
+
+        suppose("some incompatible contract interface is in the repository") {
+            contractInterfacesRepository.store(interfaceId, INCOMPATIBLE_INTERFACE)
+        }
+
+        verify("400 is returned for incompatible smart contract interface") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/set-interfaces")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "interfaces": ["${interfaceId.value}"]
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isBadRequest)
+                .andReturn()
+
+            verifyResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
         }
     }
 }

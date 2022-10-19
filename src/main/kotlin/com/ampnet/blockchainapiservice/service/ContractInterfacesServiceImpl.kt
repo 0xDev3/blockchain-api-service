@@ -5,6 +5,7 @@ import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
+import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import com.ampnet.blockchainapiservice.util.InterfaceId
 import mu.KLogging
@@ -15,7 +16,8 @@ import java.util.UUID
 class ContractInterfacesServiceImpl(
     private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,
     private val importedContractDecoratorRepository: ImportedContractDecoratorRepository,
-    private val contractInterfacesRepository: ContractInterfacesRepository
+    private val contractInterfacesRepository: ContractInterfacesRepository,
+    private val contractMetadataRepository: ContractMetadataRepository
 ) : ContractInterfacesService {
 
     companion object : KLogging()
@@ -113,11 +115,19 @@ class ContractInterfacesServiceImpl(
             interfacesProvider = contractInterfacesRepository::getById
         )
 
+        val newInterfacesList = newInterfaces.map { InterfaceId(it) }.toList()
+
         importedContractDecoratorRepository.updateInterfaces(
             contractId = contractDeploymentRequest.contractId,
             projectId = projectId,
-            interfaces = newInterfaces.map { InterfaceId(it) }.toList(),
+            interfaces = newInterfacesList,
             manifest = newManifest
+        )
+
+        contractMetadataRepository.updateInterfaces(
+            contractId = contractDeploymentRequest.contractId,
+            projectId = projectId,
+            interfaces = newInterfacesList
         )
     }
 }
