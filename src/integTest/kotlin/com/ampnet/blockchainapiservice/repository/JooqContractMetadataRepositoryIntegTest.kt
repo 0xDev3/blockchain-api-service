@@ -157,6 +157,56 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyUpdateContractMetadataInterfaces() {
+        val id = UUID.randomUUID()
+        val name = "name"
+        val description = "description"
+        val contractId = ContractId("cid")
+        val contractTags = listOf(ContractTag("tag"))
+        val contractImplements = listOf(InterfaceId("trait"))
+        val projectId = UUID.randomUUID()
+
+        suppose("contract metadata is stored into the database") {
+            repository.createOrUpdate(
+                ContractMetadata(
+                    id = id,
+                    name = name,
+                    description = description,
+                    contractId = contractId,
+                    contractTags = contractTags,
+                    contractImplements = contractImplements,
+                    projectId = projectId
+                )
+            )
+        }
+
+        val newInterfaces = listOf(InterfaceId("new-interface"))
+
+        suppose("contract metadata interfaces are updated") {
+            repository.updateInterfaces(contractId, projectId, newInterfaces)
+        }
+
+        verify("contract metadata interfaces are correctly updated in database") {
+            val record = dslContext.selectFrom(ContractMetadataTable)
+                .where(ContractMetadataTable.ID.eq(id))
+                .fetchOne()
+
+            assertThat(record).withMessage()
+                .isEqualTo(
+                    ContractMetadataRecord(
+                        id = id,
+                        name = name,
+                        description = description,
+                        contractId = contractId,
+                        contractTags = contractTags.map { it.value }.toTypedArray(),
+                        contractImplements = newInterfaces.map { it.value }.toTypedArray(),
+                        projectId = projectId
+                    )
+                )
+        }
+    }
+
+    @Test
     fun mustCorrectlyCheckIfContractMetadataExists() {
         val id = UUID.randomUUID()
         val name = "name"

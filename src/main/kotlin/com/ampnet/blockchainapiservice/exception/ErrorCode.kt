@@ -74,5 +74,8 @@ enum class ErrorCode {
     CONTRACT_DECOMPILATION_TEMPORARILY_UNAVAILABLE,
 
     @Description("Contract decorator is incompatible with contract ABI specification")
-    CONTRACT_DECORATOR_INCOMPATIBLE
+    CONTRACT_DECORATOR_INCOMPATIBLE,
+
+    @Description("Indicates that the requested contract interface cannot be found")
+    CONTRACT_INTERFACE_NOT_FOUND
 }

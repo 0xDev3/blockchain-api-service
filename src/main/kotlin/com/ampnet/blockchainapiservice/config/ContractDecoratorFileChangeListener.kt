@@ -1,7 +1,7 @@
 package com.ampnet.blockchainapiservice.config
 
 import com.ampnet.blockchainapiservice.exception.ContractDecoratorException
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
+import com.ampnet.blockchainapiservice.exception.ContractInterfaceNotFoundException
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
 import com.ampnet.blockchainapiservice.model.json.ManifestJson
@@ -176,7 +176,7 @@ class ContractDecoratorFileChangeListener(
             } catch (e: ContractDecoratorException) {
                 logger.warn(e) { "${e.message} for contract decorator: $id, skipping..." }
                 contractDecoratorRepository.delete(id)
-            } catch (e: ResourceNotFoundException) {
+            } catch (e: ContractInterfaceNotFoundException) {
                 logger.warn(e) { "${e.message} for contract decorator: $id, skipping..." }
                 contractDecoratorRepository.delete(id)
             }

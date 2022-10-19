@@ -4,6 +4,7 @@ import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTab
 import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
@@ -38,6 +39,23 @@ class JooqContractMetadataRepository(private val dslContext: DSLContext) : Contr
             .set(ContractMetadataTable.DESCRIPTION, contractMetadata.description)
             .set(ContractMetadataTable.CONTRACT_TAGS, tags)
             .set(ContractMetadataTable.CONTRACT_IMPLEMENTS, implements)
+            .execute() > 0
+    }
+
+    override fun updateInterfaces(contractId: ContractId, projectId: UUID, interfaces: List<InterfaceId>): Boolean {
+        logger.info {
+            "Update contract metadata interfaces, contractId: $contractId, projectId: $projectId," +
+                " interfaces: $interfaces"
+        }
+
+        return dslContext.update(ContractMetadataTable)
+            .set(ContractMetadataTable.CONTRACT_IMPLEMENTS, interfaces.map { it.value }.toTypedArray())
+            .where(
+                DSL.and(
+                    ContractMetadataTable.CONTRACT_ID.eq(contractId),
+                    ContractMetadataTable.PROJECT_ID.eq(projectId)
+                )
+            )
             .execute() > 0
     }
 

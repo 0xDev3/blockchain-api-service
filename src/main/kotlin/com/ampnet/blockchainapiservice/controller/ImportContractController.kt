@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.controller
 import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import com.ampnet.blockchainapiservice.model.params.ImportContractParams
 import com.ampnet.blockchainapiservice.model.request.ImportContractRequest
+import com.ampnet.blockchainapiservice.model.request.ImportedContractInterfacesRequest
 import com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
@@ -10,9 +11,11 @@ import com.ampnet.blockchainapiservice.model.result.Project
 import com.ampnet.blockchainapiservice.service.ContractDeploymentRequestService
 import com.ampnet.blockchainapiservice.service.ContractImportService
 import com.ampnet.blockchainapiservice.service.ContractInterfacesService
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -49,5 +52,56 @@ class ImportContractController(
                 manifests.map { ContractInterfaceManifestResponse(it) }
             )
         )
+    }
+
+    @PatchMapping("/v1/import-smart-contract/{id}/add-interfaces")
+    fun addInterfacesToImportedSmartContract(
+        @ApiKeyBinding project: Project,
+        @PathVariable("id") id: UUID,
+        @Valid @RequestBody requestBody: ImportedContractInterfacesRequest
+    ): ResponseEntity<ContractDeploymentRequestResponse> {
+        contractInterfacesService.addInterfacesToImportedContract(
+            importedContractId = id,
+            projectId = project.id,
+            interfaces = requestBody.interfaces.map { InterfaceId(it) }
+        )
+
+        val importedContract = contractDeploymentRequestService.getContractDeploymentRequest(id)
+
+        return ResponseEntity.ok(ContractDeploymentRequestResponse(importedContract))
+    }
+
+    @PatchMapping("/v1/import-smart-contract/{id}/remove-interfaces")
+    fun removeInterfacesFromImportedSmartContract(
+        @ApiKeyBinding project: Project,
+        @PathVariable("id") id: UUID,
+        @Valid @RequestBody requestBody: ImportedContractInterfacesRequest
+    ): ResponseEntity<ContractDeploymentRequestResponse> {
+        contractInterfacesService.removeInterfacesFromImportedContract(
+            importedContractId = id,
+            projectId = project.id,
+            interfaces = requestBody.interfaces.map { InterfaceId(it) }
+        )
+
+        val importedContract = contractDeploymentRequestService.getContractDeploymentRequest(id)
+
+        return ResponseEntity.ok(ContractDeploymentRequestResponse(importedContract))
+    }
+
+    @PatchMapping("/v1/import-smart-contract/{id}/set-interfaces")
+    fun setInterfacesForImportedSmartContract(
+        @ApiKeyBinding project: Project,
+        @PathVariable("id") id: UUID,
+        @Valid @RequestBody requestBody: ImportedContractInterfacesRequest
+    ): ResponseEntity<ContractDeploymentRequestResponse> {
+        contractInterfacesService.setImportedContractInterfaces(
+            importedContractId = id,
+            projectId = project.id,
+            interfaces = requestBody.interfaces.map { InterfaceId(it) }
+        )
+
+        val importedContract = contractDeploymentRequestService.getContractDeploymentRequest(id)
+
+        return ResponseEntity.ok(ContractDeploymentRequestResponse(importedContract))
     }
 }
