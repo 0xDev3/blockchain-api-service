@@ -5,7 +5,7 @@ import com.ampnet.blockchainapiservice.model.json.EventDecorator
 import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
-import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -14,7 +14,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
     @Test
     fun mustCorrectlyStoreAndThenGetContractInterfaceById() {
         val repository = InMemoryContractInterfacesRepository()
-        val id = ContractId("id")
+        val id = InterfaceId("id")
         val interfaceManifest = InterfaceManifestJson(
             name = "name",
             description = "description",
@@ -38,7 +38,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
     fun mustCorrectlyStoreAndThenGetContractInterfaceInfoMarkdownById() {
         val repository = InMemoryContractInterfacesRepository()
         val infoMd = "info-md"
-        val id = ContractId("id")
+        val id = InterfaceId("id")
 
         val storedInfoMd = suppose("some contract interface info.md is stored") {
             repository.store(id, infoMd)
@@ -55,7 +55,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
     @Test
     fun mustCorrectlyDeleteContractInterfaceAndThenReturnNullWhenGettingById() {
         val repository = InMemoryContractInterfacesRepository()
-        val id = ContractId("id")
+        val id = InterfaceId("id")
         val interfaceManifest = InterfaceManifestJson(
             name = "name",
             description = "description",
@@ -99,7 +99,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
     fun mustCorrectlyGetAllContractInterfaces() {
         val repository = InMemoryContractInterfacesRepository()
 
-        val id1 = ContractId("id-1")
+        val id1 = InterfaceId("id-1")
         val interfaceManifest1 = InterfaceManifestJson(
             name = "name-1",
             description = "description-1",
@@ -107,7 +107,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
             functionDecorators = emptyList()
         )
 
-        val id2 = ContractId("id-2")
+        val id2 = InterfaceId("id-2")
         val interfaceManifest2 = InterfaceManifestJson(
             name = "name-2",
             description = "description-2",
@@ -147,10 +147,10 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
     fun mustCorrectlyGetAllContractInterfaceInfoMarkdownFiles() {
         val repository = InMemoryContractInterfacesRepository()
 
-        val id1 = ContractId("id-1")
+        val id1 = InterfaceId("id-1")
         val infoMd1 = "info-md-1"
 
-        val id2 = ContractId("id-2")
+        val id2 = InterfaceId("id-2")
         val infoMd2 = "info-md-2"
 
         suppose("some contract interface info.md files are stored") {
@@ -168,7 +168,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
     fun mustCorrectlyGetAllPartiallyContractInterfacesWhenThereIsAFullMatch() {
         val repository = InMemoryContractInterfacesRepository()
 
-        val id1 = ContractId("id-1")
+        val id1 = InterfaceId("id-1")
         val interfaceManifest1 = InterfaceManifestJson(
             name = "name-1",
             description = "description-1",
@@ -180,7 +180,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
             )
         )
 
-        val id2 = ContractId("id-2")
+        val id2 = InterfaceId("id-2")
         val interfaceManifest2 = InterfaceManifestJson(
             name = "name-2",
             description = "description-2",
@@ -222,7 +222,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
     fun mustCorrectlyGetAllPartiallyContractInterfacesWhenThereIsAPartialMatch() {
         val repository = InMemoryContractInterfacesRepository()
 
-        val id1 = ContractId("id-1")
+        val id1 = InterfaceId("id-1")
         val interfaceManifest1 = InterfaceManifestJson(
             name = "name-1",
             description = "description-1",
@@ -234,7 +234,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
             )
         )
 
-        val id2 = ContractId("id-2")
+        val id2 = InterfaceId("id-2")
         val interfaceManifest2 = InterfaceManifestJson(
             name = "name-2",
             description = "description-2",
@@ -276,7 +276,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
     fun mustNotGetPartiallyContractInterfacesWhenInterfaceHasSignaturesMoreThanAbi() {
         val repository = InMemoryContractInterfacesRepository()
 
-        val id1 = ContractId("id-1")
+        val id1 = InterfaceId("id-1")
         val interfaceManifest1 = InterfaceManifestJson(
             name = "name-1",
             description = "description-1",
@@ -288,7 +288,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
             )
         )
 
-        val id2 = ContractId("id-2")
+        val id2 = InterfaceId("id-2")
         val interfaceManifest2 = InterfaceManifestJson(
             name = "name-2",
             description = "description-2",

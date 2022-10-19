@@ -9,7 +9,7 @@ import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestR
 import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse
 import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
-import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
@@ -22,7 +22,7 @@ import java.util.UUID
 class ContractInterfacesControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val ID = ContractId("example.interface")
+        private val ID = InterfaceId("example.interface")
         private val INTERFACE_MANIFEST_JSON = InterfaceManifestJson(
             name = "name",
             description = "description",

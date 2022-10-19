@@ -12,7 +12,7 @@ import com.ampnet.blockchainapiservice.model.json.TypeDecorator
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -44,8 +44,8 @@ class ContractDecoratorTest : TestBase() {
         private val MANIFEST_JSON = ManifestJson(
             name = "name",
             description = "description",
-            tags = emptyList(),
-            implements = listOf("override-1", "override-2", "extra"),
+            tags = emptySet(),
+            implements = setOf("override-1", "override-2", "extra"),
             eventDecorators = listOf(
                 eventDecorator("FromDecorator", "string", "not-overridden-1")
             ),
@@ -187,11 +187,11 @@ class ContractDecoratorTest : TestBase() {
     @Test
     fun mustCorrectlyOverrideFunctionsAndEvents() {
         val map = mapOf(
-            ContractId("override-1") to INTERFACE_MANIFEST_OVERRIDE_1,
-            ContractId("override-2") to INTERFACE_MANIFEST_OVERRIDE_2,
-            ContractId("extra") to INTERFACE_MANIFEST_EXTRA
+            InterfaceId("override-1") to INTERFACE_MANIFEST_OVERRIDE_1,
+            InterfaceId("override-2") to INTERFACE_MANIFEST_OVERRIDE_2,
+            InterfaceId("extra") to INTERFACE_MANIFEST_EXTRA
         )
-        val interfacesProvider: (ContractId) -> InterfaceManifestJson? = { id -> map[id] }
+        val interfacesProvider: (InterfaceId) -> InterfaceManifestJson? = { id -> map[id] }
 
         verify("functions and events are correctly overridden") {
             val id = ContractId("contract-id")
@@ -210,7 +210,7 @@ class ContractDecoratorTest : TestBase() {
                         description = MANIFEST_JSON.description,
                         binary = ContractBinaryData(ARTIFACT_JSON.bytecode),
                         tags = MANIFEST_JSON.tags.map { ContractTag(it) },
-                        implements = MANIFEST_JSON.implements.map { ContractTrait(it) },
+                        implements = MANIFEST_JSON.implements.map { InterfaceId(it) },
                         constructors = emptyList(),
                         functions = listOf(
                             ContractFunction(
