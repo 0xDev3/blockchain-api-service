@@ -13,7 +13,7 @@ import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import mu.KLogging
@@ -183,7 +183,7 @@ class JooqContractDeploymentRequestRepository(
             contractData = requestRecord.contractData,
             constructorParams = requestRecord.constructorParams,
             contractTags = metadataRecord.contractTags.map { ContractTag(it) },
-            contractImplements = metadataRecord.contractImplements.map { ContractTrait(it) },
+            contractImplements = metadataRecord.contractImplements.map { InterfaceId(it) },
             initialEthAmount = requestRecord.initialEthAmount,
             chainId = requestRecord.chainId,
             redirectUrl = requestRecord.redirectUrl,
@@ -216,7 +216,7 @@ class JooqContractDeploymentRequestRepository(
             )
         }
 
-    private fun AndList<ContractTrait>.contractTraitsAndCondition(): Condition? =
+    private fun AndList<InterfaceId>.contractTraitsAndCondition(): Condition? =
         takeIf { list.isNotEmpty() }?.let {
             ContractMetadataTable.CONTRACT_IMPLEMENTS.contains(
                 it.list.map { v -> v.value }.toTypedArray()

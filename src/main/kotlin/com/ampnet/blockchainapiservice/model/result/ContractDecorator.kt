@@ -1,5 +1,7 @@
 package com.ampnet.blockchainapiservice.model.result
 
+import com.ampnet.blockchainapiservice.exception.ContractDecoratorException
+import com.ampnet.blockchainapiservice.exception.ContractInterfaceNotFoundException
 import com.ampnet.blockchainapiservice.model.json.AbiInputOutput
 import com.ampnet.blockchainapiservice.model.json.AbiObject
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
@@ -12,7 +14,7 @@ import com.ampnet.blockchainapiservice.model.json.TypeDecorator
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 
 data class ContractDecorator(
     val id: ContractId,
@@ -20,28 +22,21 @@ data class ContractDecorator(
     val description: String?,
     val binary: ContractBinaryData,
     val tags: List<ContractTag>,
-    val implements: List<ContractTrait>,
+    val implements: List<InterfaceId>,
     val constructors: List<ContractConstructor>,
     val functions: List<ContractFunction>,
     val events: List<ContractEvent>
 ) {
     companion object {
-        class ContractDecoratorException(override val message: String) : RuntimeException() {
-            companion object {
-                private const val serialVersionUID: Long = -4648452291836117997L
-            }
-        }
-
         operator fun invoke(
             id: ContractId,
             artifact: ArtifactJson,
             manifest: ManifestJson,
-            interfacesProvider: ((ContractId) -> InterfaceManifestJson?)?
+            interfacesProvider: ((InterfaceId) -> InterfaceManifestJson?)?
         ): ContractDecorator {
             val manifestInterfaces = interfacesProvider?.let { provider ->
-                manifest.implements.map { interfaceName ->
-                    provider(ContractId(interfaceName))
-                        ?: throw ContractDecoratorException("Contract interface does not exist: $interfaceName")
+                manifest.implements.map(InterfaceId::invoke).map { id ->
+                    provider(id) ?: throw ContractInterfaceNotFoundException(id)
                 }
             }.orEmpty()
 
@@ -54,7 +49,7 @@ data class ContractDecorator(
                 description = manifest.description,
                 binary = ContractBinaryData(artifact.bytecode),
                 tags = manifest.tags.map { ContractTag(it) },
-                implements = manifest.implements.map { ContractTrait(it) },
+                implements = manifest.implements.map { InterfaceId(it) },
                 constructors = decorateConstructors(artifact, manifest),
                 functions = decorateFunctions(artifact, manifest, interfaceFunctions),
                 events = decorateEvents(artifact, manifest, interfaceEvents)

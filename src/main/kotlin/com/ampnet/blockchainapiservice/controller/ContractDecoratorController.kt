@@ -15,7 +15,7 @@ import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -41,7 +41,7 @@ class ContractDecoratorController(
     ): ResponseEntity<ContractDecoratorsResponse> {
         val filters = ContractDecoratorFilters(
             contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
-            contractImplements = contractImplements.parseOrListWithNestedAndLists { ContractTrait(it) }
+            contractImplements = contractImplements.parseOrListWithNestedAndLists { InterfaceId(it) }
         )
         val contractDecorators = contractDecoratorRepository.getAll(filters) +
             projectId.getIfPresent { importedContractDecoratorRepository.getAll(it, filters) }
@@ -56,7 +56,7 @@ class ContractDecoratorController(
     ): ResponseEntity<ManifestJsonsResponse> {
         val filters = ContractDecoratorFilters(
             contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
-            contractImplements = contractImplements.parseOrListWithNestedAndLists { ContractTrait(it) }
+            contractImplements = contractImplements.parseOrListWithNestedAndLists { InterfaceId(it) }
         )
         val contractManifests = contractDecoratorRepository.getAllManifestJsonFiles(filters) +
             projectId.getIfPresent { importedContractDecoratorRepository.getAllManifestJsonFiles(it, filters) }
@@ -71,7 +71,7 @@ class ContractDecoratorController(
     ): ResponseEntity<ArtifactJsonsResponse> {
         val filters = ContractDecoratorFilters(
             contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
-            contractImplements = contractImplements.parseOrListWithNestedAndLists { ContractTrait(it) }
+            contractImplements = contractImplements.parseOrListWithNestedAndLists { InterfaceId(it) }
         )
         val contractArtifacts = contractDecoratorRepository.getAllArtifactJsonFiles(filters) +
             projectId.getIfPresent { importedContractDecoratorRepository.getAllArtifactJsonFiles(it, filters) }
@@ -86,7 +86,7 @@ class ContractDecoratorController(
     ): ResponseEntity<InfoMarkdownsResponse> {
         val filters = ContractDecoratorFilters(
             contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
-            contractImplements = contractImplements.parseOrListWithNestedAndLists { ContractTrait(it) }
+            contractImplements = contractImplements.parseOrListWithNestedAndLists { InterfaceId(it) }
         )
         val contractInfoMarkdowns = contractDecoratorRepository.getAllInfoMarkdownFiles(filters) +
             projectId.getIfPresent { importedContractDecoratorRepository.getAllInfoMarkdownFiles(it, filters) }

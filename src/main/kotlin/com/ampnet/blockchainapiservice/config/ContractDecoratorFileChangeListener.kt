@@ -1,10 +1,11 @@
 package com.ampnet.blockchainapiservice.config
 
+import com.ampnet.blockchainapiservice.exception.ContractDecoratorException
+import com.ampnet.blockchainapiservice.exception.ContractInterfaceNotFoundException
 import com.ampnet.blockchainapiservice.model.json.ArtifactJson
 import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
 import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
-import com.ampnet.blockchainapiservice.model.result.ContractDecorator.Companion.ContractDecoratorException
 import com.ampnet.blockchainapiservice.model.result.ContractMetadata
 import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
 import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
@@ -12,6 +13,7 @@ import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
 import com.ampnet.blockchainapiservice.service.UuidProvider
 import com.ampnet.blockchainapiservice.util.Constants
 import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.fasterxml.jackson.databind.DatabindException
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KLogging
@@ -112,12 +114,12 @@ class ContractDecoratorFileChangeListener(
 
     private fun processContractInterface(manifest: Path) {
         val relativePath = manifest.relativeTo(interfacesDir)
-        val id = ContractId(relativePath.toString().removeSuffix("manifest.json").removeSuffix(".").removeSuffix("/"))
+        val id = InterfaceId(relativePath.toString().removeSuffix("manifest.json").removeSuffix(".").removeSuffix("/"))
         logger.info { "Processing contract interface $id..." }
 
         val infoMd = manifest.parent.resolve(manifest.name.removeSuffix("manifest.json") + "info.md").toFile()
         val infoMarkdown = infoMd.takeIf { it.isFile }?.readText() ?: ""
-        val manifestJson = objectMapper.tryParse(id, "interface", manifest.toFile(), InterfaceManifestJson::class)
+        val manifestJson = objectMapper.tryParse(id.value, "interface", manifest.toFile(), InterfaceManifestJson::class)
 
         if (manifestJson != null) {
             contractInterfacesRepository.store(id, manifestJson)
@@ -143,8 +145,8 @@ class ContractDecoratorFileChangeListener(
         val artifact = contractDecoratorDir.resolve("artifact.json").toFile()
         val manifest = contractDecoratorDir.resolve("manifest.json").toFile()
         val infoMd = contractDecoratorDir.resolve("info.md").toFile()
-        val artifactJson = objectMapper.tryParse(id, "decorator", artifact, ArtifactJson::class)
-        val manifestJson = objectMapper.tryParse(id, "decorator", manifest, ManifestJson::class)
+        val artifactJson = objectMapper.tryParse(id.value, "decorator", artifact, ArtifactJson::class)
+        val manifestJson = objectMapper.tryParse(id.value, "decorator", manifest, ManifestJson::class)
         val infoMarkdown = infoMd.takeIf { it.isFile }?.readText() ?: ""
 
         if (artifactJson != null && manifestJson != null) {
@@ -174,13 +176,16 @@ class ContractDecoratorFileChangeListener(
             } catch (e: ContractDecoratorException) {
                 logger.warn(e) { "${e.message} for contract decorator: $id, skipping..." }
                 contractDecoratorRepository.delete(id)
+            } catch (e: ContractInterfaceNotFoundException) {
+                logger.warn(e) { "${e.message} for contract decorator: $id, skipping..." }
+                contractDecoratorRepository.delete(id)
             }
         } else {
             contractDecoratorRepository.delete(id)
         }
     }
 
-    private fun <T : Any> ObjectMapper.tryParse(id: ContractId, type: String, file: File, valueType: KClass<T>): T? =
+    private fun <T : Any> ObjectMapper.tryParse(id: String, type: String, file: File, valueType: KClass<T>): T? =
         if (file.isFile) {
             try {
                 readValue(file, valueType.java)

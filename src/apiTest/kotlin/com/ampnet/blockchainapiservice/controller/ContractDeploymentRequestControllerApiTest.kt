@@ -33,7 +33,7 @@ import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -71,7 +71,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             description = "description",
             binary = ContractBinaryData(ExampleContract.BINARY),
             tags = listOf(ContractTag("example"), ContractTag("simple")),
-            implements = listOf(ContractTrait("traits.example"), ContractTrait("traits.exampleOwnable")),
+            implements = listOf(InterfaceId("traits.example"), InterfaceId("traits.exampleOwnable")),
             constructors = listOf(
                 ContractConstructor(
                     inputs = listOf(

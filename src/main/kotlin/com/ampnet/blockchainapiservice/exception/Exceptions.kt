@@ -3,6 +3,7 @@ package com.ampnet.blockchainapiservice.exception
 import com.ampnet.blockchainapiservice.util.ChainId
 import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractId
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import org.springframework.http.HttpStatus
 import java.util.UUID
 
@@ -209,5 +210,25 @@ class ContractDecompilationTemporarilyUnavailableException : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = 4124559311239162111L
+    }
+}
+
+class ContractDecoratorException(reason: String) : ServiceException(
+    errorCode = ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Contract decorator incompatible: $reason"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -4648452291836117997L
+    }
+}
+
+class ContractInterfaceNotFoundException(interfaceId: InterfaceId) : ServiceException(
+    errorCode = ErrorCode.CONTRACT_INTERFACE_NOT_FOUND,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Smart contract interface not found for ID: ${interfaceId.value}"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 6166118515189449736L
     }
 }

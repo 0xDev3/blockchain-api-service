@@ -10,7 +10,7 @@ import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.ampnet.blockchainapiservice.model.result.ContractDecorator
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.ampnet.blockchainapiservice.util.UtcDateTime
 import mu.KLogging
 import org.jooq.Condition
@@ -22,7 +22,8 @@ import java.util.UUID
 @Repository
 @Suppress("TooManyFunctions")
 class JooqImportedContractDecoratorRepository(
-    private val dslContext: DSLContext
+    private val dslContext: DSLContext,
+    private val contractInterfacesRepository: ContractInterfacesRepository
 ) : ImportedContractDecoratorRepository {
 
     companion object : KLogging()
@@ -56,8 +57,33 @@ class JooqImportedContractDecoratorRepository(
             id = contractId,
             artifact = artifactJson,
             manifest = manifestJson,
-            interfacesProvider = null
+            interfacesProvider = contractInterfacesRepository::getById
         )
+    }
+
+    override fun updateInterfaces(
+        contractId: ContractId,
+        projectId: UUID,
+        interfaces: List<InterfaceId>,
+        manifest: ManifestJson
+    ): Boolean {
+        logger.info {
+            "Update imported contract decorator interfaces, contractId: $contractId, projectId: $projectId," +
+                " interfaces: $interfaces"
+        }
+        return dslContext.update(ImportedContractDecoratorTable)
+            .set(ImportedContractDecoratorTable.CONTRACT_IMPLEMENTS, interfaces.map { it.value }.toTypedArray())
+            .set(
+                ImportedContractDecoratorTable.MANIFEST_JSON,
+                manifest.copy(implements = interfaces.map { it.value }.toSet())
+            )
+            .where(
+                DSL.and(
+                    ImportedContractDecoratorTable.CONTRACT_ID.eq(contractId),
+                    ImportedContractDecoratorTable.PROJECT_ID.eq(projectId)
+                )
+            )
+            .execute() > 0
     }
 
     override fun getByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ContractDecorator? {
@@ -75,7 +101,7 @@ class JooqImportedContractDecoratorRepository(
                     id = it.contractId,
                     artifact = it.artifactJson,
                     manifest = it.manifestJson,
-                    interfacesProvider = null
+                    interfacesProvider = contractInterfacesRepository::getById
                 )
             }
     }
@@ -132,7 +158,7 @@ class JooqImportedContractDecoratorRepository(
                     id = it.contractId,
                     artifact = it.artifactJson,
                     manifest = it.manifestJson,
-                    interfacesProvider = null
+                    interfacesProvider = contractInterfacesRepository::getById
                 )
             }
     }
@@ -178,7 +204,7 @@ class JooqImportedContractDecoratorRepository(
             )
         }
 
-    private fun AndList<ContractTrait>.contractTraitsAndCondition(): Condition? =
+    private fun AndList<InterfaceId>.contractTraitsAndCondition(): Condition? =
         takeIf { list.isNotEmpty() }?.let {
             ImportedContractDecoratorTable.CONTRACT_IMPLEMENTS.contains(
                 it.list.map { v -> v.value }.toTypedArray()

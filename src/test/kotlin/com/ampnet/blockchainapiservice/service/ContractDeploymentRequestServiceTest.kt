@@ -27,9 +27,9 @@ import com.ampnet.blockchainapiservice.util.ContractAddress
 import com.ampnet.blockchainapiservice.util.ContractBinaryData
 import com.ampnet.blockchainapiservice.util.ContractId
 import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.ContractTrait
 import com.ampnet.blockchainapiservice.util.FunctionArgument
 import com.ampnet.blockchainapiservice.util.FunctionData
+import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.ampnet.blockchainapiservice.util.Status
 import com.ampnet.blockchainapiservice.util.TransactionHash
 import com.ampnet.blockchainapiservice.util.WalletAddress
@@ -77,7 +77,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             description = "description",
             binary = ContractBinaryData("12"),
             tags = listOf(ContractTag("test-tag")),
-            implements = listOf(ContractTrait("test-trait")),
+            implements = listOf(InterfaceId("test-trait")),
             constructors = emptyList(),
             functions = emptyList(),
             events = emptyList()

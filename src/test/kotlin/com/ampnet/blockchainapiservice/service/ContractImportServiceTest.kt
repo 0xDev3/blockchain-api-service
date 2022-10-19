@@ -117,8 +117,8 @@ class ContractImportServiceTest : TestBase() {
         private val MANIFEST_JSON = ManifestJson(
             name = "imported",
             description = "imported",
-            tags = emptyList(),
-            implements = emptyList(),
+            tags = emptySet(),
+            implements = emptySet(),
             eventDecorators = emptyList(),
             constructorDecorators = listOf(
                 ConstructorDecorator(
