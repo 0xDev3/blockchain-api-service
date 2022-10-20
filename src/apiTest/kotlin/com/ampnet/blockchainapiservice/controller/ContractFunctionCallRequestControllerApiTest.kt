@@ -987,7 +987,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         redirectUrl = PROJECT.baseRedirectUrl.value +
                             "/request-function-call/${createResponse.id}/action",
                         projectId = PROJECT_ID,
-                        createdAt = createResponse.createdAt,
+                        createdAt = fetchResponse.createdAt,
                         arbitraryData = createResponse.arbitraryData,
                         screenConfig = ScreenConfig(
                             beforeActionMessage = "before-action-message",
@@ -1122,7 +1122,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         redirectUrl = PROJECT.baseRedirectUrl.value +
                             "/request-function-call/${createResponse.id}/action",
                         projectId = projectId,
-                        createdAt = createResponse.createdAt,
+                        createdAt = fetchResponse.createdAt,
                         arbitraryData = createResponse.arbitraryData,
                         screenConfig = ScreenConfig(
                             beforeActionMessage = "before-action-message",
@@ -1277,7 +1277,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
                                     "/request-function-call/${createResponse.id}/action",
                                 projectId = PROJECT_ID,
-                                createdAt = createResponse.createdAt,
+                                createdAt = fetchResponse.requests[0].createdAt,
                                 arbitraryData = createResponse.arbitraryData,
                                 screenConfig = ScreenConfig(
                                     beforeActionMessage = "before-action-message",
@@ -1425,7 +1425,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
                                     "/request-function-call/${createResponse.id}/action",
                                 projectId = projectId,
-                                createdAt = createResponse.createdAt,
+                                createdAt = fetchResponse.requests[0].createdAt,
                                 arbitraryData = createResponse.arbitraryData,
                                 screenConfig = ScreenConfig(
                                     beforeActionMessage = "before-action-message",

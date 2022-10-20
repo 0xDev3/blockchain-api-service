@@ -10,7 +10,6 @@ import com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse
 import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
 import com.ampnet.blockchainapiservice.repository.AddressBookRepository
 import com.ampnet.blockchainapiservice.security.WithMockUser
-import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -115,11 +114,13 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                         address = address,
                         phoneNumber = phoneNumber,
                         email = email,
-                        createdAt = UtcDateTime(response.createdAt),
+                        createdAt = storedEntry.createdAt,
                         userId = OWNER_ID
                     )
                 )
 
+            assertThat(storedEntry.createdAt.value)
+                .isCloseTo(response.createdAt, WITHIN_TIME_TOLERANCE)
             assertThat(storedEntry.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }

@@ -456,7 +456,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
                             timestamp = fetchResponse.lockTx.timestamp
                         ),
-                        createdAt = createResponse.createdAt
+                        createdAt = fetchResponse.createdAt
                     )
                 )
 
@@ -698,7 +698,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].lockTx.timestamp
                                 ),
-                                createdAt = createResponse.createdAt
+                                createdAt = fetchResponse.requests[0].createdAt
                             )
                         )
                     )

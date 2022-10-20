@@ -28,6 +28,7 @@ class JsonConfig {
     @Primary
     fun objectMapper(): ObjectMapper {
         val mapper = ObjectMapper()
+
         mapper.propertyNamingStrategy = PropertyNamingStrategies.SnakeCaseStrategy()
         mapper.registerModule(JavaTimeModule())
         mapper.registerModule(
@@ -38,14 +39,15 @@ class JsonConfig {
         )
         mapper.registerModule(
             SimpleModule().apply {
-                addSerializer(BigInteger::class.java, ToStringSerializer())
                 addSerializer(BigDecimal::class.java, ToStringSerializer())
+                addSerializer(BigInteger::class.java, ToStringSerializer())
                 addSerializer(Tuple::class.java, TupleSerializer())
             }
         )
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         mapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false)
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
         return mapper.registerModule(KotlinModule.Builder().build())
     }
 }
