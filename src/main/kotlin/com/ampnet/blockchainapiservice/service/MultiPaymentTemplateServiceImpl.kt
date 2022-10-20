@@ -165,7 +165,7 @@ class MultiPaymentTemplateServiceImpl(
         val updatedAt = utcDateTimeProvider.getUtcDateTime()
 
         return multiPaymentTemplateRepository.deleteItem(
-            id = template.id,
+            templateId = template.id,
             itemId = itemId,
             updatedAt = updatedAt
         ) ?: throw ResourceNotFoundException(

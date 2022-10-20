@@ -13,32 +13,34 @@ class FunctionArgumentEncodingBugfixes : TestBase() {
 
     @Test
     fun bugfix1() {
-        val json = """{
-            |  "type": "tuple[]",
-            |  "value": [
-            |    [
-            |      {
-            |        "type": "bytes32",
-            |        "value": [
-            |          "107", "76",  "252", "241", "214",
-            |          "241", "26",  "201", "186", "38",
-            |          "152", "78",  "56",  "0",   "8",
-            |          "101", "118", "9",   "105", "90",
-            |          "224", "241", "181", "102", "135",
-            |          "216", "149", "117", "253", "160",
-            |          "199", "73"
-            |        ]
-            |      },
-            |      {
-            |        "type": "address",
-            |        "value": "0xe9787e557efb20d70ead824bc91d7d21121756f0"
-            |      },
-            |      { "type": "uint256", "value": "100000000000000000000" },
-            |      { "type": "uint256", "value": "0" },
-            |      { "type": "uint256", "value": "1663583544786" }
-            |    ]
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "type": "tuple[]",
+              |  "value": [
+              |    [
+              |      {
+              |        "type": "bytes32",
+              |        "value": [
+              |          "107", "76",  "252", "241", "214",
+              |          "241", "26",  "201", "186", "38",
+              |          "152", "78",  "56",  "0",   "8",
+              |          "101", "118", "9",   "105", "90",
+              |          "224", "241", "181", "102", "135",
+              |          "216", "149", "117", "253", "160",
+              |          "199", "73"
+              |        ]
+              |      },
+              |      {
+              |        "type": "address",
+              |        "value": "0xe9787e557efb20d70ead824bc91d7d21121756f0"
+              |      },
+              |      { "type": "uint256", "value": "100000000000000000000" },
+              |      { "type": "uint256", "value": "0" },
+              |      { "type": "uint256", "value": "1663583544786" }
+              |    ]
+              |  ]
+              |}
+            """.trimMargin()
 
         val deserializedArgument = suppose("type hierarchy will be deserialized") {
             objectMapper.readValue(json, FunctionArgument::class.java)
