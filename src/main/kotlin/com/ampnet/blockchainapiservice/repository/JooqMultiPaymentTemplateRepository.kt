@@ -135,6 +135,7 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
 
         dslContext.update(MultiPaymentTemplateTable)
             .set(MultiPaymentTemplateTable.UPDATED_AT, updatedAt)
+            .where(MultiPaymentTemplateTable.ID.eq(item.templateId))
             .execute()
         return getById(item.templateId)
     }
@@ -149,19 +150,26 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
             .execute()
         dslContext.update(MultiPaymentTemplateTable)
             .set(MultiPaymentTemplateTable.UPDATED_AT, updatedAt)
+            .where(MultiPaymentTemplateTable.ID.eq(item.templateId))
             .execute()
         return getById(item.templateId)
     }
 
-    override fun deleteItem(id: UUID, itemId: UUID, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>? {
-        logger.info { "Delete multi-payment template item, id: $id" }
+    override fun deleteItem(templateId: UUID, itemId: UUID, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>? {
+        logger.info { "Delete multi-payment template item, templateId: $templateId, itemId: $templateId" }
         dslContext.deleteFrom(MultiPaymentTemplateItemTable)
-            .where(MultiPaymentTemplateItemTable.TEMPLATE_ID.eq(id))
+            .where(
+                DSL.and(
+                    MultiPaymentTemplateItemTable.ID.eq(itemId),
+                    MultiPaymentTemplateItemTable.TEMPLATE_ID.eq(templateId)
+                )
+            )
             .execute()
         dslContext.update(MultiPaymentTemplateTable)
             .set(MultiPaymentTemplateTable.UPDATED_AT, updatedAt)
+            .where(MultiPaymentTemplateTable.ID.eq(templateId))
             .execute()
-        return getById(id)
+        return getById(templateId)
     }
 
     private fun MultiPaymentTemplateRecord.toModel() =

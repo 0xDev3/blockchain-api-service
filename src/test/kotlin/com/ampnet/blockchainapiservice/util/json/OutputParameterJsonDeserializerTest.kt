@@ -29,21 +29,23 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeBaseTypes() {
-        val json = """{
-            |  "args": [
-            |    "address", "bool", "string", "bytes", "byte", "uint", "uint8", "uint16", "uint24", "uint32", "uint40",
-            |    "uint48", "uint56", "uint64", "uint72", "uint80", "uint88", "uint96", "uint104", "uint112", "uint120",
-            |    "uint128", "uint136", "uint144", "uint152", "uint160", "uint168", "uint176", "uint184", "uint192",
-            |    "uint200", "uint208", "uint216", "uint224", "uint232", "uint240", "uint248", "uint256", "int", "int8",
-            |    "int16", "int24", "int32", "int40", "int48", "int56", "int64", "int72", "int80", "int88", "int96",
-            |    "int104", "int112", "int120", "int128", "int136", "int144", "int152", "int160", "int168", "int176",
-            |    "int184", "int192", "int200", "int208", "int216", "int224", "int232", "int240", "int248", "int256",
-            |    "bytes1", "bytes2", "bytes3", "bytes4", "bytes5", "bytes6", "bytes7", "bytes8", "bytes9", "bytes10",
-            |    "bytes11", "bytes12", "bytes13", "bytes14", "bytes15", "bytes16", "bytes17", "bytes18", "bytes19",
-            |    "bytes20", "bytes21", "bytes22", "bytes23", "bytes24", "bytes25", "bytes26", "bytes27", "bytes28",
-            |    "bytes29", "bytes30", "bytes31", "bytes32"
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    "address", "bool", "string", "bytes", "byte", "uint", "uint8", "uint16", "uint24", "uint32",
+              |    "uint40", "uint48", "uint56", "uint64", "uint72", "uint80", "uint88", "uint96", "uint104", "uint112",
+              |    "uint120", "uint128", "uint136", "uint144", "uint152", "uint160", "uint168", "uint176", "uint184",
+              |    "uint192", "uint200", "uint208", "uint216", "uint224", "uint232", "uint240", "uint248", "uint256",
+              |    "int", "int8", "int16", "int24", "int32", "int40", "int48", "int56", "int64", "int72", "int80",
+              |    "int88", "int96", "int104", "int112", "int120", "int128", "int136", "int144", "int152", "int160",
+              |    "int168", "int176", "int184", "int192", "int200", "int208", "int216", "int224", "int232", "int240",
+              |    "int248", "int256", "bytes1", "bytes2", "bytes3", "bytes4", "bytes5", "bytes6", "bytes7", "bytes8",
+              |    "bytes9", "bytes10", "bytes11", "bytes12", "bytes13", "bytes14", "bytes15", "bytes16", "bytes17",
+              |    "bytes18", "bytes19", "bytes20", "bytes21", "bytes22", "bytes23", "bytes24", "bytes25", "bytes26",
+              |    "bytes27", "bytes28", "bytes29", "bytes30", "bytes31", "bytes32"
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse base types") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
@@ -74,9 +76,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeDynamicArrayType() {
-        val json = """{
-            |  "args": ["string[]"]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": ["string[]"]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse dynamic array type") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
@@ -88,9 +92,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeSizedArrayType() {
-        val json = """{
-            |  "args": ["bool[2]"]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": ["bool[2]"]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse sized array type") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
@@ -102,9 +108,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeNestedArrayType() {
-        val json = """{
-            |  "args": ["uint[][2][3]"]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": ["uint[][2][3]"]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse nested array type") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
@@ -116,14 +124,16 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeTuple() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "elems": ["string", "uint"]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "elems": ["string", "uint"]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
@@ -135,28 +145,30 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeNestedTuple() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "elems": [
-            |        "string",
-            |        {
-            |          "type": "tuple",
-            |          "elems": [
-            |            "string",
-            |            {
-            |              "type": "tuple",
-            |              "elems": ["string", "bool", "bytes5"]
-            |            },
-            |            "int"
-            |          ]
-            |        },
-            |        "uint"
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "elems": [
+              |        "string",
+              |        {
+              |          "type": "tuple",
+              |          "elems": [
+              |            "string",
+              |            {
+              |              "type": "tuple",
+              |              "elems": ["string", "bool", "bytes5"]
+              |            },
+              |            "int"
+              |          ]
+              |        },
+              |        "uint"
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse nested tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
@@ -180,14 +192,16 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeTupleWithArrayElements() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "elems": ["string[]", "uint[]"]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "elems": ["string[]", "uint[]"]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse tuple with array elements") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
@@ -206,14 +220,16 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeTupleArray() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple[]",
-            |      "elems": ["string", "uint"]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple[]",
+              |      "elems": ["string", "uint"]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse tuple array") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
@@ -231,32 +247,34 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeArrayOfNestedTuplesWithArrays() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple[][2]",
-            |      "elems": [
-            |        "string[][1]",
-            |        {
-            |          "type": "tuple[]",
-            |          "elems": [
-            |            "address[]",
-            |            {
-            |              "type": "tuple",
-            |              "elems": ["int"]
-            |            },
-            |            "bool",
-            |            {
-            |              "type": "tuple[][]",
-            |              "elems": ["uint"]
-            |            }
-            |          ]
-            |        },
-            |        "uint"
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple[][2]",
+              |      "elems": [
+              |        "string[][1]",
+              |        {
+              |          "type": "tuple[]",
+              |          "elems": [
+              |            "address[]",
+              |            {
+              |              "type": "tuple",
+              |              "elems": ["int"]
+              |            },
+              |            "bool",
+              |            {
+              |              "type": "tuple[][]",
+              |              "elems": ["uint"]
+              |            }
+              |          ]
+              |        },
+              |        "uint"
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse array of nested tuples with arrays") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
@@ -288,9 +306,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForUnknownType() {
-        val json = """{
-            |  "args": ["unknown-type"]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": ["unknown-type"]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -304,9 +324,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForInvalidValueType() {
-        val json = """{
-            |  "args": [[]]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [[]]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -320,13 +342,15 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForMissingTupleType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "elems": []
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "elems": []
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -340,14 +364,16 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForInvalidTupleType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "non-tuple",
-            |      "elems": []
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "non-tuple",
+              |      "elems": []
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -361,13 +387,15 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForMissingTupleElements() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple"
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple"
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -381,14 +409,16 @@ class OutputParameterJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForInvalidTupleElement() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "elems": [[]]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "elems": [[]]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {

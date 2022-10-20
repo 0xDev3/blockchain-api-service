@@ -16,7 +16,7 @@ class ContractDecoratorFileWatcherConfig {
     companion object : KLogging()
 
     @Bean
-    @Suppress("LongParameterList", "ReturnCount")
+    @Suppress("LongParameterList")
     fun setUpContractDecoratorFileWatcher(
         uuidProvider: UuidProvider,
         contractDecoratorRepository: ContractDecoratorRepository,
@@ -29,7 +29,6 @@ class ContractDecoratorFileWatcherConfig {
 
         if (interfacesDir == null) {
             logger.warn { "Contract interfaces directory not set, no contract interfaces will be loaded" }
-            return null
         }
 
         logger.info { "Watching for contract interface changes in $interfacesDir" }
@@ -59,7 +58,7 @@ class ContractDecoratorFileWatcherConfig {
             properties.contractDecorators.fillChangePollInterval,
             properties.contractDecorators.fileChangeQuietInterval
         ).apply {
-            addSourceDirectories(listOf(interfacesDir.toFile(), contractsDir.toFile()))
+            addSourceDirectories(listOfNotNull(interfacesDir?.toFile(), contractsDir.toFile()))
             addListener(listener)
             start()
         }

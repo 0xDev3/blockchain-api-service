@@ -42,7 +42,6 @@ java.targetCompatibility = Versions.Compile.targetCompatibility
 allprojects {
     repositories {
         mavenCentral()
-        jcenter()
         maven(url = "https://jitpack.io")
     }
 }
@@ -60,6 +59,7 @@ kotlin {
 jib {
     val dockerUsername: String = System.getenv("DOCKER_USERNAME") ?: "DOCKER_USERNAME"
     val dockerPassword: String = System.getenv("DOCKER_PASSWORD") ?: "DOCKER_PASSWORD"
+
     to {
         image = "ampnet/${rootProject.name}:$version"
         auth {
@@ -108,6 +108,9 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql")
     flywayMigration(Configurations.Database.driverDependency)
     jooqGenerator(Configurations.Database.driverDependency)
+    jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
+
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:${Versions.Plugins.detekt}")
 
     implementation("org.web3j:core:${Versions.Dependencies.web3j}")
     implementation("com.github.komputing:kethereum:${Versions.Dependencies.kethereum}")
