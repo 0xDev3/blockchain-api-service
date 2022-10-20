@@ -1,5 +1,6 @@
 import io.gitlab.arturbosch.detekt.Detekt
 import nu.studer.gradle.jooq.JooqGenerate
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 import org.jooq.meta.jaxb.ForcedType
@@ -324,6 +325,9 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+
+    testLogging.events("failed")
+    testLogging.exceptionFormat = TestExceptionFormat.FULL
 }
 
 task("fullTest") {
