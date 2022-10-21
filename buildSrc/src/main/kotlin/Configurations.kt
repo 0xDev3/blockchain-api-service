@@ -16,9 +16,9 @@ object Configurations {
     }
 
     object Docker {
-        const val baseImage = "gcr.io/distroless/java"
-        const val tag = "11"
-        const val digest = "sha256:1d377403a44d32779be00fceec4803be0301c7f4a62b72d7307dc411860c24c3"
+        const val baseImage = "gcr.io/distroless/java17"
+        const val tag = "latest"
+        const val digest = "sha256:6508f83c5424778581bd174de54e8be95868849471c65753f5f1a82cbd49059e"
     }
 
     object Tests {

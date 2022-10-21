@@ -241,422 +241,424 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             bytes21, bytes22, bytes23, bytes24, bytes25, bytes26, bytes27, bytes28, bytes29, bytes30, bytes31, bytes32
         )
 
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "address",
-            |      "value": "${address.value}"
-            |    },
-            |    {
-            |      "type": "bool",
-            |      "value": ${bool.value}
-            |    },
-            |    {
-            |      "type": "string",
-            |      "value": "${string.value}"
-            |    },
-            |    {
-            |      "type": "bytes",
-            |      "value": ${bytes.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "byte",
-            |      "value": ${byte.value}
-            |    },
-            |    {
-            |      "type": "uint",
-            |      "value": "${uint.value}"
-            |    },
-            |    {
-            |      "type": "uint8",
-            |      "value": ${uint8.value}
-            |    },
-            |    {
-            |      "type": "uint16",
-            |      "value": ${uint16.value}
-            |    },
-            |    {
-            |      "type": "uint24",
-            |      "value": ${uint24.value}
-            |    },
-            |    {
-            |      "type": "uint32",
-            |      "value": ${uint32.value}
-            |    },
-            |    {
-            |      "type": "uint40",
-            |      "value": ${uint40.value}
-            |    },
-            |    {
-            |      "type": "uint48",
-            |      "value": ${uint48.value}
-            |    },
-            |    {
-            |      "type": "uint56",
-            |      "value": ${uint56.value}
-            |    },
-            |    {
-            |      "type": "uint64",
-            |      "value": ${uint64.value}
-            |    },
-            |    {
-            |      "type": "uint72",
-            |      "value": ${uint72.value}
-            |    },
-            |    {
-            |      "type": "uint80",
-            |      "value": ${uint80.value}
-            |    },
-            |    {
-            |      "type": "uint88",
-            |      "value": ${uint88.value}
-            |    },
-            |    {
-            |      "type": "uint96",
-            |      "value": ${uint96.value}
-            |    },
-            |    {
-            |      "type": "uint104",
-            |      "value": ${uint104.value}
-            |    },
-            |    {
-            |      "type": "uint112",
-            |      "value": ${uint112.value}
-            |    },
-            |    {
-            |      "type": "uint120",
-            |      "value": ${uint120.value}
-            |    },
-            |    {
-            |      "type": "uint128",
-            |      "value": ${uint128.value}
-            |    },
-            |    {
-            |      "type": "uint136",
-            |      "value": ${uint136.value}
-            |    },
-            |    {
-            |      "type": "uint144",
-            |      "value": ${uint144.value}
-            |    },
-            |    {
-            |      "type": "uint152",
-            |      "value": ${uint152.value}
-            |    },
-            |    {
-            |      "type": "uint160",
-            |      "value": ${uint160.value}
-            |    },
-            |    {
-            |      "type": "uint168",
-            |      "value": ${uint168.value}
-            |    },
-            |    {
-            |      "type": "uint176",
-            |      "value": ${uint176.value}
-            |    },
-            |    {
-            |      "type": "uint184",
-            |      "value": ${uint184.value}
-            |    },
-            |    {
-            |      "type": "uint192",
-            |      "value": ${uint192.value}
-            |    },
-            |    {
-            |      "type": "uint200",
-            |      "value": ${uint200.value}
-            |    },
-            |    {
-            |      "type": "uint208",
-            |      "value": ${uint208.value}
-            |    },
-            |    {
-            |      "type": "uint216",
-            |      "value": ${uint216.value}
-            |    },
-            |    {
-            |      "type": "uint224",
-            |      "value": ${uint224.value}
-            |    },
-            |    {
-            |      "type": "uint232",
-            |      "value": ${uint232.value}
-            |    },
-            |    {
-            |      "type": "uint240",
-            |      "value": ${uint240.value}
-            |    },
-            |    {
-            |      "type": "uint248",
-            |      "value": ${uint248.value}
-            |    },
-            |    {
-            |      "type": "uint256",
-            |      "value": ${uint256.value}
-            |    },
-            |    {
-            |      "type": "int",
-            |      "value": "${int.value}"
-            |    },
-            |    {
-            |      "type": "int8",
-            |      "value": ${int8.value}
-            |    },
-            |    {
-            |      "type": "int16",
-            |      "value": ${int16.value}
-            |    },
-            |    {
-            |      "type": "int24",
-            |      "value": ${int24.value}
-            |    },
-            |    {
-            |      "type": "int32",
-            |      "value": ${int32.value}
-            |    },
-            |    {
-            |      "type": "int40",
-            |      "value": ${int40.value}
-            |    },
-            |    {
-            |      "type": "int48",
-            |      "value": ${int48.value}
-            |    },
-            |    {
-            |      "type": "int56",
-            |      "value": ${int56.value}
-            |    },
-            |    {
-            |      "type": "int64",
-            |      "value": ${int64.value}
-            |    },
-            |    {
-            |      "type": "int72",
-            |      "value": ${int72.value}
-            |    },
-            |    {
-            |      "type": "int80",
-            |      "value": ${int80.value}
-            |    },
-            |    {
-            |      "type": "int88",
-            |      "value": ${int88.value}
-            |    },
-            |    {
-            |      "type": "int96",
-            |      "value": ${int96.value}
-            |    },
-            |    {
-            |      "type": "int104",
-            |      "value": ${int104.value}
-            |    },
-            |    {
-            |      "type": "int112",
-            |      "value": ${int112.value}
-            |    },
-            |    {
-            |      "type": "int120",
-            |      "value": ${int120.value}
-            |    },
-            |    {
-            |      "type": "int128",
-            |      "value": ${int128.value}
-            |    },
-            |    {
-            |      "type": "int136",
-            |      "value": ${int136.value}
-            |    },
-            |    {
-            |      "type": "int144",
-            |      "value": ${int144.value}
-            |    },
-            |    {
-            |      "type": "int152",
-            |      "value": ${int152.value}
-            |    },
-            |    {
-            |      "type": "int160",
-            |      "value": ${int160.value}
-            |    },
-            |    {
-            |      "type": "int168",
-            |      "value": ${int168.value}
-            |    },
-            |    {
-            |      "type": "int176",
-            |      "value": ${int176.value}
-            |    },
-            |    {
-            |      "type": "int184",
-            |      "value": ${int184.value}
-            |    },
-            |    {
-            |      "type": "int192",
-            |      "value": ${int192.value}
-            |    },
-            |    {
-            |      "type": "int200",
-            |      "value": ${int200.value}
-            |    },
-            |    {
-            |      "type": "int208",
-            |      "value": ${int208.value}
-            |    },
-            |    {
-            |      "type": "int216",
-            |      "value": ${int216.value}
-            |    },
-            |    {
-            |      "type": "int224",
-            |      "value": ${int224.value}
-            |    },
-            |    {
-            |      "type": "int232",
-            |      "value": ${int232.value}
-            |    },
-            |    {
-            |      "type": "int240",
-            |      "value": ${int240.value}
-            |    },
-            |    {
-            |      "type": "int248",
-            |      "value": ${int248.value}
-            |    },
-            |    {
-            |      "type": "int256",
-            |      "value": ${int256.value}
-            |    },
-            |    {
-            |      "type": "bytes1",
-            |      "value": ${bytes1.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes2",
-            |      "value": ${bytes2.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes3",
-            |      "value": ${bytes3.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes4",
-            |      "value": ${bytes4.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes5",
-            |      "value": ${bytes5.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes6",
-            |      "value": ${bytes6.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes7",
-            |      "value": ${bytes7.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes8",
-            |      "value": ${bytes8.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes9",
-            |      "value": ${bytes9.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes10",
-            |      "value": ${bytes10.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes11",
-            |      "value": ${bytes11.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes12",
-            |      "value": ${bytes12.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes13",
-            |      "value": ${bytes13.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes14",
-            |      "value": ${bytes14.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes15",
-            |      "value": ${bytes15.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes16",
-            |      "value": ${bytes16.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes17",
-            |      "value": ${bytes17.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes18",
-            |      "value": ${bytes18.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes19",
-            |      "value": ${bytes19.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes20",
-            |      "value": ${bytes20.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes21",
-            |      "value": ${bytes21.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes22",
-            |      "value": ${bytes22.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes23",
-            |      "value": ${bytes23.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes24",
-            |      "value": ${bytes24.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes25",
-            |      "value": ${bytes25.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes26",
-            |      "value": ${bytes26.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes27",
-            |      "value": ${bytes27.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes28",
-            |      "value": ${bytes28.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes29",
-            |      "value": ${bytes29.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes30",
-            |      "value": ${bytes30.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes31",
-            |      "value": ${bytes31.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    },
-            |    {
-            |      "type": "bytes32",
-            |      "value": ${bytes32.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "address",
+              |      "value": "${address.value}"
+              |    },
+              |    {
+              |      "type": "bool",
+              |      "value": ${bool.value}
+              |    },
+              |    {
+              |      "type": "string",
+              |      "value": "${string.value}"
+              |    },
+              |    {
+              |      "type": "bytes",
+              |      "value": ${bytes.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "byte",
+              |      "value": ${byte.value}
+              |    },
+              |    {
+              |      "type": "uint",
+              |      "value": "${uint.value}"
+              |    },
+              |    {
+              |      "type": "uint8",
+              |      "value": ${uint8.value}
+              |    },
+              |    {
+              |      "type": "uint16",
+              |      "value": ${uint16.value}
+              |    },
+              |    {
+              |      "type": "uint24",
+              |      "value": ${uint24.value}
+              |    },
+              |    {
+              |      "type": "uint32",
+              |      "value": ${uint32.value}
+              |    },
+              |    {
+              |      "type": "uint40",
+              |      "value": ${uint40.value}
+              |    },
+              |    {
+              |      "type": "uint48",
+              |      "value": ${uint48.value}
+              |    },
+              |    {
+              |      "type": "uint56",
+              |      "value": ${uint56.value}
+              |    },
+              |    {
+              |      "type": "uint64",
+              |      "value": ${uint64.value}
+              |    },
+              |    {
+              |      "type": "uint72",
+              |      "value": ${uint72.value}
+              |    },
+              |    {
+              |      "type": "uint80",
+              |      "value": ${uint80.value}
+              |    },
+              |    {
+              |      "type": "uint88",
+              |      "value": ${uint88.value}
+              |    },
+              |    {
+              |      "type": "uint96",
+              |      "value": ${uint96.value}
+              |    },
+              |    {
+              |      "type": "uint104",
+              |      "value": ${uint104.value}
+              |    },
+              |    {
+              |      "type": "uint112",
+              |      "value": ${uint112.value}
+              |    },
+              |    {
+              |      "type": "uint120",
+              |      "value": ${uint120.value}
+              |    },
+              |    {
+              |      "type": "uint128",
+              |      "value": ${uint128.value}
+              |    },
+              |    {
+              |      "type": "uint136",
+              |      "value": ${uint136.value}
+              |    },
+              |    {
+              |      "type": "uint144",
+              |      "value": ${uint144.value}
+              |    },
+              |    {
+              |      "type": "uint152",
+              |      "value": ${uint152.value}
+              |    },
+              |    {
+              |      "type": "uint160",
+              |      "value": ${uint160.value}
+              |    },
+              |    {
+              |      "type": "uint168",
+              |      "value": ${uint168.value}
+              |    },
+              |    {
+              |      "type": "uint176",
+              |      "value": ${uint176.value}
+              |    },
+              |    {
+              |      "type": "uint184",
+              |      "value": ${uint184.value}
+              |    },
+              |    {
+              |      "type": "uint192",
+              |      "value": ${uint192.value}
+              |    },
+              |    {
+              |      "type": "uint200",
+              |      "value": ${uint200.value}
+              |    },
+              |    {
+              |      "type": "uint208",
+              |      "value": ${uint208.value}
+              |    },
+              |    {
+              |      "type": "uint216",
+              |      "value": ${uint216.value}
+              |    },
+              |    {
+              |      "type": "uint224",
+              |      "value": ${uint224.value}
+              |    },
+              |    {
+              |      "type": "uint232",
+              |      "value": ${uint232.value}
+              |    },
+              |    {
+              |      "type": "uint240",
+              |      "value": ${uint240.value}
+              |    },
+              |    {
+              |      "type": "uint248",
+              |      "value": ${uint248.value}
+              |    },
+              |    {
+              |      "type": "uint256",
+              |      "value": ${uint256.value}
+              |    },
+              |    {
+              |      "type": "int",
+              |      "value": "${int.value}"
+              |    },
+              |    {
+              |      "type": "int8",
+              |      "value": ${int8.value}
+              |    },
+              |    {
+              |      "type": "int16",
+              |      "value": ${int16.value}
+              |    },
+              |    {
+              |      "type": "int24",
+              |      "value": ${int24.value}
+              |    },
+              |    {
+              |      "type": "int32",
+              |      "value": ${int32.value}
+              |    },
+              |    {
+              |      "type": "int40",
+              |      "value": ${int40.value}
+              |    },
+              |    {
+              |      "type": "int48",
+              |      "value": ${int48.value}
+              |    },
+              |    {
+              |      "type": "int56",
+              |      "value": ${int56.value}
+              |    },
+              |    {
+              |      "type": "int64",
+              |      "value": ${int64.value}
+              |    },
+              |    {
+              |      "type": "int72",
+              |      "value": ${int72.value}
+              |    },
+              |    {
+              |      "type": "int80",
+              |      "value": ${int80.value}
+              |    },
+              |    {
+              |      "type": "int88",
+              |      "value": ${int88.value}
+              |    },
+              |    {
+              |      "type": "int96",
+              |      "value": ${int96.value}
+              |    },
+              |    {
+              |      "type": "int104",
+              |      "value": ${int104.value}
+              |    },
+              |    {
+              |      "type": "int112",
+              |      "value": ${int112.value}
+              |    },
+              |    {
+              |      "type": "int120",
+              |      "value": ${int120.value}
+              |    },
+              |    {
+              |      "type": "int128",
+              |      "value": ${int128.value}
+              |    },
+              |    {
+              |      "type": "int136",
+              |      "value": ${int136.value}
+              |    },
+              |    {
+              |      "type": "int144",
+              |      "value": ${int144.value}
+              |    },
+              |    {
+              |      "type": "int152",
+              |      "value": ${int152.value}
+              |    },
+              |    {
+              |      "type": "int160",
+              |      "value": ${int160.value}
+              |    },
+              |    {
+              |      "type": "int168",
+              |      "value": ${int168.value}
+              |    },
+              |    {
+              |      "type": "int176",
+              |      "value": ${int176.value}
+              |    },
+              |    {
+              |      "type": "int184",
+              |      "value": ${int184.value}
+              |    },
+              |    {
+              |      "type": "int192",
+              |      "value": ${int192.value}
+              |    },
+              |    {
+              |      "type": "int200",
+              |      "value": ${int200.value}
+              |    },
+              |    {
+              |      "type": "int208",
+              |      "value": ${int208.value}
+              |    },
+              |    {
+              |      "type": "int216",
+              |      "value": ${int216.value}
+              |    },
+              |    {
+              |      "type": "int224",
+              |      "value": ${int224.value}
+              |    },
+              |    {
+              |      "type": "int232",
+              |      "value": ${int232.value}
+              |    },
+              |    {
+              |      "type": "int240",
+              |      "value": ${int240.value}
+              |    },
+              |    {
+              |      "type": "int248",
+              |      "value": ${int248.value}
+              |    },
+              |    {
+              |      "type": "int256",
+              |      "value": ${int256.value}
+              |    },
+              |    {
+              |      "type": "bytes1",
+              |      "value": ${bytes1.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes2",
+              |      "value": ${bytes2.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes3",
+              |      "value": ${bytes3.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes4",
+              |      "value": ${bytes4.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes5",
+              |      "value": ${bytes5.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes6",
+              |      "value": ${bytes6.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes7",
+              |      "value": ${bytes7.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes8",
+              |      "value": ${bytes8.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes9",
+              |      "value": ${bytes9.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes10",
+              |      "value": ${bytes10.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes11",
+              |      "value": ${bytes11.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes12",
+              |      "value": ${bytes12.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes13",
+              |      "value": ${bytes13.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes14",
+              |      "value": ${bytes14.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes15",
+              |      "value": ${bytes15.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes16",
+              |      "value": ${bytes16.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes17",
+              |      "value": ${bytes17.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes18",
+              |      "value": ${bytes18.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes19",
+              |      "value": ${bytes19.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes20",
+              |      "value": ${bytes20.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes21",
+              |      "value": ${bytes21.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes22",
+              |      "value": ${bytes22.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes23",
+              |      "value": ${bytes23.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes24",
+              |      "value": ${bytes24.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes25",
+              |      "value": ${bytes25.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes26",
+              |      "value": ${bytes26.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes27",
+              |      "value": ${bytes27.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes28",
+              |      "value": ${bytes28.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes29",
+              |      "value": ${bytes29.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes30",
+              |      "value": ${bytes30.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes31",
+              |      "value": ${bytes31.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    },
+              |    {
+              |      "type": "bytes32",
+              |      "value": ${bytes32.value.joinToString(prefix = "[", separator = ", ", postfix = "]")}
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse base types") {
             val result = objectMapper.readValue(json, Result::class.java).args
@@ -686,14 +688,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeEmptyArrayType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "bytes[]",
-            |      "value": []
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "bytes[]",
+              |      "value": []
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse empty dynamic array type") {
             val (componentType, result) = objectMapper.readValue(json, Result::class.java).args
@@ -712,14 +716,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeDynamicArrayType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "string[]",
-            |      "value": ["a", "b"]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "string[]",
+              |      "value": ["a", "b"]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse dynamic array type") {
             val (componentType, result) = objectMapper.readValue(json, Result::class.java).args
@@ -738,14 +744,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeZeroSizedArrayType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "uint[0]",
-            |      "value": []
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "uint[0]",
+              |      "value": []
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse zero-sized array type") {
             val (componentType, result) = objectMapper.readValue(json, Result::class.java).args
@@ -764,14 +772,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeSizedArrayType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "bool[2]",
-            |      "value": [true, false]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "bool[2]",
+              |      "value": [true, false]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse sized array type") {
             val (componentType, result) = objectMapper.readValue(json, Result::class.java).args
@@ -790,26 +800,28 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeNestedArrayType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "uint[][2][3]",
-            |      "value": [
-            |        [
-            |          [], [1]
-            |        ],
-            |        [
-            |          [2, 3],
-            |          [4, 5, 6]
-            |        ],
-            |        [
-            |          [7, 8, 9, 10],
-            |          [11, 12, 13, 14, 15]
-            |        ]
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "uint[][2][3]",
+              |      "value": [
+              |        [
+              |          [], [1]
+              |        ],
+              |        [
+              |          [2, 3],
+              |          [4, 5, 6]
+              |        ],
+              |        [
+              |          [7, 8, 9, 10],
+              |          [11, 12, 13, 14, 15]
+              |        ]
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse nested array type") {
             val readValue = objectMapper.readValue(json, Result::class.java).args
@@ -856,23 +868,25 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeTuple() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "value": [
-            |        {
-            |          "type": "string",
-            |          "value": "test"
-            |        },
-            |        {
-            |          "type": "uint",
-            |          "value": 1
-            |        }
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "value": [
+              |        {
+              |          "type": "string",
+              |          "value": "test"
+              |        },
+              |        {
+              |          "type": "uint",
+              |          "value": 1
+              |        }
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args
@@ -886,49 +900,51 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeNestedTuple() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "value": [
-            |        {
-            |          "type": "string",
-            |          "value": "test"
-            |        },
-            |        {
-            |          "type": "tuple",
-            |          "value": [
-            |            {
-            |              "type": "string",
-            |              "value": "nested1"
-            |            },
-            |            {
-            |              "type": "tuple",
-            |              "value": [
-            |                {
-            |                  "type": "string",
-            |                  "value": "nested2"
-            |                },
-            |                {
-            |                  "type": "bool",
-            |                  "value": true
-            |                }
-            |              ]
-            |            },
-            |            {
-            |              "type": "uint",
-            |              "value": 0
-            |            }
-            |          ]
-            |        },
-            |        {
-            |          "type": "uint",
-            |          "value": 1
-            |        }
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "value": [
+              |        {
+              |          "type": "string",
+              |          "value": "test"
+              |        },
+              |        {
+              |          "type": "tuple",
+              |          "value": [
+              |            {
+              |              "type": "string",
+              |              "value": "nested1"
+              |            },
+              |            {
+              |              "type": "tuple",
+              |              "value": [
+              |                {
+              |                  "type": "string",
+              |                  "value": "nested2"
+              |                },
+              |                {
+              |                  "type": "bool",
+              |                  "value": true
+              |                }
+              |              ]
+              |            },
+              |            {
+              |              "type": "uint",
+              |              "value": 0
+              |            }
+              |          ]
+              |        },
+              |        {
+              |          "type": "uint",
+              |          "value": 1
+              |        }
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse nested tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args
@@ -966,23 +982,25 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeTupleWithArrayElements() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "value": [
-            |        {
-            |          "type": "string[]",
-            |          "value": ["test", "another"]
-            |        },
-            |        {
-            |          "type": "uint[]",
-            |          "value": [0, 1, 2]
-            |        }
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "value": [
+              |        {
+              |          "type": "string[]",
+              |          "value": ["test", "another"]
+              |        },
+              |        {
+              |          "type": "uint[]",
+              |          "value": [0, 1, 2]
+              |        }
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse tuple with array elements") {
             val result = objectMapper.readValue(json, Result::class.java).args
@@ -1005,35 +1023,37 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeTupleArray() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple[]",
-            |      "value": [
-            |        [
-            |          {
-            |            "type": "string",
-            |            "value": "tuple1"
-            |          },
-            |          {
-            |            "type": "uint",
-            |            "value": 0
-            |          }
-            |        ],
-            |        [
-            |          {
-            |            "type": "string",
-            |            "value": "tuple2"
-            |          },
-            |          {
-            |            "type": "uint",
-            |            "value": 1
-            |          }
-            |        ]
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple[]",
+              |      "value": [
+              |        [
+              |          {
+              |            "type": "string",
+              |            "value": "tuple1"
+              |          },
+              |          {
+              |            "type": "uint",
+              |            "value": 0
+              |          }
+              |        ],
+              |        [
+              |          {
+              |            "type": "string",
+              |            "value": "tuple2"
+              |          },
+              |          {
+              |            "type": "uint",
+              |            "value": 1
+              |          }
+              |        ]
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse tuple array") {
             val result = objectMapper.readValue(json, Result::class.java).args
@@ -1057,91 +1077,93 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeserializeArrayOfNestedTuplesWithArrays() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple[]",
-            |      "value": [
-            |        [
-            |          {
-            |            "type": "string[][1]",
-            |            "value": [["test1"]]
-            |          },
-            |          {
-            |            "type": "tuple[]",
-            |            "value": [
-            |              [
-            |                {
-            |                  "type": "address[]",
-            |                  "value": ["0x0"]
-            |                },
-            |                {
-            |                  "type": "tuple",
-            |                  "value": [
-            |                    {
-            |                      "type": "int",
-            |                      "value": 2
-            |                    }
-            |                  ]
-            |                },
-            |                {
-            |                  "type": "bool",
-            |                  "value": true
-            |                },
-            |                {
-            |                  "type": "tuple[]",
-            |                  "value": []
-            |                }
-            |              ]
-            |            ]
-            |          },
-            |          {
-            |            "type": "uint",
-            |            "value": 1
-            |          }
-            |        ],
-            |        [
-            |          {
-            |            "type": "string[][1]",
-            |            "value": [["test2"]]
-            |          },
-            |          {
-            |            "type": "tuple[]",
-            |            "value": [
-            |              [
-            |                {
-            |                  "type": "address[]",
-            |                  "value": ["0x1"]
-            |                },
-            |                {
-            |                  "type": "tuple",
-            |                  "value": [
-            |                    {
-            |                      "type": "int",
-            |                      "value": 0
-            |                    }
-            |                  ]
-            |                },
-            |                {
-            |                  "type": "bool",
-            |                  "value": false
-            |                },
-            |                {
-            |                  "type": "tuple[]",
-            |                  "value": []
-            |                }
-            |              ]
-            |            ]
-            |          },
-            |          {
-            |            "type": "uint",
-            |            "value": 10
-            |          }
-            |        ]
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple[]",
+              |      "value": [
+              |        [
+              |          {
+              |            "type": "string[][1]",
+              |            "value": [["test1"]]
+              |          },
+              |          {
+              |            "type": "tuple[]",
+              |            "value": [
+              |              [
+              |                {
+              |                  "type": "address[]",
+              |                  "value": ["0x0"]
+              |                },
+              |                {
+              |                  "type": "tuple",
+              |                  "value": [
+              |                    {
+              |                      "type": "int",
+              |                      "value": 2
+              |                    }
+              |                  ]
+              |                },
+              |                {
+              |                  "type": "bool",
+              |                  "value": true
+              |                },
+              |                {
+              |                  "type": "tuple[]",
+              |                  "value": []
+              |                }
+              |              ]
+              |            ]
+              |          },
+              |          {
+              |            "type": "uint",
+              |            "value": 1
+              |          }
+              |        ],
+              |        [
+              |          {
+              |            "type": "string[][1]",
+              |            "value": [["test2"]]
+              |          },
+              |          {
+              |            "type": "tuple[]",
+              |            "value": [
+              |              [
+              |                {
+              |                  "type": "address[]",
+              |                  "value": ["0x1"]
+              |                },
+              |                {
+              |                  "type": "tuple",
+              |                  "value": [
+              |                    {
+              |                      "type": "int",
+              |                      "value": 0
+              |                    }
+              |                  ]
+              |                },
+              |                {
+              |                  "type": "bool",
+              |                  "value": false
+              |                },
+              |                {
+              |                  "type": "tuple[]",
+              |                  "value": []
+              |                }
+              |              ]
+              |            ]
+              |          },
+              |          {
+              |            "type": "uint",
+              |            "value": 10
+              |          }
+              |        ]
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("must correctly parse array of nested tuples with arrays") {
             val result = objectMapper.readValue(json, Result::class.java).args
@@ -1216,10 +1238,12 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
     @Test
     fun mustCorrectlyGetTypeHierarchy() {
         val deserializer = FunctionArgumentJsonDeserializer()
-        val simpleJson = """{
-            |  "type": "string",
-            |  "value": "test"
-            |}""".trimMargin()
+        val simpleJson =
+            """{
+              |  "type": "string",
+              |  "value": "test"
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for simple JSON") {
             val tree = objectMapper.readTree(simpleJson)
@@ -1228,10 +1252,12 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("string")
         }
 
-        val arrayJson = """{
-            |  "type": "string[]",
-            |  "value": ["test"]
-            |}""".trimMargin()
+        val arrayJson =
+            """{
+              |  "type": "string[]",
+              |  "value": ["test"]
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for array JSON") {
             val tree = objectMapper.readTree(arrayJson)
@@ -1240,10 +1266,12 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("string[]")
         }
 
-        val emptyArrayJson = """{
-            |  "type": "string[0]",
-            |  "value": []
-            |}""".trimMargin()
+        val emptyArrayJson =
+            """{
+              |  "type": "string[0]",
+              |  "value": []
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for array JSON") {
             val tree = objectMapper.readTree(emptyArrayJson)
@@ -1252,10 +1280,12 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("string[0]")
         }
 
-        val nestedArrayJson = """{
-            |  "type": "string[1][1][]",
-            |  "value": [[["test"]]]
-            |}""".trimMargin()
+        val nestedArrayJson =
+            """{
+              |  "type": "string[1][1][]",
+              |  "value": [[["test"]]]
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for nested array JSON") {
             val tree = objectMapper.readTree(nestedArrayJson)
@@ -1264,19 +1294,21 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("string[1][1][]")
         }
 
-        val tupleJson = """{
-            |  "type": "tuple",
-            |  "value": [
-            |    {
-            |      "type": "string",
-            |      "value": "test"
-            |    },
-            |    {
-            |      "type": "uint",
-            |      "value": 1
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val tupleJson =
+            """{
+              |  "type": "tuple",
+              |  "value": [
+              |    {
+              |      "type": "string",
+              |      "value": "test"
+              |    },
+              |    {
+              |      "type": "uint",
+              |      "value": 1
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for tuple JSON") {
             val tree = objectMapper.readTree(tupleJson)
@@ -1285,41 +1317,43 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("tuple(string,uint)")
         }
 
-        val nestedTupleJson = """{
-            |  "type": "tuple",
-            |  "value": [
-            |    {
-            |      "type": "string",
-            |      "value": "test"
-            |    },
-            |    {
-            |      "type": "tuple",
-            |      "value": [
-            |        {
-            |          "type": "address",
-            |          "value": "0x0"
-            |        },
-            |        {
-            |          "type": "tuple",
-            |          "value": [
-            |            {
-            |              "type": "int",
-            |              "value": 2
-            |            }
-            |          ]
-            |        },
-            |        {
-            |          "type": "bool",
-            |          "value": true
-            |        }
-            |      ]
-            |    },
-            |    {
-            |      "type": "uint",
-            |      "value": 1
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val nestedTupleJson =
+            """{
+              |  "type": "tuple",
+              |  "value": [
+              |    {
+              |      "type": "string",
+              |      "value": "test"
+              |    },
+              |    {
+              |      "type": "tuple",
+              |      "value": [
+              |        {
+              |          "type": "address",
+              |          "value": "0x0"
+              |        },
+              |        {
+              |          "type": "tuple",
+              |          "value": [
+              |            {
+              |              "type": "int",
+              |              "value": 2
+              |            }
+              |          ]
+              |        },
+              |        {
+              |          "type": "bool",
+              |          "value": true
+              |        }
+              |      ]
+              |    },
+              |    {
+              |      "type": "uint",
+              |      "value": 1
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for tuple JSON") {
             val tree = objectMapper.readTree(nestedTupleJson)
@@ -1328,10 +1362,12 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("tuple(string,tuple(address,tuple(int),bool),uint)")
         }
 
-        val emptyTupleArrayJson = """{
-            |  "type": "tuple[]",
-            |  "value": []
-            |}""".trimMargin()
+        val emptyTupleArrayJson =
+            """{
+              |  "type": "tuple[]",
+              |  "value": []
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for empty tuple array JSON") {
             val tree = objectMapper.readTree(emptyTupleArrayJson)
@@ -1340,10 +1376,12 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("tuple(*)[]")
         }
 
-        val emptyNestedTupleArrayJson = """{
-            |  "type": "tuple[][0][]",
-            |  "value": [[[]]]
-            |}""".trimMargin()
+        val emptyNestedTupleArrayJson =
+            """{
+              |  "type": "tuple[][0][]",
+              |  "value": [[[]]]
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for nested empty tuple array JSON") {
             val tree = objectMapper.readTree(emptyNestedTupleArrayJson)
@@ -1352,21 +1390,23 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("tuple(*)[][0][]")
         }
 
-        val tupleArrayJson = """{
-            |  "type": "tuple[]",
-            |  "value": [
-            |    [
-            |      {
-            |        "type": "string",
-            |        "value": "test"
-            |      },
-            |      {
-            |        "type": "uint",
-            |        "value": 1
-            |      }
-            |    ]
-            |  ]
-            |}""".trimMargin()
+        val tupleArrayJson =
+            """{
+              |  "type": "tuple[]",
+              |  "value": [
+              |    [
+              |      {
+              |        "type": "string",
+              |        "value": "test"
+              |      },
+              |      {
+              |        "type": "uint",
+              |        "value": 1
+              |      }
+              |    ]
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for tuple array JSON") {
             val tree = objectMapper.readTree(tupleArrayJson)
@@ -1375,25 +1415,27 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("tuple(string,uint)[]")
         }
 
-        val nestedTupleArrayJson = """{
-            |  "type": "tuple[1][1][]",
-            |  "value": [
-            |    [
-            |      [
-            |        [
-            |          {
-            |            "type": "string",
-            |            "value": "test"
-            |          },
-            |          {
-            |            "type": "uint",
-            |            "value": 1
-            |          }
-            |        ]
-            |      ]
-            |    ]
-            |  ]
-            |}""".trimMargin()
+        val nestedTupleArrayJson =
+            """{
+              |  "type": "tuple[1][1][]",
+              |  "value": [
+              |    [
+              |      [
+              |        [
+              |          {
+              |            "type": "string",
+              |            "value": "test"
+              |          },
+              |          {
+              |            "type": "uint",
+              |            "value": 1
+              |          }
+              |        ]
+              |      ]
+              |    ]
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for nested tuple array JSON") {
             val tree = objectMapper.readTree(nestedTupleArrayJson)
@@ -1402,49 +1444,51 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .isEqualTo("tuple(string,uint)[1][1][]")
         }
 
-        val nestedTupleWithArraysJson = """{
-            |  "type": "tuple[]",
-            |  "value": [
-            |    [
-            |      {
-            |        "type": "string[][1]",
-            |        "value": [["test"]]
-            |      },
-            |      {
-            |        "type": "tuple[]",
-            |        "value": [
-            |          [
-            |            {
-            |              "type": "address[]",
-            |              "value": ["0x0"]
-            |            },
-            |            {
-            |              "type": "tuple",
-            |              "value": [
-            |                {
-            |                  "type": "int",
-            |                  "value": 2
-            |                }
-            |              ]
-            |            },
-            |            {
-            |              "type": "bool",
-            |              "value": true
-            |            },
-            |            {
-            |              "type": "tuple[]",
-            |              "value": []
-            |            }
-            |          ]
-            |        ]
-            |      },
-            |      {
-            |        "type": "uint",
-            |        "value": 1
-            |      }
-            |    ]
-            |  ]
-            |}""".trimMargin()
+        val nestedTupleWithArraysJson =
+            """{
+              |  "type": "tuple[]",
+              |  "value": [
+              |    [
+              |      {
+              |        "type": "string[][1]",
+              |        "value": [["test"]]
+              |      },
+              |      {
+              |        "type": "tuple[]",
+              |        "value": [
+              |          [
+              |            {
+              |              "type": "address[]",
+              |              "value": ["0x0"]
+              |            },
+              |            {
+              |              "type": "tuple",
+              |              "value": [
+              |                {
+              |                  "type": "int",
+              |                  "value": 2
+              |                }
+              |              ]
+              |            },
+              |            {
+              |              "type": "bool",
+              |              "value": true
+              |            },
+              |            {
+              |              "type": "tuple[]",
+              |              "value": []
+              |            }
+              |          ]
+              |        ]
+              |      },
+              |      {
+              |        "type": "uint",
+              |        "value": 1
+              |      }
+              |    ]
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("correct type hierarchy is returned for tuple with arrays JSON") {
             val tree = objectMapper.readTree(nestedTupleWithArraysJson)
@@ -1456,11 +1500,13 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenDeserializedValueIsNotAnObject() {
-        val json = """{
-            |  "args": [
-            |    "invalid-arg"
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    "invalid-arg"
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1474,13 +1520,15 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenTypeIsMissing() {
-        val json = """{
-            |  "args": [
-            |    {
-            |       "value": 123
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |       "value": 123
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1494,13 +1542,15 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenValueIsMissing() {
-        val json = """{
-            |  "args": [
-            |    {
-            |       "type": "address"
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |       "type": "address"
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1514,14 +1564,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForUnknownType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |       "type": "dummy-type",
-            |       "value": 123
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |       "type": "dummy-type",
+              |       "value": 123
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1535,14 +1587,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTextFails() {
-        val json = """{
-            |  "args": [
-            |    {
-            |       "type": "address",
-            |       "value": 123
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |       "type": "address",
+              |       "value": 123
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1556,14 +1610,17 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingBooleanFails() {
-        val json = """{
-            |  "args": [
-            |    {
-            |       "type": "bool",
-            |       "value": 123
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |       "type": "bool",
+              |       "value": 123
+              |    }
+              |  ]
+              |
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1577,14 +1634,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingBigIntFails() {
-        val json = """{
-            |  "args": [
-            |    {
-            |       "type": "uint",
-            |       "value": {}
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |       "type": "uint",
+              |       "value": {}
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1598,14 +1657,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingBytesFails() {
-        val json = """{
-            |  "args": [
-            |    {
-            |       "type": "bytes",
-            |       "value": "not-an-array"
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |       "type": "bytes",
+              |       "value": "not-an-array"
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1619,14 +1680,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingBytesHaveWrongLength() {
-        val json = """{
-            |  "args": [
-            |    {
-            |       "type": "bytes1",
-            |       "value": [1, 2]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |       "type": "bytes1",
+              |       "value": [1, 2]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1640,14 +1703,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseForUnknownArrayType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "dummy-type[]",
-            |      "value": []
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "dummy-type[]",
+              |      "value": []
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1661,14 +1726,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenArrayValueIsNotAnArray() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "uint[]",
-            |      "value": false
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "uint[]",
+              |      "value": false
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1682,14 +1749,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenArrayHasInconsistentElements() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "uint[]",
-            |      "value": [1, false]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "uint[]",
+              |      "value": [1, false]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1703,14 +1772,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenSizedArrayHasInvalidNumberOfElements() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "uint[2]",
-            |      "value": [1]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "uint[2]",
+              |      "value": [1]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1724,14 +1795,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingEmptyTuple() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "value": []
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "value": []
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1745,14 +1818,16 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleWithNonArrayValue() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "value": "non-an-array"
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "value": "non-an-array"
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1766,18 +1841,20 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleWithMissingElementType() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "value": [
-            |        {
-            |          "value": "missing-type"
-            |        }
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "value": [
+              |        {
+              |          "value": "missing-type"
+              |        }
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1791,18 +1868,20 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleWithMissingElementValue() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple",
-            |      "value": [
-            |        {
-            |          "type": "missing-value"
-            |        }
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple",
+              |      "value": [
+              |        {
+              |          "type": "missing-value"
+              |        }
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1816,31 +1895,33 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleArrayWithMismatchingTuples() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple[]",
-            |      "value": [
-            |        [
-            |          {
-            |            "type": "string",
-            |            "value": "tuple1"
-            |          },
-            |          {
-            |            "type": "uint",
-            |            "value": 0
-            |          }
-            |        ],
-            |        [
-            |          {
-            |            "type": "string",
-            |            "value": "tuple2"
-            |          }
-            |        ]
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple[]",
+              |      "value": [
+              |        [
+              |          {
+              |            "type": "string",
+              |            "value": "tuple1"
+              |          },
+              |          {
+              |            "type": "uint",
+              |            "value": 0
+              |          }
+              |        ],
+              |        [
+              |          {
+              |            "type": "string",
+              |            "value": "tuple2"
+              |          }
+              |        ]
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {
@@ -1854,98 +1935,100 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
 
     @Test
     fun mustThrowJsonMappingExceptionWithJsonParseExceptionCauseWhenParsingTupleArrayWithMismatchingNestedTuples() {
-        val json = """{
-            |  "args": [
-            |    {
-            |      "type": "tuple[]",
-            |      "value": [
-            |        [
-            |          {
-            |            "type": "string[][1]",
-            |            "value": [["test1"]]
-            |          },
-            |          {
-            |            "type": "tuple[]",
-            |            "value": [
-            |              [
-            |                {
-            |                  "type": "address[]",
-            |                  "value": ["0x0"]
-            |                },
-            |                {
-            |                  "type": "tuple",
-            |                  "value": [
-            |                    {
-            |                      "type": "int",
-            |                      "value": 2
-            |                    }
-            |                  ]
-            |                },
-            |                {
-            |                  "type": "bool",
-            |                  "value": true
-            |                },
-            |                {
-            |                  "type": "tuple[]",
-            |                  "value": []
-            |                }
-            |              ]
-            |            ]
-            |          },
-            |          {
-            |            "type": "uint",
-            |            "value": 1
-            |          }
-            |        ],
-            |        [
-            |          {
-            |            "type": "string[][1]",
-            |            "value": [["test2"]]
-            |          },
-            |          {
-            |            "type": "tuple[]",
-            |            "value": [
-            |              [
-            |                {
-            |                  "type": "address[]",
-            |                  "value": ["0x1"]
-            |                },
-            |                {
-            |                  "type": "tuple",
-            |                  "value": [
-            |                    {
-            |                      "type": "int",
-            |                      "value": 0
-            |                    }
-            |                  ]
-            |                },
-            |                {
-            |                  "type": "bool",
-            |                  "value": false
-            |                },
-            |                {
-            |                  "type": "tuple[]",
-            |                  "value": [
-            |                    [
-            |                      {
-            |                        "type": "string",
-            |                        "value": "non-matching"
-            |                      }
-            |                    ]
-            |                  ]
-            |                }
-            |              ]
-            |            ]
-            |          },
-            |          {
-            |            "type": "uint",
-            |            "value": 10
-            |          }
-            |        ]
-            |      ]
-            |    }
-            |  ]
-            |}""".trimMargin()
+        val json =
+            """{
+              |  "args": [
+              |    {
+              |      "type": "tuple[]",
+              |      "value": [
+              |        [
+              |          {
+              |            "type": "string[][1]",
+              |            "value": [["test1"]]
+              |          },
+              |          {
+              |            "type": "tuple[]",
+              |            "value": [
+              |              [
+              |                {
+              |                  "type": "address[]",
+              |                  "value": ["0x0"]
+              |                },
+              |                {
+              |                  "type": "tuple",
+              |                  "value": [
+              |                    {
+              |                      "type": "int",
+              |                      "value": 2
+              |                    }
+              |                  ]
+              |                },
+              |                {
+              |                  "type": "bool",
+              |                  "value": true
+              |                },
+              |                {
+              |                  "type": "tuple[]",
+              |                  "value": []
+              |                }
+              |              ]
+              |            ]
+              |          },
+              |          {
+              |            "type": "uint",
+              |            "value": 1
+              |          }
+              |        ],
+              |        [
+              |          {
+              |            "type": "string[][1]",
+              |            "value": [["test2"]]
+              |          },
+              |          {
+              |            "type": "tuple[]",
+              |            "value": [
+              |              [
+              |                {
+              |                  "type": "address[]",
+              |                  "value": ["0x1"]
+              |                },
+              |                {
+              |                  "type": "tuple",
+              |                  "value": [
+              |                    {
+              |                      "type": "int",
+              |                      "value": 0
+              |                    }
+              |                  ]
+              |                },
+              |                {
+              |                  "type": "bool",
+              |                  "value": false
+              |                },
+              |                {
+              |                  "type": "tuple[]",
+              |                  "value": [
+              |                    [
+              |                      {
+              |                        "type": "string",
+              |                        "value": "non-matching"
+              |                      }
+              |                    ]
+              |                  ]
+              |                }
+              |              ]
+              |            ]
+              |          },
+              |          {
+              |            "type": "uint",
+              |            "value": 10
+              |          }
+              |        ]
+              |      ]
+              |    }
+              |  ]
+              |}
+            """.trimMargin()
 
         verify("JsonMappingException is thrown") {
             val ex = assertThrows<JsonMappingException>(message) {

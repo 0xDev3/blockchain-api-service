@@ -18,7 +18,6 @@ import com.ampnet.blockchainapiservice.security.WithMockUser
 import com.ampnet.blockchainapiservice.util.AssetType
 import com.ampnet.blockchainapiservice.util.Balance
 import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.ampnet.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -149,7 +148,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                                     walletAddress = WALLET_ADDRESS,
                                     itemName = ITEM_NAME,
                                     assetAmount = ASSET_AMOUNT,
-                                    createdAt = UtcDateTime(response.items[0].createdAt)
+                                    createdAt = storedTemplate.items.value[0].createdAt
                                 )
                             )
                         ),
@@ -157,13 +156,17 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         tokenAddress = TOKEN_ADDRESS,
                         chainId = CHAIN_ID,
                         userId = OWNER_ID,
-                        createdAt = UtcDateTime(response.createdAt),
+                        createdAt = storedTemplate.createdAt,
                         updatedAt = null
                     )
                 )
 
             assertThat(storedTemplate.createdAt.value)
+                .isCloseTo(response.createdAt, WITHIN_TIME_TOLERANCE)
+            assertThat(storedTemplate.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(storedTemplate.items.value[0].createdAt.value)
+                .isCloseTo(response.items[0].createdAt, WITHIN_TIME_TOLERANCE)
             assertThat(storedTemplate.items.value[0].createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
@@ -248,10 +251,12 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                         templateName = newTemplateName,
                         tokenAddress = null,
                         chainId = newChainId,
-                        updatedAt = response.updatedAt?.let { UtcDateTime(it) }
+                        updatedAt = storedTemplate.updatedAt
                     )
                 )
 
+            assertThat(storedTemplate.updatedAt?.value)
+                .isCloseTo(response.updatedAt, WITHIN_TIME_TOLERANCE)
             assertThat(storedTemplate.updatedAt?.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
@@ -641,16 +646,20 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                                     walletAddress = newWalletAddress,
                                     itemName = newItemName,
                                     assetAmount = newAmount,
-                                    createdAt = UtcDateTime(response.items[1].createdAt)
+                                    createdAt = storedTemplate.items.value[1].createdAt
                                 )
                             )
                         ),
-                        updatedAt = response.updatedAt?.let { UtcDateTime(it) }
+                        updatedAt = storedTemplate.updatedAt
                     )
                 )
 
             assertThat(storedTemplate.updatedAt?.value)
+                .isCloseTo(response.updatedAt, WITHIN_TIME_TOLERANCE)
+            assertThat(storedTemplate.updatedAt?.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(storedTemplate.items.value[1].createdAt.value)
+                .isCloseTo(response.items[1].createdAt, WITHIN_TIME_TOLERANCE)
             assertThat(storedTemplate.items.value[1].createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
@@ -835,10 +844,12 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                                 )
                             )
                         ),
-                        updatedAt = response.updatedAt?.let { UtcDateTime(it) }
+                        updatedAt = storedTemplate.updatedAt
                     )
                 )
 
+            assertThat(storedTemplate.updatedAt?.value)
+                .isCloseTo(response.updatedAt, WITHIN_TIME_TOLERANCE)
             assertThat(storedTemplate.updatedAt?.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
@@ -993,10 +1004,12 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     template.copy(
                         items = WithItems(emptyList()),
-                        updatedAt = response.updatedAt?.let { UtcDateTime(it) }
+                        updatedAt = storedTemplate.updatedAt
                     )
                 )
 
+            assertThat(storedTemplate.updatedAt?.value)
+                .isCloseTo(response.updatedAt, WITHIN_TIME_TOLERANCE)
             assertThat(storedTemplate.updatedAt?.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
