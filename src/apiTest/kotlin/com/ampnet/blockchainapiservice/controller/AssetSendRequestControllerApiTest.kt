@@ -1178,7 +1178,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = createResponse.createdAt
+                                createdAt = fetchResponse.requests[0].createdAt
                             )
                         )
                     )
@@ -1300,7 +1300,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = createResponse.createdAt
+                                createdAt = fetchResponse.requests[0].createdAt
                             )
                         )
                     )
@@ -1419,7 +1419,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = createResponse.createdAt
+                                createdAt = fetchResponse.requests[0].createdAt
                             )
                         )
                     )
@@ -1543,7 +1543,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = createResponse.createdAt
+                                createdAt = fetchResponse.requests[0].createdAt
                             )
                         )
                     )
@@ -1662,7 +1662,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = createResponse.createdAt
+                                createdAt = fetchResponse.requests[0].createdAt
                             )
                         )
                     )

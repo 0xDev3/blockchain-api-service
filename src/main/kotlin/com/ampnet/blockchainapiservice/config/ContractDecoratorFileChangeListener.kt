@@ -36,14 +36,14 @@ class ContractDecoratorFileChangeListener(
     private val contractMetadataRepository: ContractMetadataRepository,
     private val objectMapper: ObjectMapper,
     private val contractsDir: Path,
-    private val interfacesDir: Path,
+    private val interfacesDir: Path?,
     private val ignoredDirs: List<String>
 ) : FileChangeListener {
 
     companion object : KLogging()
 
     init {
-        processNestedInterfaces(interfacesDir)
+        interfacesDir?.let { processNestedInterfaces(it, it) }
 
         contractsDir.listDirectoryEntries()
             .filter { it.filterDirs() }
@@ -60,7 +60,7 @@ class ContractDecoratorFileChangeListener(
         val (decoratorChanges, interfaceChanges) = changeSet.partition { it.sourceDirectory.toPath() == contractsDir }
 
         onContractDecoratorChange(decoratorChanges)
-        onContractInterfaceChange(interfaceChanges)
+        interfacesDir?.let { onContractInterfaceChange(it, interfaceChanges) }
     }
 
     private fun onContractDecoratorChange(changeSet: List<ChangedFiles>) {
@@ -81,7 +81,7 @@ class ContractDecoratorFileChangeListener(
         }
     }
 
-    private fun onContractInterfaceChange(changeSet: List<ChangedFiles>) {
+    private fun onContractInterfaceChange(interfacesRootDir: Path, changeSet: List<ChangedFiles>) {
         logger.info { "Detected contract interface changes: $changeSet" }
 
         changeSet.flatMap { it.files }
@@ -94,26 +94,26 @@ class ContractDecoratorFileChangeListener(
                     changedPath
                 }
             }
-            .forEach { processContractInterface(it) }
+            .forEach { processContractInterface(interfacesRootDir, it) }
     }
 
     private fun Path.filterManifestFiles(): Boolean = this.isRegularFile() && this.name.endsWith("manifest.json")
 
     private fun Path.filterDirs(): Boolean = this.isDirectory() && !ignoredDirs.contains(this.name)
 
-    private fun processNestedInterfaces(dir: Path) {
+    private fun processNestedInterfaces(interfacesRootDir: Path, dir: Path) {
         dir.listDirectoryEntries()
             .forEach {
                 if (it.filterManifestFiles()) {
-                    processContractInterface(it)
+                    processContractInterface(interfacesRootDir, it)
                 } else {
-                    processNestedInterfaces(it)
+                    processNestedInterfaces(interfacesRootDir, it)
                 }
             }
     }
 
-    private fun processContractInterface(manifest: Path) {
-        val relativePath = manifest.relativeTo(interfacesDir)
+    private fun processContractInterface(interfacesRootDir: Path, manifest: Path) {
+        val relativePath = manifest.relativeTo(interfacesRootDir)
         val id = InterfaceId(relativePath.toString().removeSuffix("manifest.json").removeSuffix(".").removeSuffix("/"))
         logger.info { "Processing contract interface $id..." }
 
@@ -155,7 +155,7 @@ class ContractDecoratorFileChangeListener(
                     id = id,
                     artifact = artifactJson,
                     manifest = manifestJson,
-                    interfacesProvider = contractInterfacesRepository::getById
+                    interfacesProvider = interfacesDir?.let { contractInterfacesRepository::getById }
                 )
 
                 contractDecoratorRepository.store(decorator)

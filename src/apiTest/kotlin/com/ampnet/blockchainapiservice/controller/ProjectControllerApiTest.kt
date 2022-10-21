@@ -103,7 +103,9 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("project is correctly stored into the database") {
-            assertThat(projectRepository.getById(response.id))
+            val storedProject = projectRepository.getById(response.id)!!
+
+            assertThat(storedProject)
                 .isEqualTo(
                     Project(
                         id = response.id,
@@ -112,9 +114,14 @@ class ProjectControllerApiTest : ControllerTestBase() {
                         baseRedirectUrl = baseRedirectUrl,
                         chainId = chainId,
                         customRpcUrl = customRpcUrl,
-                        createdAt = UtcDateTime(response.createdAt)
+                        createdAt = storedProject.createdAt
                     )
                 )
+
+            assertThat(storedProject.createdAt.value)
+                .isCloseTo(response.createdAt, WITHIN_TIME_TOLERANCE)
+            assertThat(storedProject.createdAt.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -164,9 +171,14 @@ class ProjectControllerApiTest : ControllerTestBase() {
                         baseRedirectUrl = project.baseRedirectUrl.value,
                         chainId = project.chainId.value,
                         customRpcUrl = project.customRpcUrl,
-                        createdAt = project.createdAt.value
+                        createdAt = response.createdAt
                     )
                 )
+
+            assertThat(response.createdAt)
+                .isCloseTo(project.createdAt.value, WITHIN_TIME_TOLERANCE)
+            assertThat(response.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -269,9 +281,14 @@ class ProjectControllerApiTest : ControllerTestBase() {
                         baseRedirectUrl = project.baseRedirectUrl.value,
                         chainId = project.chainId.value,
                         customRpcUrl = project.customRpcUrl,
-                        createdAt = project.createdAt.value
+                        createdAt = response.createdAt
                     )
                 )
+
+            assertThat(response.createdAt)
+                .isCloseTo(project.createdAt.value, WITHIN_TIME_TOLERANCE)
+            assertThat(response.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -386,7 +403,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                                 baseRedirectUrl = project1.baseRedirectUrl.value,
                                 chainId = project1.chainId.value,
                                 customRpcUrl = project1.customRpcUrl,
-                                createdAt = project1.createdAt.value
+                                createdAt = response.projects[0].createdAt
                             ),
                             ProjectResponse(
                                 id = project2.id,
@@ -395,11 +412,20 @@ class ProjectControllerApiTest : ControllerTestBase() {
                                 baseRedirectUrl = project2.baseRedirectUrl.value,
                                 chainId = project2.chainId.value,
                                 customRpcUrl = project2.customRpcUrl,
-                                createdAt = project2.createdAt.value
+                                createdAt = response.projects[1].createdAt
                             )
                         )
                     )
                 )
+
+            assertThat(response.projects[0].createdAt)
+                .isCloseTo(project1.createdAt.value, WITHIN_TIME_TOLERANCE)
+            assertThat(response.projects[0].createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+            assertThat(response.projects[1].createdAt)
+                .isCloseTo(project2.createdAt.value, WITHIN_TIME_TOLERANCE)
+            assertThat(response.projects[1].createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -457,9 +483,14 @@ class ProjectControllerApiTest : ControllerTestBase() {
                         id = apiKey.id,
                         projectId = apiKey.projectId,
                         apiKey = apiKey.apiKey,
-                        createdAt = apiKey.createdAt.value
+                        createdAt = response.createdAt
                     )
                 )
+
+            assertThat(response.createdAt)
+                .isCloseTo(apiKey.createdAt.value, WITHIN_TIME_TOLERANCE)
+            assertThat(response.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
@@ -549,15 +580,22 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("API key is correctly stored into the database") {
-            assertThat(apiKeyRepository.getById(response.id))
+            val apiKey = apiKeyRepository.getById(response.id)!!
+
+            assertThat(apiKey)
                 .isEqualTo(
                     ApiKey(
                         id = response.id,
                         projectId = response.projectId,
                         apiKey = response.apiKey,
-                        createdAt = UtcDateTime(response.createdAt)
+                        createdAt = apiKey.createdAt
                     )
                 )
+
+            assertThat(apiKey.createdAt.value)
+                .isCloseTo(response.createdAt, WITHIN_TIME_TOLERANCE)
+            assertThat(apiKey.createdAt.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 

@@ -17,5 +17,5 @@ interface MultiPaymentTemplateRepository {
     fun getAllByWalletAddress(walletAddress: WalletAddress): List<MultiPaymentTemplate<NoItems>>
     fun addItem(item: MultiPaymentTemplateItem, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>?
     fun updateItem(item: MultiPaymentTemplateItem, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>?
-    fun deleteItem(id: UUID, itemId: UUID, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>?
+    fun deleteItem(templateId: UUID, itemId: UUID, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>?
 }
