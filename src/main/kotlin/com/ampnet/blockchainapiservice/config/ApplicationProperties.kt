@@ -26,6 +26,8 @@ class ApplicationProperties {
     val chainCelo = ChainProperties()
     val chainParaTime = ChainProperties()
     val chainMoonbeam = ChainProperties()
+    val chainPolygonZkEvmTestnet = ChainProperties()
+    val chainCeloAlfajoresTestnet = ChainProperties()
     var infuraId: String = ""
     val contractDecorators = ContractDecoratorProperties()
     val metaPixelProperties = MetaPixelProperties()
