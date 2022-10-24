@@ -7,6 +7,7 @@ on: [ pull_request ]
 
 env:
   JAVA_VERSION: '17'
+  JAVA_DISTRIBUTION: 'adopt'
 
 jobs:
   code-control:
@@ -31,17 +32,18 @@ jobs:
           - 5432:5432
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
       - name: Check Java version
         run: java -version
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Set up Gradle cache
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -75,17 +77,18 @@ jobs:
           - 5432:5432
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up JDK 17
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v2
         with:
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
           java-version: ${{ env.JAVA_VERSION }}
       - name: Check Java version
         run: java -version
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Set up Gradle cache
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: |
             ~/.gradle/caches
@@ -106,7 +109,7 @@ jobs:
       - name: Verify test coverage minimum limit
         run: ./gradlew jacocoTestCoverageVerification
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: build/reports/jacoco/report.xml
