@@ -62,7 +62,7 @@ jib {
     val dockerPassword: String = System.getenv("DOCKER_PASSWORD") ?: "DOCKER_PASSWORD"
 
     to {
-        image = "dev3/${rootProject.name}:$version"
+        image = "ampnet/${rootProject.name}:$version"
         auth {
             username = dockerUsername
             password = dockerPassword
