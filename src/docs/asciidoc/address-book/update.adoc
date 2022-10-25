@@ -16,6 +16,6 @@ include::{snippets}/AddressBookControllerApiTest/mustCorrectlyUpdateAddressBookE
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.AddressBookEntryResponse.adoc[]

@@ -13,4 +13,4 @@ include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyFetchErc20Loc
 include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyFetchErc20LockRequestsByProjectId/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20LockRequestsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.Erc20LockRequestsResponse.adoc[]

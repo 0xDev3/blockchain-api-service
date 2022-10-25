@@ -31,6 +31,6 @@ include::{snippets}/AssetMultiSendRequestControllerApiTest/mustCorrectlyCreateAs
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateAssetMultiSendRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.CreateAssetMultiSendRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetMultiSendRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.AssetMultiSendRequestResponse.adoc[]

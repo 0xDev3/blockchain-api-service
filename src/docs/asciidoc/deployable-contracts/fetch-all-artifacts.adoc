@@ -37,4 +37,4 @@ include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContrac
 include::{snippets}/ContractDecoratorControllerApiTest/mustCorrectlyFetchContractArtifactsWithFilters/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.ArtifactJsonsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.ArtifactJsonsResponse.adoc[]

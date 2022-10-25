@@ -1,4 +1,4 @@
-= AMPnet Blockchain API Service Documentation
+= Dev3 Blockchain API Service Documentation
 Version {version}, {date}
 :doctype: book
 :toc: left
@@ -9,7 +9,7 @@ Version {version}, {date}
 :icons: font
 
 == Introduction
-This document contains generated documentation for `AMPnet blockchain-api-service`. Blockchain API service provides
+This document contains generated documentation for `Dev3 blockchain-api-service`. Blockchain API service provides
 endpoints to verify user wallet ownership as well as endpoints to fetch data from blockchain for verified wallets.
 Source code is available on https://github.com/0xDev3/blockchain-api-service[Github].
 

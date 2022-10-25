@@ -13,4 +13,4 @@ include::{snippets}/MultiPaymentTemplateControllerApiTest/mustCorrectlyFetchMult
 include::{snippets}/MultiPaymentTemplateControllerApiTest/mustCorrectlyFetchMultiPaymentTemplateById/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse.adoc[]
