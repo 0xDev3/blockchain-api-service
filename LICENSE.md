@@ -1,6 +1,6 @@
 The MIT License
 
-Copyright (c) 2018-2022 AMPnet IO d.o.o. https://www.ampnet.io
+Copyright (c) 2018-2022 Dev3 IO d.o.o. https://dev3.sh/
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

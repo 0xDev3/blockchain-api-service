@@ -43,6 +43,6 @@ include::{snippets}/ContractReadonlyFunctionCallControllerApiTest/mustCorrectlyC
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.ReadonlyFunctionCallRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.ReadonlyFunctionCallRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.ReadonlyFunctionCallResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.ReadonlyFunctionCallResponse.adoc[]

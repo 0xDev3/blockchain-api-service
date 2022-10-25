@@ -18,6 +18,6 @@ include::{snippets}/MultiPaymentTemplateControllerApiTest/mustCorrectlyCreateMul
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateMultiPaymentTemplateRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.CreateMultiPaymentTemplateRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse.adoc[]

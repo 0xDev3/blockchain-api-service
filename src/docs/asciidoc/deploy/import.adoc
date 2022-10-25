@@ -24,6 +24,6 @@ include::{snippets}/ImportContractControllerApiTest/mustCorrectlyImportSmartCont
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.ImportContractRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.ImportContractRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse.adoc[]

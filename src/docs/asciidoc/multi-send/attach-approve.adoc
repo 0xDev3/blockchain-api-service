@@ -9,7 +9,7 @@ Only token transfers require an approve transaction, for native asset this step 
 include::{snippets}/AssetMultiSendRequestControllerApiTest/mustCorrectlyAttachApproveTransactionInfo/http-request.adoc[]
 ====
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest.adoc[]
 
 .Response Example
 [%collapsible]

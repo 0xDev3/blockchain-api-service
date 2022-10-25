@@ -13,4 +13,4 @@ include::{snippets}/ProjectControllerApiTest/mustCorrectlyReturnProjectById/http
 include::{snippets}/ProjectControllerApiTest/mustCorrectlyReturnProjectById/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.ProjectResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.ProjectResponse.adoc[]

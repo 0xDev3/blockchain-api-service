@@ -1,0 +1,9 @@
+package dev3.blockchainapiservice.config.validation
+
+object ValidationConstants {
+    const val REQUEST_BODY_MAX_STRING_LENGTH = 256
+    const val REQUEST_BODY_MAX_ARGS_LENGTH = 50
+    const val REQUEST_BODY_MAX_JSON_CHARS = 5_000
+    const val FUNCTION_ARGUMENT_MAX_JSON_CHARS = 1_000
+    const val UINT_256_MAX = "115792089237316195423570985008687907853269984665640564039457584007913129639936" // 2^256
+}

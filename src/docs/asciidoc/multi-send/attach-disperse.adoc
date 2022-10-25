@@ -10,7 +10,7 @@ its info has been attached to the request. For native asset transfers, only disp
 include::{snippets}/AssetMultiSendRequestControllerApiTest/mustCorrectlyAttachDisperseTransactionInfo/http-request.adoc[]
 ====
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest.adoc[]
 
 .Response Example
 [%collapsible]
