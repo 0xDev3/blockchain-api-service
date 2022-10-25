@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.model.request.ReadonlyFunctionCallRequest
-import com.ampnet.blockchainapiservice.util.BlockNumber
-import com.ampnet.blockchainapiservice.util.FunctionArgument
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.model.request.ReadonlyFunctionCallRequest
+import dev3.blockchainapiservice.util.BlockNumber
+import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.util.WalletAddress
 
 data class CreateReadonlyFunctionCallParams(
     val identifier: DeployedContractIdentifier,

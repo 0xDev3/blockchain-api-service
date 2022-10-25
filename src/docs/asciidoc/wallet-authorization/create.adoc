@@ -24,6 +24,6 @@ include::{snippets}/AuthorizationRequestControllerApiTest/mustCorrectlyCreateAut
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateAuthorizationRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.CreateAuthorizationRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.AuthorizationRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.AuthorizationRequestResponse.adoc[]

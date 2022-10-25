@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.util.json
+package dev3.blockchainapiservice.util.json
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.config.JsonConfig
-import com.ampnet.blockchainapiservice.util.FunctionArgument
-import com.ampnet.blockchainapiservice.util.SizedStaticArray
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.config.JsonConfig
+import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.util.SizedStaticArray
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

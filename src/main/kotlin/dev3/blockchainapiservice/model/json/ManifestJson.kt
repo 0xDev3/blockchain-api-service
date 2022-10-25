@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.model.json
+package dev3.blockchainapiservice.model.json
 
-import com.ampnet.blockchainapiservice.util.InterfaceId
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonNaming
+import dev3.blockchainapiservice.util.InterfaceId
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class ManifestJson(

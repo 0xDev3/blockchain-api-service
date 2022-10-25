@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
-import com.ampnet.blockchainapiservice.model.result.ContractMetadata
-import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
+import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
+import dev3.blockchainapiservice.model.result.ContractMetadata
+import dev3.blockchainapiservice.util.ContractId
+import dev3.blockchainapiservice.util.InterfaceId
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL

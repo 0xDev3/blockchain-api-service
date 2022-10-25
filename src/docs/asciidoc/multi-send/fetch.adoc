@@ -25,4 +25,4 @@ include::{snippets}/AssetMultiSendRequestControllerApiTest/mustCorrectlyFetchAss
 include::{snippets}/AssetMultiSendRequestControllerApiTest/mustCorrectlyFetchAssetMultiSendRequestForSomeToken/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetMultiSendRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.AssetMultiSendRequestResponse.adoc[]

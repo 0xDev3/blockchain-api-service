@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.request.CreateContractFunctionCallRequest
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.FunctionArgument
-import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.request.CreateContractFunctionCallRequest
+import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.util.WalletAddress
 
 data class CreateContractFunctionCallRequestParams(
     val identifier: DeployedContractIdentifier,

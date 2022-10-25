@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.model.params.CreateAuthorizationRequestParams
-import com.ampnet.blockchainapiservice.model.result.AuthorizationRequest
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.util.SignedMessage
-import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.ampnet.blockchainapiservice.util.WithStatus
+import dev3.blockchainapiservice.model.params.CreateAuthorizationRequestParams
+import dev3.blockchainapiservice.model.result.AuthorizationRequest
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.util.SignedMessage
+import dev3.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.util.WithStatus
 import java.util.UUID
 
 interface AuthorizationRequestService {

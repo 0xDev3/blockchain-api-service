@@ -1,12 +1,12 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.exception.AliasAlreadyInUseException
-import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.AddressBookTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
-import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.exception.AliasAlreadyInUseException
+import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.tables.AddressBookTable
+import dev3.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
+import dev3.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
+import dev3.blockchainapiservice.model.result.AddressBookEntry
+import dev3.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL

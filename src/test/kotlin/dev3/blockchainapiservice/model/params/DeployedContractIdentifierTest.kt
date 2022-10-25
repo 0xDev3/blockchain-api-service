@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.exception.InvalidRequestBodyException
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.exception.InvalidRequestBodyException
+import dev3.blockchainapiservice.util.ContractAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

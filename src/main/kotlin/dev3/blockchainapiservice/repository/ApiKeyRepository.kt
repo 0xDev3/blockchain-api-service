@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.model.result.ApiKey
+import dev3.blockchainapiservice.model.result.ApiKey
 import java.util.UUID
 
 interface ApiKeyRepository {

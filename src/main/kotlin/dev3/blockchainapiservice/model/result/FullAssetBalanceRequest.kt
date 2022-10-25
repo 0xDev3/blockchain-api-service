@@ -1,15 +1,15 @@
-package com.ampnet.blockchainapiservice.model.result
+package dev3.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.util.AccountBalance
-import com.ampnet.blockchainapiservice.util.BlockNumber
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.SignedMessage
-import com.ampnet.blockchainapiservice.util.Status
-import com.ampnet.blockchainapiservice.util.UtcDateTime
-import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.util.AccountBalance
+import dev3.blockchainapiservice.util.BlockNumber
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.SignedMessage
+import dev3.blockchainapiservice.util.Status
+import dev3.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 data class FullAssetBalanceRequest(

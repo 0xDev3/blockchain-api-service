@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.request.CreateAssetBalanceRequest
-import com.ampnet.blockchainapiservice.util.BlockNumber
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.request.CreateAssetBalanceRequest
+import dev3.blockchainapiservice.util.BlockNumber
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.WalletAddress
 
 data class CreateAssetBalanceRequestParams(
     val redirectUrl: String?,

@@ -10,7 +10,7 @@
     <root level="info">
         <appender-ref ref="STDOUT"/>
     </root>
-    <logger name="com.ampnet" level="debug">
+    <logger name="dev3" level="debug">
         <appender-ref ref="STDOUT"/>
     </logger>
 </configuration>

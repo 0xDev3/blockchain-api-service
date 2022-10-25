@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.security
+package dev3.blockchainapiservice.security
 
-import com.ampnet.blockchainapiservice.testcontainers.HardhatTestContainer
+import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import org.springframework.security.test.context.support.WithSecurityContext
 
 @Retention(value = AnnotationRetention.RUNTIME)

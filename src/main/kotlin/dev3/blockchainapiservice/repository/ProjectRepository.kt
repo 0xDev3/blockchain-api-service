@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
 import java.util.UUID
 
 interface ProjectRepository {

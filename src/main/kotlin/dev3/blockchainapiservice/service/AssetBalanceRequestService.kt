@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
-import com.ampnet.blockchainapiservice.model.result.AssetBalanceRequest
-import com.ampnet.blockchainapiservice.model.result.FullAssetBalanceRequest
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.util.SignedMessage
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
+import dev3.blockchainapiservice.model.result.AssetBalanceRequest
+import dev3.blockchainapiservice.model.result.FullAssetBalanceRequest
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.util.SignedMessage
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface AssetBalanceRequestService {

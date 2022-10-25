@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.security
+package dev3.blockchainapiservice.security
 
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextHolder

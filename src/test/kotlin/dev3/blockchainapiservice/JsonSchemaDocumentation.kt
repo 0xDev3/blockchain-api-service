@@ -1,9 +1,5 @@
-package com.ampnet.blockchainapiservice
+package dev3.blockchainapiservice
 
-import com.ampnet.blockchainapiservice.config.JsonConfig
-import com.ampnet.blockchainapiservice.util.annotation.SchemaAnyOf
-import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
-import com.ampnet.blockchainapiservice.util.annotation.SchemaName
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.NamingBase
@@ -16,6 +12,10 @@ import com.github.victools.jsonschema.generator.OptionPreset
 import com.github.victools.jsonschema.generator.SchemaGenerator
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder
 import com.github.victools.jsonschema.generator.SchemaVersion
+import dev3.blockchainapiservice.config.JsonConfig
+import dev3.blockchainapiservice.util.annotation.SchemaAnyOf
+import dev3.blockchainapiservice.util.annotation.SchemaIgnore
+import dev3.blockchainapiservice.util.annotation.SchemaName
 import java.lang.reflect.Type
 import java.math.BigInteger
 import java.nio.file.Files

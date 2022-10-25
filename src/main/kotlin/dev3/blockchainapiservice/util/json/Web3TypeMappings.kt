@@ -1,16 +1,16 @@
-package com.ampnet.blockchainapiservice.util.json
+package dev3.blockchainapiservice.util.json
 
-import com.ampnet.blockchainapiservice.util.AbiType
-import com.ampnet.blockchainapiservice.util.AddressType
-import com.ampnet.blockchainapiservice.util.BoolType
-import com.ampnet.blockchainapiservice.util.DynamicBytesType
-import com.ampnet.blockchainapiservice.util.IntType
-import com.ampnet.blockchainapiservice.util.StaticBytesType
-import com.ampnet.blockchainapiservice.util.StringType
-import com.ampnet.blockchainapiservice.util.UintType
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.util.AbiType
+import dev3.blockchainapiservice.util.AddressType
+import dev3.blockchainapiservice.util.BoolType
+import dev3.blockchainapiservice.util.DynamicBytesType
+import dev3.blockchainapiservice.util.IntType
+import dev3.blockchainapiservice.util.StaticBytesType
+import dev3.blockchainapiservice.util.StringType
+import dev3.blockchainapiservice.util.UintType
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.DynamicBytes

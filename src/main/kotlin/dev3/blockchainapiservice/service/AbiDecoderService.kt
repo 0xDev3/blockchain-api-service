@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.util.AbiType
+import dev3.blockchainapiservice.util.AbiType
 
 interface AbiDecoderService {
     fun decode(types: List<AbiType>, encodedInput: String): List<Any>

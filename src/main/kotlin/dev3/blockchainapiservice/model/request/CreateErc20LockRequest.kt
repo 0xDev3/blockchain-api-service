@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.model.request
+package dev3.blockchainapiservice.model.request
 
-import com.ampnet.blockchainapiservice.config.validation.MaxJsonNodeChars
-import com.ampnet.blockchainapiservice.config.validation.MaxStringSize
-import com.ampnet.blockchainapiservice.config.validation.ValidEthAddress
-import com.ampnet.blockchainapiservice.config.validation.ValidUint256
-import com.ampnet.blockchainapiservice.model.ScreenConfig
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.config.validation.MaxJsonNodeChars
+import dev3.blockchainapiservice.config.validation.MaxStringSize
+import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.config.validation.ValidUint256
+import dev3.blockchainapiservice.model.ScreenConfig
 import java.math.BigInteger
 import javax.validation.Valid
 import javax.validation.constraints.NotNull

@@ -1,5 +1,5 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.json.ArtifactJson
+import dev3.blockchainapiservice.model.json.ArtifactJson
 
 data class ArtifactJsonsResponse(val artifacts: List<ArtifactJson>)

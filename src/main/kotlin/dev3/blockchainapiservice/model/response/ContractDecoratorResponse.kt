@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.result.ContractConstructor
-import com.ampnet.blockchainapiservice.model.result.ContractDecorator
-import com.ampnet.blockchainapiservice.model.result.ContractEvent
-import com.ampnet.blockchainapiservice.model.result.ContractFunction
+import dev3.blockchainapiservice.model.result.ContractConstructor
+import dev3.blockchainapiservice.model.result.ContractDecorator
+import dev3.blockchainapiservice.model.result.ContractEvent
+import dev3.blockchainapiservice.model.result.ContractFunction
 
 data class ContractDecoratorResponse(
     val id: String,

@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.blockchain.BlockchainService
-import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.params.ParamsFactory
-import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.blockchain.BlockchainService
+import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.params.ParamsFactory
+import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.TransactionHash
 import mu.KLogging
 import org.springframework.stereotype.Service
 

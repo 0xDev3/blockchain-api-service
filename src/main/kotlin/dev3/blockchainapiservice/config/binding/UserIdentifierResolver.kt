@@ -1,12 +1,12 @@
-package com.ampnet.blockchainapiservice.config.binding
+package dev3.blockchainapiservice.config.binding
 
-import com.ampnet.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
-import com.ampnet.blockchainapiservice.exception.BadAuthenticationException
-import com.ampnet.blockchainapiservice.model.result.UserIdentifier
-import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import com.ampnet.blockchainapiservice.repository.UserIdentifierRepository
-import com.ampnet.blockchainapiservice.service.UuidProvider
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
+import dev3.blockchainapiservice.exception.BadAuthenticationException
+import dev3.blockchainapiservice.model.result.UserIdentifier
+import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.repository.UserIdentifierRepository
+import dev3.blockchainapiservice.service.UuidProvider
+import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.core.MethodParameter
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.support.WebDataBinderFactory

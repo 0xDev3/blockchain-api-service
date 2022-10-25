@@ -1,14 +1,14 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.exception.AliasAlreadyInUseException
-import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
-import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
-import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.exception.AliasAlreadyInUseException
+import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
+import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
+import dev3.blockchainapiservice.model.result.AddressBookEntry
+import dev3.blockchainapiservice.testcontainers.SharedTestContainers
+import dev3.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach

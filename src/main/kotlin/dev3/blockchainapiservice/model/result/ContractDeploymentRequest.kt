@@ -1,22 +1,22 @@
-package com.ampnet.blockchainapiservice.model.result
+package dev3.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.ContractBinaryData
-import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.InterfaceId
-import com.ampnet.blockchainapiservice.util.Status
-import com.ampnet.blockchainapiservice.util.TransactionData
-import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.UtcDateTime
-import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.ampnet.blockchainapiservice.util.WithTransactionData
-import com.ampnet.blockchainapiservice.util.ZeroAddress
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.ContractBinaryData
+import dev3.blockchainapiservice.util.ContractId
+import dev3.blockchainapiservice.util.ContractTag
+import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.util.Status
+import dev3.blockchainapiservice.util.TransactionData
+import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.util.WithTransactionData
+import dev3.blockchainapiservice.util.ZeroAddress
 import java.util.UUID
 
 data class ContractDeploymentRequest(

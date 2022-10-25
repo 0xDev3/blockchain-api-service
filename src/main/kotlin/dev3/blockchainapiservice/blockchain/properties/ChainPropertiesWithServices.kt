@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.blockchain.properties
+package dev3.blockchainapiservice.blockchain.properties
 
 import org.web3j.protocol.Web3j
 import java.math.BigInteger

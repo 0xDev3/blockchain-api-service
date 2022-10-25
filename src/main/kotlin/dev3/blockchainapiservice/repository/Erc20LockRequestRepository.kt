@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.model.params.StoreErc20LockRequestParams
-import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
-import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.model.params.StoreErc20LockRequestParams
+import dev3.blockchainapiservice.model.result.Erc20LockRequest
+import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface Erc20LockRequestRepository {

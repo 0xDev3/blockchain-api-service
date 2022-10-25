@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.model.request
+package dev3.blockchainapiservice.model.request
 
-import com.ampnet.blockchainapiservice.config.validation.MaxStringSize
-import com.ampnet.blockchainapiservice.config.validation.ValidEthAddress
-import com.ampnet.blockchainapiservice.exception.MissingTokenAddressException
-import com.ampnet.blockchainapiservice.exception.TokenAddressNotAllowedException
-import com.ampnet.blockchainapiservice.util.AssetType
+import dev3.blockchainapiservice.config.validation.MaxStringSize
+import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.exception.MissingTokenAddressException
+import dev3.blockchainapiservice.exception.TokenAddressNotAllowedException
+import dev3.blockchainapiservice.util.AssetType
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 

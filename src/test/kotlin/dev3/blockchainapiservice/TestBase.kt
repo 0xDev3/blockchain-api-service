@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice
+package dev3.blockchainapiservice
 
 import org.assertj.core.api.Assert
 import org.assertj.core.api.Assertions.within

@@ -1,15 +1,15 @@
-package com.ampnet.blockchainapiservice.model.request
+package dev3.blockchainapiservice.model.request
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.config.validation.ValidationConstants
-import com.ampnet.blockchainapiservice.config.validation.ValidationConstants.FUNCTION_ARGUMENT_MAX_JSON_CHARS
-import com.ampnet.blockchainapiservice.model.params.OutputParameter
-import com.ampnet.blockchainapiservice.util.BoolType
-import com.ampnet.blockchainapiservice.util.FunctionArgument
-import com.ampnet.blockchainapiservice.util.JsonNodeConverter
-import com.ampnet.blockchainapiservice.util.UintType
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.config.validation.ValidationConstants
+import dev3.blockchainapiservice.config.validation.ValidationConstants.FUNCTION_ARGUMENT_MAX_JSON_CHARS
+import dev3.blockchainapiservice.model.params.OutputParameter
+import dev3.blockchainapiservice.util.BoolType
+import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.util.JsonNodeConverter
+import dev3.blockchainapiservice.util.UintType
+import dev3.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.JSON
 import org.junit.jupiter.api.AfterAll

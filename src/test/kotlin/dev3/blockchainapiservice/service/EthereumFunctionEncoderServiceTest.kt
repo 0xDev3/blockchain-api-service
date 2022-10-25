@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.FunctionArgument
-import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigInteger

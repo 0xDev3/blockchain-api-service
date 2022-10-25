@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
-import com.ampnet.blockchainapiservice.model.result.UserIdentifier
-import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
+import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
+import dev3.blockchainapiservice.model.result.UserIdentifier
+import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL

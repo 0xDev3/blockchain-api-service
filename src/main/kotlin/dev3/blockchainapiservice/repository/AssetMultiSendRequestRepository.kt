@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
-import com.ampnet.blockchainapiservice.model.result.AssetMultiSendRequest
-import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
+import dev3.blockchainapiservice.model.result.AssetMultiSendRequest
+import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface AssetMultiSendRequestRepository {

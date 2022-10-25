@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.util.BaseUrl
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.BaseUrl
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
 
 data class CreateProjectParams(
     val issuerContractAddress: ContractAddress,

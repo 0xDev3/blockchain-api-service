@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.controller
+package dev3.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestResponse
-import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
-import com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse
-import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
+import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.model.response.InfoMarkdownsResponse
+import dev3.blockchainapiservice.repository.ContractInterfacesRepository
+import dev3.blockchainapiservice.util.InterfaceId
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated

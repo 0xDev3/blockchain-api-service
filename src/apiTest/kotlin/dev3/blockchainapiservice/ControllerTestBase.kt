@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice
+package dev3.blockchainapiservice
 
-import com.ampnet.blockchainapiservice.TestBase.Companion.VerifyMessage
-import com.ampnet.blockchainapiservice.exception.ErrorCode
-import com.ampnet.blockchainapiservice.exception.ErrorResponse
-import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import dev3.blockchainapiservice.TestBase.Companion.VerifyMessage
+import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.exception.ErrorResponse
+import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance

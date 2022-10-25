@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.model.json.EventDecorator
-import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
-import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
-import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.model.json.EventDecorator
+import dev3.blockchainapiservice.model.json.FunctionDecorator
+import dev3.blockchainapiservice.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

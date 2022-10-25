@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.config.validation.MaxJsonNodeChars
-import com.ampnet.blockchainapiservice.config.validation.ValidationConstants
-import com.ampnet.blockchainapiservice.util.AbiType
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.ampnet.blockchainapiservice.util.annotation.SchemaAnyOf
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.config.validation.MaxJsonNodeChars
+import dev3.blockchainapiservice.config.validation.ValidationConstants
+import dev3.blockchainapiservice.util.AbiType
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.util.annotation.SchemaAnyOf
 
 data class ExecuteReadonlyFunctionCallParams(
     val contractAddress: ContractAddress,

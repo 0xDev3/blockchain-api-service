@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
-import com.ampnet.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
-import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
+import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
+import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface ContractDeploymentRequestRepository {

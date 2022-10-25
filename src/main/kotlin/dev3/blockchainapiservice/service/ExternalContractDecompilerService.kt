@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.config.ApplicationProperties
-import com.ampnet.blockchainapiservice.exception.CannotDecompileContractBinaryException
-import com.ampnet.blockchainapiservice.exception.ContractDecompilationTemporarilyUnavailableException
-import com.ampnet.blockchainapiservice.model.json.DecompiledContractJson
-import com.ampnet.blockchainapiservice.util.ContractBinaryData
+import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.exception.CannotDecompileContractBinaryException
+import dev3.blockchainapiservice.exception.ContractDecompilationTemporarilyUnavailableException
+import dev3.blockchainapiservice.model.json.DecompiledContractJson
+import dev3.blockchainapiservice.util.ContractBinaryData
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpClientErrorException.BadRequest
 import org.springframework.web.client.RestClientException

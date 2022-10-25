@@ -1,15 +1,15 @@
-package com.ampnet.blockchainapiservice.controller
+package dev3.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
-import com.ampnet.blockchainapiservice.model.params.CreateErc20LockRequestParams
-import com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest
-import com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest
-import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestResponse
-import com.ampnet.blockchainapiservice.model.response.Erc20LockRequestsResponse
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.service.Erc20LockRequestService
-import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.model.params.CreateErc20LockRequestParams
+import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
+import dev3.blockchainapiservice.model.request.CreateErc20LockRequest
+import dev3.blockchainapiservice.model.response.Erc20LockRequestResponse
+import dev3.blockchainapiservice.model.response.Erc20LockRequestsResponse
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.service.Erc20LockRequestService
+import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping

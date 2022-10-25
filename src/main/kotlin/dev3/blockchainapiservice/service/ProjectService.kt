@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.model.params.CreateProjectParams
-import com.ampnet.blockchainapiservice.model.result.ApiKey
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.model.result.UserIdentifier
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.model.params.CreateProjectParams
+import dev3.blockchainapiservice.model.result.ApiKey
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.model.result.UserIdentifier
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
 import java.util.UUID
 
 interface ProjectService {

@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.util
+package dev3.blockchainapiservice.util
 
 sealed interface AbiType {
     fun isDynamic(): Boolean

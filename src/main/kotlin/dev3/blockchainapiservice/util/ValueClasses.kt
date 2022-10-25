@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.util
+package dev3.blockchainapiservice.util
 
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Uint

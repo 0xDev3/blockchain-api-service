@@ -17,4 +17,4 @@ include::{snippets}/ContractFunctionCallRequestControllerApiTest/mustCorrectlyFe
 include::{snippets}/ContractFunctionCallRequestControllerApiTest/mustCorrectlyFetchContractFunctionCallRequest/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.ContractFunctionCallRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.ContractFunctionCallRequestResponse.adoc[]

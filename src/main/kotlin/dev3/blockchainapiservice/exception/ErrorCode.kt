@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.exception
+package dev3.blockchainapiservice.exception
 
-import com.ampnet.blockchainapiservice.util.annotation.Description
+import dev3.blockchainapiservice.util.annotation.Description
 
 enum class ErrorCode {
 

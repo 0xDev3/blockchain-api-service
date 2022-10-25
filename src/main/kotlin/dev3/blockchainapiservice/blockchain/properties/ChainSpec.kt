@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.blockchain.properties
+package dev3.blockchainapiservice.blockchain.properties
 
-import com.ampnet.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ChainId
 
 data class ChainSpec(
     val chainId: ChainId,

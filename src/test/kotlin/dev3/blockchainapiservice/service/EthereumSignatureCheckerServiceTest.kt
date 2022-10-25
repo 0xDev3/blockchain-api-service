@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.util.SignedMessage
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.util.SignedMessage
+import dev3.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

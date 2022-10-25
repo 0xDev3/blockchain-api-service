@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.result.AuthorizationRequest
-import com.ampnet.blockchainapiservice.util.Status
-import com.ampnet.blockchainapiservice.util.WithStatus
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.result.AuthorizationRequest
+import dev3.blockchainapiservice.util.Status
+import dev3.blockchainapiservice.util.WithStatus
 import java.time.OffsetDateTime
 import java.util.UUID
 

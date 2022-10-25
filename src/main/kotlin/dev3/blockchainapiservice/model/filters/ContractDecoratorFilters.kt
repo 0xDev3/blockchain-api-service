@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.model.filters
+package dev3.blockchainapiservice.model.filters
 
-import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.util.ContractTag
+import dev3.blockchainapiservice.util.InterfaceId
 
 data class ContractDecoratorFilters(
     val contractTags: OrList<AndList<ContractTag>>,

@@ -15,6 +15,6 @@ include::{snippets}/MultiPaymentTemplateControllerApiTest/mustCorrectlyUpdateIte
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse.adoc[]

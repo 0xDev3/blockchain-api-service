@@ -1,14 +1,14 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.params.CreateProjectParams
-import com.ampnet.blockchainapiservice.model.result.ApiKey
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.model.result.UserIdentifier
-import com.ampnet.blockchainapiservice.repository.ApiKeyRepository
-import com.ampnet.blockchainapiservice.repository.ProjectRepository
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.params.CreateProjectParams
+import dev3.blockchainapiservice.model.result.ApiKey
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.model.result.UserIdentifier
+import dev3.blockchainapiservice.repository.ApiKeyRepository
+import dev3.blockchainapiservice.repository.ProjectRepository
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.Base64

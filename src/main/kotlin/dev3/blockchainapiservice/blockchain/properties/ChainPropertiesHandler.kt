@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.blockchain.properties
+package dev3.blockchainapiservice.blockchain.properties
 
-import com.ampnet.blockchainapiservice.config.ApplicationProperties
-import com.ampnet.blockchainapiservice.config.ChainProperties
-import com.ampnet.blockchainapiservice.exception.UnsupportedChainIdException
-import com.ampnet.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.ChainProperties
+import dev3.blockchainapiservice.exception.UnsupportedChainIdException
+import dev3.blockchainapiservice.util.ChainId
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
 import java.time.Duration

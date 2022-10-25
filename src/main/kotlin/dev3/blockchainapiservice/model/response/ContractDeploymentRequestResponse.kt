@@ -1,16 +1,16 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
-import com.ampnet.blockchainapiservice.util.FunctionArgumentSchema
-import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.Status
-import com.ampnet.blockchainapiservice.util.WithTransactionData
-import com.ampnet.blockchainapiservice.util.ZeroAddress
-import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
-import com.ampnet.blockchainapiservice.util.annotation.SchemaName
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.util.FunctionArgumentSchema
+import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.Status
+import dev3.blockchainapiservice.util.WithTransactionData
+import dev3.blockchainapiservice.util.ZeroAddress
+import dev3.blockchainapiservice.util.annotation.SchemaIgnore
+import dev3.blockchainapiservice.util.annotation.SchemaName
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import java.util.UUID

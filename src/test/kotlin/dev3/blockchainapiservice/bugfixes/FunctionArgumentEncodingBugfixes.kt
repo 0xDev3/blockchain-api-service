@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.bugfixes
+package dev3.blockchainapiservice.bugfixes
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.config.JsonConfig
-import com.ampnet.blockchainapiservice.service.EthereumFunctionEncoderService
-import com.ampnet.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.config.JsonConfig
+import dev3.blockchainapiservice.service.EthereumFunctionEncoderService
+import dev3.blockchainapiservice.util.FunctionArgument
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

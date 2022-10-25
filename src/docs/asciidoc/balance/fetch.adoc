@@ -19,4 +19,4 @@ include::{snippets}/AssetBalanceRequestControllerApiTest/mustCorrectlyFetchAsset
 include::{snippets}/AssetBalanceRequestControllerApiTest/mustCorrectlyFetchAssetBalanceRequestForSomeToken/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetBalanceRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.AssetBalanceRequestResponse.adoc[]

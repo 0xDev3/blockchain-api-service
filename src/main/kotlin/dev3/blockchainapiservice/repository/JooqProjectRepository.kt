@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.exception.DuplicateIssuerContractAddressException
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ProjectTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.exception.DuplicateIssuerContractAddressException
+import dev3.blockchainapiservice.generated.jooq.tables.ProjectTable
+import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL

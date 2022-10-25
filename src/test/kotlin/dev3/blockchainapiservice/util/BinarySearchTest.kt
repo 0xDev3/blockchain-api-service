@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.util
+package dev3.blockchainapiservice.util
 
-import com.ampnet.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.TestBase
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigInteger

@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.config.ApplicationProperties
-import com.ampnet.blockchainapiservice.model.result.UserIdentifier
 import com.facebook.ads.sdk.APIContext
 import com.facebook.ads.sdk.APIException
 import com.facebook.ads.sdk.serverside.CustomData
 import com.facebook.ads.sdk.serverside.Event
 import com.facebook.ads.sdk.serverside.EventRequest
 import com.facebook.ads.sdk.serverside.UserData
+import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.model.result.UserIdentifier
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.UUID

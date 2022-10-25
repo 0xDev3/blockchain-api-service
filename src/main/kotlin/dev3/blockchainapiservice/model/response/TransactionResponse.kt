@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.EthereumAddress
-import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.TransactionData
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.EthereumAddress
+import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.TransactionData
+import dev3.blockchainapiservice.util.WalletAddress
 import java.math.BigInteger
 import java.time.OffsetDateTime
 

@@ -1,5 +1,5 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.json.ManifestJson
+import dev3.blockchainapiservice.model.json.ManifestJson
 
 data class ManifestJsonsResponse(val manifests: List<ManifestJson>)

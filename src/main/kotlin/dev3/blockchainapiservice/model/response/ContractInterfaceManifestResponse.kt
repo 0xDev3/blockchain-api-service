@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.json.EventDecorator
-import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
-import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
-import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.model.json.EventDecorator
+import dev3.blockchainapiservice.model.json.FunctionDecorator
+import dev3.blockchainapiservice.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.util.InterfaceId
 
 data class ContractInterfaceManifestResponse(
     val id: String,

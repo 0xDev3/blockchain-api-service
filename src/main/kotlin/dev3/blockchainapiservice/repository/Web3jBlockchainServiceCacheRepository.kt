@@ -1,12 +1,12 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
-import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
-import com.ampnet.blockchainapiservice.util.AccountBalance
-import com.ampnet.blockchainapiservice.util.BlockNumber
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.util.AccountBalance
+import dev3.blockchainapiservice.util.BlockNumber
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface Web3jBlockchainServiceCacheRepository {

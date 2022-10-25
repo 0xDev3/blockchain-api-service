@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.util
+package dev3.blockchainapiservice.util
 
-import com.ampnet.blockchainapiservice.config.validation.MaxJsonNodeChars
-import com.ampnet.blockchainapiservice.config.validation.ValidationConstants
-import com.ampnet.blockchainapiservice.util.annotation.SchemaAnyOf
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.config.validation.MaxJsonNodeChars
+import dev3.blockchainapiservice.config.validation.ValidationConstants
+import dev3.blockchainapiservice.util.annotation.SchemaAnyOf
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.Type

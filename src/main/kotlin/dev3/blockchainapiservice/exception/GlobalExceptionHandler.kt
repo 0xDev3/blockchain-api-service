@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.exception
+package dev3.blockchainapiservice.exception
 
 import mu.KLogging
 import org.springframework.http.HttpStatus

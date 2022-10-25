@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.util
+package dev3.blockchainapiservice.util
 
-import com.ampnet.blockchainapiservice.config.JsonConfig
-import com.ampnet.blockchainapiservice.model.json.ArtifactJson
-import com.ampnet.blockchainapiservice.model.json.ManifestJson
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.config.JsonConfig
+import dev3.blockchainapiservice.model.json.ArtifactJson
+import dev3.blockchainapiservice.model.json.ManifestJson
 import org.jooq.Converter
 import org.jooq.JSON
 import java.math.BigInteger

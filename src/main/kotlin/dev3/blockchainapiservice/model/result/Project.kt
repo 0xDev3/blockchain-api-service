@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.model.result
+package dev3.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.util.BaseUrl
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.BaseUrl
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.UtcDateTime
 import java.util.UUID
 
 data class Project(

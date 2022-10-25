@@ -1,15 +1,15 @@
-package com.ampnet.blockchainapiservice.controller
+package dev3.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.ControllerTestBase
-import com.ampnet.blockchainapiservice.exception.ErrorCode
-import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
-import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
-import com.ampnet.blockchainapiservice.model.json.TypeDecorator
-import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestResponse
-import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
-import com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse
-import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.ControllerTestBase
+import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.model.json.FunctionDecorator
+import dev3.blockchainapiservice.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.model.json.TypeDecorator
+import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
+import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.model.response.InfoMarkdownsResponse
+import dev3.blockchainapiservice.repository.ContractInterfacesRepository
+import dev3.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach

@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice
+package dev3.blockchainapiservice
 
-import com.ampnet.blockchainapiservice.util.JsonNodeConverter
-import com.ampnet.blockchainapiservice.util.UtcDateTime
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ArrayNode
+import dev3.blockchainapiservice.util.JsonNodeConverter
+import dev3.blockchainapiservice.util.UtcDateTime
 import org.jooq.JSON
 import java.time.OffsetDateTime
 

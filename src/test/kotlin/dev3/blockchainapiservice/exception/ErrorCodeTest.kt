@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.exception
+package dev3.blockchainapiservice.exception
 
-import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.util.annotation.Description
+import dev3.blockchainapiservice.JsonSchemaDocumentation
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.util.annotation.Description
 import org.junit.jupiter.api.Test
 import java.nio.file.Files
 import java.nio.file.Paths

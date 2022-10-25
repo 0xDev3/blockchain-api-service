@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.model.result
+package dev3.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.util.ContractId
+import dev3.blockchainapiservice.util.ContractTag
+import dev3.blockchainapiservice.util.InterfaceId
 import java.util.UUID
 
 data class ContractMetadata(

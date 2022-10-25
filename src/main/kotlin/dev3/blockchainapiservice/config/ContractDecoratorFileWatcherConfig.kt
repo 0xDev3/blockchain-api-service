@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.config
+package dev3.blockchainapiservice.config
 
-import com.ampnet.blockchainapiservice.repository.ContractDecoratorRepository
-import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
-import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
-import com.ampnet.blockchainapiservice.service.UuidProvider
 import com.fasterxml.jackson.databind.ObjectMapper
+import dev3.blockchainapiservice.repository.ContractDecoratorRepository
+import dev3.blockchainapiservice.repository.ContractInterfacesRepository
+import dev3.blockchainapiservice.repository.ContractMetadataRepository
+import dev3.blockchainapiservice.service.UuidProvider
 import mu.KLogging
 import org.springframework.boot.devtools.filewatch.FileSystemWatcher
 import org.springframework.context.annotation.Bean

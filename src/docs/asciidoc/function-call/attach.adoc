@@ -8,7 +8,7 @@ hash is attached to the request, any subsequent attempts to attach a new transac
 include::{snippets}/ContractFunctionCallRequestControllerApiTest/mustCorrectlyAttachTransactionInfo/http-request.adoc[]
 ====
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.AttachTransactionInfoRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest.adoc[]
 
 .Response Example
 [%collapsible]

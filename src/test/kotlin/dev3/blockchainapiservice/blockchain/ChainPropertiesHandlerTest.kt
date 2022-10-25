@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.blockchain
+package dev3.blockchainapiservice.blockchain
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.blockchain.properties.Chain
-import com.ampnet.blockchainapiservice.blockchain.properties.ChainPropertiesHandler
-import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
-import com.ampnet.blockchainapiservice.config.ApplicationProperties
-import com.ampnet.blockchainapiservice.exception.ErrorCode
-import com.ampnet.blockchainapiservice.exception.UnsupportedChainIdException
-import com.ampnet.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.blockchain.properties.ChainPropertiesHandler
+import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.exception.UnsupportedChainIdException
+import dev3.blockchainapiservice.util.ChainId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

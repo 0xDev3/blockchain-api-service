@@ -1,15 +1,15 @@
-package com.ampnet.blockchainapiservice.controller
+package dev3.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
-import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
-import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestResponse
-import com.ampnet.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
-import com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse
-import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.JsonSchemaDocumentation
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
+import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.model.response.InfoMarkdownsResponse
+import dev3.blockchainapiservice.repository.ContractInterfacesRepository
+import dev3.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
