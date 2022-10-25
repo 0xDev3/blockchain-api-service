@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.model.result
+package dev3.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.UtcDateTime
 import java.util.UUID
 
 data class ApiKey(

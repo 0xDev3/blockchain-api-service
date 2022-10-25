@@ -1,12 +1,12 @@
-package com.ampnet.blockchainapiservice.model.result
+package dev3.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.EthereumAddress
-import com.ampnet.blockchainapiservice.util.FunctionData
-import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.UtcDateTime
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.EthereumAddress
+import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.WalletAddress
 import java.math.BigInteger
 
 data class BlockchainTransactionInfo(

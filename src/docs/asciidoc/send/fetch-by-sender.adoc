@@ -15,4 +15,4 @@ include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSen
 include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSendRequestsBySenderAddress/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.AssetSendRequestsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.AssetSendRequestsResponse.adoc[]

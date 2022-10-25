@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.model.result
+package dev3.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.util.BlockNumber
-import com.ampnet.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.BlockNumber
+import dev3.blockchainapiservice.util.UtcDateTime
 
 data class ReadonlyFunctionCallResult(
     val blockNumber: BlockNumber,

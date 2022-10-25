@@ -1,10 +1,5 @@
-package com.ampnet.blockchainapiservice.util.json
+package dev3.blockchainapiservice.util.json
 
-import com.ampnet.blockchainapiservice.model.params.OutputParameter
-import com.ampnet.blockchainapiservice.util.AbiType
-import com.ampnet.blockchainapiservice.util.DynamicArrayType
-import com.ampnet.blockchainapiservice.util.StaticArrayType
-import com.ampnet.blockchainapiservice.util.TupleType
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
@@ -12,6 +7,11 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
+import dev3.blockchainapiservice.model.params.OutputParameter
+import dev3.blockchainapiservice.util.AbiType
+import dev3.blockchainapiservice.util.DynamicArrayType
+import dev3.blockchainapiservice.util.StaticArrayType
+import dev3.blockchainapiservice.util.TupleType
 
 typealias TypeResolver = (String) -> AbiType
 

@@ -1,12 +1,12 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.result.Erc20LockRequest
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.Status
-import com.ampnet.blockchainapiservice.util.WithFunctionData
-import com.ampnet.blockchainapiservice.util.WithTransactionData
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.result.Erc20LockRequest
+import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.Status
+import dev3.blockchainapiservice.util.WithFunctionData
+import dev3.blockchainapiservice.util.WithTransactionData
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import java.util.UUID

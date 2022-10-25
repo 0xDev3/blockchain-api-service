@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.util.UtcDateTime
 import java.util.UUID
 
 interface ParamsFactory<P, R> {

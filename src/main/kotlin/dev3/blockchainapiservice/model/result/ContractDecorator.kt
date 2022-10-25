@@ -1,20 +1,20 @@
-package com.ampnet.blockchainapiservice.model.result
+package dev3.blockchainapiservice.model.result
 
-import com.ampnet.blockchainapiservice.exception.ContractDecoratorException
-import com.ampnet.blockchainapiservice.exception.ContractInterfaceNotFoundException
-import com.ampnet.blockchainapiservice.model.json.AbiInputOutput
-import com.ampnet.blockchainapiservice.model.json.AbiObject
-import com.ampnet.blockchainapiservice.model.json.ArtifactJson
-import com.ampnet.blockchainapiservice.model.json.EventDecorator
-import com.ampnet.blockchainapiservice.model.json.FunctionDecorator
-import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJson
-import com.ampnet.blockchainapiservice.model.json.ManifestJson
-import com.ampnet.blockchainapiservice.model.json.OverridableDecorator
-import com.ampnet.blockchainapiservice.model.json.TypeDecorator
-import com.ampnet.blockchainapiservice.util.ContractBinaryData
-import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.exception.ContractDecoratorException
+import dev3.blockchainapiservice.exception.ContractInterfaceNotFoundException
+import dev3.blockchainapiservice.model.json.AbiInputOutput
+import dev3.blockchainapiservice.model.json.AbiObject
+import dev3.blockchainapiservice.model.json.ArtifactJson
+import dev3.blockchainapiservice.model.json.EventDecorator
+import dev3.blockchainapiservice.model.json.FunctionDecorator
+import dev3.blockchainapiservice.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.model.json.ManifestJson
+import dev3.blockchainapiservice.model.json.OverridableDecorator
+import dev3.blockchainapiservice.model.json.TypeDecorator
+import dev3.blockchainapiservice.util.ContractBinaryData
+import dev3.blockchainapiservice.util.ContractId
+import dev3.blockchainapiservice.util.ContractTag
+import dev3.blockchainapiservice.util.InterfaceId
 
 data class ContractDecorator(
     val id: ContractId,

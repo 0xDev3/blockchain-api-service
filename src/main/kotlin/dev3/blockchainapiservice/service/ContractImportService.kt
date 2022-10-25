@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.model.params.ImportContractParams
-import com.ampnet.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.model.params.ImportContractParams
+import dev3.blockchainapiservice.model.result.Project
 import java.util.UUID
 
 interface ContractImportService {

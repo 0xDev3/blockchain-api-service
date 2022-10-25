@@ -1,15 +1,15 @@
-package com.ampnet.blockchainapiservice.controller
+package dev3.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.JsonSchemaDocumentation
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
-import com.ampnet.blockchainapiservice.model.response.AddressBookEntriesResponse
-import com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse
-import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
-import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import com.ampnet.blockchainapiservice.service.AddressBookService
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.JsonSchemaDocumentation
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
+import dev3.blockchainapiservice.model.response.AddressBookEntriesResponse
+import dev3.blockchainapiservice.model.response.AddressBookEntryResponse
+import dev3.blockchainapiservice.model.result.AddressBookEntry
+import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.service.AddressBookService
+import dev3.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.given

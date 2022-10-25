@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.blockchain;
+package dev3.blockchainapiservice.blockchain;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;

@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.request.ImportContractRequest
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.ContractId
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.request.ImportContractRequest
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.ContractId
 
 data class ImportContractParams(
     val alias: String,

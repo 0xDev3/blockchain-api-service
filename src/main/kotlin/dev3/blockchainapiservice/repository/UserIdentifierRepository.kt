@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.generated.jooq.enums.UserIdentifierType
-import com.ampnet.blockchainapiservice.model.result.UserIdentifier
-import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.model.result.UserIdentifier
+import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface UserIdentifierRepository {

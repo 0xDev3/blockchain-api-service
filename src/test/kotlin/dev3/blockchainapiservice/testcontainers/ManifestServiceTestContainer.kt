@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.testcontainers
+package dev3.blockchainapiservice.testcontainers
 
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy

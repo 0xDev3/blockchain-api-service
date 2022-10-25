@@ -21,6 +21,6 @@ include::{snippets}/Erc20LockRequestControllerApiTest/mustCorrectlyCreateErc20Lo
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.CreateErc20LockRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.Erc20LockRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.Erc20LockRequestResponse.adoc[]

@@ -1,16 +1,16 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.UtcDateTime
-import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
-import com.ampnet.blockchainapiservice.model.params.PreStoreContractFunctionCallRequestParams as PreStoreParams
+import dev3.blockchainapiservice.model.params.PreStoreContractFunctionCallRequestParams as PreStoreParams
 
 data class StoreContractFunctionCallRequestParams(
     val id: UUID,

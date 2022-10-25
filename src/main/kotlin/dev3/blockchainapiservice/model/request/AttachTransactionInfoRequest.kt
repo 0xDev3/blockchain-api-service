@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.model.request
+package dev3.blockchainapiservice.model.request
 
-import com.ampnet.blockchainapiservice.config.validation.ValidEthAddress
-import com.ampnet.blockchainapiservice.config.validation.ValidEthTxHash
+import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.config.validation.ValidEthTxHash
 import javax.validation.constraints.NotNull
 
 data class AttachTransactionInfoRequest(

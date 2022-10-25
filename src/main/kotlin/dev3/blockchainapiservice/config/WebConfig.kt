@@ -1,12 +1,12 @@
-package com.ampnet.blockchainapiservice.config
+package dev3.blockchainapiservice.config
 
-import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
-import com.ampnet.blockchainapiservice.config.binding.UserIdentifierResolver
-import com.ampnet.blockchainapiservice.repository.ApiKeyRepository
-import com.ampnet.blockchainapiservice.repository.ProjectRepository
-import com.ampnet.blockchainapiservice.repository.UserIdentifierRepository
-import com.ampnet.blockchainapiservice.service.UuidProvider
 import com.fasterxml.jackson.databind.ObjectMapper
+import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
+import dev3.blockchainapiservice.config.binding.UserIdentifierResolver
+import dev3.blockchainapiservice.repository.ApiKeyRepository
+import dev3.blockchainapiservice.repository.ProjectRepository
+import dev3.blockchainapiservice.repository.UserIdentifierRepository
+import dev3.blockchainapiservice.service.UuidProvider
 import org.springframework.beans.factory.BeanCreationException
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean

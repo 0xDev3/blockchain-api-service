@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
-import com.ampnet.blockchainapiservice.util.WithDeployedContractIdAndAddress
+import dev3.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
+import dev3.blockchainapiservice.util.WithDeployedContractIdAndAddress
 
 interface ContractReadonlyFunctionCallService {
     fun callReadonlyContractFunction(

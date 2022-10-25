@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.controller
+package dev3.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
-import com.ampnet.blockchainapiservice.config.validation.ValidEthAddress
-import com.ampnet.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
-import com.ampnet.blockchainapiservice.model.response.AddressBookEntriesResponse
-import com.ampnet.blockchainapiservice.model.response.AddressBookEntryResponse
-import com.ampnet.blockchainapiservice.model.result.UserIdentifier
-import com.ampnet.blockchainapiservice.service.AddressBookService
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
+import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
+import dev3.blockchainapiservice.model.response.AddressBookEntriesResponse
+import dev3.blockchainapiservice.model.response.AddressBookEntryResponse
+import dev3.blockchainapiservice.model.result.UserIdentifier
+import dev3.blockchainapiservice.service.AddressBookService
+import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping

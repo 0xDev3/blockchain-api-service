@@ -1,15 +1,15 @@
-package com.ampnet.blockchainapiservice.controller
+package dev3.blockchainapiservice.controller
 
-import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
-import com.ampnet.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
-import com.ampnet.blockchainapiservice.model.request.AttachSignedMessageRequest
-import com.ampnet.blockchainapiservice.model.request.CreateAssetBalanceRequest
-import com.ampnet.blockchainapiservice.model.response.AssetBalanceRequestResponse
-import com.ampnet.blockchainapiservice.model.response.AssetBalanceRequestsResponse
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.service.AssetBalanceRequestService
-import com.ampnet.blockchainapiservice.util.SignedMessage
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
+import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
+import dev3.blockchainapiservice.model.request.CreateAssetBalanceRequest
+import dev3.blockchainapiservice.model.response.AssetBalanceRequestResponse
+import dev3.blockchainapiservice.model.response.AssetBalanceRequestsResponse
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.service.AssetBalanceRequestService
+import dev3.blockchainapiservice.util.SignedMessage
+import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping

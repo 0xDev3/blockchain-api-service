@@ -24,6 +24,6 @@ include::{snippets}/ContractDeploymentRequestControllerApiTest/mustCorrectlyCrea
 Schemas:
 
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.CreateContractDeploymentRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.CreateContractDeploymentRequest.adoc[]
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse.adoc[]

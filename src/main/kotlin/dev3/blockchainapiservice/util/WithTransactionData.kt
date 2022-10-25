@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.util
+package dev3.blockchainapiservice.util
 
-import com.ampnet.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import java.math.BigInteger
 
 data class WithTransactionData<T>(val value: T, val status: Status, val transactionData: TransactionData)

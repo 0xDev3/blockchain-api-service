@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.json.InterfaceManifestJsonWithId
-import com.ampnet.blockchainapiservice.model.result.ContractDecorator
-import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
-import com.ampnet.blockchainapiservice.repository.ContractInterfacesRepository
-import com.ampnet.blockchainapiservice.repository.ContractMetadataRepository
-import com.ampnet.blockchainapiservice.repository.ImportedContractDecoratorRepository
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.model.result.ContractDecorator
+import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.repository.ContractInterfacesRepository
+import dev3.blockchainapiservice.repository.ContractMetadataRepository
+import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
+import dev3.blockchainapiservice.util.InterfaceId
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.UUID

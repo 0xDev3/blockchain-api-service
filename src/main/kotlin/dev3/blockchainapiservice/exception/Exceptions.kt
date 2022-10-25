@@ -1,9 +1,9 @@
-package com.ampnet.blockchainapiservice.exception
+package dev3.blockchainapiservice.exception
 
-import com.ampnet.blockchainapiservice.util.ChainId
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.ContractId
+import dev3.blockchainapiservice.util.InterfaceId
 import org.springframework.http.HttpStatus
 import java.util.UUID
 

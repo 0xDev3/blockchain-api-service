@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.wiremock
+package dev3.blockchainapiservice.wiremock
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration

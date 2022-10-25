@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
-import com.ampnet.blockchainapiservice.model.result.ContractMetadata
-import com.ampnet.blockchainapiservice.testcontainers.SharedTestContainers
-import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.ContractTag
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
+import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
+import dev3.blockchainapiservice.model.result.ContractMetadata
+import dev3.blockchainapiservice.testcontainers.SharedTestContainers
+import dev3.blockchainapiservice.util.ContractId
+import dev3.blockchainapiservice.util.ContractTag
+import dev3.blockchainapiservice.util.InterfaceId
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach

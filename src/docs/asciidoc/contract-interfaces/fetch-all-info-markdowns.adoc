@@ -13,4 +13,4 @@ include::{snippets}/ContractInterfacesControllerApiTest/mustCorrectlyFetchContra
 include::{snippets}/ContractInterfacesControllerApiTest/mustCorrectlyFetchContractInterfaceInfoMarkdowns/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.InfoMarkdownsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.InfoMarkdownsResponse.adoc[]

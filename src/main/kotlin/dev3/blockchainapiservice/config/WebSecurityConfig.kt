@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.config
+package dev3.blockchainapiservice.config
 
-import com.ampnet.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import com.ampnet.core.jwt.AuthenticationEntryPointExceptionHandler
 import com.ampnet.core.jwt.filter.JwtAuthenticationFilter
 import com.ampnet.core.jwt.provider.JwtAuthenticationProvider
 import com.fasterxml.jackson.databind.ObjectMapper
+import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -28,34 +28,34 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) {
 
     @Autowired
     fun authBuilder(authBuilder: AuthenticationManagerBuilder, applicationProperties: ApplicationProperties) {
-        val authenticationProvider = JwtAuthenticationProvider(applicationProperties.jwt.publicKey)
-        authBuilder.authenticationProvider(authenticationProvider)
+        authBuilder.authenticationProvider(JwtAuthenticationProvider(applicationProperties.jwt.publicKey))
     }
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("*")
-        configuration.allowedMethods = listOf(
-            HttpMethod.HEAD.name,
-            HttpMethod.GET.name,
-            HttpMethod.POST.name,
-            HttpMethod.PUT.name,
-            HttpMethod.PATCH.name,
-            HttpMethod.OPTIONS.name,
-            HttpMethod.DELETE.name
-        )
-        configuration.allowedHeaders = listOf(
-            HttpHeaders.AUTHORIZATION,
-            HttpHeaders.CONTENT_TYPE,
-            HttpHeaders.CACHE_CONTROL,
-            HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
-            ProjectApiKeyResolver.API_KEY_HEADER
-        )
+        val configuration = CorsConfiguration().apply {
+            allowedOrigins = listOf("*")
+            allowedMethods = listOf(
+                HttpMethod.HEAD.name,
+                HttpMethod.GET.name,
+                HttpMethod.POST.name,
+                HttpMethod.PUT.name,
+                HttpMethod.PATCH.name,
+                HttpMethod.OPTIONS.name,
+                HttpMethod.DELETE.name
+            )
+            allowedHeaders = listOf(
+                HttpHeaders.AUTHORIZATION,
+                HttpHeaders.CONTENT_TYPE,
+                HttpHeaders.CACHE_CONTROL,
+                HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
+                ProjectApiKeyResolver.API_KEY_HEADER
+            )
+        }
 
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", configuration)
-        return source
+        return UrlBasedCorsConfigurationSource().apply {
+            registerCorsConfiguration("/**", configuration)
+        }
     }
 
     @Bean

@@ -8,7 +8,7 @@ message are attached to the request, any subsequent attempts to attach new value
 include::{snippets}/AuthorizationRequestControllerApiTest/mustCorrectlyAttachSignedMessage/http-request.adoc[]
 ====
 .Request Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.request.AttachSignedMessageRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.request.AttachSignedMessageRequest.adoc[]
 
 .Response Example
 [%collapsible]

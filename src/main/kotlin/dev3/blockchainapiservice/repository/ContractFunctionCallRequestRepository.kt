@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
-import com.ampnet.blockchainapiservice.model.params.StoreContractFunctionCallRequestParams
-import com.ampnet.blockchainapiservice.model.result.ContractFunctionCallRequest
-import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
+import dev3.blockchainapiservice.model.params.StoreContractFunctionCallRequestParams
+import dev3.blockchainapiservice.model.result.ContractFunctionCallRequest
+import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface ContractFunctionCallRequestRepository {

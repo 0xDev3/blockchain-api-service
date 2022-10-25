@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.config.validation
+package dev3.blockchainapiservice.config.validation
 
 object ValidationConstants {
     const val REQUEST_BODY_MAX_STRING_LENGTH = 256

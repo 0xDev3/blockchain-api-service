@@ -17,6 +17,6 @@ Content-Type: application/json
 ====
 
 .Error Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.exception.ErrorResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.exception.ErrorResponse.adoc[]
 
-include::{snippets}/com.ampnet.blockchainapiservice.exception.ErrorCode.adoc[]
+include::{snippets}/dev3.blockchainapiservice.exception.ErrorCode.adoc[]

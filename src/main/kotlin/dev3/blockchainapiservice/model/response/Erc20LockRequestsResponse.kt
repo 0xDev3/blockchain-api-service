@@ -1,3 +1,3 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
 data class Erc20LockRequestsResponse(val requests: List<Erc20LockRequestResponse>)

@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.model.result.ContractMetadata
-import com.ampnet.blockchainapiservice.util.ContractId
-import com.ampnet.blockchainapiservice.util.InterfaceId
+import dev3.blockchainapiservice.model.result.ContractMetadata
+import dev3.blockchainapiservice.util.ContractId
+import dev3.blockchainapiservice.util.InterfaceId
 import java.util.UUID
 
 interface ContractMetadataRepository {

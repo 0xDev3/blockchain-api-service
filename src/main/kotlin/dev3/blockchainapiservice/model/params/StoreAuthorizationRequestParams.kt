@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.util.UtcDateTime
-import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 data class StoreAuthorizationRequestParams(

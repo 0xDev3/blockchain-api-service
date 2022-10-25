@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.util.SignedMessage
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.util.SignedMessage
+import dev3.blockchainapiservice.util.WalletAddress
 import org.kethereum.crypto.signedMessageToKey
 import org.kethereum.crypto.toAddress
 import org.kethereum.model.SignatureData

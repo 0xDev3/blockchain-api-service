@@ -53,7 +53,7 @@
         </appender>
     </springProfile>
 
-    <logger name="com.ampnet" level="DEBUG" />
+    <logger name="dev3" level="DEBUG" />
 
     <root level="info">
         <appender-ref ref="CONSOLE"/>

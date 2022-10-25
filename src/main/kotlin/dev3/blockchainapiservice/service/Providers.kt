@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.UtcDateTime
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
 import java.time.OffsetDateTime

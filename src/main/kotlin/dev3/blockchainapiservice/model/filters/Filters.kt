@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.model.filters
+package dev3.blockchainapiservice.model.filters
 
 @JvmInline
 value class AndList<T>(val list: List<T>) {

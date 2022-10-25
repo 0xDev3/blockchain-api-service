@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.ContractAddress
 import java.util.UUID
 
 data class PreStoreContractFunctionCallRequestParams(

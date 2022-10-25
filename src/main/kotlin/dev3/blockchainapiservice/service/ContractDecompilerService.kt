@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.model.json.DecompiledContractJson
-import com.ampnet.blockchainapiservice.util.ContractBinaryData
+import dev3.blockchainapiservice.model.json.DecompiledContractJson
+import dev3.blockchainapiservice.util.ContractBinaryData
 
 interface ContractDecompilerService {
     fun decompile(contractBinary: ContractBinaryData): DecompiledContractJson

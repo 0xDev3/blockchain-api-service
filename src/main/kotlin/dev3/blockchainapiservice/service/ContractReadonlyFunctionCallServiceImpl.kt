@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.blockchain.BlockchainService
-import com.ampnet.blockchainapiservice.blockchain.properties.ChainSpec
-import com.ampnet.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
-import com.ampnet.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
-import com.ampnet.blockchainapiservice.util.BlockName
-import com.ampnet.blockchainapiservice.util.WithDeployedContractIdAndAddress
+import dev3.blockchainapiservice.blockchain.BlockchainService
+import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
+import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
+import dev3.blockchainapiservice.util.BlockName
+import dev3.blockchainapiservice.util.WithDeployedContractIdAndAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 

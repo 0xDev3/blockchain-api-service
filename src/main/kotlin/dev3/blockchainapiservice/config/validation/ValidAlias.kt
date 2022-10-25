@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.config.validation
+package dev3.blockchainapiservice.config.validation
 
 import javax.validation.Constraint
 import javax.validation.Payload

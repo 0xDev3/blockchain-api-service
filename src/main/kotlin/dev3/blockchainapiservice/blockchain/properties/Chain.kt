@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.blockchain.properties
+package dev3.blockchainapiservice.blockchain.properties
 
-import com.ampnet.blockchainapiservice.config.ApplicationProperties
-import com.ampnet.blockchainapiservice.config.ChainProperties
-import com.ampnet.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.ChainProperties
+import dev3.blockchainapiservice.util.ChainId
 
 @Suppress("MagicNumber")
 enum class Chain(

@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.config.validation
+package dev3.blockchainapiservice.config.validation
 
 import com.fasterxml.jackson.databind.JsonNode
 import javax.validation.ConstraintValidator

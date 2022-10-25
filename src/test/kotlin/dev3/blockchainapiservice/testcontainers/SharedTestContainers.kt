@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.testcontainers
+package dev3.blockchainapiservice.testcontainers
 
 object SharedTestContainers {
     val postgresContainer by lazy { PostgresTestContainer() }

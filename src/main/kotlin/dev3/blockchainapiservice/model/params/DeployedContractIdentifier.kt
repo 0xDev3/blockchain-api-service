@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.exception.InvalidRequestBodyException
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.exception.InvalidRequestBodyException
+import dev3.blockchainapiservice.util.ContractAddress
 import java.util.UUID
 
 interface DeployedContractIdentifierRequestBody {

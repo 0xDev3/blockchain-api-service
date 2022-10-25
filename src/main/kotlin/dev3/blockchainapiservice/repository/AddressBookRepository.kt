@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.model.result.AddressBookEntry
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface AddressBookRepository {

@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.AssetMultiSendRequestRecord
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
-import com.ampnet.blockchainapiservice.model.result.AssetMultiSendRequest
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.TransactionHash
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTable
+import dev3.blockchainapiservice.generated.jooq.tables.records.AssetMultiSendRequestRecord
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
+import dev3.blockchainapiservice.model.result.AssetMultiSendRequest
+import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL

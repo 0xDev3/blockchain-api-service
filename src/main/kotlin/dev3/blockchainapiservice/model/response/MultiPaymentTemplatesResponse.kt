@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.result.MultiPaymentTemplate
-import com.ampnet.blockchainapiservice.model.result.NoItems
-import com.ampnet.blockchainapiservice.util.AssetType
+import dev3.blockchainapiservice.model.result.MultiPaymentTemplate
+import dev3.blockchainapiservice.model.result.NoItems
+import dev3.blockchainapiservice.util.AssetType
 import java.time.OffsetDateTime
 import java.util.UUID
 

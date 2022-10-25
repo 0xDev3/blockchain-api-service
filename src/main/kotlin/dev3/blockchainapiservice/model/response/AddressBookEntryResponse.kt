@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
+import dev3.blockchainapiservice.model.result.AddressBookEntry
 import java.time.OffsetDateTime
 import java.util.UUID
 

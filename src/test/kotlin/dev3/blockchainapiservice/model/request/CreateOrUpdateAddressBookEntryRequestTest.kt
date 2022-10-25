@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.model.request
+package dev3.blockchainapiservice.model.request
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.config.validation.ValidationConstants
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.config.validation.ValidationConstants
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll

@@ -1,7 +1,7 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.util.FunctionArgument
-import com.ampnet.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.util.FunctionData
 
 interface FunctionEncoderService {
     fun encode(

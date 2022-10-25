@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.model.response
+package dev3.blockchainapiservice.model.response
 
-import com.ampnet.blockchainapiservice.model.params.OutputParameterSchema
-import com.ampnet.blockchainapiservice.model.result.ReadonlyFunctionCallResult
-import com.ampnet.blockchainapiservice.util.WithDeployedContractIdAndAddress
-import com.ampnet.blockchainapiservice.util.annotation.SchemaAnyOf
-import com.ampnet.blockchainapiservice.util.annotation.SchemaIgnore
-import com.ampnet.blockchainapiservice.util.annotation.SchemaName
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.params.OutputParameterSchema
+import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
+import dev3.blockchainapiservice.util.WithDeployedContractIdAndAddress
+import dev3.blockchainapiservice.util.annotation.SchemaAnyOf
+import dev3.blockchainapiservice.util.annotation.SchemaIgnore
+import dev3.blockchainapiservice.util.annotation.SchemaName
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import java.util.UUID

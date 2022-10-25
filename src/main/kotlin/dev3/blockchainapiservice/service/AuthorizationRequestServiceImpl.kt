@@ -1,15 +1,15 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.exception.CannotAttachSignedMessageException
-import com.ampnet.blockchainapiservice.model.params.CreateAuthorizationRequestParams
-import com.ampnet.blockchainapiservice.model.params.StoreAuthorizationRequestParams
-import com.ampnet.blockchainapiservice.model.result.AuthorizationRequest
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.repository.AuthorizationRequestRepository
-import com.ampnet.blockchainapiservice.util.SignedMessage
-import com.ampnet.blockchainapiservice.util.Status
-import com.ampnet.blockchainapiservice.util.WalletAddress
-import com.ampnet.blockchainapiservice.util.WithStatus
+import dev3.blockchainapiservice.exception.CannotAttachSignedMessageException
+import dev3.blockchainapiservice.model.params.CreateAuthorizationRequestParams
+import dev3.blockchainapiservice.model.params.StoreAuthorizationRequestParams
+import dev3.blockchainapiservice.model.result.AuthorizationRequest
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.repository.AuthorizationRequestRepository
+import dev3.blockchainapiservice.util.SignedMessage
+import dev3.blockchainapiservice.util.Status
+import dev3.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.util.WithStatus
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.UUID

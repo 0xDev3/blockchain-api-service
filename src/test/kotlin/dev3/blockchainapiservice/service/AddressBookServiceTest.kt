@@ -1,13 +1,13 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.TestBase
-import com.ampnet.blockchainapiservice.TestData
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
-import com.ampnet.blockchainapiservice.model.result.AddressBookEntry
-import com.ampnet.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import com.ampnet.blockchainapiservice.repository.AddressBookRepository
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
+import dev3.blockchainapiservice.model.result.AddressBookEntry
+import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.repository.AddressBookRepository
+import dev3.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

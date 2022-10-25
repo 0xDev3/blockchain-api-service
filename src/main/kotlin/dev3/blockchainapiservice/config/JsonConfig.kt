@@ -1,11 +1,5 @@
-package com.ampnet.blockchainapiservice.config
+package dev3.blockchainapiservice.config
 
-import com.ampnet.blockchainapiservice.model.params.OutputParameter
-import com.ampnet.blockchainapiservice.util.FunctionArgument
-import com.ampnet.blockchainapiservice.util.Tuple
-import com.ampnet.blockchainapiservice.util.json.FunctionArgumentJsonDeserializer
-import com.ampnet.blockchainapiservice.util.json.OutputParameterJsonDeserializer
-import com.ampnet.blockchainapiservice.util.json.TupleSerializer
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategies
@@ -15,6 +9,12 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.addDeserializer
+import dev3.blockchainapiservice.model.params.OutputParameter
+import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.util.Tuple
+import dev3.blockchainapiservice.util.json.FunctionArgumentJsonDeserializer
+import dev3.blockchainapiservice.util.json.OutputParameterJsonDeserializer
+import dev3.blockchainapiservice.util.json.TupleSerializer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary

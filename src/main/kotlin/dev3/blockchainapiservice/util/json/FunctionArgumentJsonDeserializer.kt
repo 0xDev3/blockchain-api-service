@@ -1,7 +1,5 @@
-package com.ampnet.blockchainapiservice.util.json
+package dev3.blockchainapiservice.util.json
 
-import com.ampnet.blockchainapiservice.util.FunctionArgument
-import com.ampnet.blockchainapiservice.util.SizedStaticArray
 import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
@@ -9,6 +7,8 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.util.SizedStaticArray
 import org.web3j.abi.datatypes.Bytes
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.DynamicStruct

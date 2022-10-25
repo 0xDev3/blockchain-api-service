@@ -1,10 +1,10 @@
-package com.ampnet.blockchainapiservice.config.binding
+package dev3.blockchainapiservice.config.binding
 
-import com.ampnet.blockchainapiservice.config.binding.annotation.ApiKeyBinding
-import com.ampnet.blockchainapiservice.exception.NonExistentApiKeyException
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.repository.ApiKeyRepository
-import com.ampnet.blockchainapiservice.repository.ProjectRepository
+import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.exception.NonExistentApiKeyException
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.repository.ApiKeyRepository
+import dev3.blockchainapiservice.repository.ProjectRepository
 import org.springframework.core.MethodParameter
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest

@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.util.annotation
+package dev3.blockchainapiservice.util.annotation
 
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.FIELD)
 @Retention(AnnotationRetention.RUNTIME)

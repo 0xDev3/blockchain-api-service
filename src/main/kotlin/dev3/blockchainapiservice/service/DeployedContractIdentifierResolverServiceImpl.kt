@@ -1,15 +1,15 @@
-package com.ampnet.blockchainapiservice.service
+package dev3.blockchainapiservice.service
 
-import com.ampnet.blockchainapiservice.exception.ContractNotYetDeployedException
-import com.ampnet.blockchainapiservice.exception.ResourceNotFoundException
-import com.ampnet.blockchainapiservice.model.params.DeployedContractAddressIdentifier
-import com.ampnet.blockchainapiservice.model.params.DeployedContractAliasIdentifier
-import com.ampnet.blockchainapiservice.model.params.DeployedContractIdIdentifier
-import com.ampnet.blockchainapiservice.model.params.DeployedContractIdentifier
-import com.ampnet.blockchainapiservice.model.result.ContractDeploymentRequest
-import com.ampnet.blockchainapiservice.model.result.Project
-import com.ampnet.blockchainapiservice.repository.ContractDeploymentRequestRepository
-import com.ampnet.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.exception.ContractNotYetDeployedException
+import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.params.DeployedContractAddressIdentifier
+import dev3.blockchainapiservice.model.params.DeployedContractAliasIdentifier
+import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
+import dev3.blockchainapiservice.model.params.DeployedContractIdentifier
+import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.UUID

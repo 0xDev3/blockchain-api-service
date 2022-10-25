@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.model
+package dev3.blockchainapiservice.model
 
-import com.ampnet.blockchainapiservice.config.validation.ValidationConstants
+import dev3.blockchainapiservice.config.validation.ValidationConstants
 import javax.validation.constraints.Size
 
 data class ScreenConfig(

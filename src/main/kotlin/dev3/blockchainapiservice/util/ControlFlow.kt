@@ -1,4 +1,4 @@
-package com.ampnet.blockchainapiservice.util
+package dev3.blockchainapiservice.util
 
 private class ShortCircuitingException : RuntimeException() {
     companion object {

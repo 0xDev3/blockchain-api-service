@@ -1,11 +1,11 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.model.result.MultiPaymentTemplate
-import com.ampnet.blockchainapiservice.model.result.MultiPaymentTemplateItem
-import com.ampnet.blockchainapiservice.model.result.NoItems
-import com.ampnet.blockchainapiservice.model.result.WithItems
-import com.ampnet.blockchainapiservice.util.UtcDateTime
-import com.ampnet.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.model.result.MultiPaymentTemplate
+import dev3.blockchainapiservice.model.result.MultiPaymentTemplateItem
+import dev3.blockchainapiservice.model.result.NoItems
+import dev3.blockchainapiservice.model.result.WithItems
+import dev3.blockchainapiservice.util.UtcDateTime
+import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 interface MultiPaymentTemplateRepository {

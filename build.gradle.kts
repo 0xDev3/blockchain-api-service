@@ -35,7 +35,7 @@ extensions.configure(KtlintExtension::class.java) {
     version.set(Versions.Tools.ktlint)
 }
 
-group = "com.ampnet"
+group = "dev3"
 version = Versions.project
 java.sourceCompatibility = Versions.Compile.sourceCompatibility
 java.targetCompatibility = Versions.Compile.targetCompatibility
@@ -62,7 +62,7 @@ jib {
     val dockerPassword: String = System.getenv("DOCKER_PASSWORD") ?: "DOCKER_PASSWORD"
 
     to {
-        image = "ampnet/${rootProject.name}:$version"
+        image = "dev3/${rootProject.name}:$version"
         auth {
             username = dockerUsername
             password = dockerPassword
@@ -71,7 +71,7 @@ jib {
     }
     container {
         creationTime = "USE_CURRENT_TIMESTAMP"
-        mainClass = "com.ampnet.blockchainapiservice.BlockchainApiServiceApplicationKt"
+        mainClass = "dev3.blockchainapiservice.BlockchainApiServiceApplicationKt"
     }
     from {
         image = "${Configurations.Docker.baseImage}:${Configurations.Docker.tag}@${Configurations.Docker.digest}"
@@ -167,98 +167,98 @@ jooq {
                         excludes = "flyway_schema_history"
                         forcedTypes = listOf(
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.ChainId"
-                                converter = "com.ampnet.blockchainapiservice.util.ChainIdConverter"
+                                userType = "dev3.blockchainapiservice.util.ChainId"
+                                converter = "dev3.blockchainapiservice.util.ChainIdConverter"
                                 includeExpression = "chain_id"
                                 includeTypes = "BIGINT"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.ContractAddress"
-                                converter = "com.ampnet.blockchainapiservice.util.ContractAddressConverter"
+                                userType = "dev3.blockchainapiservice.util.ContractAddress"
+                                converter = "dev3.blockchainapiservice.util.ContractAddressConverter"
                                 includeExpression = "token_address|.*_contract_address|contract_address"
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.WalletAddress"
-                                converter = "com.ampnet.blockchainapiservice.util.WalletAddressConverter"
+                                userType = "dev3.blockchainapiservice.util.WalletAddress"
+                                converter = "dev3.blockchainapiservice.util.WalletAddressConverter"
                                 includeExpression = ".*_address"
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.Balance"
-                                converter = "com.ampnet.blockchainapiservice.util.BalanceConverter"
+                                userType = "dev3.blockchainapiservice.util.Balance"
+                                converter = "dev3.blockchainapiservice.util.BalanceConverter"
                                 includeExpression = ".*_amount"
                                 includeTypes = "NUMERIC"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.BlockNumber"
-                                converter = "com.ampnet.blockchainapiservice.util.BlockNumberConverter"
+                                userType = "dev3.blockchainapiservice.util.BlockNumber"
+                                converter = "dev3.blockchainapiservice.util.BlockNumberConverter"
                                 includeExpression = "block_number"
                                 includeTypes = "NUMERIC"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.TransactionHash"
-                                converter = "com.ampnet.blockchainapiservice.util.TransactionHashConverter"
+                                userType = "dev3.blockchainapiservice.util.TransactionHash"
+                                converter = "dev3.blockchainapiservice.util.TransactionHashConverter"
                                 includeExpression = ".*tx_hash"
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.model.json.ManifestJson"
-                                converter = "com.ampnet.blockchainapiservice.util.ManifestJsonConverter"
+                                userType = "dev3.blockchainapiservice.model.json.ManifestJson"
+                                converter = "dev3.blockchainapiservice.util.ManifestJsonConverter"
                                 includeExpression = "manifest_json"
                                 includeTypes = "JSON"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.model.json.ArtifactJson"
-                                converter = "com.ampnet.blockchainapiservice.util.ArtifactJsonConverter"
+                                userType = "dev3.blockchainapiservice.model.json.ArtifactJson"
+                                converter = "dev3.blockchainapiservice.util.ArtifactJsonConverter"
                                 includeExpression = "artifact_json"
                                 includeTypes = "JSON"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.SignedMessage"
-                                converter = "com.ampnet.blockchainapiservice.util.SignedMessageConverter"
+                                userType = "dev3.blockchainapiservice.util.SignedMessage"
+                                converter = "dev3.blockchainapiservice.util.SignedMessageConverter"
                                 includeExpression = "signed_message"
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.DurationSeconds"
-                                converter = "com.ampnet.blockchainapiservice.util.DurationSecondsConverter"
+                                userType = "dev3.blockchainapiservice.util.DurationSeconds"
+                                converter = "dev3.blockchainapiservice.util.DurationSecondsConverter"
                                 includeExpression = ".*_duration_seconds"
                                 includeTypes = "NUMERIC"
                             },
                             ForcedType().apply {
                                 userType = "com.fasterxml.jackson.databind.JsonNode"
-                                converter = "com.ampnet.blockchainapiservice.util.JsonNodeConverter"
+                                converter = "dev3.blockchainapiservice.util.JsonNodeConverter"
                                 includeExpression = ".*"
                                 includeTypes = "JSON"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.UtcDateTime"
-                                converter = "com.ampnet.blockchainapiservice.util.UtcDateTimeConverter"
+                                userType = "dev3.blockchainapiservice.util.UtcDateTime"
+                                converter = "dev3.blockchainapiservice.util.UtcDateTimeConverter"
                                 includeExpression = ".*"
                                 includeTypes = "TIMESTAMPTZ"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.BaseUrl"
-                                converter = "com.ampnet.blockchainapiservice.util.BaseUrlConverter"
+                                userType = "dev3.blockchainapiservice.util.BaseUrl"
+                                converter = "dev3.blockchainapiservice.util.BaseUrlConverter"
                                 includeExpression = "base_redirect_url"
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.ContractId"
-                                converter = "com.ampnet.blockchainapiservice.util.ContractIdConverter"
+                                userType = "dev3.blockchainapiservice.util.ContractId"
+                                converter = "dev3.blockchainapiservice.util.ContractIdConverter"
                                 includeExpression = "contract_id"
                                 includeTypes = "VARCHAR"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.ContractBinaryData"
-                                converter = "com.ampnet.blockchainapiservice.util.ContractBinaryDataConverter"
+                                userType = "dev3.blockchainapiservice.util.ContractBinaryData"
+                                converter = "dev3.blockchainapiservice.util.ContractBinaryDataConverter"
                                 includeExpression = "contract_data"
                                 includeTypes = "BYTEA"
                             },
                             ForcedType().apply {
-                                userType = "com.ampnet.blockchainapiservice.util.FunctionData"
-                                converter = "com.ampnet.blockchainapiservice.util.FunctionDataConverter"
+                                userType = "dev3.blockchainapiservice.util.FunctionData"
+                                converter = "dev3.blockchainapiservice.util.FunctionDataConverter"
                                 includeExpression = "tx_data"
                                 includeTypes = "BYTEA"
                             }
@@ -280,7 +280,7 @@ jooq {
                         withNonnullAnnotationType("NotNull")
                     }
                     target.apply {
-                        packageName = "com.ampnet.blockchainapiservice.generated.jooq"
+                        packageName = "dev3.blockchainapiservice.generated.jooq"
                         directory = "$buildDir/generated/sources/jooq/main/kotlin"
                     }
                     strategy.apply {
@@ -311,7 +311,7 @@ tasks.withType<JooqGenerate> {
 }
 
 tasks.register<TransformJooqClassesTask>("transformJooqClasses") {
-    jooqClassesPath.set("$buildDir/generated/sources/jooq/main/kotlin/com/ampnet/blockchainapiservice/generated/jooq")
+    jooqClassesPath.set("$buildDir/generated/sources/jooq/main/kotlin/dev3/blockchainapiservice/generated/jooq")
     dependsOn(tasks["generateJooq"])
 }
 
@@ -353,7 +353,7 @@ tasks.withType<JacocoReport> {
     sourceDirectories.setFrom(listOf(file("${project.projectDir}/src/main/kotlin")))
     classDirectories.setFrom(
         fileTree("$buildDir/classes/kotlin/main").apply {
-            exclude("com/ampnet/blockchainapiservice/generated/**")
+            exclude("dev3/blockchainapiservice/generated/**")
         }
     )
     dependsOn(tasks["fullTest"])
@@ -367,7 +367,7 @@ tasks.withType<JacocoCoverageVerification> {
     sourceDirectories.setFrom(listOf(file("${project.projectDir}/src/main/kotlin")))
     classDirectories.setFrom(
         fileTree("$buildDir/classes/kotlin/main").apply {
-            exclude("com/ampnet/blockchainapiservice/generated/**")
+            exclude("dev3/blockchainapiservice/generated/**")
         }
     )
 
@@ -387,12 +387,12 @@ detekt {
 }
 
 tasks.withType<Detekt> {
-    exclude("com/ampnet/blockchainapiservice/generated/**")
+    exclude("dev3/blockchainapiservice/generated/**")
 }
 
 ktlint {
     filter {
-        exclude("com/ampnet/blockchainapiservice/generated/**")
+        exclude("dev3/blockchainapiservice/generated/**")
     }
 }
 

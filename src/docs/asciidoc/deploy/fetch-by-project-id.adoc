@@ -41,4 +41,4 @@ include::{snippets}/ContractDeploymentRequestControllerApiTest/mustCorrectlyFetc
 include::{snippets}/ContractDeploymentRequestControllerApiTest/mustCorrectlyFetchContractDeploymentRequestsByProjectIdAndFilters/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/com.ampnet.blockchainapiservice.model.response.ContractDeploymentRequestsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.ContractDeploymentRequestsResponse.adoc[]

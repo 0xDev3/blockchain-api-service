@@ -1,12 +1,12 @@
-package com.ampnet.blockchainapiservice.model.params
+package dev3.blockchainapiservice.model.params
 
-import com.ampnet.blockchainapiservice.model.ScreenConfig
-import com.ampnet.blockchainapiservice.model.request.CreateErc20LockRequest
-import com.ampnet.blockchainapiservice.util.Balance
-import com.ampnet.blockchainapiservice.util.ContractAddress
-import com.ampnet.blockchainapiservice.util.DurationSeconds
-import com.ampnet.blockchainapiservice.util.WalletAddress
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.request.CreateErc20LockRequest
+import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.DurationSeconds
+import dev3.blockchainapiservice.util.WalletAddress
 
 data class CreateErc20LockRequestParams(
     val redirectUrl: String?,

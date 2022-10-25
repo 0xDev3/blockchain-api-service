@@ -1,6 +1,6 @@
-package com.ampnet.blockchainapiservice.testcontainers
+package dev3.blockchainapiservice.testcontainers
 
-import com.ampnet.blockchainapiservice.util.BlockNumber
+import dev3.blockchainapiservice.util.BlockNumber
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy
 import org.web3j.crypto.Credentials

@@ -1,8 +1,8 @@
-package com.ampnet.blockchainapiservice.repository
+package dev3.blockchainapiservice.repository
 
-import com.ampnet.blockchainapiservice.generated.jooq.tables.ApiKeyTable
-import com.ampnet.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
-import com.ampnet.blockchainapiservice.model.result.ApiKey
+import dev3.blockchainapiservice.generated.jooq.tables.ApiKeyTable
+import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
+import dev3.blockchainapiservice.model.result.ApiKey
 import mu.KLogging
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
