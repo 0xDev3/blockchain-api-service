@@ -345,10 +345,10 @@ tasks.withType<JacocoReport> {
     executionData(*allTestExecFiles.toTypedArray())
 
     reports {
-        xml.isEnabled = true
-        xml.destination = file("$buildDir/reports/jacoco/report.xml")
-        csv.isEnabled = false
-        html.destination = file("$buildDir/reports/jacoco/html")
+        xml.required.set(true)
+        xml.outputLocation.set(file("$buildDir/reports/jacoco/report.xml"))
+        csv.required.set(false)
+        html.outputLocation.set(file("$buildDir/reports/jacoco/html"))
     }
     sourceDirectories.setFrom(listOf(file("${project.projectDir}/src/main/kotlin")))
     classDirectories.setFrom(
