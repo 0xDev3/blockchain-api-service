@@ -10,6 +10,8 @@ import java.time.Duration
 @ConfigurationProperties(prefix = "blockchain-api-service")
 class ApplicationProperties {
     val jwt = JwtProperties()
+    val ipfs = IpfsProperties()
+    val createPayoutQueue = QueueProperties()
     val chainEthereum = ChainProperties()
     val chainGoerli = ChainProperties()
     val chainMatic = ChainProperties()
@@ -38,6 +40,12 @@ class JwtProperties {
     lateinit var publicKey: String
 }
 
+class IpfsProperties {
+    var url = "https://api.pinata.cloud/"
+    var apiKey = ""
+    var secretApiKey = ""
+}
+
 @Suppress("MagicNumber")
 class ChainProperties {
     var minBlockConfirmationsForCaching: BigInteger? = null
@@ -63,4 +71,10 @@ class MetaPixelProperties {
 class ContractManifestServiceProperties {
     var baseUrl: String? = null
     var decompileContractPath = "/decompile-contract"
+}
+
+@Suppress("MagicNumber")
+class QueueProperties {
+    var polling: Long = 5_000L
+    var initialDelay: Long = 15_000L
 }
