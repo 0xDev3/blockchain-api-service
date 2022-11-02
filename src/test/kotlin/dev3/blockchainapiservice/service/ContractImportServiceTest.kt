@@ -31,6 +31,7 @@ import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.service.ContractImportServiceImpl.Companion.TypeAndValue
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
+import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.Constants
 import dev3.blockchainapiservice.util.ContractAddress
@@ -148,7 +149,8 @@ class ContractImportServiceTest : TestBase() {
             deployedContractAddress = PARAMS.contractAddress,
             data = FunctionData("${ARTIFACT_JSON.bytecode}${ENCODED_CONSTRUCTOR_CALL.withoutPrefix}"),
             value = Balance.ZERO,
-            binary = ContractBinaryData(ARTIFACT_JSON.deployedBytecode)
+            binary = ContractBinaryData(ARTIFACT_JSON.deployedBytecode),
+            blockNumber = BlockNumber(BigInteger.ONE)
         )
     }
 
