@@ -41,6 +41,17 @@ class WebConfig(
         .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
         .build()
 
+    @Bean("pinataRestTemplate")
+    fun pinataRestTemplate(
+        objectMapper: ObjectMapper,
+        applicationProperties: ApplicationProperties
+    ): RestTemplate = RestTemplateBuilder()
+        .rootUri(applicationProperties.ipfs.url)
+        .defaultHeader("pinata_api_key", applicationProperties.ipfs.apiKey)
+        .defaultHeader("pinata_secret_api_key", applicationProperties.ipfs.secretApiKey)
+        .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+        .build()
+
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(UserIdentifierResolver(uuidProvider, userIdentifierRepository))
         resolvers.add(ProjectApiKeyResolver(apiKeyRepository, projectRepository))
