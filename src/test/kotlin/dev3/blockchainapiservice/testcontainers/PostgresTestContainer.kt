@@ -47,5 +47,8 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
         dslContext.deleteFrom(FetchAccountBalanceCacheTable).execute()
         dslContext.deleteFrom(FetchErc20AccountBalanceCacheTable).execute()
         dslContext.deleteFrom(FetchTransactionInfoCacheTable).execute()
+        // TODO dslContext.deleteFrom(SnapshotTable).execute()
+        // TODO dslContext.deleteFrom(MerkleTreeLeafNodeTable).execute()
+        // TODO dslContext.deleteFrom(MerkleTreeRootTable).execute()
     }
 }

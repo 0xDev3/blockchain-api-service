@@ -106,7 +106,7 @@ class ContractDecoratorFileChangeListener(
             .forEach {
                 if (it.filterManifestFiles()) {
                     processContractInterface(interfacesRootDir, it)
-                } else {
+                } else if (it.filterDirs()) {
                     processNestedInterfaces(interfacesRootDir, it)
                 }
             }
@@ -132,7 +132,7 @@ class ContractDecoratorFileChangeListener(
     private fun processNestedDecorators(dir: Path, parts: List<String>, setName: String) {
         if (dir.resolve("artifact.json").isRegularFile() || dir.resolve("manifest.json").isRegularFile()) {
             processContractDecorator(dir, parts, setName)
-        } else {
+        } else if (dir.filterDirs()) {
             dir.listDirectoryEntries().forEach { processNestedDecorators(it, parts + dir.name, setName) }
         }
     }

@@ -5,6 +5,11 @@ import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.ApplicationProperties
 import dev3.blockchainapiservice.exception.BlockchainReadException
+import dev3.blockchainapiservice.features.payout.model.params.GetPayoutsForInvestorParams
+import dev3.blockchainapiservice.features.payout.model.result.PayoutForInvestor
+import dev3.blockchainapiservice.features.payout.util.HashFunction
+import dev3.blockchainapiservice.features.payout.util.MerkleHash
+import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
@@ -39,10 +44,14 @@ import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.DynamicArray
 import org.web3j.abi.datatypes.Uint
 import org.web3j.abi.datatypes.generated.Uint256
+import org.web3j.protocol.core.DefaultBlockParameter
+import org.web3j.protocol.core.DefaultBlockParameterName
+import org.web3j.protocol.core.methods.request.EthFilter
 import org.web3j.protocol.exceptions.TransactionException
 import org.web3j.tx.Transfer
 import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.utils.Convert
+import org.web3j.utils.Numeric
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -689,6 +698,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             ).send()
         }
 
+        hardhatContainer.mine()
+
         val deploymentTransaction = contract.transactionReceipt.get()
 
         suppose("1000 blocks will be mined after contract deployment transaction") {
@@ -723,9 +734,316 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         deployedContractAddress = ContractAddress(contract.contractAddress),
                         data = FunctionData(data),
                         value = Balance.ZERO,
-                        binary = ContractBinaryData(SimpleERC20.BINARY.substring(rawBinaryIndex))
+                        binary = ContractBinaryData(SimpleERC20.BINARY.substring(rawBinaryIndex)),
+                        blockNumber = BlockNumber(deploymentTransaction.blockNumber)
                     )
                 )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchBalancesBasedOnBlockRange() {
+        val mainAccount = accounts[0]
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(mainAccount.address),
+                listOf(BigInteger("10000")),
+                mainAccount.address
+            ).send()
+        }
+
+        hardhatContainer.mine()
+
+        suppose("some accounts get ERC20 tokens") {
+            contract.transfer(accounts[1].address, BigInteger("100")).send()
+            contract.transfer(accounts[2].address, BigInteger("200")).send()
+            contract.transfer(accounts[3].address, BigInteger("300")).send()
+            contract.transfer(accounts[4].address, BigInteger("400")).send()
+            hardhatContainer.mine()
+        }
+
+        val startBlock = BlockNumber(BigInteger.ZERO)
+        val endBlock1 = hardhatContainer.blockNumber()
+
+        contract.applyWeb3jFilterFix(startBlock, endBlock1)
+
+        suppose("some additional transactions of ERC20 token are made") {
+            contract.transfer(accounts[1].address, BigInteger("900")).send()
+            contract.transfer(accounts[5].address, BigInteger("1000")).send()
+            contract.transfer(accounts[6].address, BigInteger("2000")).send()
+            hardhatContainer.mine()
+        }
+
+        verify("correct balances are fetched for first end block") {
+            val service = createService()
+            val balances = service.fetchErc20AccountBalances(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                erc20ContractAddress = ContractAddress(contract.contractAddress),
+                ignoredErc20Addresses = emptySet(),
+                startBlock = startBlock,
+                endBlock = endBlock1
+            )
+
+            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+                PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("9000"))),
+                PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("100"))),
+                PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
+                PayoutAccountBalance(WalletAddress(accounts[3].address), Balance(BigInteger("300"))),
+                PayoutAccountBalance(WalletAddress(accounts[4].address), Balance(BigInteger("400")))
+            )
+        }
+
+        val endBlock2 = hardhatContainer.blockNumber()
+
+        verify("correct balances are fetched for second end block") {
+            val service = createService()
+            val balances = service.fetchErc20AccountBalances(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                erc20ContractAddress = ContractAddress(contract.contractAddress),
+                ignoredErc20Addresses = emptySet(),
+                startBlock = startBlock,
+                endBlock = endBlock2
+            )
+
+            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+                PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("5100"))),
+                PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("1000"))),
+                PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
+                PayoutAccountBalance(WalletAddress(accounts[3].address), Balance(BigInteger("300"))),
+                PayoutAccountBalance(WalletAddress(accounts[4].address), Balance(BigInteger("400"))),
+                PayoutAccountBalance(WalletAddress(accounts[5].address), Balance(BigInteger("1000"))),
+                PayoutAccountBalance(WalletAddress(accounts[6].address), Balance(BigInteger("2000")))
+            )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchBalancesBasedOnBlockRangeWhenSomeAddressesAreIgnored() {
+        val mainAccount = accounts[0]
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(mainAccount.address),
+                listOf(BigInteger("10000")),
+                mainAccount.address
+            ).send()
+        }
+
+        hardhatContainer.mine()
+
+        suppose("some accounts get ERC20 tokens") {
+            contract.transfer(accounts[1].address, BigInteger("100")).send()
+            contract.transfer(accounts[2].address, BigInteger("200")).send()
+            contract.transfer(accounts[3].address, BigInteger("300")).send()
+            contract.transfer(accounts[4].address, BigInteger("400")).send()
+            hardhatContainer.mine()
+        }
+
+        val startBlock = BlockNumber(BigInteger.ZERO)
+        val endBlock = hardhatContainer.blockNumber()
+
+        contract.applyWeb3jFilterFix(startBlock, endBlock)
+
+        suppose("some additional transactions of ERC20 token are made") {
+            contract.transfer(accounts[1].address, BigInteger("900")).send()
+            contract.transfer(accounts[5].address, BigInteger("1000")).send()
+            contract.transfer(accounts[6].address, BigInteger("2000")).send()
+            hardhatContainer.mine()
+        }
+
+        val ignoredAddresses = setOf(
+            WalletAddress(mainAccount.address),
+            WalletAddress(accounts[1].address),
+            WalletAddress(accounts[3].address)
+        )
+
+        verify("correct balances are fetched") {
+            val service = createService()
+            val balances = service.fetchErc20AccountBalances(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                erc20ContractAddress = ContractAddress(contract.contractAddress),
+                ignoredErc20Addresses = ignoredAddresses,
+                startBlock = startBlock,
+                endBlock = endBlock
+            )
+
+            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+                PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
+                PayoutAccountBalance(WalletAddress(accounts[4].address), Balance(BigInteger("400")))
+            )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchBalancesForNullStartBlock() {
+        val mainAccount = accounts[0]
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            SimpleERC20.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                listOf(mainAccount.address),
+                listOf(BigInteger("10000")),
+                mainAccount.address
+            ).send()
+        }
+
+        hardhatContainer.mine()
+
+        suppose("some accounts get ERC20 tokens") {
+            contract.transfer(accounts[1].address, BigInteger("100")).send()
+            contract.transfer(accounts[2].address, BigInteger("200")).send()
+            contract.transfer(accounts[3].address, BigInteger("300")).send()
+            contract.transfer(accounts[4].address, BigInteger("400")).send()
+            hardhatContainer.mine()
+        }
+
+        val startBlock = null
+        val endBlock1 = hardhatContainer.blockNumber()
+
+        contract.applyWeb3jFilterFix(startBlock, endBlock1)
+
+        suppose("some additional transactions of ERC20 token are made") {
+            contract.transfer(accounts[1].address, BigInteger("900")).send()
+            contract.transfer(accounts[5].address, BigInteger("1000")).send()
+            contract.transfer(accounts[6].address, BigInteger("2000")).send()
+            hardhatContainer.mine()
+        }
+
+        verify("correct balances are fetched for first end block") {
+            val service = createService()
+            val balances = service.fetchErc20AccountBalances(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                erc20ContractAddress = ContractAddress(contract.contractAddress),
+                ignoredErc20Addresses = emptySet(),
+                startBlock = startBlock,
+                endBlock = endBlock1
+            )
+
+            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+                PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("9000"))),
+                PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("100"))),
+                PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
+                PayoutAccountBalance(WalletAddress(accounts[3].address), Balance(BigInteger("300"))),
+                PayoutAccountBalance(WalletAddress(accounts[4].address), Balance(BigInteger("400")))
+            )
+        }
+
+        val endBlock2 = hardhatContainer.blockNumber()
+
+        verify("correct balances are fetched for second end block") {
+            val service = createService()
+            val balances = service.fetchErc20AccountBalances(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                erc20ContractAddress = ContractAddress(contract.contractAddress),
+                ignoredErc20Addresses = emptySet(),
+                startBlock = startBlock,
+                endBlock = endBlock2
+            )
+
+            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+                PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("5100"))),
+                PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("1000"))),
+                PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
+                PayoutAccountBalance(WalletAddress(accounts[3].address), Balance(BigInteger("300"))),
+                PayoutAccountBalance(WalletAddress(accounts[4].address), Balance(BigInteger("400"))),
+                PayoutAccountBalance(WalletAddress(accounts[5].address), Balance(BigInteger("1000"))),
+                PayoutAccountBalance(WalletAddress(accounts[6].address), Balance(BigInteger("2000")))
+            )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchPayoutsForInvestor() {
+        val mainAccount = accounts[0]
+        val hash = HashFunction.KECCAK_256.invoke("test")
+        val owner1 = WalletAddress("aaa1")
+        val owner2 = WalletAddress("aaa2")
+        val owner3 = WalletAddress("aaa3")
+        val investor1 = WalletAddress("bbb1")
+        val investor2 = WalletAddress("bbb2")
+        val payoutsAndInvestments = listOf(
+            createPayoutWithInvestor(id = 0, owner = owner1, asset = "a", hash = hash, investor = investor1),
+            createPayoutWithInvestor(id = 1, owner = owner1, asset = "a", hash = hash, investor = investor1),
+            createPayoutWithInvestor(id = 2, owner = owner2, asset = "b", hash = hash, investor = investor2),
+            createPayoutWithInvestor(id = 3, owner = owner2, asset = "c", hash = hash, investor = investor2),
+            createPayoutWithInvestor(id = 4, owner = owner3, asset = "d", hash = hash, investor = investor1)
+        )
+
+        val payouts = payoutsAndInvestments.map { it.first }
+
+        val manager = suppose("simple payout manager contract is deployed") {
+            SimplePayoutManager.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                payouts
+            ).send()
+        }
+
+        hardhatContainer.mine()
+
+        val service = suppose("simple payout service contract is deployed") {
+            SimplePayoutService.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider()
+            ).send()
+        }
+
+        hardhatContainer.mine()
+
+        suppose("some investments are claimed") {
+            payoutsAndInvestments.forEach {
+                manager.setClaim(it.second.payoutId, it.second.investor, it.second.amountClaimed).send()
+            }
+            hardhatContainer.mine()
+        }
+
+        val investor1NullParams = GetPayoutsForInvestorParams(
+            payoutService = ContractAddress(service.contractAddress),
+            payoutManager = ContractAddress(manager.contractAddress),
+            investor = investor1
+        )
+        val investor2NullParams = investor1NullParams.copy(investor = investor2)
+        val blockchainService = createService()
+        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
+
+        verify("all payouts states are fetched") {
+            // investor 1
+            assertThat(blockchainService.getPayoutsForInvestor(chainSpec, investor1NullParams))
+                .withMessage()
+                .containsExactlyInAnyOrderElementsOf(payoutsAndInvestments.forInvestor(investor1))
+
+            // investor 2
+            assertThat(blockchainService.getPayoutsForInvestor(chainSpec, investor2NullParams))
+                .withMessage()
+                .containsExactlyInAnyOrderElementsOf(payoutsAndInvestments.forInvestor(investor2))
+        }
+    }
+
+    @Test
+    fun mustThrowBlockchainReadExceptionWhenFetchingPayoutsForInvestorFails() {
+        val nullParams = GetPayoutsForInvestorParams(
+            payoutService = ContractAddress("0"),
+            payoutManager = ContractAddress("0"),
+            investor = WalletAddress("1")
+        )
+        val blockchainService = createService()
+        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
+
+        verify("exception is thrown") {
+            assertThrows<BlockchainReadException>(message) {
+                blockchainService.getPayoutsForInvestor(chainSpec, nullParams)
+            }
         }
     }
 
@@ -741,4 +1059,65 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             web3jBlockchainServiceCacheRepository = mock(),
             applicationProperties = hardhatProperties()
         )
+
+    // This is needed to make web3j work correctly with Hardhat until https://github.com/web3j/web3j/pull/1580 is merged
+    private fun SimpleERC20.applyWeb3jFilterFix(startBlock: BlockNumber?, endBlock: BlockNumber) {
+        val startBlockParameter =
+            startBlock?.value?.let(DefaultBlockParameter::valueOf) ?: DefaultBlockParameterName.EARLIEST
+        val endBlockParameter = DefaultBlockParameter.valueOf(endBlock.value)
+
+        repeat(15) {
+            hardhatContainer.web3j.ethNewFilter(
+                EthFilter(startBlockParameter, endBlockParameter, contractAddress)
+            ).send()
+            hardhatContainer.mine()
+        }
+    }
+
+    private fun createPayout(id: Long, owner: WalletAddress, asset: String, hash: MerkleHash): PayoutStruct =
+        PayoutStruct(
+            BigInteger.valueOf(id),
+            owner.rawValue,
+            "payout-info-$id",
+            false,
+            ContractAddress(asset).rawValue,
+            BigInteger.valueOf(id * 1_000L),
+            emptyList(),
+            Numeric.hexStringToByteArray(hash.value),
+            BigInteger.valueOf(id),
+            BigInteger.valueOf(id + 1),
+            "ipfs-hash-$id",
+            ContractAddress("ffff").rawValue,
+            BigInteger.valueOf(id * 500L),
+            BigInteger.valueOf(id * 500L)
+        )
+
+    private fun createPayoutWithInvestor(
+        id: Long,
+        owner: WalletAddress,
+        asset: String,
+        hash: MerkleHash,
+        investor: WalletAddress
+    ): Pair<PayoutStruct, PayoutStateForInvestor> =
+        Pair(
+            createPayout(id = id, owner = owner, asset = asset, hash = hash),
+            PayoutStateForInvestor(
+                BigInteger.valueOf(id),
+                investor.rawValue,
+                BigInteger.valueOf(id * 31L)
+            )
+        )
+
+    private fun List<Pair<PayoutStruct, PayoutStateForInvestor>>.forInvestor(
+        investor: WalletAddress
+    ): List<PayoutForInvestor> =
+        map {
+            val state = it.second
+
+            if (WalletAddress(state.investor) == investor) {
+                PayoutForInvestor(it.first, it.second)
+            } else {
+                PayoutForInvestor(it.first, PayoutStateForInvestor(state.payoutId, investor.rawValue, BigInteger.ZERO))
+            }
+        }
 }
