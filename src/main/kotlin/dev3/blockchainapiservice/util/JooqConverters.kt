@@ -2,12 +2,18 @@ package dev3.blockchainapiservice.util
 
 import com.fasterxml.jackson.databind.JsonNode
 import dev3.blockchainapiservice.config.JsonConfig
+import dev3.blockchainapiservice.features.payout.util.HashFunction
+import dev3.blockchainapiservice.features.payout.util.SnapshotFailureCause
+import dev3.blockchainapiservice.features.payout.util.SnapshotStatus
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.ManifestJson
 import org.jooq.Converter
 import org.jooq.JSON
 import java.math.BigInteger
 import java.time.OffsetDateTime
+import dev3.blockchainapiservice.generated.jooq.enums.HashFunction as DbHashFunction
+import dev3.blockchainapiservice.generated.jooq.enums.SnapshotFailureCause as DbSnapshotFailureCause
+import dev3.blockchainapiservice.generated.jooq.enums.SnapshotStatus as DbSnapshotStatus
 
 class ChainIdConverter : Converter<Long, ChainId> {
     override fun from(value: Long?): ChainId? = value?.let { ChainId(it) }
@@ -197,5 +203,40 @@ class ArtifactJsonConverter : Converter<JSON, ArtifactJson> {
 
     companion object {
         private const val serialVersionUID: Long = 2789587672933464251L
+    }
+}
+
+class HashFunctionConverter : Converter<DbHashFunction, HashFunction> {
+    override fun from(value: DbHashFunction?): HashFunction? = value?.let { HashFunction.fromDbEnum(it) }
+    override fun to(value: HashFunction?): DbHashFunction? = value?.toDbEnum
+    override fun fromType(): Class<DbHashFunction> = DbHashFunction::class.java
+    override fun toType(): Class<HashFunction> = HashFunction::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = -1278554981366510795L
+    }
+}
+
+class SnapshotStatusConverter : Converter<DbSnapshotStatus, SnapshotStatus> {
+    override fun from(value: DbSnapshotStatus?): SnapshotStatus? = value?.let { SnapshotStatus.fromDbEnum(it) }
+    override fun to(value: SnapshotStatus?): DbSnapshotStatus? = value?.toDbEnum
+    override fun fromType(): Class<DbSnapshotStatus> = DbSnapshotStatus::class.java
+    override fun toType(): Class<SnapshotStatus> = SnapshotStatus::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = 2689706619411255540L
+    }
+}
+
+class SnapshotFailureCauseConverter : Converter<DbSnapshotFailureCause, SnapshotFailureCause> {
+    override fun from(value: DbSnapshotFailureCause?): SnapshotFailureCause? =
+        value?.let { SnapshotFailureCause.fromDbEnum(it) }
+
+    override fun to(value: SnapshotFailureCause?): DbSnapshotFailureCause? = value?.toDbEnum
+    override fun fromType(): Class<DbSnapshotFailureCause> = DbSnapshotFailureCause::class.java
+    override fun toType(): Class<SnapshotFailureCause> = SnapshotFailureCause::class.java
+
+    companion object {
+        private const val serialVersionUID: Long = -1586298250144589782L
     }
 }

@@ -59,6 +59,17 @@ class BlockchainReadException(message: String) : ServiceException(
     }
 }
 
+class BlockchainEventReadException(message: String, cause: Throwable) : ServiceException(
+    errorCode = ErrorCode.BLOCKCHAIN_EVENT_READ_ERROR,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = message,
+    cause = cause
+) {
+    companion object {
+        private const val serialVersionUID: Long = 8801902527558907485L
+    }
+}
+
 class CannotAttachTxInfoException(message: String) : ServiceException(
     errorCode = ErrorCode.TX_INFO_ALREADY_SET,
     httpStatus = HttpStatus.BAD_REQUEST,
@@ -230,5 +241,15 @@ class ContractInterfaceNotFoundException(interfaceId: InterfaceId) : ServiceExce
 ) {
     companion object {
         private const val serialVersionUID: Long = 6166118515189449736L
+    }
+}
+
+class IpfsUploadFailedException : ServiceException(
+    errorCode = ErrorCode.IPFS_UPLOAD_FAILED,
+    httpStatus = HttpStatus.SERVICE_UNAVAILABLE,
+    message = "IPFS file upload has failed"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 7232463362753458703L
     }
 }
