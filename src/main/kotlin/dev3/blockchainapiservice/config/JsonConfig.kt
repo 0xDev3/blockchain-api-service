@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.addDeserializer
+import dev3.blockchainapiservice.features.payout.util.MerkleTree
+import dev3.blockchainapiservice.features.payout.util.json.MerkleTreeJsonSerializer
+import dev3.blockchainapiservice.features.payout.util.json.PathSegmentJsonSerializer
 import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.Tuple
@@ -35,6 +38,8 @@ class JsonConfig {
             SimpleModule().apply {
                 addDeserializer(FunctionArgument::class, FunctionArgumentJsonDeserializer())
                 addDeserializer(OutputParameter::class, OutputParameterJsonDeserializer())
+                addSerializer(MerkleTree::class.java, MerkleTreeJsonSerializer())
+                addSerializer(MerkleTree.Companion.PathSegment::class.java, PathSegmentJsonSerializer())
             }
         )
         mapper.registerModule(

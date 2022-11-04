@@ -19,6 +19,12 @@ enum class ErrorCode {
     )
     BLOCKCHAIN_READ_ERROR,
 
+    @Description(
+        "Requested event data cannot be retrieved from the blockchain because it is not well formed (i.e." +
+            " non-existent contract address, calling non-existent contract function etc.)"
+    )
+    BLOCKCHAIN_EVENT_READ_ERROR,
+
     @Description("The transaction info has already been set for the requested resource and it cannot be overridden")
     TX_INFO_ALREADY_SET,
 
@@ -77,5 +83,8 @@ enum class ErrorCode {
     CONTRACT_DECORATOR_INCOMPATIBLE,
 
     @Description("Indicates that the requested contract interface cannot be found")
-    CONTRACT_INTERFACE_NOT_FOUND
+    CONTRACT_INTERFACE_NOT_FOUND,
+
+    @Description("Indicates that file upload to IPFS has failed")
+    IPFS_UPLOAD_FAILED
 }
