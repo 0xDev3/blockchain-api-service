@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.TypeDecorator
@@ -26,7 +28,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
         private val INTERFACE_MANIFEST_JSON = InterfaceManifestJson(
             name = "name",
             description = "description",
-            tags = setOf("interface-tag"),
+            tags = setOf("interface-tag", "another-interface-tag"),
             eventDecorators = emptyList(),
             functionDecorators = listOf(
                 FunctionDecorator(
@@ -59,7 +61,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
     fun beforeEach() {
         postgresContainer.cleanAllDatabaseTables(dslContext)
 
-        contractInterfacesRepository.getAll().forEach {
+        contractInterfacesRepository.getAll(ContractInterfaceFilters(OrList(emptyList()))).forEach {
             contractInterfacesRepository.delete(it.id)
         }
     }
@@ -72,7 +74,9 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch contract interfaces is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/contract-interfaces")
+                MockMvcRequestBuilders.get(
+                    "/v1/contract-interfaces?tags=interface-tag AND another-interface-tag,other-tag"
+                )
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -88,6 +92,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
                             ContractInterfaceManifestResponse(
                                 id = ID.value,
                                 name = INTERFACE_MANIFEST_JSON.name,
+                                tags = INTERFACE_MANIFEST_JSON.tags.toList(),
                                 description = INTERFACE_MANIFEST_JSON.description,
                                 eventDecorators = INTERFACE_MANIFEST_JSON.eventDecorators,
                                 functionDecorators = INTERFACE_MANIFEST_JSON.functionDecorators
@@ -101,12 +106,15 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
     @Test
     fun mustCorrectlyFetchContractInterfaceInfoMarkdowns() {
         suppose("some contract interface info.md exists in the database") {
+            contractInterfacesRepository.store(ID, INTERFACE_MANIFEST_JSON)
             contractInterfacesRepository.store(ID, INFO_MD)
         }
 
         val response = suppose("request to fetch contract interface info.md files is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/contract-interfaces/info.md")
+                MockMvcRequestBuilders.get(
+                    "/v1/contract-interfaces/info.md?tags=interface-tag AND another-interface-tag,other-tag"
+                )
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -142,6 +150,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
                     ContractInterfaceManifestResponse(
                         id = ID.value,
                         name = INTERFACE_MANIFEST_JSON.name,
+                        tags = INTERFACE_MANIFEST_JSON.tags.toList(),
                         description = INTERFACE_MANIFEST_JSON.description,
                         eventDecorators = INTERFACE_MANIFEST_JSON.eventDecorators,
                         functionDecorators = INTERFACE_MANIFEST_JSON.functionDecorators

@@ -9,6 +9,7 @@ import dev3.blockchainapiservice.util.InterfaceId
 data class ContractInterfaceManifestResponse(
     val id: String,
     val name: String?,
+    val tags: List<String>,
     val description: String?,
     val eventDecorators: List<EventDecorator>,
     val functionDecorators: List<FunctionDecorator>
@@ -17,6 +18,7 @@ data class ContractInterfaceManifestResponse(
         id = manifest.id.value,
         name = manifest.name,
         description = manifest.description,
+        tags = manifest.tags.toList(),
         eventDecorators = manifest.eventDecorators,
         functionDecorators = manifest.functionDecorators
     )
@@ -25,6 +27,7 @@ data class ContractInterfaceManifestResponse(
         id = id.value,
         name = manifest.name,
         description = manifest.description,
+        tags = manifest.tags.toList(),
         eventDecorators = manifest.eventDecorators,
         functionDecorators = manifest.functionDecorators
     )

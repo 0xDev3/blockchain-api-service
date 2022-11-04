@@ -8,6 +8,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.filters.AndList
 import dev3.blockchainapiservice.model.filters.ContractDecoratorFilters
+import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
 import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
@@ -80,7 +81,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
     @BeforeEach
     fun beforeEach() {
         postgresContainer.cleanAllDatabaseTables(dslContext)
-        interfacesRepository.getAll().forEach {
+        interfacesRepository.getAll(ContractInterfaceFilters(OrList(emptyList()))).forEach {
             interfacesRepository.delete(it.id)
         }
 

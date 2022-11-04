@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.json.EventDecorator
 import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
@@ -125,13 +127,14 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interfaces are returned") {
-            assertThat(repository.getAll()).withMessage()
+            assertThat(repository.getAll(ContractInterfaceFilters(OrList(emptyList())))).withMessage()
                 .containsExactlyInAnyOrderElementsOf(
                     listOf(
                         InterfaceManifestJsonWithId(
                             id = id1,
                             name = interfaceManifest1.name,
                             description = interfaceManifest1.description,
+                            tags = interfaceManifest1.tags,
                             eventDecorators = interfaceManifest1.eventDecorators,
                             functionDecorators = interfaceManifest1.functionDecorators
                         ),
@@ -139,6 +142,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
                             id = id2,
                             name = interfaceManifest2.name,
                             description = interfaceManifest2.description,
+                            tags = interfaceManifest2.tags,
                             eventDecorators = interfaceManifest2.eventDecorators,
                             functionDecorators = interfaceManifest2.functionDecorators
                         )
@@ -152,9 +156,29 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val repository = InMemoryContractInterfacesRepository()
 
         val id1 = InterfaceId("id-1")
-        val infoMd1 = "info-md-1"
+        val interfaceManifest1 = InterfaceManifestJson(
+            name = "name-1",
+            description = "description-1",
+            tags = setOf("interface-tag-1"),
+            eventDecorators = emptyList(),
+            functionDecorators = emptyList()
+        )
 
         val id2 = InterfaceId("id-2")
+        val interfaceManifest2 = InterfaceManifestJson(
+            name = "name-2",
+            description = "description-2",
+            tags = setOf("interface-tag-2"),
+            eventDecorators = emptyList(),
+            functionDecorators = emptyList()
+        )
+
+        suppose("some contract interfaces are stored") {
+            repository.store(id1, interfaceManifest1)
+            repository.store(id2, interfaceManifest2)
+        }
+
+        val infoMd1 = "info-md-1"
         val infoMd2 = "info-md-2"
 
         suppose("some contract interface info.md files are stored") {
@@ -163,7 +187,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interfaces are returned") {
-            assertThat(repository.getAllInfoMarkdownFiles()).withMessage()
+            assertThat(repository.getAllInfoMarkdownFiles(ContractInterfaceFilters(OrList(emptyList())))).withMessage()
                 .containsExactlyInAnyOrderElementsOf(listOf(infoMd1, infoMd2))
         }
     }
@@ -216,6 +240,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
                             id = id1,
                             name = "name-1",
                             description = "description-1",
+                            tags = interfaceManifest1.tags,
                             eventDecorators = interfaceManifest1.eventDecorators,
                             functionDecorators = interfaceManifest1.functionDecorators
                         )
@@ -272,6 +297,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
                             id = id1,
                             name = "name-1",
                             description = "description-1",
+                            tags = interfaceManifest1.tags,
                             eventDecorators = interfaceManifest1.eventDecorators,
                             functionDecorators = interfaceManifest1.functionDecorators
                         )
