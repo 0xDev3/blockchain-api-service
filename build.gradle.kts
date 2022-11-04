@@ -261,6 +261,24 @@ jooq {
                                 converter = "dev3.blockchainapiservice.util.FunctionDataConverter"
                                 includeExpression = "tx_data"
                                 includeTypes = "BYTEA"
+                            },
+                            ForcedType().apply {
+                                userType = "dev3.blockchainapiservice.features.payout.util.HashFunction"
+                                converter = "dev3.blockchainapiservice.util.HashFunctionConverter"
+                                includeExpression = ".*"
+                                includeTypes = "HASH_FUNCTION"
+                            },
+                            ForcedType().apply {
+                                userType = "dev3.blockchainapiservice.features.payout.util.SnapshotStatus"
+                                converter = "dev3.blockchainapiservice.util.SnapshotStatusConverter"
+                                includeExpression = ".*"
+                                includeTypes = "SNAPSHOT_STATUS"
+                            },
+                            ForcedType().apply {
+                                userType = "dev3.blockchainapiservice.features.payout.util.SnapshotFailureCause"
+                                converter = "dev3.blockchainapiservice.util.SnapshotFailureCauseConverter"
+                                includeExpression = ".*"
+                                includeTypes = "SNAPSHOT_FAILURE_CAUSE"
                             }
                         )
                     }

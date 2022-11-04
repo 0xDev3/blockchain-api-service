@@ -1,6 +1,7 @@
 package dev3.blockchainapiservice.model.result
 
 import dev3.blockchainapiservice.util.Balance
+import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.FunctionData
@@ -13,5 +14,6 @@ data class ContractDeploymentTransactionInfo(
     val deployedContractAddress: ContractAddress,
     val data: FunctionData,
     val value: Balance,
-    val binary: ContractBinaryData
+    val binary: ContractBinaryData,
+    val blockNumber: BlockNumber
 )

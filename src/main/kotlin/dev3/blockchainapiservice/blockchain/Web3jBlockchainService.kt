@@ -3,8 +3,12 @@ package dev3.blockchainapiservice.blockchain
 import dev3.blockchainapiservice.blockchain.properties.ChainPropertiesHandler
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.exception.BlockchainEventReadException
 import dev3.blockchainapiservice.exception.BlockchainReadException
 import dev3.blockchainapiservice.exception.TemporaryBlockchainReadException
+import dev3.blockchainapiservice.features.payout.model.params.GetPayoutsForInvestorParams
+import dev3.blockchainapiservice.features.payout.model.result.PayoutForInvestor
+import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
@@ -31,6 +35,7 @@ import mu.KLogging
 import org.springframework.stereotype.Service
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameter
+import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.RemoteFunctionCall
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
@@ -43,6 +48,7 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
+@Suppress("TooManyFunctions")
 class Web3jBlockchainService(
     private val abiDecoderService: AbiDecoderService,
     private val uuidProvider: UuidProvider,
@@ -312,10 +318,73 @@ class Web3jBlockchainService(
                     deployedContractAddress = ContractAddress(deployTx.first.contractAddress),
                     data = FunctionData(deployTx.second.input),
                     value = Balance(deployTx.second.value),
-                    binary = ContractBinaryData(binary)
+                    binary = ContractBinaryData(binary),
+                    blockNumber = BlockNumber(contractDeploymentBlock)
                 )
             }
         }
+    }
+
+    override fun fetchErc20AccountBalances(
+        chainSpec: ChainSpec,
+        erc20ContractAddress: ContractAddress,
+        ignoredErc20Addresses: Set<WalletAddress>,
+        startBlock: BlockNumber?,
+        endBlock: BlockNumber
+    ): List<PayoutAccountBalance> {
+        logger.info {
+            "Fetching balances ERC20 account balances, chainSpec: $chainSpec," +
+                " erc20ContractAddress: $erc20ContractAddress, ignoredErc20Addresses: $ignoredErc20Addresses," +
+                " startBlock: $startBlock, endBlock: $endBlock"
+        }
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
+        val contract = IERC20.load(
+            erc20ContractAddress.rawValue,
+            blockchainProperties.web3j,
+            ReadonlyTransactionManager(blockchainProperties.web3j, erc20ContractAddress.rawValue),
+            DefaultGasProvider()
+        )
+
+        val startBlockParameter =
+            startBlock?.value?.let(DefaultBlockParameter::valueOf) ?: DefaultBlockParameterName.EARLIEST
+        val endBlockParameter = DefaultBlockParameter.valueOf(endBlock.value)
+
+        logger.debug { "Block range from: ${startBlockParameter.value} to: ${endBlockParameter.value}" }
+
+        // TODO split this into 2k blocks for larger assets - TBD on sprint planning
+        val accounts = contract.findAccounts(startBlockParameter, endBlockParameter) - ignoredErc20Addresses
+
+        logger.debug { "Found ${accounts.size} holder addresses for ERC20 contract: $erc20ContractAddress" }
+
+        contract.setDefaultBlockParameter(endBlockParameter)
+
+        return accounts.map { account ->
+            val balance = contract.balanceOf(account.rawValue).sendSafely()?.let { Balance(it) }
+                ?: throw BlockchainReadException("Unable to fetch balance for address: $account")
+            PayoutAccountBalance(account, balance)
+        }.filter { it.balance.rawValue > BigInteger.ZERO }
+    }
+
+    override fun getPayoutsForInvestor(
+        chainSpec: ChainSpec,
+        params: GetPayoutsForInvestorParams
+    ): List<PayoutForInvestor> {
+        logger.debug { "Get payouts for investor, chainSpec: $chainSpec, params: $params" }
+
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
+        val manager = IPayoutManager.load(
+            params.payoutManager.rawValue,
+            blockchainProperties.web3j,
+            ReadonlyTransactionManager(blockchainProperties.web3j, params.payoutManager.rawValue),
+            DefaultGasProvider()
+        )
+
+        val payoutStates = manager.fetchAllPayouts()?.let { allPayouts ->
+            manager.fetchAllPayoutStatesForInvestor(params, allPayouts)
+        }
+
+        return payoutStates?.map { PayoutForInvestor(it.first, it.second) }
+            ?: throw BlockchainReadException("Failed reading payout data for investor")
     }
 
     private fun Web3j.getBlockDescriptor(
@@ -353,6 +422,68 @@ class Web3jBlockchainService(
             ethLatestBlockNumber
         }
     }
+
+    private fun IERC20.findAccounts(
+        startBlockParameter: DefaultBlockParameter,
+        endBlockParameter: DefaultBlockParameter
+    ): Set<WalletAddress> {
+        val accounts = HashSet<WalletAddress>()
+        val errors = mutableListOf<BlockchainEventReadException>()
+
+        transferEventFlowable(startBlockParameter, endBlockParameter)
+            .subscribe(
+                { event ->
+                    accounts.add(WalletAddress(event.from))
+                    accounts.add(WalletAddress(event.to))
+                },
+                { error ->
+                    logger.error(error) { "Error processing contract transfer event" }
+                    errors += BlockchainEventReadException("Error processing contract transfer event", error)
+                }
+            ).dispose()
+
+        if (errors.isNotEmpty()) {
+            throw errors[0]
+        }
+
+        return accounts
+    }
+
+    @Suppress("TooGenericExceptionCaught")
+    private fun IPayoutManager.fetchAllPayouts(): List<PayoutStruct>? =
+        try {
+            val numOfPayouts = currentPayoutId.send().longValueExact()
+            (0L until numOfPayouts).map { id -> getPayoutInfo(BigInteger.valueOf(id)).send() }
+        } catch (ex: Exception) {
+            logger.warn("Failed smart contract call", ex)
+            null
+        }
+
+    @Suppress("TooGenericExceptionCaught")
+    private fun IPayoutManager.fetchAllPayoutStatesForInvestor(
+        params: GetPayoutsForInvestorParams,
+        allPayouts: List<PayoutStruct>
+    ): List<Pair<PayoutStruct, PayoutStateForInvestor>>? =
+        try {
+            val payoutIds = allPayouts.map { it.payoutId }
+            val claimedFunds = payoutIds.associateWith { payoutId ->
+                Balance(getAmountOfClaimedFunds(payoutId, params.investor.rawValue).send())
+            }
+
+            allPayouts.map { payout ->
+                Pair(
+                    payout,
+                    PayoutStateForInvestor(
+                        payout.payoutId,
+                        params.investor.rawValue,
+                        claimedFunds.getValue(payout.payoutId).rawValue
+                    )
+                )
+            }
+        } catch (ex: Exception) {
+            logger.warn("Failed smart contract call", ex)
+            null
+        }
 
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
     private fun <S, T : Response<*>?> Request<S, T>.sendSafely(): T? {
