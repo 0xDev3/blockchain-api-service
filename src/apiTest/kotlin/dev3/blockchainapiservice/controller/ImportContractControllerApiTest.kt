@@ -120,6 +120,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         private val CONTRACT_INTERFACE = InterfaceManifestJson(
             name = "Example Interface",
             description = "Example smart contract interface",
+            tags = setOf("interface-tag"),
             eventDecorators = emptyList(),
             functionDecorators = listOf(
                 FunctionDecorator(
@@ -157,6 +158,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         private val INCOMPATIBLE_INTERFACE = InterfaceManifestJson(
             name = "Incomaptible Interface",
             description = "Incomaptible smart contract interface",
+            tags = setOf("interface-tag"),
             eventDecorators = emptyList(),
             functionDecorators = listOf(
                 FunctionDecorator(

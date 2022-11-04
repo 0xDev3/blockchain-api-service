@@ -26,6 +26,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
         private val INTERFACE_MANIFEST_JSON = InterfaceManifestJson(
             name = "name",
             description = "description",
+            tags = setOf("interface-tag"),
             eventDecorators = emptyList(),
             functionDecorators = listOf(
                 FunctionDecorator(

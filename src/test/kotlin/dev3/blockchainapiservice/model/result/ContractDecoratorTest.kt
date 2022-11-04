@@ -57,6 +57,7 @@ class ContractDecoratorTest : TestBase() {
         private val INTERFACE_MANIFEST_OVERRIDE_1 = InterfaceManifestJson(
             name = "name",
             description = "description",
+            tags = setOf("interface-tag"),
             eventDecorators = listOf(
                 eventDecorator("FromDecorator", "string", "overridden-1-1"),
                 eventDecorator("FromOverride1", "uint", "overridden-1-2")
@@ -69,6 +70,7 @@ class ContractDecoratorTest : TestBase() {
         private val INTERFACE_MANIFEST_OVERRIDE_2 = InterfaceManifestJson(
             name = "name",
             description = "description",
+            tags = setOf("interface-tag"),
             eventDecorators = listOf(
                 eventDecorator("FromDecorator", "string", "overridden-2-1"),
                 eventDecorator("FromOverride1", "uint", "overridden-2-2"),
@@ -83,6 +85,7 @@ class ContractDecoratorTest : TestBase() {
         private val INTERFACE_MANIFEST_EXTRA = InterfaceManifestJson(
             name = "name",
             description = "description",
+            tags = setOf("interface-tag"),
             eventDecorators = listOf(
                 eventDecorator("FromDecorator", "string", "extra-1"),
                 eventDecorator("FromOverride1", "uint", "extra-2"),
@@ -209,7 +212,7 @@ class ContractDecoratorTest : TestBase() {
                         name = MANIFEST_JSON.name,
                         description = MANIFEST_JSON.description,
                         binary = ContractBinaryData(ARTIFACT_JSON.bytecode),
-                        tags = MANIFEST_JSON.tags.map { ContractTag(it) },
+                        tags = MANIFEST_JSON.tags.map { ContractTag(it) } + ContractTag("interface-tag"),
                         implements = MANIFEST_JSON.implements.map { InterfaceId(it) },
                         constructors = emptyList(),
                         functions = listOf(

@@ -18,6 +18,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest = InterfaceManifestJson(
             name = "name",
             description = "description",
+            tags = setOf("interface-tag"),
             eventDecorators = emptyList(),
             functionDecorators = emptyList()
         )
@@ -59,6 +60,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest = InterfaceManifestJson(
             name = "name",
             description = "description",
+            tags = setOf("interface-tag"),
             eventDecorators = emptyList(),
             functionDecorators = emptyList()
         )
@@ -103,6 +105,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest1 = InterfaceManifestJson(
             name = "name-1",
             description = "description-1",
+            tags = setOf("interface-tag-1"),
             eventDecorators = emptyList(),
             functionDecorators = emptyList()
         )
@@ -111,6 +114,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest2 = InterfaceManifestJson(
             name = "name-2",
             description = "description-2",
+            tags = setOf("interface-tag-2"),
             eventDecorators = emptyList(),
             functionDecorators = emptyList()
         )
@@ -172,6 +176,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest1 = InterfaceManifestJson(
             name = "name-1",
             description = "description-1",
+            tags = setOf("interface-tag-1"),
             eventDecorators = listOf(
                 simpleEventDecorator("Event(string)")
             ),
@@ -184,6 +189,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest2 = InterfaceManifestJson(
             name = "name-2",
             description = "description-2",
+            tags = setOf("interface-tag-2"),
             eventDecorators = listOf(
                 simpleEventDecorator("NonMatchingEvent(string)")
             ),
@@ -226,6 +232,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest1 = InterfaceManifestJson(
             name = "name-1",
             description = "description-1",
+            tags = setOf("interface-tag-1"),
             eventDecorators = listOf(
                 simpleEventDecorator("Event(string)")
             ),
@@ -238,6 +245,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest2 = InterfaceManifestJson(
             name = "name-2",
             description = "description-2",
+            tags = setOf("interface-tag-2"),
             eventDecorators = listOf(
                 simpleEventDecorator("NonMatchingEvent(string)")
             ),
@@ -280,6 +288,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest1 = InterfaceManifestJson(
             name = "name-1",
             description = "description-1",
+            tags = setOf("interface-tag-1"),
             eventDecorators = listOf(
                 simpleEventDecorator("Event(string)")
             ),
@@ -292,6 +301,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         val interfaceManifest2 = InterfaceManifestJson(
             name = "name-2",
             description = "description-2",
+            tags = setOf("interface-tag-2"),
             eventDecorators = listOf(
                 simpleEventDecorator("NonMatchingEvent(string)")
             ),

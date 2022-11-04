@@ -42,13 +42,14 @@ data class ContractDecorator(
 
             val interfaceFunctions = manifestInterfaces.flatMap { it.functionDecorators }.resolveOverrides()
             val interfaceEvents = manifestInterfaces.flatMap { it.eventDecorators }.resolveOverrides()
+            val decoratorTags = manifest.tags + manifestInterfaces.flatMap { it.tags }
 
             return ContractDecorator(
                 id = id,
                 name = manifest.name,
                 description = manifest.description,
                 binary = ContractBinaryData(artifact.bytecode),
-                tags = manifest.tags.map { ContractTag(it) },
+                tags = decoratorTags.map { ContractTag(it) },
                 implements = manifest.implements.map { InterfaceId(it) },
                 constructors = decorateConstructors(artifact, manifest),
                 functions = decorateFunctions(artifact, manifest, interfaceFunctions),
