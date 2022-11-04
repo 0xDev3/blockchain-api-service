@@ -44,7 +44,8 @@ data class TypeDecorator(
     val name: String,
     val description: String,
     val recommendedTypes: List<String>,
-    val parameters: List<TypeDecorator>?
+    val parameters: List<TypeDecorator>?,
+    val hints: List<Any>?
 )
 
 interface OverridableDecorator {

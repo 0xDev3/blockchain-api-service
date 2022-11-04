@@ -130,7 +130,8 @@ class ContractImportServiceTest : TestBase() {
                             name = "",
                             description = "",
                             recommendedTypes = emptyList(),
-                            parameters = null
+                            parameters = null,
+                            hints = emptyList()
                         )
                     )
                 )
@@ -1157,7 +1158,8 @@ class ContractImportServiceTest : TestBase() {
         solidityName = "",
         solidityType = solidityType,
         recommendedTypes = emptyList(),
-        parameters = parameters
+        parameters = parameters,
+        hints = null
     )
 
     private fun tupleOf(vararg elems: Any) = Tuple(elems.toList())
