@@ -22,6 +22,8 @@ data class ManifestJson(
 data class InterfaceManifestJson(
     val name: String?,
     val description: String?,
+    @JsonDeserialize(`as` = LinkedHashSet::class)
+    val tags: Set<String>,
     val eventDecorators: List<EventDecorator>,
     val functionDecorators: List<FunctionDecorator>
 )
@@ -31,6 +33,8 @@ data class InterfaceManifestJsonWithId(
     val id: InterfaceId,
     val name: String?,
     val description: String?,
+    @JsonDeserialize(`as` = LinkedHashSet::class)
+    val tags: Set<String>,
     val eventDecorators: List<EventDecorator>,
     val functionDecorators: List<FunctionDecorator>
 )

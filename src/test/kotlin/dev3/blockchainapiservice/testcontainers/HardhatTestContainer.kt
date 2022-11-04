@@ -71,6 +71,8 @@ class HardhatTestContainer : GenericContainer<HardhatTestContainer>("gluwa/hardh
     }
 
     fun reset() {
+        web3j = Web3j.build(web3jService)
+
         Request("hardhat_reset", emptyList<String>(), web3jService, VoidResponse::class.java).send()
         Request("evm_setAutomine", listOf(true), web3jService, VoidResponse::class.java).send()
 

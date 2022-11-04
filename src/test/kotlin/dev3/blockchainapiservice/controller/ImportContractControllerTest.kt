@@ -181,6 +181,7 @@ class ImportContractControllerTest : TestBase() {
             id = InterfaceId("interface-id"),
             name = "name",
             description = "description",
+            tags = emptySet(),
             eventDecorators = emptyList(),
             functionDecorators = emptyList()
         )

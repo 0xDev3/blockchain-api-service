@@ -1,8 +1,12 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.model.filters.AndList
+import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.model.json.OverridableDecorator
+import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
 import mu.KLogging
 import org.springframework.stereotype.Repository
@@ -44,22 +48,25 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
         return infoMarkdownStorage[id]
     }
 
-    override fun getAll(): List<InterfaceManifestJsonWithId> {
-        logger.debug { "Get all contract interfaces" }
-        return storage.entries.map {
-            InterfaceManifestJsonWithId(
-                id = it.key,
-                name = it.value.name,
-                description = it.value.description,
-                eventDecorators = it.value.eventDecorators,
-                functionDecorators = it.value.functionDecorators
-            )
-        }
+    override fun getAll(filters: ContractInterfaceFilters): List<InterfaceManifestJsonWithId> {
+        logger.debug { "Get all contract interfaces, filters: $filters" }
+        return storage.entries
+            .filterBy(filters.interfaceTags) { it.tags.map { t -> ContractTag(t) } }
+            .map {
+                InterfaceManifestJsonWithId(
+                    id = it.key,
+                    name = it.value.name,
+                    description = it.value.description,
+                    tags = it.value.tags,
+                    eventDecorators = it.value.eventDecorators,
+                    functionDecorators = it.value.functionDecorators
+                )
+            }
     }
 
-    override fun getAllInfoMarkdownFiles(): List<String> {
-        logger.debug { "Get all contract interface info.md files" }
-        return infoMarkdownStorage.values.toList()
+    override fun getAllInfoMarkdownFiles(filters: ContractInterfaceFilters): List<String> {
+        logger.debug { "Get all contract interface info.md files, filters: $filters" }
+        return getAll(filters).map { infoMarkdownStorage[it.id] ?: "" }
     }
 
     override fun getAllWithPartiallyMatchingInterfaces(
@@ -79,6 +86,7 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
                         id = id,
                         name = interfaceDecorator.name,
                         description = interfaceDecorator.description,
+                        tags = interfaceDecorator.tags,
                         eventDecorators = matchingEvents,
                         functionDecorators = matchingFunctions
                     )
@@ -93,5 +101,21 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
     ): List<T>? {
         val interfaceDecoratorSignatures = interfaceDecorators.map { it.signature }.toSet()
         return interfaceDecorators.takeIf { abiSignatures.containsAll(interfaceDecoratorSignatures) }
+    }
+
+    private fun <T> Collection<Map.Entry<InterfaceId, InterfaceManifestJson>>.filterBy(
+        orList: OrList<AndList<T>>,
+        values: (InterfaceManifestJson) -> List<T>
+    ): Collection<Map.Entry<InterfaceId, InterfaceManifestJson>> {
+        val conditions = orList.list.map { it.list }
+
+        return if (conditions.isEmpty()) {
+            this
+        } else {
+            filter { entry ->
+                val interfaceDecorator = values(entry.value)
+                conditions.map { condition -> interfaceDecorator.containsAll(condition) }.contains(true)
+            }
+        }
     }
 }

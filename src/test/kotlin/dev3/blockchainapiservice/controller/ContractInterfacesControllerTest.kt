@@ -3,6 +3,8 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
@@ -26,19 +28,20 @@ class ContractInterfacesControllerTest : TestBase() {
             id = InterfaceId("interface-id"),
             name = "name",
             description = "description",
+            tags = emptySet(),
             eventDecorators = emptyList(),
             functionDecorators = emptyList()
         )
 
         suppose("some contract interfaces will be fetched") {
-            given(repository.getAll())
+            given(repository.getAll(ContractInterfaceFilters(OrList(emptyList()))))
                 .willReturn(listOf(result))
         }
 
         val controller = ContractInterfacesController(repository)
 
         verify("controller returns correct response") {
-            val response = controller.getContractInterfaces()
+            val response = controller.getContractInterfaces(emptyList())
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -51,6 +54,7 @@ class ContractInterfacesControllerTest : TestBase() {
                                     id = result.id.value,
                                     name = result.name,
                                     description = result.description,
+                                    tags = result.tags.toList(),
                                     eventDecorators = result.eventDecorators,
                                     functionDecorators = result.functionDecorators
                                 )
@@ -67,14 +71,14 @@ class ContractInterfacesControllerTest : TestBase() {
         val result = "info-md"
 
         suppose("some contract interface info.md files will be fetched") {
-            given(repository.getAllInfoMarkdownFiles())
+            given(repository.getAllInfoMarkdownFiles(ContractInterfaceFilters(OrList(emptyList()))))
                 .willReturn(listOf(result))
         }
 
         val controller = ContractInterfacesController(repository)
 
         verify("controller returns correct response") {
-            val response = controller.getContractInterfaceInfoMarkdownFiles()
+            val response = controller.getContractInterfaceInfoMarkdownFiles(emptyList())
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
@@ -90,6 +94,7 @@ class ContractInterfacesControllerTest : TestBase() {
         val result = InterfaceManifestJson(
             name = "name",
             description = "description",
+            tags = setOf("interface-tag"),
             eventDecorators = emptyList(),
             functionDecorators = emptyList()
         )
@@ -113,6 +118,7 @@ class ContractInterfacesControllerTest : TestBase() {
                             id = id.value,
                             name = result.name,
                             description = result.description,
+                            tags = result.tags.toList(),
                             eventDecorators = result.eventDecorators,
                             functionDecorators = result.functionDecorators
                         )
