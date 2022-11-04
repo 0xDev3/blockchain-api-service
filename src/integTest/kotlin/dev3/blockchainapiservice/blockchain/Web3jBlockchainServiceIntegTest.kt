@@ -135,6 +135,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 value,
                 Convert.Unit.WEI
             ).send()
+            hardhatContainer.mine()
         }
 
         val blockNumberBeforeSendingBalance = hardhatContainer.blockNumber()
@@ -147,6 +148,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 value,
                 Convert.Unit.WEI
             ).send()
+            hardhatContainer.mine()
         }
 
         val service = createService()
@@ -745,6 +747,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     fun mustCorrectlyFetchBalancesBasedOnBlockRange() {
         val mainAccount = accounts[0]
 
+        suppose("1000 blocks will be mined before contract deployment transaction") {
+            repeat(1_000) { hardhatContainer.mine() }
+        }
+
         val contract = suppose("simple ERC20 contract is deployed") {
             SimpleERC20.deploy(
                 hardhatContainer.web3j,
@@ -756,7 +762,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             ).send()
         }
 
-        hardhatContainer.mine()
+        suppose("1000 blocks will be mined after contract deployment transaction") {
+            repeat(1_000) { hardhatContainer.mine() }
+        }
 
         suppose("some accounts get ERC20 tokens") {
             contract.transfer(accounts[1].address, BigInteger("100")).send()
