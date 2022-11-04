@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.util.InterfaceId
@@ -10,8 +11,8 @@ interface ContractInterfacesRepository {
     fun delete(id: InterfaceId): Boolean
     fun getById(id: InterfaceId): InterfaceManifestJson?
     fun getInfoMarkdownById(id: InterfaceId): String?
-    fun getAll(): List<InterfaceManifestJsonWithId>
-    fun getAllInfoMarkdownFiles(): List<String>
+    fun getAll(filters: ContractInterfaceFilters): List<InterfaceManifestJsonWithId>
+    fun getAllInfoMarkdownFiles(filters: ContractInterfaceFilters): List<String>
     fun getAllWithPartiallyMatchingInterfaces(
         abiFunctionSignatures: Set<String>,
         abiEventSignatures: Set<String>

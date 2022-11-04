@@ -129,7 +129,7 @@ class ContractInterfacesServiceTest : TestBase() {
             linkReferences = null,
             deployedLinkReferences = null
         )
-        private val EMPTY_CONTRACT_INTERFACE = InterfaceManifestJson(null, null, emptyList(), emptyList())
+        private val EMPTY_CONTRACT_INTERFACE = InterfaceManifestJson(null, null, emptySet(), emptyList(), emptyList())
     }
 
     @Test
@@ -163,6 +163,7 @@ class ContractInterfacesServiceTest : TestBase() {
                             id = InterfaceId("already-implemented"),
                             name = "Already Implemented",
                             description = "Already Implemented",
+                            tags = emptySet(),
                             eventDecorators = MANIFEST_JSON.eventDecorators,
                             functionDecorators = emptyList()
                         ),
@@ -170,6 +171,7 @@ class ContractInterfacesServiceTest : TestBase() {
                             id = InterfaceId("not-yet-implemented"),
                             name = "Not Yet Implemented",
                             description = "Not Yet Implemented",
+                            tags = emptySet(),
                             eventDecorators = emptyList(),
                             functionDecorators = MANIFEST_JSON.functionDecorators
                         )
@@ -192,6 +194,7 @@ class ContractInterfacesServiceTest : TestBase() {
                             id = InterfaceId("not-yet-implemented"),
                             name = "Not Yet Implemented",
                             description = "Not Yet Implemented",
+                            tags = emptySet(),
                             eventDecorators = emptyList(),
                             functionDecorators = MANIFEST_JSON.functionDecorators
                         )

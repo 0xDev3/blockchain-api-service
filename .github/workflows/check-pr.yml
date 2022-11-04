@@ -100,10 +100,28 @@ jobs:
         run: ./gradlew clean build -x test -x integTest -x apiTest --stacktrace
       - name: Unit tests
         run: ./gradlew test
+      - name: Failed unit tests results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: unit-test-results
+          path: build/reports/tests/test/
       - name: Integration tests
         run: ./gradlew integTest
+      - name: Failed integration tests results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: integration-test-results
+          path: build/reports/tests/integTest/
       - name: API tests
         run: ./gradlew apiTest
+      - name: Failed API tests results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-test-results
+          path: build/reports/tests/apiTest/
       - name: Generate test coverage report
         run: ./gradlew jacocoTestReport
       - name: Verify test coverage minimum limit
