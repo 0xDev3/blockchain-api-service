@@ -81,7 +81,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             solidityName = "owner",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     description = "Main constructor",
@@ -101,7 +102,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             solidityName = "",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     emittableEvents = emptyList(),

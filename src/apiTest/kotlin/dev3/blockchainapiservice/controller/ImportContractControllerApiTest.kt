@@ -88,7 +88,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             solidityName = "owner",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     description = "Main constructor",
@@ -108,7 +109,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             solidityName = "",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     emittableEvents = emptyList(),
@@ -132,7 +134,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             name = "New owner",
                             description = "New owner of the cotnract",
                             recommendedTypes = emptyList(),
-                            parameters = emptyList()
+                            parameters = emptyList(),
+                            hints = emptyList()
                         )
                     ),
                     returnDecorators = emptyList(),
@@ -148,7 +151,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             name = "Current owner",
                             description = "Current owner of the cotnract",
                             recommendedTypes = emptyList(),
-                            parameters = emptyList()
+                            parameters = emptyList(),
+                            hints = emptyList()
                         )
                     ),
                     emittableEvents = emptyList()
@@ -539,7 +543,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                                         solidityName = "param1",
                                         solidityType = "address",
                                         recommendedTypes = emptyList(),
-                                        parameters = null
+                                        parameters = null,
+                                        hints = null
                                     )
                                 ),
                                 outputs = emptyList(),

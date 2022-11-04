@@ -164,7 +164,8 @@ class ContractDecoratorTest : TestBase() {
                         name = "Arg1",
                         description = "Arg1",
                         recommendedTypes = emptyList(),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 ),
                 returnDecorators = emptyList(),
@@ -181,7 +182,8 @@ class ContractDecoratorTest : TestBase() {
                         name = "Arg1",
                         description = "Arg1",
                         recommendedTypes = emptyList(),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 )
             )
@@ -227,7 +229,8 @@ class ContractDecoratorTest : TestBase() {
                                         solidityType = "string",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
-                                        parameters = null
+                                        parameters = null,
+                                        hints = null
                                     )
                                 ),
                                 outputs = emptyList(),
@@ -245,7 +248,8 @@ class ContractDecoratorTest : TestBase() {
                                         solidityType = "uint",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
-                                        parameters = null
+                                        parameters = null,
+                                        hints = null
                                     )
                                 ),
                                 outputs = emptyList(),
@@ -263,7 +267,8 @@ class ContractDecoratorTest : TestBase() {
                                         solidityType = "int",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
-                                        parameters = null
+                                        parameters = null,
+                                        hints = null
                                     )
                                 ),
                                 outputs = emptyList(),
@@ -281,7 +286,8 @@ class ContractDecoratorTest : TestBase() {
                                         solidityType = "bool",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
-                                        parameters = null
+                                        parameters = null,
+                                        hints = null
                                     )
                                 ),
                                 outputs = emptyList(),
@@ -301,7 +307,8 @@ class ContractDecoratorTest : TestBase() {
                                         solidityType = "string",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
-                                        parameters = null
+                                        parameters = null,
+                                        hints = null
                                     )
                                 )
                             ),
@@ -316,7 +323,8 @@ class ContractDecoratorTest : TestBase() {
                                         solidityType = "uint",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
-                                        parameters = null
+                                        parameters = null,
+                                        hints = null
                                     )
                                 )
                             ),
@@ -331,7 +339,8 @@ class ContractDecoratorTest : TestBase() {
                                         solidityType = "int",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
-                                        parameters = null
+                                        parameters = null,
+                                        hints = null
                                     )
                                 )
                             ),
@@ -346,7 +355,8 @@ class ContractDecoratorTest : TestBase() {
                                         solidityType = "bool",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
-                                        parameters = null
+                                        parameters = null,
+                                        hints = null
                                     )
                                 )
                             )

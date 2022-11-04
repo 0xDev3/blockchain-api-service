@@ -52,7 +52,8 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                             solidityName = "owner",
                             solidityType = "address",
                             recommendedTypes = emptyList(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     description = "Main constructor",
@@ -72,7 +73,8 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                             solidityName = "",
                             solidityType = "address",
                             recommendedTypes = emptyList(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     emittableEvents = emptyList(),
@@ -96,7 +98,8 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                             name = "Owner address",
                             description = "Contract owner address",
                             recommendedTypes = emptyList(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     )
                 )
@@ -112,7 +115,8 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                             name = "Owner address",
                             description = "Contract owner address",
                             recommendedTypes = emptyList(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     emittableEvents = emptyList()
