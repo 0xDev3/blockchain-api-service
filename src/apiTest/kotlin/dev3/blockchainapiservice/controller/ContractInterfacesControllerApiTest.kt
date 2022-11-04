@@ -41,7 +41,8 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
                             name = "Owner address",
                             description = "Contract owner address",
                             recommendedTypes = emptyList(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     emittableEvents = emptyList()

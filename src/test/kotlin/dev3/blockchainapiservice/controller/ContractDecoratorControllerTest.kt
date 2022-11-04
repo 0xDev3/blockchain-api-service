@@ -53,7 +53,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             solidityName = "owner",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     description = "Main constructor",
@@ -73,7 +74,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             solidityName = "",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     emittableEvents = emptyList(),
@@ -146,7 +148,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             solidityName = "owner",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     description = "Main constructor",
@@ -166,7 +169,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             solidityName = "",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     emittableEvents = emptyList(),
@@ -462,7 +466,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             solidityName = "owner",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     description = "Main constructor",
@@ -482,7 +487,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             solidityName = "",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     emittableEvents = emptyList(),
@@ -543,7 +549,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             solidityName = "owner",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     description = "Main constructor",
@@ -563,7 +570,8 @@ class ContractDecoratorControllerTest : TestBase() {
                             solidityName = "",
                             solidityType = "address",
                             recommendedTypes = listOf(),
-                            parameters = null
+                            parameters = null,
+                            hints = null
                         )
                     ),
                     emittableEvents = emptyList(),
