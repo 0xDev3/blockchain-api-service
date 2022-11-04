@@ -44,6 +44,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         private val EMPTY_INTERFACE_MANIFEST = InterfaceManifestJson(
             name = null,
             description = null,
+            tags = emptySet(),
             eventDecorators = emptyList(),
             functionDecorators = emptyList()
         )

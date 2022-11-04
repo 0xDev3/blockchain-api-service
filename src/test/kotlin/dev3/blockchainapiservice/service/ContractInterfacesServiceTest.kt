@@ -129,7 +129,7 @@ class ContractInterfacesServiceTest : TestBase() {
             linkReferences = null,
             deployedLinkReferences = null
         )
-        private val EMPTY_CONTRACT_INTERFACE = InterfaceManifestJson(null, null, emptyList(), emptyList())
+        private val EMPTY_CONTRACT_INTERFACE = InterfaceManifestJson(null, null, emptySet(), emptyList(), emptyList())
     }
 
     @Test

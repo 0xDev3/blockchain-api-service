@@ -90,6 +90,7 @@ class ContractInterfacesControllerTest : TestBase() {
         val result = InterfaceManifestJson(
             name = "name",
             description = "description",
+            tags = setOf("interface-tag"),
             eventDecorators = emptyList(),
             functionDecorators = emptyList()
         )
