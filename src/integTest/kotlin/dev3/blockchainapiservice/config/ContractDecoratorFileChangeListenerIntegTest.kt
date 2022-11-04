@@ -49,7 +49,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         solidityName = "arg",
                         solidityType = "address",
                         recommendedTypes = listOf("example"),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 ),
                 description = "Constructor description",
@@ -63,7 +64,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         solidityName = "arg",
                         solidityType = "string",
                         recommendedTypes = listOf("example"),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 ),
                 description = "Payable constructor description",
@@ -82,7 +84,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         solidityName = "arg",
                         solidityType = "address",
                         recommendedTypes = listOf("example"),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 ),
                 outputs = listOf(
@@ -92,7 +95,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         solidityName = "",
                         solidityType = "bool",
                         recommendedTypes = listOf("example"),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 ),
                 emittableEvents = listOf("ExampleEvent(address)"),
@@ -109,7 +113,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         solidityName = "arg",
                         solidityType = "address",
                         recommendedTypes = listOf("example"),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 ),
                 outputs = listOf(
@@ -119,7 +124,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         solidityName = "",
                         solidityType = "bool",
                         recommendedTypes = listOf("example"),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 ),
                 emittableEvents = listOf("ExampleEvent(address)"),
@@ -136,7 +142,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         solidityName = "arg",
                         solidityType = "address",
                         recommendedTypes = listOf("example"),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 ),
                 outputs = listOf(
@@ -146,7 +153,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         solidityName = "",
                         solidityType = "bool",
                         recommendedTypes = listOf("example"),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 ),
                 emittableEvents = listOf("ExampleEvent(address)"),
@@ -165,7 +173,8 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         solidityName = "arg",
                         solidityType = "address",
                         recommendedTypes = listOf("example"),
-                        parameters = null
+                        parameters = null,
+                        hints = null
                     )
                 )
             )

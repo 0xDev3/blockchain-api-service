@@ -146,7 +146,8 @@ data class ContractDecorator(
                     solidityName = it.second.name,
                     solidityType = it.second.type,
                     recommendedTypes = it.first.recommendedTypes,
-                    parameters = it.first.parameters?.toContractParameters(it.second.components ?: emptyList())
+                    parameters = it.first.parameters?.toContractParameters(it.second.components ?: emptyList()),
+                    hints = it.first.hints
                 )
             }
 
@@ -161,7 +162,8 @@ data class ContractParameter(
     val solidityName: String,
     val solidityType: String,
     val recommendedTypes: List<String>,
-    val parameters: List<ContractParameter>?
+    val parameters: List<ContractParameter>?,
+    val hints: List<Any>?
 )
 
 data class ContractConstructor(

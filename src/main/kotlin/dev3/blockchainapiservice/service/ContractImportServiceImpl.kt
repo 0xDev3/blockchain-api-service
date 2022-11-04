@@ -115,7 +115,8 @@ class ContractImportServiceImpl(
                 solidityName = "",
                 solidityType = "bytes32",
                 recommendedTypes = emptyList(),
-                parameters = null
+                parameters = null,
+                hints = null
             )
         }
 
