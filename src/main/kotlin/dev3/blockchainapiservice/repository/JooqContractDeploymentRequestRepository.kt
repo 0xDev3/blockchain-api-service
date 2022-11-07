@@ -10,6 +10,7 @@ import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
@@ -103,12 +104,28 @@ class JooqContractDeploymentRequestRepository(
     }
 
     override fun getByAliasAndProjectId(alias: String, projectId: UUID): ContractDeploymentRequest? {
-        logger.debug { "Get contract deployment request by alias and project ID, alias: $alias, projectId: $projectId" }
+        logger.debug { "Get contract deployment request by alias: $alias, projectId: $projectId" }
         return dslContext.selectWithJoin()
             .where(
                 DSL.and(
                     ContractDeploymentRequestTable.ALIAS.eq(alias),
                     ContractDeploymentRequestTable.PROJECT_ID.eq(projectId),
+                    ContractDeploymentRequestTable.DELETED.eq(false)
+                )
+            )
+            .fetchOne { it.toModel() }
+    }
+
+    override fun getByContractAddressAndChainId(
+        contractAddress: ContractAddress,
+        chainId: ChainId
+    ): ContractDeploymentRequest? {
+        logger.debug { "Get contract deployment request by contractAddress: $contractAddress, chainId: $chainId" }
+        return dslContext.selectWithJoin()
+            .where(
+                DSL.and(
+                    ContractDeploymentRequestTable.CONTRACT_ADDRESS.eq(contractAddress),
+                    ContractDeploymentRequestTable.CHAIN_ID.eq(chainId),
                     ContractDeploymentRequestTable.DELETED.eq(false)
                 )
             )
