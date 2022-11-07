@@ -37,7 +37,8 @@ class ImportContractController(
         @Valid @RequestBody requestBody: ImportContractRequest
     ): ResponseEntity<ContractDeploymentRequestResponse> {
         val params = ImportContractParams(requestBody)
-        val importedContractId = contractImportService.importContract(params, project)
+        val importedContractId = contractImportService.importExistingContract(params, project)
+            ?: contractImportService.importContract(params, project)
         val importedContract = contractDeploymentRequestService.getContractDeploymentRequest(importedContractId)
         return ResponseEntity.ok(ContractDeploymentRequestResponse(importedContract))
     }

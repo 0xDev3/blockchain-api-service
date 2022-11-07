@@ -9,6 +9,7 @@ import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.params.ImportContractParams
 import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
+import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractMetadata
 import dev3.blockchainapiservice.model.result.ContractParameter
@@ -47,6 +48,23 @@ class ContractImportServiceImpl(
         data class TypeAndValue(val type: String, val value: Any)
     }
 
+    override fun importExistingContract(params: ImportContractParams, project: Project): UUID? {
+        logger.info { "Attempting to importing existing smart contract, params: $params, project: $project" }
+
+        return contractDeploymentRequestRepository.getByContractAddressAndChainId(
+            contractAddress = params.contractAddress,
+            chainId = project.chainId
+        )?.let {
+            logger.info { "Already existing contract found, params: $params, project: $project" }
+
+            if (it.imported) {
+                copyImportedContract(params, project, it)
+            } else {
+                copyDeployedContract(params, project, it)
+            }
+        }
+    }
+
     override fun importContract(
         params: ImportContractParams,
         project: Project
@@ -58,6 +76,91 @@ class ContractImportServiceImpl(
         } else {
             importAndDecompileContract(params, project)
         }
+    }
+
+    private fun copyDeployedContract(
+        params: ImportContractParams,
+        project: Project,
+        request: ContractDeploymentRequest
+    ): UUID {
+        val id = uuidProvider.getUuid()
+        val storedRequest = contractDeploymentRequestRepository.store(
+            params = StoreContractDeploymentRequestParams.fromContractDeploymentRequest(
+                id = id,
+                importContractParams = params,
+                contractDeploymentRequest = request,
+                project = project,
+                createdAt = utcDateTimeProvider.getUtcDateTime()
+            ),
+            metadataProjectId = Constants.NIL_UUID
+        )
+
+        contractDeploymentRequestRepository.setTxInfo(id, request.txHash!!, request.deployerAddress!!)
+        contractDeploymentRequestRepository.setContractAddress(id, params.contractAddress)
+
+        return storedRequest.id
+    }
+
+    private fun copyImportedContract(
+        params: ImportContractParams,
+        project: Project,
+        request: ContractDeploymentRequest
+    ): UUID {
+        val existingManifestJson = importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(
+            contractId = request.contractId,
+            projectId = request.projectId
+        )!!
+        val existingArtifactJson = importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(
+            contractId = request.contractId,
+            projectId = request.projectId
+        )!!
+        val existingInfoMarkdown = importedContractDecoratorRepository.getInfoMarkdownByContractIdAndProjectId(
+            contractId = request.contractId,
+            projectId = request.projectId
+        )!!
+
+        val newContractId = ContractId("imported-${params.contractAddress.rawValue}-${project.chainId.value}")
+        val newDecorator = importedContractDecoratorRepository.getByContractIdAndProjectId(
+            contractId = newContractId,
+            projectId = project.id
+        ) ?: importedContractDecoratorRepository.store(
+            id = uuidProvider.getUuid(),
+            projectId = project.id,
+            contractId = newContractId,
+            manifestJson = existingManifestJson,
+            artifactJson = existingArtifactJson,
+            infoMarkdown = existingInfoMarkdown,
+            importedAt = utcDateTimeProvider.getUtcDateTime()
+        )
+
+        contractMetadataRepository.createOrUpdate(
+            ContractMetadata(
+                id = uuidProvider.getUuid(),
+                name = newDecorator.name,
+                description = newDecorator.description,
+                contractId = newContractId,
+                contractTags = newDecorator.tags,
+                contractImplements = newDecorator.implements,
+                projectId = project.id
+            )
+        )
+
+        val id = uuidProvider.getUuid()
+        val storedRequest = contractDeploymentRequestRepository.store(
+            params = StoreContractDeploymentRequestParams.fromContractDeploymentRequest(
+                id = id,
+                importContractParams = params,
+                contractDeploymentRequest = request.copy(contractId = newContractId),
+                project = project,
+                createdAt = utcDateTimeProvider.getUtcDateTime()
+            ).copy(imported = true),
+            metadataProjectId = project.id
+        )
+
+        contractDeploymentRequestRepository.setTxInfo(id, request.txHash!!, request.deployerAddress!!)
+        contractDeploymentRequestRepository.setContractAddress(id, params.contractAddress)
+
+        return storedRequest.id
     }
 
     @Suppress("ThrowsCount")
