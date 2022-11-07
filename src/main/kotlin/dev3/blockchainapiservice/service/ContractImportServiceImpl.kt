@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "TooManyFunctions")
 class ContractImportServiceImpl(
     private val abiDecoderService: AbiDecoderService,
     private val contractDecompilerService: ContractDecompilerService,
