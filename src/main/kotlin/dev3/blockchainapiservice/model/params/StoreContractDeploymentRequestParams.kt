@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.model.params
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
@@ -55,6 +56,29 @@ data class StoreContractDeploymentRequestParams(
             createdAt = createdAt,
             arbitraryData = params.createParams.arbitraryData,
             screenConfig = params.createParams.screenConfig,
+            imported = false
+        )
+
+        fun fromContractDeploymentRequest(
+            id: UUID,
+            importContractParams: ImportContractParams,
+            contractDeploymentRequest: ContractDeploymentRequest,
+            project: Project,
+            createdAt: UtcDateTime,
+        ) = StoreContractDeploymentRequestParams(
+            id = id,
+            alias = importContractParams.alias,
+            contractId = contractDeploymentRequest.contractId,
+            contractData = contractDeploymentRequest.contractData,
+            constructorParams = contractDeploymentRequest.constructorParams,
+            deployerAddress = contractDeploymentRequest.deployerAddress,
+            initialEthAmount = contractDeploymentRequest.initialEthAmount,
+            chainId = contractDeploymentRequest.chainId,
+            redirectUrl = project.createRedirectUrl(importContractParams.redirectUrl, id, PATH),
+            projectId = project.id,
+            createdAt = createdAt,
+            arbitraryData = importContractParams.arbitraryData,
+            screenConfig = importContractParams.screenConfig,
             imported = false
         )
     }
