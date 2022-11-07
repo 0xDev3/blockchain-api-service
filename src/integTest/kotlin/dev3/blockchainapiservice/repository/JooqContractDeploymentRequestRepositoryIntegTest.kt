@@ -169,6 +169,35 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchContractDeploymentRequestByContractAddressAndChainId() {
+        val metadata = createMetadataRecord()
+        val record = createRecord(UUID.randomUUID(), metadata)
+
+        suppose("some contract deployment request exists in database") {
+            dslContext.executeInsert(metadata)
+            dslContext.executeInsert(record)
+            repository.setContractAddress(record.id, CONTRACT_ADDRESS)
+        }
+
+        verify("contract deployment request is correctly fetched by contract address and chain ID") {
+            val result = repository.getByContractAddressAndChainId(CONTRACT_ADDRESS, record.chainId)
+
+            assertThat(result).withMessage()
+                .isEqualTo(record.toModel(metadata))
+        }
+    }
+
+    @Test
+    fun mustReturnNullWhenFetchingNonExistentContractDeploymentRequestByContractAddressAndChainId() {
+        verify("null is returned when fetching non-existent contract deployment request by c. address and chain ID") {
+            val result = repository.getByContractAddressAndChainId(ContractAddress("dead"), ChainId(1337L))
+
+            assertThat(result).withMessage()
+                .isNull()
+        }
+    }
+
+    @Test
     fun mustCorrectlyFetchContractDeploymentRequestsByProjectIdAndFilters() {
         val cid1Metadata = createMetadataRecord(contractId = ContractId("cid-1"))
         val cid2Metadata = createMetadataRecord(contractId = ContractId("cid-2"))
