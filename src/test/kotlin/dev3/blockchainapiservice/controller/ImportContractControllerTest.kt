@@ -104,6 +104,11 @@ class ImportContractControllerTest : TestBase() {
             createdAt = TestData.TIMESTAMP
         )
 
+        suppose("some smart contract is not already imported") {
+            given(importService.importExistingContract(params, project))
+                .willReturn(null)
+        }
+
         suppose("some smart contract will be imported") {
             given(importService.importContract(params, project))
                 .willReturn(result.value.id)

@@ -249,6 +249,187 @@ class ImportContractControllerApiTest : ControllerTestBase() {
     }
 
     @Test
+    fun mustCorrectlyImportAlreadyDeployedSmartContract() {
+        val alias = "alias"
+        val ownerAddress = WalletAddress("a")
+        val mainAccount = accounts[0]
+        val deployerAddress = WalletAddress(mainAccount.address)
+        val initialEthAmount = Balance.ZERO
+
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
+        val paramsJson =
+            """
+                [
+                    {
+                        "type": "address",
+                        "value": "${ownerAddress.rawValue}"
+                    }
+                ]
+            """.trimIndent()
+
+        val createResponse = suppose("request to create contract deployment request is made") {
+            val createResponse = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/deploy")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$alias",
+                                "contract_id": "${CONTRACT_DECORATOR.id.value}",
+                                "constructor_params": $paramsJson,
+                                "deployer_address": "${deployerAddress.rawValue}",
+                                "initial_eth_amount": "${initialEthAmount.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(
+                createResponse.response.contentAsString,
+                ContractDeploymentRequestResponse::class.java
+            )
+        }
+
+        val contract = suppose("contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.mine()
+        }
+
+        val receipt = contract.transactionReceipt.get()
+        val txHash = TransactionHash(receipt.transactionHash)
+        val contractAddress = ContractAddress(receipt.contractAddress)
+
+        suppose("transaction info is attached to contract deployment request") {
+            contractDeploymentRequestRepository.setTxInfo(createResponse.id, txHash, deployerAddress)
+            contractDeploymentRequestRepository.setContractAddress(createResponse.id, contractAddress)
+        }
+
+        val newAlias = "new-alias"
+        val importResponse = suppose("request to import smart contract is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.post("/v1/import-smart-contract")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        """
+                            {
+                                "alias": "$newAlias",
+                                "contract_address": "${contractAddress.rawValue}",
+                                "arbitrary_data": {
+                                    "test": true
+                                },
+                                "screen_config": {
+                                    "before_action_message": "before-action-message",
+                                    "after_action_message": "after-action-message"
+                                }
+                            }
+                        """.trimIndent()
+                    )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDeploymentRequestResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(importResponse).withMessage()
+                .isEqualTo(
+                    ContractDeploymentRequestResponse(
+                        id = importResponse.id,
+                        alias = newAlias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
+                        status = Status.SUCCESS,
+                        contractId = CONTRACT_DECORATOR.id.value,
+                        contractDeploymentData = createResponse.contractDeploymentData,
+                        constructorParams = createResponse.constructorParams,
+                        contractTags = CONTRACT_DECORATOR.tags.map { it.value },
+                        contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
+                        initialEthAmount = BigInteger.ZERO,
+                        chainId = PROJECT.chainId.value,
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${importResponse.id}/action",
+                        projectId = PROJECT_ID,
+                        createdAt = importResponse.createdAt,
+                        arbitraryData = importResponse.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        contractAddress = ContractAddress(contract.contractAddress).rawValue,
+                        deployerAddress = deployerAddress.rawValue,
+                        deployTx = createResponse.deployTx.copy(
+                            txHash = txHash.value,
+                            blockConfirmations = importResponse.deployTx.blockConfirmations,
+                            timestamp = importResponse.deployTx.timestamp
+                        ),
+                        imported = false
+                    )
+                )
+
+            assertThat(importResponse.createdAt)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+
+        verify("contract deployment request is correctly stored in database") {
+            val storedRequest = contractDeploymentRequestRepository.getById(importResponse.id)
+
+            assertThat(storedRequest).withMessage()
+                .isEqualTo(
+                    ContractDeploymentRequest(
+                        id = importResponse.id,
+                        alias = newAlias,
+                        name = CONTRACT_DECORATOR.name,
+                        description = CONTRACT_DECORATOR.description,
+                        contractId = CONTRACT_DECORATOR.id,
+                        contractData = ContractBinaryData(createResponse.contractDeploymentData),
+                        constructorParams = createResponse.constructorParams,
+                        contractTags = CONTRACT_DECORATOR.tags,
+                        contractImplements = CONTRACT_DECORATOR.implements,
+                        initialEthAmount = Balance.ZERO,
+                        chainId = PROJECT.chainId,
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${importResponse.id}/action",
+                        projectId = PROJECT_ID,
+                        createdAt = storedRequest!!.createdAt,
+                        arbitraryData = importResponse.arbitraryData,
+                        screenConfig = ScreenConfig(
+                            beforeActionMessage = "before-action-message",
+                            afterActionMessage = "after-action-message"
+                        ),
+                        contractAddress = contractAddress,
+                        deployerAddress = deployerAddress,
+                        txHash = txHash,
+                        imported = false
+                    )
+                )
+
+            assertThat(storedRequest.createdAt.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
     fun mustCorrectlyImportSmartContractForSomeExistingContractDecorator() {
         suppose("some contract decorator exists in the database") {
             contractDecoratorRepository.store(CONTRACT_DECORATOR)
