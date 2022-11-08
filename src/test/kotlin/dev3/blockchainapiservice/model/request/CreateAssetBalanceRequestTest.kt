@@ -56,7 +56,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("redirectUrl")
         }
@@ -352,7 +352,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("value must be a valid JSON of at most 5000 characters")
+                .isEqualTo("value must be a valid JSON of at most $REQUEST_BODY_MAX_JSON_CHARS characters")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("arbitraryData")
         }
@@ -400,7 +400,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("screenConfig.beforeActionMessage")
         }
@@ -451,7 +451,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("screenConfig.afterActionMessage")
         }

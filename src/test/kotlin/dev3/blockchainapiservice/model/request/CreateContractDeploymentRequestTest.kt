@@ -163,7 +163,7 @@ class CreateContractDeploymentRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("contractId")
         }
@@ -212,7 +212,7 @@ class CreateContractDeploymentRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 50")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_ARGS_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("constructorParams")
         }
@@ -242,7 +242,7 @@ class CreateContractDeploymentRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("value must be a valid JSON of at most 1000 characters")
+                .isEqualTo("value must be a valid JSON of at most $FUNCTION_ARGUMENT_MAX_JSON_CHARS characters")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("constructorParams[0].rawJson")
         }
@@ -460,7 +460,7 @@ class CreateContractDeploymentRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("redirectUrl")
         }
@@ -508,7 +508,7 @@ class CreateContractDeploymentRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("value must be a valid JSON of at most 5000 characters")
+                .isEqualTo("value must be a valid JSON of at most $REQUEST_BODY_MAX_JSON_CHARS characters")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("arbitraryData")
         }
@@ -558,7 +558,7 @@ class CreateContractDeploymentRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("screenConfig.beforeActionMessage")
         }
@@ -611,7 +611,7 @@ class CreateContractDeploymentRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("screenConfig.afterActionMessage")
         }

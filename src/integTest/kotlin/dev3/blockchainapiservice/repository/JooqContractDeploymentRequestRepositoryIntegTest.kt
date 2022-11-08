@@ -25,6 +25,7 @@ import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
 import dev3.blockchainapiservice.util.TransactionHash
+import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -37,6 +38,7 @@ import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
 import java.math.BigInteger
+import java.time.Duration
 import java.util.UUID
 
 @JooqTest
@@ -171,19 +173,34 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestByContractAddressAndChainId() {
         val metadata = createMetadataRecord()
-        val record = createRecord(UUID.randomUUID(), metadata)
+        val olderRecord = createRecord(
+            id = UUID.randomUUID(),
+            metadata = metadata,
+            createdAt = TestData.TIMESTAMP
+        )
 
-        suppose("some contract deployment request exists in database") {
+        suppose("some older contract deployment request exists in database") {
             dslContext.executeInsert(metadata)
-            dslContext.executeInsert(record)
-            repository.setContractAddress(record.id, CONTRACT_ADDRESS)
+            dslContext.executeInsert(olderRecord)
+            repository.setContractAddress(olderRecord.id, CONTRACT_ADDRESS)
+        }
+
+        val newerRecord = createRecord(
+            id = UUID.randomUUID(),
+            metadata = metadata,
+            createdAt = TestData.TIMESTAMP + Duration.ofDays(1L)
+        )
+
+        suppose("some newer contract deployment request exists in database with same contract address") {
+            dslContext.executeInsert(newerRecord)
+            repository.setContractAddress(newerRecord.id, CONTRACT_ADDRESS)
         }
 
         verify("contract deployment request is correctly fetched by contract address and chain ID") {
-            val result = repository.getByContractAddressAndChainId(CONTRACT_ADDRESS, record.chainId)
+            val result = repository.getByContractAddressAndChainId(CONTRACT_ADDRESS, olderRecord.chainId)
 
             assertThat(result).withMessage()
-                .isEqualTo(record.toModel(metadata))
+                .isEqualTo(olderRecord.toModel(metadata))
         }
     }
 
@@ -967,7 +984,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         projectId: UUID = PROJECT_ID_1,
         contractAddress: ContractAddress? = CONTRACT_ADDRESS,
         deployerAddress: WalletAddress? = DEPLOYER_ADDRESS,
-        txHash: TransactionHash? = TX_HASH
+        txHash: TransactionHash? = TX_HASH,
+        createdAt: UtcDateTime = TestData.TIMESTAMP
     ) = ContractDeploymentRequestRecord(
         id = id,
         alias = UUID.randomUUID().toString(),
@@ -978,7 +996,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         chainId = CHAIN_ID,
         redirectUrl = REDIRECT_URL,
         projectId = projectId,
-        createdAt = TestData.TIMESTAMP,
+        createdAt = createdAt,
         arbitraryData = ARBITRARY_DATA,
         screenBeforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
         screenAfterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE,
