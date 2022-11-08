@@ -122,17 +122,19 @@ data class ContractDecorator(
                 imported = imported
             ).resolveOverrides()
 
-            return decorators.map {
-                val artifactEvent = events.getAbiObjectBySignature(it.signature)
+            return decorators.mapNotNull { decorator ->
+                val artifactEvent = events[decorator.signature]
 
-                ContractEvent(
-                    name = it.name,
-                    description = it.description,
-                    solidityName = artifactEvent.name ?: throw ContractDecoratorException(
-                        "Event ${it.signature} is missing event name in artifact.json"
-                    ),
-                    inputs = it.parameterDecorators.toContractParameters(artifactEvent.inputs.orEmpty())
-                )
+                artifactEvent?.let {
+                    ContractEvent(
+                        name = decorator.name,
+                        description = decorator.description,
+                        solidityName = artifactEvent.name ?: throw ContractDecoratorException(
+                            "Event ${decorator.signature} is missing event name in artifact.json"
+                        ),
+                        inputs = decorator.parameterDecorators.toContractParameters(artifactEvent.inputs.orEmpty())
+                    )
+                }
             }
         }
 
