@@ -78,7 +78,8 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
             val id = it.key
             val interfaceDecorator = it.value
             val matchingFunctions = findMatches(interfaceDecorator.functionDecorators, abiFunctionSignatures)
-            val matchingEvents = findMatches(interfaceDecorator.eventDecorators, abiEventSignatures)
+            // events do not need to match inteface definition
+            val matchingEvents = findMatches(interfaceDecorator.eventDecorators, abiEventSignatures) ?: emptyList()
 
             matchingFunctions?.let {
                 matchingEvents?.let {
