@@ -190,7 +190,7 @@ class ContractDecoratorTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyOverrideFunctionsAndEvents() {
+    fun mustCorrectlyOverrideFunctionsAndEventsForNonImportedDecorator() {
         val map = mapOf(
             InterfaceId("override-1") to INTERFACE_MANIFEST_OVERRIDE_1,
             InterfaceId("override-2") to INTERFACE_MANIFEST_OVERRIDE_2,
@@ -204,6 +204,7 @@ class ContractDecoratorTest : TestBase() {
                 id = id,
                 artifact = ARTIFACT_JSON,
                 manifest = MANIFEST_JSON,
+                imported = false,
                 interfacesProvider = interfacesProvider
             )
 
@@ -299,6 +300,184 @@ class ContractDecoratorTest : TestBase() {
                             ContractEvent(
                                 name = "not-overridden-1",
                                 description = "not-overridden-1",
+                                solidityName = "FromDecorator",
+                                inputs = listOf(
+                                    ContractParameter(
+                                        name = "Arg1",
+                                        description = "Arg1",
+                                        solidityType = "string",
+                                        solidityName = "arg1",
+                                        recommendedTypes = emptyList(),
+                                        parameters = null,
+                                        hints = null
+                                    )
+                                )
+                            ),
+                            ContractEvent(
+                                name = "overridden-1-2",
+                                description = "overridden-1-2",
+                                solidityName = "FromOverride1",
+                                inputs = listOf(
+                                    ContractParameter(
+                                        name = "Arg1",
+                                        description = "Arg1",
+                                        solidityType = "uint",
+                                        solidityName = "arg1",
+                                        recommendedTypes = emptyList(),
+                                        parameters = null,
+                                        hints = null
+                                    )
+                                )
+                            ),
+                            ContractEvent(
+                                name = "overridden-2-3",
+                                description = "overridden-2-3",
+                                solidityName = "FromOverride2",
+                                inputs = listOf(
+                                    ContractParameter(
+                                        name = "Arg1",
+                                        description = "Arg1",
+                                        solidityType = "int",
+                                        solidityName = "arg1",
+                                        recommendedTypes = emptyList(),
+                                        parameters = null,
+                                        hints = null
+                                    )
+                                )
+                            ),
+                            ContractEvent(
+                                name = "extra-4",
+                                description = "extra-4",
+                                solidityName = "ExtraEvent",
+                                inputs = listOf(
+                                    ContractParameter(
+                                        name = "Arg1",
+                                        description = "Arg1",
+                                        solidityType = "bool",
+                                        solidityName = "arg1",
+                                        recommendedTypes = emptyList(),
+                                        parameters = null,
+                                        hints = null
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyOverrideFunctionsAndEventsForImportedDecorator() {
+        val map = mapOf(
+            InterfaceId("override-1") to INTERFACE_MANIFEST_OVERRIDE_1,
+            InterfaceId("override-2") to INTERFACE_MANIFEST_OVERRIDE_2,
+            InterfaceId("extra") to INTERFACE_MANIFEST_EXTRA
+        )
+        val interfacesProvider: (InterfaceId) -> InterfaceManifestJson? = { id -> map[id] }
+
+        verify("functions and events are correctly overridden") {
+            val id = ContractId("contract-id")
+            val result = ContractDecorator(
+                id = id,
+                artifact = ARTIFACT_JSON,
+                manifest = MANIFEST_JSON,
+                imported = true,
+                interfacesProvider = interfacesProvider
+            )
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    ContractDecorator(
+                        id = id,
+                        name = MANIFEST_JSON.name,
+                        description = MANIFEST_JSON.description,
+                        binary = ContractBinaryData(ARTIFACT_JSON.bytecode),
+                        tags = MANIFEST_JSON.tags.map { ContractTag(it) } + ContractTag("interface-tag"),
+                        implements = MANIFEST_JSON.implements.map { InterfaceId(it) },
+                        constructors = emptyList(),
+                        functions = listOf(
+                            ContractFunction(
+                                name = "overridden-1-1",
+                                description = "overridden-1-1",
+                                solidityName = "fromDecorator",
+                                inputs = listOf(
+                                    ContractParameter(
+                                        name = "Arg1",
+                                        description = "Arg1",
+                                        solidityType = "string",
+                                        solidityName = "arg1",
+                                        recommendedTypes = emptyList(),
+                                        parameters = null,
+                                        hints = null
+                                    )
+                                ),
+                                outputs = emptyList(),
+                                emittableEvents = emptyList(),
+                                readOnly = false
+                            ),
+                            ContractFunction(
+                                name = "overridden-1-2",
+                                description = "overridden-1-2",
+                                solidityName = "fromOverride1",
+                                inputs = listOf(
+                                    ContractParameter(
+                                        name = "Arg1",
+                                        description = "Arg1",
+                                        solidityType = "uint",
+                                        solidityName = "arg1",
+                                        recommendedTypes = emptyList(),
+                                        parameters = null,
+                                        hints = null
+                                    )
+                                ),
+                                outputs = emptyList(),
+                                emittableEvents = emptyList(),
+                                readOnly = false
+                            ),
+                            ContractFunction(
+                                name = "overridden-2-3",
+                                description = "overridden-2-3",
+                                solidityName = "fromOverride2",
+                                inputs = listOf(
+                                    ContractParameter(
+                                        name = "Arg1",
+                                        description = "Arg1",
+                                        solidityType = "int",
+                                        solidityName = "arg1",
+                                        recommendedTypes = emptyList(),
+                                        parameters = null,
+                                        hints = null
+                                    )
+                                ),
+                                outputs = emptyList(),
+                                emittableEvents = emptyList(),
+                                readOnly = false
+                            ),
+                            ContractFunction(
+                                name = "extra-4",
+                                description = "extra-4",
+                                solidityName = "extraFunction",
+                                inputs = listOf(
+                                    ContractParameter(
+                                        name = "Arg1",
+                                        description = "Arg1",
+                                        solidityType = "bool",
+                                        solidityName = "arg1",
+                                        recommendedTypes = emptyList(),
+                                        parameters = null,
+                                        hints = null
+                                    )
+                                ),
+                                outputs = emptyList(),
+                                emittableEvents = emptyList(),
+                                readOnly = false
+                            )
+                        ),
+                        events = listOf(
+                            ContractEvent(
+                                name = "overridden-1-1",
+                                description = "overridden-1-1",
                                 solidityName = "FromDecorator",
                                 inputs = listOf(
                                     ContractParameter(
