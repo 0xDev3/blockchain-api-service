@@ -155,6 +155,7 @@ class ContractDecoratorFileChangeListener(
                     id = id,
                     artifact = artifactJson,
                     manifest = manifestJson,
+                    imported = false,
                     interfacesProvider = interfacesDir?.let { contractInterfacesRepository::getById }
                 )
 

@@ -112,6 +112,7 @@ class ContractInterfacesServiceImpl(
             id = contractDeploymentRequest.contractId,
             artifact = importedArtifact,
             manifest = newManifest,
+            imported = true,
             interfacesProvider = contractInterfacesRepository::getById
         )
 
