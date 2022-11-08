@@ -57,6 +57,7 @@ class JooqImportedContractDecoratorRepository(
             id = contractId,
             artifact = artifactJson,
             manifest = manifestJson,
+            imported = true,
             interfacesProvider = contractInterfacesRepository::getById
         )
     }
@@ -101,6 +102,7 @@ class JooqImportedContractDecoratorRepository(
                     id = it.contractId,
                     artifact = it.artifactJson,
                     manifest = it.manifestJson,
+                    imported = true,
                     interfacesProvider = contractInterfacesRepository::getById
                 )
             }
@@ -158,6 +160,7 @@ class JooqImportedContractDecoratorRepository(
                     id = it.contractId,
                     artifact = it.artifactJson,
                     manifest = it.manifestJson,
+                    imported = true,
                     interfacesProvider = contractInterfacesRepository::getById
                 )
             }
