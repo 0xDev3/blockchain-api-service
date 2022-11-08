@@ -60,7 +60,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("deployedContractAlias")
         }
@@ -273,7 +273,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("functionName")
         }
@@ -322,7 +322,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 50")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_ARGS_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("functionParams")
         }
@@ -352,7 +352,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("value must be a valid JSON of at most 1000 characters")
+                .isEqualTo("value must be a valid JSON of at most $FUNCTION_ARGUMENT_MAX_JSON_CHARS characters")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("functionParams[0].rawJson")
         }
@@ -384,7 +384,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
     }
 
     @Test
-    fun mustNotAllowTooInvalidOutputParams() {
+    fun mustNotAllowInvalidOutputParams() {
         val requestWithTooLongListOfArguments = suppose("request with too long list of arguments is created") {
             ReadonlyFunctionCallRequest(
                 deployedContractId = null,
@@ -406,7 +406,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 50")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_ARGS_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("outputParams")
         }
