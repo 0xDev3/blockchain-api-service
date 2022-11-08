@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.model.request
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.validation.ValidationConstants
+import dev3.blockchainapiservice.config.validation.ValidationConstants.REQUEST_BODY_MAX_JSON_CHARS
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.JsonNodeConverter
@@ -148,7 +149,7 @@ class ImportContractRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("contractId")
         }
@@ -278,7 +279,7 @@ class ImportContractRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("redirectUrl")
         }
@@ -304,7 +305,7 @@ class ImportContractRequestTest : TestBase() {
 
     @Test
     fun mustNotAllowTooLongJsonForArbitraryData() {
-        val tooLongValue = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_JSON_CHARS + 1)
+        val tooLongValue = "a".repeat(REQUEST_BODY_MAX_JSON_CHARS + 1)
         val requestWithTooLongJson = suppose("request with too long JSON is created") {
             ImportContractRequest(
                 alias = "a-b_3.1",
@@ -322,7 +323,7 @@ class ImportContractRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("value must be a valid JSON of at most 5000 characters")
+                .isEqualTo("value must be a valid JSON of at most $REQUEST_BODY_MAX_JSON_CHARS characters")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("arbitraryData")
         }
@@ -368,7 +369,7 @@ class ImportContractRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("screenConfig.beforeActionMessage")
         }
@@ -417,7 +418,7 @@ class ImportContractRequestTest : TestBase() {
             assertThat(violations.size).withMessage()
                 .isOne()
             assertThat(violations[0].message).withMessage()
-                .isEqualTo("size must be between 0 and 256")
+                .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
             assertThat(violations[0].propertyPath.toString()).withMessage()
                 .isEqualTo("screenConfig.afterActionMessage")
         }
