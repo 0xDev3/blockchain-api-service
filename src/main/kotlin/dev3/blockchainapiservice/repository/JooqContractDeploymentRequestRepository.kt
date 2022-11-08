@@ -129,6 +129,8 @@ class JooqContractDeploymentRequestRepository(
                     ContractDeploymentRequestTable.DELETED.eq(false)
                 )
             )
+            .orderBy(ContractDeploymentRequestTable.CREATED_AT.asc())
+            .limit(1)
             .fetchOne { it.toModel() }
     }
 
