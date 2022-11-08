@@ -156,6 +156,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
             id = contractId,
             artifact = artifactJson,
             manifest = manifestJson,
+            imported = true,
             interfacesProvider = null
         )
 
@@ -218,6 +219,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
             id = contractId,
             artifact = artifactJson,
             manifest = expectedManifest,
+            imported = true,
             interfacesProvider = null
         )
 
@@ -486,6 +488,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
             id = testData.contractId,
             artifact = testData.artifact,
             manifest = testData.manifest,
+            imported = true,
             interfacesProvider = null
         ),
         manifest = testData.manifest,

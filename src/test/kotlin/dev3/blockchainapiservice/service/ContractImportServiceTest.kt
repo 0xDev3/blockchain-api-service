@@ -205,6 +205,7 @@ class ContractImportServiceTest : TestBase() {
             id = CONTRACT_ID,
             artifact = ARTIFACT_JSON,
             manifest = MANIFEST_JSON,
+            imported = true,
             interfacesProvider = null
         )
         private val CONTRACT_DEPLOYMENT_TRANSACTION_INFO = ContractDeploymentTransactionInfo(
@@ -361,6 +362,7 @@ class ContractImportServiceTest : TestBase() {
             id = newContractId,
             artifact = ARTIFACT_JSON,
             manifest = MANIFEST_JSON,
+            imported = true,
             interfacesProvider = null
         )
 
@@ -488,6 +490,7 @@ class ContractImportServiceTest : TestBase() {
             id = newContractId,
             artifact = ARTIFACT_JSON,
             manifest = MANIFEST_JSON,
+            imported = true,
             interfacesProvider = null
         )
 

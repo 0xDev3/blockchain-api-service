@@ -32,6 +32,7 @@ data class ContractDecorator(
             id: ContractId,
             artifact: ArtifactJson,
             manifest: ManifestJson,
+            imported: Boolean,
             interfacesProvider: ((InterfaceId) -> InterfaceManifestJson?)?
         ): ContractDecorator {
             val manifestInterfaces = interfacesProvider?.let { provider ->
@@ -52,8 +53,8 @@ data class ContractDecorator(
                 tags = decoratorTags.map { ContractTag(it) },
                 implements = manifest.implements.map { InterfaceId(it) },
                 constructors = decorateConstructors(artifact, manifest),
-                functions = decorateFunctions(artifact, manifest, interfaceFunctions),
-                events = decorateEvents(artifact, manifest, interfaceEvents)
+                functions = decorateFunctions(artifact, manifest, interfaceFunctions, imported),
+                events = decorateEvents(artifact, manifest, interfaceEvents, imported)
             )
         }
 
@@ -75,11 +76,16 @@ data class ContractDecorator(
         private fun decorateFunctions(
             artifact: ArtifactJson,
             manifest: ManifestJson,
-            interfaceFunctions: List<FunctionDecorator>
+            interfaceFunctions: List<FunctionDecorator>,
+            imported: Boolean
         ): List<ContractFunction> {
             val functions = artifact.abi.filter { it.type == "function" }
                 .associateBy { "${it.name}(${it.inputs.orEmpty().toTypeList()})" }
-            val decorators = (manifest.functionDecorators + interfaceFunctions).resolveOverrides()
+            val decorators = concatByPriority(
+                manifestItems = manifest.functionDecorators,
+                interfaceItems = interfaceFunctions,
+                imported = imported
+            ).resolveOverrides()
 
             return decorators.map {
                 val artifactFunction = functions.getAbiObjectBySignature(it.signature)
@@ -105,11 +111,16 @@ data class ContractDecorator(
         private fun decorateEvents(
             artifact: ArtifactJson,
             manifest: ManifestJson,
-            interfaceEvents: List<EventDecorator>
+            interfaceEvents: List<EventDecorator>,
+            imported: Boolean
         ): List<ContractEvent> {
             val events = artifact.abi.filter { it.type == "event" }
                 .associateBy { "${it.name}(${it.inputs.orEmpty().toTypeList()})" }
-            val decorators = (manifest.eventDecorators + interfaceEvents).resolveOverrides()
+            val decorators = concatByPriority(
+                manifestItems = manifest.eventDecorators,
+                interfaceItems = interfaceEvents,
+                imported = imported
+            ).resolveOverrides()
 
             return decorators.map {
                 val artifactEvent = events.getAbiObjectBySignature(it.signature)
@@ -153,6 +164,9 @@ data class ContractDecorator(
 
         private fun <T : OverridableDecorator> List<T>.resolveOverrides(): List<T> =
             distinctBy { it.signature }
+
+        private fun <T> concatByPriority(manifestItems: List<T>, interfaceItems: List<T>, imported: Boolean): List<T> =
+            if (imported) interfaceItems + manifestItems else manifestItems + interfaceItems
     }
 }
 
