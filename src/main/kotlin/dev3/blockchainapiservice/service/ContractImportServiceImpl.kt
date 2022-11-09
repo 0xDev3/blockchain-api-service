@@ -19,7 +19,6 @@ import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.util.Constants
-import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.Tuple
 import mu.KLogging
@@ -90,7 +89,8 @@ class ContractImportServiceImpl(
                 importContractParams = params,
                 contractDeploymentRequest = request,
                 project = project,
-                createdAt = utcDateTimeProvider.getUtcDateTime()
+                createdAt = utcDateTimeProvider.getUtcDateTime(),
+                imported = false
             ),
             metadataProjectId = Constants.NIL_UUID
         )
@@ -152,8 +152,9 @@ class ContractImportServiceImpl(
                 importContractParams = params,
                 contractDeploymentRequest = request.copy(contractId = newContractId),
                 project = project,
-                createdAt = utcDateTimeProvider.getUtcDateTime()
-            ).copy(imported = true),
+                createdAt = utcDateTimeProvider.getUtcDateTime(),
+                imported = true
+            ),
             metadataProjectId = project.id
         )
 
@@ -299,21 +300,14 @@ class ContractImportServiceImpl(
         )
 
         val id = uuidProvider.getUuid()
-        val storeParams = StoreContractDeploymentRequestParams(
+        val storeParams = StoreContractDeploymentRequestParams.fromImportedContract(
             id = id,
-            alias = params.alias,
+            params = params,
             contractId = contractId,
-            contractData = ContractBinaryData(contractDeploymentTransactionInfo.data.value),
+            contractDeploymentTransactionInfo = contractDeploymentTransactionInfo,
             constructorParams = objectMapper.valueToTree(inputArgs(constructorInputs, decodedConstructorParams)),
-            deployerAddress = contractDeploymentTransactionInfo.from,
-            initialEthAmount = contractDeploymentTransactionInfo.value,
-            chainId = project.chainId,
-            redirectUrl = project.createRedirectUrl(params.redirectUrl, id, StoreContractDeploymentRequestParams.PATH),
-            projectId = project.id,
-            createdAt = utcDateTimeProvider.getUtcDateTime(),
-            arbitraryData = params.arbitraryData,
-            screenConfig = params.screenConfig,
-            imported = true
+            project = project,
+            createdAt = utcDateTimeProvider.getUtcDateTime()
         )
 
         contractDeploymentRequestRepository.store(storeParams, metadataProjectId)
