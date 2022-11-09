@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
@@ -30,7 +31,7 @@ data class StoreContractDeploymentRequestParams(
     val imported: Boolean
 ) {
     companion object : ParamsFactory<PreStoreContractDeploymentRequestParams, StoreContractDeploymentRequestParams> {
-        const val PATH = "/request-deploy/\${id}/action"
+        private const val PATH = "/request-deploy/\${id}/action"
         private val objectMapper = ObjectMapper()
 
         override fun fromCreateParams(
@@ -59,12 +60,40 @@ data class StoreContractDeploymentRequestParams(
             imported = false
         )
 
+        @Suppress("LongParameterList")
+        fun fromImportedContract(
+            id: UUID,
+            params: ImportContractParams,
+            contractId: ContractId,
+            contractDeploymentTransactionInfo: ContractDeploymentTransactionInfo,
+            constructorParams: JsonNode,
+            project: Project,
+            createdAt: UtcDateTime
+        ) = StoreContractDeploymentRequestParams(
+            id = id,
+            alias = params.alias,
+            contractId = contractId,
+            contractData = ContractBinaryData(contractDeploymentTransactionInfo.data.value),
+            constructorParams = constructorParams,
+            deployerAddress = contractDeploymentTransactionInfo.from,
+            initialEthAmount = contractDeploymentTransactionInfo.value,
+            chainId = project.chainId,
+            redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
+            projectId = project.id,
+            createdAt = createdAt,
+            arbitraryData = params.arbitraryData,
+            screenConfig = params.screenConfig,
+            imported = true
+        )
+
+        @Suppress("LongParameterList")
         fun fromContractDeploymentRequest(
             id: UUID,
             importContractParams: ImportContractParams,
             contractDeploymentRequest: ContractDeploymentRequest,
             project: Project,
             createdAt: UtcDateTime,
+            imported: Boolean
         ) = StoreContractDeploymentRequestParams(
             id = id,
             alias = importContractParams.alias,
@@ -79,7 +108,7 @@ data class StoreContractDeploymentRequestParams(
             createdAt = createdAt,
             arbitraryData = importContractParams.arbitraryData,
             screenConfig = importContractParams.screenConfig,
-            imported = false
+            imported = imported
         )
     }
 }
