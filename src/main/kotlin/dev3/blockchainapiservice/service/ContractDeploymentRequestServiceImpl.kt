@@ -46,13 +46,11 @@ class ContractDeploymentRequestServiceImpl(
 
         val decoratorNotFoundMessage = "Contract decorator not found for contract ID: ${params.contractId.value}"
 
-        // TODO add support for imported contract decorators
         val contractDecorator = ethCommonService.fetchResource(
             contractDecoratorRepository.getById(params.contractId),
             decoratorNotFoundMessage
         )
 
-        // TODO add support for imported contract decorators
         if (!contractMetadataRepository.exists(params.contractId, Constants.NIL_UUID)) {
             throw ResourceNotFoundException(decoratorNotFoundMessage)
         }
@@ -158,7 +156,7 @@ class ContractDeploymentRequestServiceImpl(
 
     private fun ContractDeploymentRequest.setContractAddressIfNecessary(
         deployedContractAddress: ContractAddress?
-    ): ContractDeploymentRequest {
+    ): ContractDeploymentRequest { // TODO update proxy address if it changes
         return if (contractAddress == null && deployedContractAddress != null) {
             contractDeploymentRequestRepository.setContractAddress(id, deployedContractAddress)
             copy(contractAddress = deployedContractAddress)

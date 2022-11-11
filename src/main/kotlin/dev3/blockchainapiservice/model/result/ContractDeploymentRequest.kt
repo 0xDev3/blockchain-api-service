@@ -39,7 +39,9 @@ data class ContractDeploymentRequest(
     val contractAddress: ContractAddress?,
     val deployerAddress: WalletAddress?,
     val txHash: TransactionHash?,
-    val imported: Boolean
+    val imported: Boolean,
+    val proxy: Boolean,
+    val implementationContractAddress: ContractAddress?
 ) {
     fun withTransactionData(
         status: Status,

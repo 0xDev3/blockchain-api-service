@@ -74,5 +74,6 @@ data class FunctionDecorator(
     val description: String,
     val parameterDecorators: List<TypeDecorator>,
     val returnDecorators: List<TypeDecorator>,
-    val emittableEvents: List<String>
+    val emittableEvents: List<String>,
+    val readOnly: Boolean
 ) : OverridableDecorator

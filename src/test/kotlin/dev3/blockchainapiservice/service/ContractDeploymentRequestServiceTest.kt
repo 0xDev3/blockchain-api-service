@@ -98,7 +98,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             createdAt = TestData.TIMESTAMP,
             arbitraryData = CREATE_PARAMS.arbitraryData,
             screenConfig = CREATE_PARAMS.screenConfig,
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
         private val TX_HASH = TransactionHash("tx-hash")
         private val CONTRACT_ADDRESS = ContractAddress("cafebabe")
@@ -122,7 +124,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractAddress = CONTRACT_ADDRESS,
             deployerAddress = STORE_PARAMS.deployerAddress,
             txHash = TX_HASH,
-            imported = STORE_PARAMS.imported
+            imported = STORE_PARAMS.imported,
+            proxy = STORE_PARAMS.proxy,
+            implementationContractAddress = STORE_PARAMS.implementationContractAddress
         )
         val CHAIN_SPEC = ChainSpec(STORED_REQUEST.chainId, null)
         val TRANSACTION_INFO = BlockchainTransactionInfo(

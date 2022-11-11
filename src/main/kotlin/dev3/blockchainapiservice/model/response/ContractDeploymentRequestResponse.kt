@@ -37,7 +37,9 @@ data class ContractDeploymentRequestResponse(
     val contractAddress: String?,
     val deployerAddress: String?,
     val deployTx: TransactionResponse,
-    val imported: Boolean
+    val imported: Boolean,
+    val proxy: Boolean,
+    val implementationContractAddress: String?
 ) {
     constructor(contractDeploymentRequest: ContractDeploymentRequest) : this(
         id = contractDeploymentRequest.id,
@@ -65,7 +67,9 @@ data class ContractDeploymentRequestResponse(
             data = FunctionData(contractDeploymentRequest.contractData.value),
             value = contractDeploymentRequest.initialEthAmount
         ),
-        imported = contractDeploymentRequest.imported
+        imported = contractDeploymentRequest.imported,
+        proxy = contractDeploymentRequest.proxy,
+        implementationContractAddress = contractDeploymentRequest.implementationContractAddress?.rawValue
     )
 
     constructor(contractDeploymentRequest: WithTransactionData<ContractDeploymentRequest>) : this(
@@ -89,7 +93,9 @@ data class ContractDeploymentRequestResponse(
         contractAddress = contractDeploymentRequest.value.contractAddress?.rawValue,
         deployerAddress = contractDeploymentRequest.value.deployerAddress?.rawValue,
         deployTx = TransactionResponse(contractDeploymentRequest.transactionData),
-        imported = contractDeploymentRequest.value.imported
+        imported = contractDeploymentRequest.value.imported,
+        proxy = contractDeploymentRequest.value.proxy,
+        implementationContractAddress = contractDeploymentRequest.value.implementationContractAddress?.rawValue
     )
 
     @Suppress("unused") // used for JSON schema generation

@@ -15,9 +15,12 @@ import dev3.blockchainapiservice.model.json.AbiObject
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.ConstructorDecorator
 import dev3.blockchainapiservice.model.json.DecompiledContractJson
+import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.json.TypeDecorator
+import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.ImportContractParams
+import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
@@ -25,11 +28,13 @@ import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractMetadata
 import dev3.blockchainapiservice.model.result.ContractParameter
 import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.service.ContractImportServiceImpl.Companion.TypeAndValue
+import dev3.blockchainapiservice.util.AddressType
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.BlockNumber
@@ -43,6 +48,7 @@ import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.Tuple
 import dev3.blockchainapiservice.util.WalletAddress
+import dev3.blockchainapiservice.util.ZeroAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -110,7 +116,9 @@ class ContractImportServiceTest : TestBase() {
             contractAddress = CONTRACT_ADDRESS,
             deployerAddress = WalletAddress("abc123def456"),
             txHash = TransactionHash("non-imported-tx-hash"),
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
         private val IMPORTED_CONTRACT = ContractDeploymentRequest(
             id = UUID.randomUUID(),
@@ -135,7 +143,9 @@ class ContractImportServiceTest : TestBase() {
             contractAddress = CONTRACT_ADDRESS,
             deployerAddress = WalletAddress("abc123def456"),
             txHash = TransactionHash("imported-tx-hash"),
-            imported = true
+            imported = true,
+            proxy = false,
+            implementationContractAddress = null
         )
         private val CONSTRUCTOR_PARAMS = listOf(FunctionArgument(WalletAddress("cafebabe")))
         private val ENCODED_CONSTRUCTOR_CALL = EthereumFunctionEncoderService().encodeConstructor(CONSTRUCTOR_PARAMS)
@@ -218,6 +228,91 @@ class ContractImportServiceTest : TestBase() {
             blockNumber = BlockNumber(BigInteger.ONE)
         )
         private const val INFO_MARKDOWN = "info-markdown"
+        private const val PROXY_CONSTRUCTOR_BYTECODE = "123456abc"
+        private const val PROXY_CONTRACT_BYTECODE = "abcdef000777"
+        private val PROXY_ARTIFACT_JSON = ArtifactJson(
+            contractName = "imported",
+            sourceName = "imported.sol",
+            abi = listOf(
+                AbiObject(
+                    anonymous = false,
+                    inputs = listOf(
+                        AbiInputOutput(
+                            components = null,
+                            internalType = "address",
+                            name = "someAddress",
+                            type = "address",
+                            indexed = false
+                        )
+                    ),
+                    outputs = null,
+                    stateMutability = null,
+                    name = "",
+                    type = "constructor"
+                ),
+                AbiObject(
+                    anonymous = false,
+                    inputs = emptyList(),
+                    outputs = emptyList(),
+                    stateMutability = null,
+                    name = "implementation",
+                    type = "function"
+                )
+            ),
+            bytecode = "$PROXY_CONSTRUCTOR_BYTECODE$PROXY_CONTRACT_BYTECODE",
+            deployedBytecode = PROXY_CONTRACT_BYTECODE,
+            linkReferences = null,
+            deployedLinkReferences = null
+        )
+        private val PROXY_MANIFEST_JSON = ManifestJson(
+            name = "imported",
+            description = "imported",
+            tags = emptySet(),
+            implements = emptySet(),
+            eventDecorators = emptyList(),
+            constructorDecorators = listOf(
+                ConstructorDecorator(
+                    signature = "constructor(address)",
+                    description = "",
+                    parameterDecorators = listOf(
+                        TypeDecorator(
+                            name = "",
+                            description = "",
+                            recommendedTypes = emptyList(),
+                            parameters = null,
+                            hints = emptyList()
+                        )
+                    )
+                )
+            ),
+            functionDecorators = listOf(
+                FunctionDecorator(
+                    signature = "implementation()",
+                    name = "implementation",
+                    description = "",
+                    parameterDecorators = emptyList(),
+                    returnDecorators = emptyList(),
+                    emittableEvents = emptyList(),
+                    readOnly = false
+                )
+            )
+        )
+        private val PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO = ContractDeploymentTransactionInfo(
+            hash = TransactionHash("proxy-tx-hash"),
+            from = WalletAddress("123"),
+            deployedContractAddress = ContractAddress("cafe000bafe000abc123"),
+            data = FunctionData("${PROXY_ARTIFACT_JSON.bytecode}${ENCODED_CONSTRUCTOR_CALL.withoutPrefix}"),
+            value = Balance.ZERO,
+            binary = ContractBinaryData(PROXY_ARTIFACT_JSON.deployedBytecode),
+            blockNumber = BlockNumber(BigInteger.ONE)
+        )
+        private val PROXY_CONTRACT_DECORATOR = ContractDecorator(
+            id = CONTRACT_ID,
+            artifact = PROXY_ARTIFACT_JSON,
+            manifest = PROXY_MANIFEST_JSON,
+            imported = true,
+            interfacesProvider = null
+        )
     }
 
     @Test
@@ -259,7 +354,9 @@ class ContractImportServiceTest : TestBase() {
             createdAt = timestamp,
             arbitraryData = PARAMS.arbitraryData,
             screenConfig = PARAMS.screenConfig,
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         suppose("request will be correctly copied") {
@@ -270,6 +367,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),
@@ -394,7 +492,9 @@ class ContractImportServiceTest : TestBase() {
             createdAt = newlyImportedContractTimestamp,
             arbitraryData = PARAMS.arbitraryData,
             screenConfig = PARAMS.screenConfig,
-            imported = true
+            imported = true,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
@@ -414,6 +514,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
             contractDecoratorRepository = mock(),
@@ -535,7 +636,9 @@ class ContractImportServiceTest : TestBase() {
             createdAt = newlyImportedContractTimestamp,
             arbitraryData = PARAMS.arbitraryData,
             screenConfig = PARAMS.screenConfig,
-            imported = true
+            imported = true,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
@@ -555,6 +658,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
             contractDecoratorRepository = mock(),
@@ -610,6 +714,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),
@@ -670,6 +775,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
             contractDecoratorRepository = contractDecoratorRepository,
@@ -700,7 +806,9 @@ class ContractImportServiceTest : TestBase() {
                         createdAt = TestData.TIMESTAMP,
                         arbitraryData = PARAMS.arbitraryData,
                         screenConfig = PARAMS.screenConfig,
-                        imported = true
+                        imported = true,
+                        proxy = false,
+                        implementationContractAddress = null
                     ),
                     metadataProjectId = Constants.NIL_UUID
                 )
@@ -724,6 +832,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
             contractDecoratorRepository = contractDecoratorRepository,
@@ -760,6 +869,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = contractMetadataRepository,
             contractDecoratorRepository = contractDecoratorRepository,
@@ -804,6 +914,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = contractMetadataRepository,
             contractDecoratorRepository = contractDecoratorRepository,
@@ -848,6 +959,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = contractMetadataRepository,
             contractDecoratorRepository = contractDecoratorRepository,
@@ -940,6 +1052,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = contractDecompilerService,
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
             contractDecoratorRepository = mock(),
@@ -984,7 +1097,9 @@ class ContractImportServiceTest : TestBase() {
                         createdAt = TestData.TIMESTAMP,
                         arbitraryData = PARAMS.arbitraryData,
                         screenConfig = PARAMS.screenConfig,
-                        imported = true
+                        imported = true,
+                        proxy = false,
+                        implementationContractAddress = null
                     ),
                     metadataProjectId = PROJECT.id
                 )
@@ -1054,6 +1169,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = contractDecompilerService,
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
             contractDecoratorRepository = mock(),
@@ -1098,7 +1214,9 @@ class ContractImportServiceTest : TestBase() {
                         createdAt = TestData.TIMESTAMP,
                         arbitraryData = PARAMS.arbitraryData,
                         screenConfig = PARAMS.screenConfig,
-                        imported = true
+                        imported = true,
+                        proxy = false,
+                        implementationContractAddress = null
                     ),
                     metadataProjectId = PROJECT.id
                 )
@@ -1115,10 +1233,196 @@ class ContractImportServiceTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyImportProxyContract() {
+        val blockchainService = mock<BlockchainService>()
+        val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
+        val proxyAddress = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.deployedContractAddress
+        val params = PARAMS.copy(contractAddress = proxyAddress)
+
+        suppose("proxy contract deployment transaction will be found on blockchain") {
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress))
+                .willReturn(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
+        }
+
+        val contractDecompilerService = mock<ContractDecompilerService>()
+
+        suppose("proxy contract will be decompiled") {
+            given(contractDecompilerService.decompile(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+                .willReturn(
+                    DecompiledContractJson(
+                        manifest = PROXY_MANIFEST_JSON,
+                        artifact = PROXY_ARTIFACT_JSON,
+                        infoMarkdown = "infoMd"
+                    )
+                )
+        }
+
+        val functionEncoderService = mock<FunctionEncoderService>()
+        val encodedData = FunctionData("001122")
+
+        suppose("proxy implementation function call will be encoded") {
+            given(functionEncoderService.encode("implementation", emptyList()))
+                .willReturn(encodedData)
+        }
+
+        val readOnlyParams = ExecuteReadonlyFunctionCallParams(
+            contractAddress = proxyAddress,
+            callerAddress = ZeroAddress.toWalletAddress(),
+            functionName = "implementation",
+            functionData = encodedData,
+            outputParams = listOf(OutputParameter(AddressType))
+        )
+        val implementationAddress = ContractAddress("fde333bca111")
+
+        suppose("implementation contract address will be returned") {
+            given(blockchainService.callReadonlyFunction(chainSpec, readOnlyParams))
+                .willReturn(
+                    ReadonlyFunctionCallResult(
+                        BlockNumber(BigInteger.ZERO),
+                        TestData.TIMESTAMP,
+                        implementationAddress.rawValue,
+                        listOf(implementationAddress.rawValue)
+                    )
+                )
+        }
+
+        suppose("implementation contract deployment transaction will be found on blockchain") {
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress))
+                .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
+        }
+
+        suppose("implementation contract will be decompiled") {
+            given(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+                .willReturn(
+                    DecompiledContractJson(
+                        manifest = MANIFEST_JSON,
+                        artifact = ARTIFACT_JSON,
+                        infoMarkdown = "infoMd"
+                    )
+                )
+        }
+
+        val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
+        val contractId = ContractId("imported-${params.contractAddress.rawValue}-${PROJECT.chainId.value}")
+
+        suppose("imported contract decorator does not exist in the database") {
+            given(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
+                .willReturn(null)
+        }
+
+        val contractDecorator = PROXY_CONTRACT_DECORATOR.copy(id = contractId)
+        val contractDecoratorId = UUID.randomUUID()
+        val adjustedArtifactJson = PROXY_ARTIFACT_JSON.copy(
+            bytecode = "$PROXY_CONSTRUCTOR_BYTECODE$PROXY_CONTRACT_BYTECODE",
+            deployedBytecode = PROXY_CONTRACT_BYTECODE
+        )
+
+        suppose("imported contract decorator will be stored into the database") {
+            given(
+                importedContractDecoratorRepository.store(
+                    id = contractDecoratorId,
+                    projectId = PROJECT.id,
+                    contractId = contractId,
+                    manifestJson = PROXY_MANIFEST_JSON,
+                    artifactJson = adjustedArtifactJson,
+                    infoMarkdown = "infoMd",
+                    importedAt = TestData.TIMESTAMP
+                )
+            )
+                .willReturn(contractDecorator)
+        }
+
+        val contractMetadataId = UUID.randomUUID()
+        val deployedContractId = UUID.randomUUID()
+        val uuidProvider = mock<UuidProvider>()
+
+        suppose("some UUID will be returned") {
+            given(uuidProvider.getUuid())
+                .willReturn(contractDecoratorId, contractMetadataId, deployedContractId)
+        }
+
+        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
+
+        suppose("some UTC date-time will be returned") {
+            given(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(TestData.TIMESTAMP)
+        }
+
+        val contractMetadataRepository = mock<ContractMetadataRepository>()
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        val service = ContractImportServiceImpl(
+            abiDecoderService = EthereumAbiDecoderService(),
+            contractDecompilerService = contractDecompilerService,
+            functionEncoderService = functionEncoderService,
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = contractMetadataRepository,
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = importedContractDecoratorRepository,
+            blockchainService = blockchainService,
+            uuidProvider = uuidProvider,
+            utcDateTimeProvider = utcDateTimeProvider,
+            objectMapper = objectMapper
+        )
+
+        verify("contract is successfully imported") {
+            assertThat(service.importContract(params.copy(contractId = null), PROJECT)).withMessage()
+                .isEqualTo(deployedContractId)
+
+            verifyMock(contractMetadataRepository)
+                .createOrUpdate(
+                    ContractMetadata(
+                        id = contractMetadataId,
+                        name = contractDecorator.name,
+                        description = contractDecorator.description,
+                        contractId = contractId,
+                        contractTags = contractDecorator.tags,
+                        contractImplements = contractDecorator.implements,
+                        projectId = PROJECT.id
+                    )
+                )
+            verifyNoMoreInteractions(contractMetadataRepository)
+
+            verifyMock(contractDeploymentRequestRepository)
+                .store(
+                    params = StoreContractDeploymentRequestParams(
+                        id = deployedContractId,
+                        alias = params.alias,
+                        contractId = contractId,
+                        contractData = ContractBinaryData(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.data.value),
+                        constructorParams = CONSTRUCTOR_BYTES_32_JSON,
+                        deployerAddress = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.from,
+                        initialEthAmount = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.value,
+                        chainId = PROJECT.chainId,
+                        redirectUrl = "${PROJECT.baseRedirectUrl.value}/request-deploy/$deployedContractId/action",
+                        projectId = PROJECT.id,
+                        createdAt = TestData.TIMESTAMP,
+                        arbitraryData = params.arbitraryData,
+                        screenConfig = params.screenConfig,
+                        imported = true,
+                        proxy = true,
+                        implementationContractAddress = implementationAddress
+                    ),
+                    metadataProjectId = PROJECT.id
+                )
+            verifyMock(contractDeploymentRequestRepository)
+                .setContractAddress(deployedContractId, params.contractAddress)
+            verifyMock(contractDeploymentRequestRepository)
+                .setTxInfo(
+                    id = deployedContractId,
+                    txHash = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.hash,
+                    deployer = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.from
+                )
+            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+        }
+    }
+
+    @Test
     fun mustCorrectlyCreateInputArgsForSimpleTypes() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),
@@ -1162,6 +1466,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),
@@ -1237,6 +1542,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),
@@ -1292,6 +1598,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),
@@ -1407,6 +1714,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),

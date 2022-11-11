@@ -103,7 +103,8 @@ data class ContractDecorator(
                         )
                     ),
                     emittableEvents = it.emittableEvents,
-                    readOnly = artifactFunction.stateMutability == "view" || artifactFunction.stateMutability == "pure"
+                    readOnly = it.readOnly || artifactFunction.stateMutability == "view" ||
+                        artifactFunction.stateMutability == "pure"
                 )
             }
         }

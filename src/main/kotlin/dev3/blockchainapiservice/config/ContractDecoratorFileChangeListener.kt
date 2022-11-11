@@ -72,13 +72,18 @@ class ContractDecoratorFileChangeListener(
 
         logger.info { "Detected contract directory changes: $changedDirs" }
 
-        changedDirs.forEach {
-            val setName = it.first()
-            val parts = it.drop(1).dropLast(1)
-            val decorator = it.last()
-            val contractDecoratorDir = contractsDir.resolve(setName).resolve(parts.joinToString("/")).resolve(decorator)
-            processContractDecorator(contractDecoratorDir, parts, setName)
-        }
+        changedDirs
+            .filter { it.isNotEmpty() }
+            .forEach {
+                val setName = it.first()
+                val parts = it.drop(1).dropLast(1)
+                val decorator = it.last()
+                val contractDecoratorDir = contractsDir.resolve(setName)
+                    .resolve(parts.joinToString("/"))
+                    .resolve(decorator)
+
+                processContractDecorator(contractDecoratorDir, parts, setName)
+            }
     }
 
     private fun onContractInterfaceChange(interfacesRootDir: Path, changeSet: List<ChangedFiles>) {
