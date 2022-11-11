@@ -8,6 +8,7 @@ import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.UtcDateTime
@@ -28,7 +29,9 @@ data class StoreContractDeploymentRequestParams(
     val createdAt: UtcDateTime,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig,
-    val imported: Boolean
+    val imported: Boolean,
+    val proxy: Boolean,
+    val implementationContractAddress: ContractAddress?
 ) {
     companion object : ParamsFactory<PreStoreContractDeploymentRequestParams, StoreContractDeploymentRequestParams> {
         private const val PATH = "/request-deploy/\${id}/action"
@@ -57,7 +60,9 @@ data class StoreContractDeploymentRequestParams(
             createdAt = createdAt,
             arbitraryData = params.createParams.arbitraryData,
             screenConfig = params.createParams.screenConfig,
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         @Suppress("LongParameterList")
@@ -68,7 +73,9 @@ data class StoreContractDeploymentRequestParams(
             contractDeploymentTransactionInfo: ContractDeploymentTransactionInfo,
             constructorParams: JsonNode,
             project: Project,
-            createdAt: UtcDateTime
+            createdAt: UtcDateTime,
+            proxy: Boolean,
+            implementationContractAddress: ContractAddress?
         ) = StoreContractDeploymentRequestParams(
             id = id,
             alias = params.alias,
@@ -83,7 +90,9 @@ data class StoreContractDeploymentRequestParams(
             createdAt = createdAt,
             arbitraryData = params.arbitraryData,
             screenConfig = params.screenConfig,
-            imported = true
+            imported = true,
+            proxy = proxy,
+            implementationContractAddress = implementationContractAddress
         )
 
         @Suppress("LongParameterList")
@@ -108,7 +117,9 @@ data class StoreContractDeploymentRequestParams(
             createdAt = createdAt,
             arbitraryData = importContractParams.arbitraryData,
             screenConfig = importContractParams.screenConfig,
-            imported = imported
+            imported = imported,
+            proxy = contractDeploymentRequest.proxy,
+            implementationContractAddress = contractDeploymentRequest.implementationContractAddress
         )
     }
 }

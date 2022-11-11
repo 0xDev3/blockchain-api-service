@@ -60,7 +60,9 @@ class ContractInterfacesServiceTest : TestBase() {
             contractAddress = ContractAddress("a"),
             deployerAddress = WalletAddress("b"),
             txHash = TransactionHash("tx-hash"),
-            imported = true
+            imported = true,
+            proxy = false,
+            implementationContractAddress = null
         )
         private val MANIFEST_JSON = ManifestJson(
             name = "name",
@@ -83,7 +85,8 @@ class ContractInterfacesServiceTest : TestBase() {
                     description = "description",
                     parameterDecorators = emptyList(),
                     returnDecorators = emptyList(),
-                    emittableEvents = emptyList()
+                    emittableEvents = emptyList(),
+                    readOnly = false
                 )
             )
         )

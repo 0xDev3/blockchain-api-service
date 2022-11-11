@@ -169,7 +169,8 @@ class ContractDecoratorTest : TestBase() {
                     )
                 ),
                 returnDecorators = emptyList(),
-                emittableEvents = emptyList()
+                emittableEvents = emptyList(),
+                readOnly = false
             )
 
         private fun eventDecorator(name: String, argType: String, description: String) =
