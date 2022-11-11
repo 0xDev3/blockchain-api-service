@@ -106,7 +106,7 @@ object JsonSchemaDocumentation {
     fun createSchema(type: Type) {
         Files.createDirectories(Paths.get("build/generated-snippets"))
 
-        val prettySchema = generator.generateSchema(type).apply { // TODO do this in a less hacky way
+        val prettySchema = generator.generateSchema(type).apply {
             (this["\$defs"] as? ObjectNode)?.let {
                 flattenSchemaDef(it, "FunctionArgumentTypes")
                 flattenSchemaDef(it, "ReturnValueTypes")

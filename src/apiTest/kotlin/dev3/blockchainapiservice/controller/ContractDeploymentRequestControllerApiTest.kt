@@ -257,7 +257,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
 
@@ -293,7 +295,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractAddress = null,
                         deployerAddress = deployerAddress,
                         txHash = null,
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
 
@@ -390,7 +394,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
 
@@ -426,7 +432,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractAddress = null,
                         deployerAddress = deployerAddress,
                         txHash = null,
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
 
@@ -811,7 +819,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
                             timestamp = fetchResponse.deployTx.timestamp
                         ),
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
 
@@ -949,7 +959,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
                             timestamp = fetchResponse.deployTx.timestamp
                         ),
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
 
@@ -1088,7 +1100,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
                             timestamp = fetchResponse.deployTx.timestamp
                         ),
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
 
@@ -1230,7 +1244,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
                             timestamp = fetchResponse.deployTx.timestamp
                         ),
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
 
@@ -1402,7 +1418,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].deployTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].deployTx.timestamp
                                 ),
-                                imported = false
+                                imported = false,
+                                proxy = false,
+                                implementationContractAddress = null
                             )
                         )
                     )
@@ -1551,7 +1569,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].deployTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].deployTx.timestamp
                                 ),
-                                imported = false
+                                imported = false,
+                                proxy = false,
+                                implementationContractAddress = null
                             )
                         )
                     )
@@ -1591,7 +1611,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"
                     ),
-                    imported = false
+                    imported = false,
+                    proxy = false,
+                    implementationContractAddress = null
                 ),
                 metadataProjectId = Constants.NIL_UUID
             )
@@ -1650,7 +1672,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         beforeActionMessage = "before-action-message",
                         afterActionMessage = "after-action-message"
                     ),
-                    imported = false
+                    imported = false,
+                    proxy = false,
+                    implementationContractAddress = null
                 ),
                 metadataProjectId = Constants.NIL_UUID
             )

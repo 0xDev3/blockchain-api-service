@@ -45,7 +45,8 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
                             hints = null
                         )
                     ),
-                    emittableEvents = emptyList()
+                    emittableEvents = emptyList(),
+                    readOnly = false
                 )
             )
         )

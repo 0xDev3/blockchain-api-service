@@ -141,7 +141,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractAddress = CONTRACT_ADDRESS,
             deployerAddress = STORE_PARAMS.callerAddress,
             txHash = TransactionHash("deployed-contract-hash"),
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
     }
 

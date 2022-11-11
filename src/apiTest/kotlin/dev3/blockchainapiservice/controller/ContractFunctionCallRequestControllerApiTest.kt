@@ -74,7 +74,9 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             createdAt = TestData.TIMESTAMP,
             arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig.EMPTY,
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
     }
 
