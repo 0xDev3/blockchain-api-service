@@ -367,6 +367,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
             description = "",
             parameterDecorators = emptyList(),
             returnDecorators = emptyList(),
-            emittableEvents = emptyList()
+            emittableEvents = emptyList(),
+            readOnly = false
         )
 }

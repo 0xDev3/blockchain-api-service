@@ -66,7 +66,9 @@ class JooqContractDeploymentRequestRepository(
             deployerAddress = params.deployerAddress,
             txHash = null,
             imported = params.imported,
-            deleted = false
+            deleted = false,
+            proxy = params.proxy,
+            implementationContractAddress = params.implementationContractAddress
         )
 
         try {
@@ -216,7 +218,9 @@ class JooqContractDeploymentRequestRepository(
             contractAddress = requestRecord.contractAddress,
             deployerAddress = requestRecord.deployerAddress,
             txHash = requestRecord.txHash,
-            imported = requestRecord.imported
+            imported = requestRecord.imported,
+            proxy = requestRecord.proxy,
+            implementationContractAddress = requestRecord.implementationContractAddress
         )
     }
 

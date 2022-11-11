@@ -79,7 +79,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             contractAddress = ContractAddress("cafebabe"),
             deployerAddress = params.deployerAddress,
             txHash = null,
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
         val project = Project(
             id = result.projectId,
@@ -147,7 +149,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 blockConfirmations = null,
                                 timestamp = null
                             ),
-                            imported = result.imported
+                            imported = result.imported,
+                            proxy = false,
+                            implementationContractAddress = null
                         )
                     )
                 )
@@ -207,7 +211,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 contractAddress = ContractAddress("cafebabe"),
                 deployerAddress = WalletAddress("a"),
                 txHash = txHash,
-                imported = false
+                imported = false,
+                proxy = false,
+                implementationContractAddress = null
             ),
             status = Status.SUCCESS,
             transactionData = TransactionData(
@@ -265,7 +271,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = result.transactionData.timestamp?.value
                             ),
-                            imported = result.value.imported
+                            imported = result.value.imported,
+                            proxy = false,
+                            implementationContractAddress = null
                         )
                     )
                 )
@@ -301,7 +309,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 contractAddress = ContractAddress("cafebabe"),
                 deployerAddress = WalletAddress("a"),
                 txHash = txHash,
-                imported = false
+                imported = false,
+                proxy = false,
+                implementationContractAddress = null
             ),
             status = Status.SUCCESS,
             transactionData = TransactionData(
@@ -374,7 +384,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = result.transactionData.timestamp?.value
                                     ),
-                                    imported = result.value.imported
+                                    imported = result.value.imported,
+                                    proxy = false,
+                                    implementationContractAddress = null
                                 )
                             )
                         )
@@ -413,7 +425,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 contractAddress = ContractAddress("cafebabe"),
                 deployerAddress = WalletAddress("a"),
                 txHash = txHash,
-                imported = false
+                imported = false,
+                proxy = false,
+                implementationContractAddress = null
             ),
             status = Status.SUCCESS,
             transactionData = TransactionData(
@@ -471,7 +485,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = result.transactionData.timestamp?.value
                             ),
-                            imported = result.value.imported
+                            imported = result.value.imported,
+                            proxy = false,
+                            implementationContractAddress = null
                         )
                     )
                 )

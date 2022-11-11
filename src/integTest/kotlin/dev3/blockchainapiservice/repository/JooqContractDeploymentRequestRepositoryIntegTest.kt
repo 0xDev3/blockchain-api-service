@@ -492,7 +492,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         val storedContractDeploymentRequest = suppose("contract deployment request is stored in database") {
@@ -522,7 +524,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             contractAddress = null,
             deployerAddress = null,
             txHash = null,
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         verify("storing contract deployment request returns correct result") {
@@ -601,7 +605,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         suppose("contract deployment request is stored in database") {
@@ -641,7 +647,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         contractAddress = null,
                         deployerAddress = DEPLOYER_ADDRESS,
                         txHash = TX_HASH,
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
         }
@@ -676,7 +684,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         suppose("contract deployment request is stored in database") {
@@ -717,7 +727,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         contractAddress = null,
                         deployerAddress = DEPLOYER_ADDRESS,
                         txHash = TX_HASH,
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
         }
@@ -752,7 +764,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         suppose("contract deployment request is stored in database") {
@@ -803,7 +817,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         contractAddress = null,
                         deployerAddress = DEPLOYER_ADDRESS,
                         txHash = TX_HASH,
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
         }
@@ -838,7 +854,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         suppose("contract deployment request is stored in database") {
@@ -878,7 +896,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         contractAddress = CONTRACT_ADDRESS,
                         deployerAddress = null,
                         txHash = null,
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
         }
@@ -913,7 +933,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 beforeActionMessage = DEPLOY_SCREEN_BEFORE_ACTION_MESSAGE,
                 afterActionMessage = DEPLOY_SCREEN_AFTER_ACTION_MESSAGE
             ),
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 
         suppose("contract deployment request is stored in database") {
@@ -958,7 +980,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         contractAddress = CONTRACT_ADDRESS,
                         deployerAddress = null,
                         txHash = null,
-                        imported = false
+                        imported = false,
+                        proxy = false,
+                        implementationContractAddress = null
                     )
                 )
         }
@@ -1004,7 +1028,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         deployerAddress = deployerAddress,
         txHash = txHash,
         imported = false,
-        deleted = false
+        deleted = false,
+        proxy = false,
+        implementationContractAddress = null
     )
 
     private fun ContractDeploymentRequestRecord.toModel(metadata: ContractMetadataRecord) =
@@ -1031,6 +1057,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             contractAddress = contractAddress,
             deployerAddress = deployerAddress,
             txHash = txHash,
-            imported = false
+            imported = false,
+            proxy = false,
+            implementationContractAddress = null
         )
 }
