@@ -6,7 +6,7 @@ import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
 import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.TypeDecorator
+import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.InfoMarkdownsResponse
@@ -37,9 +37,10 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
                     description = "Fetches contract owner",
                     parameterDecorators = emptyList(),
                     returnDecorators = listOf(
-                        TypeDecorator(
+                        ReturnTypeDecorator(
                             name = "Owner address",
                             description = "Contract owner address",
+                            solidityType = "address",
                             recommendedTypes = emptyList(),
                             parameters = null,
                             hints = null

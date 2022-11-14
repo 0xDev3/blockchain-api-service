@@ -15,6 +15,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRec
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.json.TypeDecorator
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
@@ -149,9 +150,10 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     description = "Get current contract owner",
                     parameterDecorators = emptyList(),
                     returnDecorators = listOf(
-                        TypeDecorator(
+                        ReturnTypeDecorator(
                             name = "Current owner",
-                            description = "Current owner of the cotnract",
+                            description = "Current owner of the contract",
+                            solidityType = "address",
                             recommendedTypes = emptyList(),
                             parameters = emptyList(),
                             hints = emptyList()

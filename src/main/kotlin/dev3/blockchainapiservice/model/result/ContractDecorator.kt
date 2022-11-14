@@ -10,6 +10,7 @@ import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.json.OverridableDecorator
+import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.json.TypeDecorator
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
@@ -27,6 +28,7 @@ data class ContractDecorator(
     val functions: List<ContractFunction>,
     val events: List<ContractEvent>
 ) {
+    @Suppress("TooManyFunctions")
     companion object {
         operator fun invoke(
             id: ContractId,
@@ -97,7 +99,7 @@ data class ContractDecorator(
                         "Function ${it.signature} is missing function name in artifact.json"
                     ),
                     inputs = it.parameterDecorators.toContractParameters(artifactFunction.inputs.orEmpty()),
-                    outputs = it.returnDecorators.toContractParameters(
+                    outputs = it.returnDecorators.returnTypeToContractParameters(
                         artifactFunction.outputs ?: throw ContractDecoratorException(
                             "Function ${it.signature} is missing is missing outputs in artifact.json"
                         )
@@ -164,6 +166,21 @@ data class ContractDecorator(
                     hints = it.first.hints
                 )
             }
+
+        private fun List<ReturnTypeDecorator>.returnTypeToContractParameters(
+            abi: List<AbiInputOutput>
+        ): List<ContractParameter> =
+            asSequence().zip(abi.asSequence() + sequence { yield(AbiInputOutput.EMPTY) }).map {
+                ContractParameter(
+                    name = it.first.name,
+                    description = it.first.description,
+                    solidityName = it.second.name,
+                    solidityType = it.first.solidityType,
+                    recommendedTypes = it.first.recommendedTypes,
+                    parameters = it.first.parameters?.returnTypeToContractParameters(it.second.components.orEmpty()),
+                    hints = it.first.hints
+                )
+            }.toList()
 
         private fun <T : OverridableDecorator> List<T>.resolveOverrides(): List<T> =
             distinctBy { it.signature }

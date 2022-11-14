@@ -9,6 +9,7 @@ import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.ConstructorDecorator
 import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.ManifestJson
+import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.json.TypeDecorator
 import dev3.blockchainapiservice.model.response.ArtifactJsonsResponse
 import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
@@ -111,9 +112,10 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                     description = "Fetches contract owner",
                     parameterDecorators = emptyList(),
                     returnDecorators = listOf(
-                        TypeDecorator(
+                        ReturnTypeDecorator(
                             name = "Owner address",
                             description = "Contract owner address",
+                            solidityType = "address",
                             recommendedTypes = emptyList(),
                             parameters = null,
                             hints = null

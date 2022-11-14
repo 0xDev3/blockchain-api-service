@@ -48,6 +48,16 @@ data class TypeDecorator(
     val hints: List<Any>?
 )
 
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
+data class ReturnTypeDecorator(
+    val name: String,
+    val description: String,
+    val solidityType: String,
+    val recommendedTypes: List<String>,
+    val parameters: List<ReturnTypeDecorator>?,
+    val hints: List<Any>?
+)
+
 interface OverridableDecorator {
     val signature: String
 }
@@ -73,7 +83,7 @@ data class FunctionDecorator(
     val name: String,
     val description: String,
     val parameterDecorators: List<TypeDecorator>,
-    val returnDecorators: List<TypeDecorator>,
+    val returnDecorators: List<ReturnTypeDecorator>,
     val emittableEvents: List<String>,
     val readOnly: Boolean
 ) : OverridableDecorator
