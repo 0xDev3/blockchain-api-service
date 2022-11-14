@@ -3,15 +3,18 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.model.params.ImportContractParams
 import dev3.blockchainapiservice.model.request.ImportContractRequest
 import dev3.blockchainapiservice.model.request.ImportedContractInterfacesRequest
+import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
+import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.service.ContractDeploymentRequestService
@@ -42,6 +45,45 @@ import java.util.UUID
 import org.mockito.kotlin.verify as verifyMock
 
 class ImportContractControllerTest : TestBase() {
+
+    @Test
+    fun mustCorrectlyPreviewContractImport() {
+        val result = ContractDecorator(
+            id = ContractId("contract-id"),
+            name = "name",
+            description = "description",
+            binary = ContractBinaryData("00"),
+            tags = emptyList(),
+            implements = emptyList(),
+            constructors = emptyList(),
+            functions = emptyList(),
+            events = emptyList()
+        )
+        val contractAddress = ContractAddress("abc")
+        val chainSpec = ChainSpec(ChainId(1337L), "test")
+
+        val importService = mock<ContractImportService>()
+
+        suppose("some smart contract import will be previewed") {
+            given(importService.previewImport(contractAddress, chainSpec))
+                .willReturn(result)
+        }
+
+        val controller = ImportContractController(importService, mock(), mock())
+
+        verify("controller returns correct response") {
+            val response = controller.previewSmartContractImport(
+                chainId = chainSpec.chainId.value,
+                contractAddress = contractAddress.rawValue,
+                customRpcUrl = chainSpec.customRpcUrl
+            )
+
+            JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
+
+            assertThat(response).withMessage()
+                .isEqualTo(ResponseEntity.ok(ContractDecoratorResponse(result)))
+        }
+    }
 
     @Test
     fun mustCorrectlyImportContract() {

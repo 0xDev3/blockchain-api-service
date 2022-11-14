@@ -1,5 +1,5 @@
 === Import Already Deployed Smart Contract
-Imports already deployed smart contract on the specified contract address. Parameters `contract_id`, `redirect_url`,
+Imports already deployed smart contract for the specified contract address. Parameters `contract_id`, `redirect_url`,
 `arbitrary_data`, `screen_config` and all its child fields are optional. `arbitrary_data` field can contain any desired
 JSON value. Contract import request ID can be interpolated into the `redirect_url` by placing `${id}` placeholder in
 the place where request ID is desired in the URL. The placeholder must strictly have dollar sign and brackets to be

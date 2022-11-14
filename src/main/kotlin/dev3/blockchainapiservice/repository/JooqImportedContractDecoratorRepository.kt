@@ -35,23 +35,29 @@ class JooqImportedContractDecoratorRepository(
         manifestJson: ManifestJson,
         artifactJson: ArtifactJson,
         infoMarkdown: String,
-        importedAt: UtcDateTime
+        importedAt: UtcDateTime,
+        previewOnly: Boolean
     ): ContractDecorator {
-        logger.info { "Store imported contract decorator, id: $id, projectId: $projectId, contractId: $contractId" }
+        logger.info {
+            "Store imported contract decorator, id: $id, projectId: $projectId, contractId: $contractId," +
+                " previewOnly: $previewOnly"
+        }
 
-        val record = ImportedContractDecoratorRecord(
-            id = id,
-            projectId = projectId,
-            contractId = contractId,
-            manifestJson = manifestJson,
-            artifactJson = artifactJson,
-            infoMarkdown = infoMarkdown,
-            contractTags = manifestJson.tags.toTypedArray(),
-            contractImplements = manifestJson.implements.toTypedArray(),
-            importedAt = importedAt
-        )
+        if (!previewOnly) {
+            val record = ImportedContractDecoratorRecord(
+                id = id,
+                projectId = projectId,
+                contractId = contractId,
+                manifestJson = manifestJson,
+                artifactJson = artifactJson,
+                infoMarkdown = infoMarkdown,
+                contractTags = manifestJson.tags.toTypedArray(),
+                contractImplements = manifestJson.implements.toTypedArray(),
+                importedAt = importedAt
+            )
 
-        dslContext.executeInsert(record)
+            dslContext.executeInsert(record)
+        }
 
         return ContractDecorator(
             id = contractId,
