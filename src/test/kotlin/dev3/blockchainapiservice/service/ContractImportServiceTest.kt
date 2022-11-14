@@ -473,7 +473,8 @@ class ContractImportServiceTest : TestBase() {
                     manifestJson = MANIFEST_JSON,
                     artifactJson = ARTIFACT_JSON,
                     infoMarkdown = INFO_MARKDOWN,
-                    importedAt = newDecoratorTimestamp
+                    importedAt = newDecoratorTimestamp,
+                    previewOnly = false
                 )
             ).willReturn(newDecorator)
         }
@@ -1024,7 +1025,8 @@ class ContractImportServiceTest : TestBase() {
                     manifestJson = MANIFEST_JSON,
                     artifactJson = adjustedArtifactJson,
                     infoMarkdown = "infoMd",
-                    importedAt = TestData.TIMESTAMP
+                    importedAt = TestData.TIMESTAMP,
+                    previewOnly = false
                 )
             )
                 .willReturn(contractDecorator)
@@ -1326,7 +1328,8 @@ class ContractImportServiceTest : TestBase() {
                     manifestJson = PROXY_MANIFEST_JSON,
                     artifactJson = adjustedArtifactJson,
                     infoMarkdown = "infoMd",
-                    importedAt = TestData.TIMESTAMP
+                    importedAt = TestData.TIMESTAMP,
+                    previewOnly = false
                 )
             )
                 .willReturn(contractDecorator)
@@ -1928,6 +1931,196 @@ class ContractImportServiceTest : TestBase() {
                         )
                     )
                 )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyPreviewAlreadyImportedContract() {
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("some imported contract will be returned from contract deployment request repository") {
+            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+                .willReturn(IMPORTED_CONTRACT)
+        }
+
+        val contractId = IMPORTED_CONTRACT.contractId
+        val decorator = ContractDecorator(
+            id = contractId,
+            artifact = ARTIFACT_JSON,
+            manifest = MANIFEST_JSON,
+            imported = true,
+            interfacesProvider = null
+        )
+
+        val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
+
+        suppose("imported contract decorator is returned") {
+            given(
+                importedContractDecoratorRepository.getByContractIdAndProjectId(
+                    contractId = contractId,
+                    projectId = IMPORTED_CONTRACT.projectId
+                )
+            )
+                .willReturn(decorator)
+        }
+
+        val service = ContractImportServiceImpl(
+            abiDecoderService = EthereumAbiDecoderService(),
+            contractDecompilerService = mock(),
+            functionEncoderService = mock(),
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = importedContractDecoratorRepository,
+            blockchainService = mock(),
+            uuidProvider = mock(),
+            utcDateTimeProvider = mock(),
+            objectMapper = objectMapper
+        )
+
+        verify("contract import is correctly previewed") {
+            assertThat(service.previewImport(CONTRACT_ADDRESS, ChainSpec(CHAIN_ID, null))).withMessage()
+                .isEqualTo(decorator)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyPreviewDeployedContract() {
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("some non-imported contract will be returned from contract deployment request repository") {
+            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+                .willReturn(NON_IMPORTED_CONTRACT)
+        }
+
+        val contractId = NON_IMPORTED_CONTRACT.contractId
+        val decorator = ContractDecorator(
+            id = contractId,
+            artifact = ARTIFACT_JSON,
+            manifest = MANIFEST_JSON,
+            imported = false,
+            interfacesProvider = null
+        )
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(contractId))
+                .willReturn(decorator)
+        }
+
+        val service = ContractImportServiceImpl(
+            abiDecoderService = EthereumAbiDecoderService(),
+            contractDecompilerService = mock(),
+            functionEncoderService = mock(),
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
+            blockchainService = mock(),
+            uuidProvider = mock(),
+            utcDateTimeProvider = mock(),
+            objectMapper = objectMapper
+        )
+
+        verify("contract import is correctly previewed") {
+            assertThat(service.previewImport(CONTRACT_ADDRESS, ChainSpec(CHAIN_ID, null))).withMessage()
+                .isEqualTo(decorator)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyPreviewContractImport() {
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("null will be returned from contract deployment request repository") {
+            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+                .willReturn(null)
+        }
+
+        val blockchainService = mock<BlockchainService>()
+        val chainSpec = ChainSpec(CHAIN_ID, null)
+
+        suppose("contract deployment transaction will be found on blockchain") {
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, CONTRACT_ADDRESS))
+                .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
+        }
+
+        val contractDecompilerService = mock<ContractDecompilerService>()
+
+        suppose("contract will be decompiled") {
+            given(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+                .willReturn(
+                    DecompiledContractJson(
+                        manifest = MANIFEST_JSON,
+                        artifact = ARTIFACT_JSON,
+                        infoMarkdown = "infoMd"
+                    )
+                )
+        }
+
+        val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
+        val contractId = ContractId("imported-${CONTRACT_ADDRESS.rawValue}-${CHAIN_ID.value}")
+
+        suppose("imported contract decorator does not exist in the database") {
+            given(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, Constants.NIL_UUID))
+                .willReturn(null)
+        }
+
+        val contractDecorator = CONTRACT_DECORATOR.copy(id = contractId)
+        val contractDecoratorId = UUID.randomUUID()
+        val adjustedArtifactJson = ARTIFACT_JSON.copy(
+            bytecode = "$CONSTRUCTOR_BYTECODE$CONTRACT_BYTECODE",
+            deployedBytecode = CONTRACT_BYTECODE
+        )
+
+        suppose("imported contract decorator will be previewed in the database") {
+            given(
+                importedContractDecoratorRepository.store(
+                    id = contractDecoratorId,
+                    projectId = Constants.NIL_UUID,
+                    contractId = contractId,
+                    manifestJson = MANIFEST_JSON,
+                    artifactJson = adjustedArtifactJson,
+                    infoMarkdown = "infoMd",
+                    importedAt = TestData.TIMESTAMP,
+                    previewOnly = true
+                )
+            )
+                .willReturn(contractDecorator)
+        }
+
+        val uuidProvider = mock<UuidProvider>()
+
+        suppose("some UUID will be returned") {
+            given(uuidProvider.getUuid())
+                .willReturn(contractDecoratorId)
+        }
+
+        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
+
+        suppose("some UTC date-time will be returned") {
+            given(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(TestData.TIMESTAMP)
+        }
+
+        val service = ContractImportServiceImpl(
+            abiDecoderService = EthereumAbiDecoderService(),
+            contractDecompilerService = contractDecompilerService,
+            functionEncoderService = mock(),
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            contractMetadataRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = importedContractDecoratorRepository,
+            blockchainService = blockchainService,
+            uuidProvider = uuidProvider,
+            utcDateTimeProvider = utcDateTimeProvider,
+            objectMapper = objectMapper
+        )
+
+        verify("contract import is correctly previewed") {
+            assertThat(service.previewImport(CONTRACT_ADDRESS, chainSpec)).withMessage()
+                .isEqualTo(contractDecorator)
         }
     }
 
