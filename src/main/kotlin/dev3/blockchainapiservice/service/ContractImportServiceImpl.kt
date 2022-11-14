@@ -57,7 +57,7 @@ class ContractImportServiceImpl(
     }
 
     override fun importExistingContract(params: ImportContractParams, project: Project): UUID? {
-        logger.info { "Attempting to importing existing smart contract, params: $params, project: $project" }
+        logger.info { "Attempting to import existing smart contract, params: $params, project: $project" }
 
         return contractDeploymentRequestRepository.getByContractAddressAndChainId(
             contractAddress = params.contractAddress,

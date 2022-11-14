@@ -32,4 +32,14 @@ data class AbiInputOutput(
     val name: String,
     val type: String,
     val indexed: Boolean?
-)
+) {
+    companion object {
+        val EMPTY = AbiInputOutput(
+            components = null,
+            internalType = "",
+            name = "",
+            type = "",
+            indexed = null
+        )
+    }
+}

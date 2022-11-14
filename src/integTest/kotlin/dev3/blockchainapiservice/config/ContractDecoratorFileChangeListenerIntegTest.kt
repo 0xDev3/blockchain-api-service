@@ -93,7 +93,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         name = "Return value",
                         description = "Return value description",
                         solidityName = "",
-                        solidityType = "bool",
+                        solidityType = "string",
                         recommendedTypes = listOf("example"),
                         parameters = null,
                         hints = null
@@ -122,7 +122,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         name = "Return value",
                         description = "Return value description",
                         solidityName = "",
-                        solidityType = "bool",
+                        solidityType = "string",
                         recommendedTypes = listOf("example"),
                         parameters = null,
                         hints = null
@@ -151,7 +151,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         name = "Return value",
                         description = "Return value description",
                         solidityName = "",
-                        solidityType = "bool",
+                        solidityType = "string",
                         recommendedTypes = listOf("example"),
                         parameters = null,
                         hints = null

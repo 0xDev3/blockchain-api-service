@@ -57,6 +57,7 @@
                 {
                     "name": "Return value",
                     "description": "Return value description",
+                    "solidityType": "string",
                     "recommendedTypes": ["example"]
                 }
             ],
@@ -77,6 +78,7 @@
                 {
                     "name": "Return value",
                     "description": "Return value description",
+                    "solidityType": "string",
                     "recommendedTypes": ["example"]
                 }
             ],
@@ -97,6 +99,7 @@
                 {
                     "name": "Return value",
                     "description": "Return value description",
+                    "solidityType": "string",
                     "recommendedTypes": ["example"]
                 }
             ],
