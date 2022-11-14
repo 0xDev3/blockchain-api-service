@@ -17,6 +17,7 @@ import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.json.TypeDecorator
+import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
@@ -252,6 +253,94 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         )
 
         contractDecoratorRepository.delete(CONTRACT_DECORATOR.id)
+    }
+
+    @Test
+    fun mustCorrectlyPreviewSmartContractImport() {
+        val mainAccount = accounts[0]
+        val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
+
+        val contract = suppose("simple ERC20 contract is deployed") {
+            ExampleContract.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                ownerAddress.rawValue
+            ).send()
+        }
+
+        val chainId = Chain.HARDHAT_TESTNET.id
+        val contractAddress = ContractAddress(contract.contractAddress)
+
+        val response = suppose("request to preview smart contract import is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get(
+                    "/v1/import-smart-contract/preview/${chainId.value}/contract/${contractAddress.rawValue}"
+                )
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ContractDecoratorResponse::class.java)
+        }
+
+        val importedContractId = ContractId("imported-${contractAddress.rawValue}-${chainId.value}")
+
+        verify("correct response is returned") {
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ContractDecoratorResponse(
+                        id = importedContractId.value,
+                        name = "Imported Contract",
+                        description = "Imported smart contract.",
+                        binary = response.binary,
+                        tags = emptyList(),
+                        implements = emptyList(),
+                        constructors = emptyList(),
+                        functions = listOf(
+                            ContractFunction(
+                                name = "setOwner",
+                                description = "",
+                                solidityName = "setOwner",
+                                inputs = listOf(
+                                    ContractParameter(
+                                        name = "param1",
+                                        description = "",
+                                        solidityName = "param1",
+                                        solidityType = "address",
+                                        recommendedTypes = emptyList(),
+                                        parameters = null,
+                                        hints = null
+                                    )
+                                ),
+                                outputs = emptyList(),
+                                emittableEvents = emptyList(),
+                                readOnly = false
+                            ),
+                            ContractFunction(
+                                name = "getOwner",
+                                description = "",
+                                solidityName = "getOwner",
+                                inputs = emptyList(),
+                                outputs = emptyList(),
+                                emittableEvents = emptyList(),
+                                readOnly = false
+                            )
+                        ),
+                        events = emptyList()
+                    )
+                )
+        }
+
+        verify("imported contract decorator is not stored in database") {
+            val importedContractDecorator = importedContractDecoratorRepository.getByContractIdAndProjectId(
+                contractId = importedContractId,
+                projectId = Constants.NIL_UUID
+            )
+
+            assertThat(importedContractDecorator).withMessage()
+                .isEqualTo(null)
+        }
     }
 
     @Test

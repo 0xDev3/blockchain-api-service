@@ -18,7 +18,8 @@ interface ImportedContractDecoratorRepository {
         manifestJson: ManifestJson,
         artifactJson: ArtifactJson,
         infoMarkdown: String,
-        importedAt: UtcDateTime
+        importedAt: UtcDateTime,
+        previewOnly: Boolean
     ): ContractDecorator
 
     fun updateInterfaces(

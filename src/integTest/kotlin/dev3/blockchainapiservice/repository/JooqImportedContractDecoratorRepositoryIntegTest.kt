@@ -125,7 +125,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyStoreAndFetchImportedContractDecorator() {
+    fun mustCorrectlyStoreAndFetchImportedContractDecoratorWhenPreviewOnlyIsSetToFalse() {
         val id = UUID.randomUUID()
         val contractId = ContractId("imported-contract")
         val manifestJson = ManifestJson(
@@ -149,7 +149,16 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         val infoMarkdown = "markdown"
 
         val storedContractDecorator = suppose("imported contract decorator will be stored into the database") {
-            repository.store(id, PROJECT_ID_1, contractId, manifestJson, artifactJson, infoMarkdown, TestData.TIMESTAMP)
+            repository.store(
+                id = id,
+                projectId = PROJECT_ID_1,
+                contractId = contractId,
+                manifestJson = manifestJson,
+                artifactJson = artifactJson,
+                infoMarkdown = infoMarkdown,
+                importedAt = TestData.TIMESTAMP,
+                previewOnly = false
+            )
         }
 
         val expectedDecorator = ContractDecorator(
@@ -205,7 +214,16 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         val infoMarkdown = "markdown"
 
         suppose("imported contract decorator will be stored into the database") {
-            repository.store(id, PROJECT_ID_1, contractId, manifestJson, artifactJson, infoMarkdown, TestData.TIMESTAMP)
+            repository.store(
+                id = id,
+                projectId = PROJECT_ID_1,
+                contractId = contractId,
+                manifestJson = manifestJson,
+                artifactJson = artifactJson,
+                infoMarkdown = infoMarkdown,
+                importedAt = TestData.TIMESTAMP,
+                previewOnly = false
+            )
         }
 
         val newInterfaces = listOf(InterfaceId("new-interface"))
@@ -235,6 +253,68 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
                 .isEqualTo(artifactJson)
             assertThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
                 .isEqualTo(infoMarkdown)
+        }
+    }
+
+    @Test
+    fun mustNotStoreImportedContractDecoratorWhenPreviewOnlyIsSetToTrue() {
+        val id = UUID.randomUUID()
+        val contractId = ContractId("imported-contract")
+        val manifestJson = ManifestJson(
+            name = "name",
+            description = "description",
+            tags = setOf("tag-1"),
+            implements = setOf("trait-1"),
+            eventDecorators = emptyList(),
+            constructorDecorators = emptyList(),
+            functionDecorators = emptyList()
+        )
+        val artifactJson = ArtifactJson(
+            contractName = "imported-contract",
+            sourceName = "imported.sol",
+            abi = emptyList(),
+            bytecode = "0x0",
+            deployedBytecode = "0x0",
+            linkReferences = null,
+            deployedLinkReferences = null
+        )
+        val infoMarkdown = "markdown"
+
+        val storedContractDecorator = suppose("imported contract decorator will be stored into the database") {
+            repository.store(
+                id = id,
+                projectId = PROJECT_ID_1,
+                contractId = contractId,
+                manifestJson = manifestJson,
+                artifactJson = artifactJson,
+                infoMarkdown = infoMarkdown,
+                importedAt = TestData.TIMESTAMP,
+                previewOnly = true
+            )
+        }
+
+        val expectedDecorator = ContractDecorator(
+            id = contractId,
+            artifact = artifactJson,
+            manifest = manifestJson,
+            imported = true,
+            interfacesProvider = null
+        )
+
+        verify("storing imported contract decorator returns correct result") {
+            assertThat(storedContractDecorator).withMessage()
+                .isEqualTo(expectedDecorator)
+        }
+
+        verify("imported contract decorator is not stored into the database") {
+            assertThat(repository.getByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+                .isNull()
+            assertThat(repository.getManifestJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+                .isNull()
+            assertThat(repository.getArtifactJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+                .isNull()
+            assertThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+                .isNull()
         }
     }
 
