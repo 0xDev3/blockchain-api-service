@@ -65,7 +65,8 @@ class ContractDecoratorControllerTest : TestBase() {
                 ContractFunction(
                     name = "Get contract owner",
                     description = "Fetches contract owner",
-                    solidityName = "getOWner",
+                    solidityName = "getOwner",
+                    signature = "getOwner()",
                     inputs = listOf(),
                     outputs = listOf(
                         ContractParameter(
@@ -82,7 +83,9 @@ class ContractDecoratorControllerTest : TestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf()
+            events = listOf(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
 
         val filters = ContractDecoratorFilters(
@@ -160,7 +163,8 @@ class ContractDecoratorControllerTest : TestBase() {
                 ContractFunction(
                     name = "Get contract owner",
                     description = "Fetches contract owner",
-                    solidityName = "getOWner",
+                    solidityName = "getOwner",
+                    signature = "getOwner()",
                     inputs = listOf(),
                     outputs = listOf(
                         ContractParameter(
@@ -177,7 +181,9 @@ class ContractDecoratorControllerTest : TestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf()
+            events = listOf(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
 
         val filters = ContractDecoratorFilters(
@@ -478,7 +484,8 @@ class ContractDecoratorControllerTest : TestBase() {
                 ContractFunction(
                     name = "Get contract owner",
                     description = "Fetches contract owner",
-                    solidityName = "getOWner",
+                    solidityName = "getOwner",
+                    signature = "getOwner()",
                     inputs = listOf(),
                     outputs = listOf(
                         ContractParameter(
@@ -495,7 +502,9 @@ class ContractDecoratorControllerTest : TestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf()
+            events = listOf(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
 
         suppose("some contract decorator will be fetched") {
@@ -561,7 +570,8 @@ class ContractDecoratorControllerTest : TestBase() {
                 ContractFunction(
                     name = "Get contract owner",
                     description = "Fetches contract owner",
-                    solidityName = "getOWner",
+                    solidityName = "getOwner",
+                    signature = "getOwner()",
                     inputs = listOf(),
                     outputs = listOf(
                         ContractParameter(
@@ -578,7 +588,9 @@ class ContractDecoratorControllerTest : TestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf()
+            events = listOf(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
         val projectId = UUID.randomUUID()
 

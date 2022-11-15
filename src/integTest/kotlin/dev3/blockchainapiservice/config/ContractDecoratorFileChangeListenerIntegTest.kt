@@ -1,7 +1,9 @@
 package dev3.blockchainapiservice.config
 
 import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.result.ContractConstructor
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractEvent
@@ -77,6 +79,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 name = "View function",
                 description = "View function description",
                 solidityName = "viewFn",
+                signature = "viewFn(address)",
                 inputs = listOf(
                     ContractParameter(
                         name = "Arg",
@@ -106,6 +109,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 name = "Pure function",
                 description = "Pure function description",
                 solidityName = "pureFn",
+                signature = "pureFn(address)",
                 inputs = listOf(
                     ContractParameter(
                         name = "Arg",
@@ -135,6 +139,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 name = "Modifying function",
                 description = "Modifying function description",
                 solidityName = "modifyingFn",
+                signature = "modifyingFn(address)",
                 inputs = listOf(
                     ContractParameter(
                         name = "Arg",
@@ -166,6 +171,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 name = "Example Event",
                 description = "Example Event description",
                 solidityName = "ExampleEvent",
+                signature = "ExampleEvent(address)",
                 inputs = listOf(
                     ContractParameter(
                         name = "Arg",
@@ -261,7 +267,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val ignoredContractId = ContractId("AnotherContractSet/IgnoredContract")
 
         verify("correct contract decorators have been loaded") {
-            assertThat(contractDecoratorRepository.getById(dummyContractId)).withMessage()
+            val dummyDecorator = contractDecoratorRepository.getById(dummyContractId)!!
+
+            assertThat(dummyDecorator).withMessage()
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
@@ -272,11 +280,15 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         implements = listOf(InterfaceId("trait.example")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
-                        events = EVENTS
+                        events = EVENTS,
+                        manifest = dummyDecorator.manifest,
+                        artifact = dummyDecorator.artifact
                     )
                 )
 
-            assertThat(contractDecoratorRepository.getById(deeplyNestedContractId)).withMessage()
+            val deeplyNestedDecorator = contractDecoratorRepository.getById(deeplyNestedContractId)!!
+
+            assertThat(deeplyNestedDecorator).withMessage()
                 .isEqualTo(
                     ContractDecorator(
                         id = deeplyNestedContractId,
@@ -287,7 +299,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         implements = listOf(InterfaceId("trait.example")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
-                        events = EVENTS
+                        events = EVENTS,
+                        manifest = deeplyNestedDecorator.manifest,
+                        artifact = deeplyNestedDecorator.artifact
                     )
                 )
 
@@ -296,7 +310,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             assertThat(contractDecoratorRepository.getById(contractWithoutManifestId)).withMessage()
                 .isNull()
 
-            assertThat(contractDecoratorRepository.getById(anotherContractId)).withMessage()
+            val anotherDecorator = contractDecoratorRepository.getById(anotherContractId)!!
+
+            assertThat(anotherDecorator).withMessage()
                 .isEqualTo(
                     ContractDecorator(
                         id = anotherContractId,
@@ -307,7 +323,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         implements = listOf(InterfaceId("trait.another")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
-                        events = EVENTS
+                        events = EVENTS,
+                        manifest = anotherDecorator.manifest,
+                        artifact = anotherDecorator.artifact
                     )
                 )
 
@@ -385,7 +403,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             implements = listOf(InterfaceId("trait.no.manifest")),
             constructors = CONSTRUCTORS,
             functions = FUNCTIONS,
-            events = EVENTS
+            events = EVENTS,
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
 
         suppose("contract which needs to be deleted is in repository") {
@@ -399,7 +419,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     implements = listOf(InterfaceId("trait.no.artifact")),
                     constructors = CONSTRUCTORS,
                     functions = FUNCTIONS,
-                    events = EVENTS
+                    events = EVENTS,
+                    manifest = ManifestJson.EMPTY,
+                    artifact = ArtifactJson.EMPTY
                 )
             )
             contractDecoratorRepository.store(withoutManifestDecorator)
@@ -468,7 +490,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val ignoredContractId = ContractId("AnotherContractSet/IgnoredContract")
 
         verify("correct contract decorators have been updated in database") {
-            assertThat(contractDecoratorRepository.getById(dummyContractId)).withMessage()
+            val dummyDecorator = contractDecoratorRepository.getById(dummyContractId)!!
+
+            assertThat(dummyDecorator).withMessage()
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
@@ -479,10 +503,15 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         implements = listOf(InterfaceId("trait.example")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
-                        events = EVENTS
+                        events = EVENTS,
+                        manifest = dummyDecorator.manifest,
+                        artifact = dummyDecorator.artifact
                     )
                 )
-            assertThat(contractDecoratorRepository.getById(deeplyNestedContractId)).withMessage()
+
+            val deeplyNestedDecorator = contractDecoratorRepository.getById(deeplyNestedContractId)!!
+
+            assertThat(deeplyNestedDecorator).withMessage()
                 .isEqualTo(
                     ContractDecorator(
                         id = deeplyNestedContractId,
@@ -493,7 +522,9 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                         implements = listOf(InterfaceId("trait.example")),
                         constructors = CONSTRUCTORS,
                         functions = FUNCTIONS,
-                        events = EVENTS
+                        events = EVENTS,
+                        manifest = deeplyNestedDecorator.manifest,
+                        artifact = deeplyNestedDecorator.artifact
                     )
                 )
 

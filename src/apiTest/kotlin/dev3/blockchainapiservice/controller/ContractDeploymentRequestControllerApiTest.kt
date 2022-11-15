@@ -12,6 +12,8 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataR
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.json.ArtifactJson
+import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestsResponse
@@ -93,7 +95,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 ContractFunction(
                     name = "Get contract owner",
                     description = "Fetches contract owner",
-                    solidityName = "getOWner",
+                    solidityName = "getOwner",
+                    signature = "getOwner()",
                     inputs = listOf(),
                     outputs = listOf(
                         ContractParameter(
@@ -110,7 +113,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf()
+            events = listOf(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
     }
 

@@ -5,7 +5,9 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.params.ImportContractParams
 import dev3.blockchainapiservice.model.request.ImportContractRequest
 import dev3.blockchainapiservice.model.request.ImportedContractInterfacesRequest
@@ -57,7 +59,9 @@ class ImportContractControllerTest : TestBase() {
             implements = emptyList(),
             constructors = emptyList(),
             functions = emptyList(),
-            events = emptyList()
+            events = emptyList(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
         val contractAddress = ContractAddress("abc")
         val chainSpec = ChainSpec(ChainId(1337L), "test")

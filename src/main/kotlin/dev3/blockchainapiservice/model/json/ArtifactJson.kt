@@ -13,7 +13,11 @@ data class ArtifactJson(
     val deployedBytecode: String,
     val linkReferences: JsonNode?,
     val deployedLinkReferences: JsonNode?
-)
+) {
+    companion object {
+        val EMPTY = ArtifactJson("", "", emptyList(), "", "", null, null)
+    }
+}
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class AbiObject(

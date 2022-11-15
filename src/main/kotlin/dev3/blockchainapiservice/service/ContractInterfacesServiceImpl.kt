@@ -22,6 +22,29 @@ class ContractInterfacesServiceImpl(
 
     companion object : KLogging()
 
+    override fun attachMatchingInterfacesToDecorator(contractDecorator: ContractDecorator): ContractDecorator {
+        val matchingInterfaces = contractInterfacesRepository.getAllWithPartiallyMatchingInterfaces(
+            abiFunctionSignatures = contractDecorator.functions.map { it.signature }.toSet(),
+            abiEventSignatures = contractDecorator.events.map { it.signature }.toSet()
+        )
+            .filterNot { contractDecorator.implements.contains(it.id) }
+            .filter { it.functionDecorators.isNotEmpty() }
+            .map { it.id.value }
+            .toSet()
+
+        val newManifest = contractDecorator.manifest.copy(
+            implements = contractDecorator.manifest.implements + matchingInterfaces
+        )
+
+        return ContractDecorator(
+            id = contractDecorator.id,
+            artifact = contractDecorator.artifact,
+            manifest = newManifest,
+            imported = true,
+            interfacesProvider = contractInterfacesRepository::getById
+        )
+    }
+
     override fun getSuggestedInterfacesForImportedSmartContract(id: UUID): List<InterfaceManifestJsonWithId> {
         logger.debug { "Fetching suggested interface for contract with id: $id" }
 
