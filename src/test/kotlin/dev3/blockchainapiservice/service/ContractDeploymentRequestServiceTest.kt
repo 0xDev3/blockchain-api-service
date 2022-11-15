@@ -9,6 +9,8 @@ import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.model.filters.OrList
+import dev3.blockchainapiservice.model.json.ArtifactJson
+import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.params.CreateContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
@@ -80,7 +82,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             implements = listOf(InterfaceId("test-trait")),
             constructors = emptyList(),
             functions = emptyList(),
-            events = emptyList()
+            events = emptyList(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
         private val ID = UUID.randomUUID()
         private val ENCODED_CONSTRUCTOR = FunctionData("0x1234")

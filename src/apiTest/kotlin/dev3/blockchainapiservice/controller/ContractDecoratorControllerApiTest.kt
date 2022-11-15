@@ -37,53 +37,6 @@ import java.util.UUID
 class ContractDecoratorControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val CONTRACT_DECORATOR = ContractDecorator(
-            id = ContractId("examples.exampleContract"),
-            name = "name",
-            description = "description",
-            binary = ContractBinaryData(ExampleContract.BINARY),
-            tags = listOf(ContractTag("example"), ContractTag("simple")),
-            implements = listOf(InterfaceId("traits.example"), InterfaceId("traits.exampleOwnable")),
-            constructors = listOf(
-                ContractConstructor(
-                    inputs = listOf(
-                        ContractParameter(
-                            name = "Owner address",
-                            description = "Contract owner address",
-                            solidityName = "owner",
-                            solidityType = "address",
-                            recommendedTypes = emptyList(),
-                            parameters = null,
-                            hints = null
-                        )
-                    ),
-                    description = "Main constructor",
-                    payable = true
-                )
-            ),
-            functions = listOf(
-                ContractFunction(
-                    name = "Get contract owner",
-                    description = "Fetches contract owner",
-                    solidityName = "getOwner",
-                    inputs = emptyList(),
-                    outputs = listOf(
-                        ContractParameter(
-                            name = "Owner address",
-                            description = "Contract owner address",
-                            solidityName = "",
-                            solidityType = "address",
-                            recommendedTypes = emptyList(),
-                            parameters = null,
-                            hints = null
-                        )
-                    ),
-                    emittableEvents = emptyList(),
-                    readOnly = true
-                )
-            ),
-            events = emptyList()
-        )
         private val MANIFEST_JSON = ManifestJson(
             name = "name",
             description = "description",
@@ -135,7 +88,57 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
             linkReferences = null,
             deployedLinkReferences = null
         )
-        private val INFO_MD = "# info.md file contents"
+        private const val INFO_MD = "# info.md file contents"
+        private val CONTRACT_DECORATOR = ContractDecorator(
+            id = ContractId("examples.exampleContract"),
+            name = "name",
+            description = "description",
+            binary = ContractBinaryData(ExampleContract.BINARY),
+            tags = listOf(ContractTag("example"), ContractTag("simple")),
+            implements = listOf(InterfaceId("traits.example"), InterfaceId("traits.exampleOwnable")),
+            constructors = listOf(
+                ContractConstructor(
+                    inputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "owner",
+                            solidityType = "address",
+                            recommendedTypes = emptyList(),
+                            parameters = null,
+                            hints = null
+                        )
+                    ),
+                    description = "Main constructor",
+                    payable = true
+                )
+            ),
+            functions = listOf(
+                ContractFunction(
+                    name = "Get contract owner",
+                    description = "Fetches contract owner",
+                    solidityName = "getOwner",
+                    signature = "getOwner()",
+                    inputs = emptyList(),
+                    outputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "",
+                            solidityType = "address",
+                            recommendedTypes = emptyList(),
+                            parameters = null,
+                            hints = null
+                        )
+                    ),
+                    emittableEvents = emptyList(),
+                    readOnly = true
+                )
+            ),
+            events = emptyList(),
+            manifest = MANIFEST_JSON,
+            artifact = ARTIFACT_JSON
+        )
     }
 
     @Autowired

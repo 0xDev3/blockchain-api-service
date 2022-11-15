@@ -14,6 +14,7 @@ import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.model.json.ManifestJson
+import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractInterfacesRepository
@@ -133,6 +134,73 @@ class ContractInterfacesServiceTest : TestBase() {
             deployedLinkReferences = null
         )
         private val EMPTY_CONTRACT_INTERFACE = InterfaceManifestJson(null, null, emptySet(), emptyList(), emptyList())
+    }
+
+    @Test
+    fun mustCorrectlyAttachInterfacesToDecorator() {
+        val contractInterfacesRepository = mock<ContractInterfacesRepository>()
+
+        suppose("some partially matching contract interfaces will be returned") {
+            given(
+                contractInterfacesRepository.getAllWithPartiallyMatchingInterfaces(
+                    abiFunctionSignatures = setOf("function(string)"),
+                    abiEventSignatures = setOf("Event(string)")
+                )
+            )
+                .willReturn(
+                    listOf(
+                        InterfaceManifestJsonWithId(
+                            id = InterfaceId("already-implemented"),
+                            name = "Already Implemented",
+                            description = "Already Implemented",
+                            tags = emptySet(),
+                            eventDecorators = MANIFEST_JSON.eventDecorators,
+                            functionDecorators = emptyList()
+                        ),
+                        InterfaceManifestJsonWithId(
+                            id = InterfaceId("not-yet-implemented"),
+                            name = "Not Yet Implemented",
+                            description = "Not Yet Implemented",
+                            tags = emptySet(),
+                            eventDecorators = emptyList(),
+                            functionDecorators = MANIFEST_JSON.functionDecorators
+                        )
+                    )
+                )
+        }
+
+        suppose("some interfaces are in the contract interfaces repository") {
+            given(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
+                .willReturn(EMPTY_CONTRACT_INTERFACE)
+        }
+
+        val service = ContractInterfacesServiceImpl(
+            contractDeploymentRequestRepository = mock(),
+            importedContractDecoratorRepository = mock(),
+            contractInterfacesRepository = contractInterfacesRepository,
+            contractMetadataRepository = mock()
+        )
+
+        val decorator = ContractDecorator(
+            id = ContractId("test"),
+            artifact = ARTIFACT_JSON,
+            manifest = MANIFEST_JSON,
+            imported = true,
+            interfacesProvider = contractInterfacesRepository::getById
+        )
+
+        verify("correct interfaces are attached") {
+            assertThat(service.attachMatchingInterfacesToDecorator(decorator)).withMessage()
+                .isEqualTo(
+                    ContractDecorator(
+                        id = decorator.id,
+                        artifact = ARTIFACT_JSON,
+                        manifest = MANIFEST_JSON.copy(implements = setOf("already-implemented", "not-yet-implemented")),
+                        imported = true,
+                        interfacesProvider = contractInterfacesRepository::getById
+                    )
+                )
+        }
     }
 
     @Test

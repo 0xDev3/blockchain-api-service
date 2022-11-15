@@ -13,8 +13,10 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataR
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.json.TypeDecorator
 import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
@@ -103,7 +105,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 ContractFunction(
                     name = "Get contract owner",
                     description = "Fetches contract owner",
-                    solidityName = "getOWner",
+                    solidityName = "getOwner",
+                    signature = "getOwner()",
                     inputs = listOf(),
                     outputs = listOf(
                         ContractParameter(
@@ -120,7 +123,9 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf()
+            events = listOf(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
         private val CONTRACT_INTERFACE = InterfaceManifestJson(
             name = "Example Interface",
@@ -135,7 +140,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     parameterDecorators = listOf(
                         TypeDecorator(
                             name = "New owner",
-                            description = "New owner of the cotnract",
+                            description = "New owner of the contract",
                             recommendedTypes = emptyList(),
                             parameters = emptyList(),
                             hints = emptyList()
@@ -161,7 +166,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         )
                     ),
                     emittableEvents = emptyList(),
-                    readOnly = false
+                    readOnly = true
                 )
             )
         )
@@ -257,6 +262,12 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyPreviewSmartContractImport() {
+        val interfaceId = InterfaceId("example.ownable")
+
+        suppose("some contract interface is in the repository") {
+            contractInterfacesRepository.store(interfaceId, CONTRACT_INTERFACE)
+        }
+
         val mainAccount = accounts[0]
         val ownerAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_10)
 
@@ -294,23 +305,24 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         name = "Imported Contract",
                         description = "Imported smart contract.",
                         binary = response.binary,
-                        tags = emptyList(),
-                        implements = emptyList(),
+                        tags = listOf("interface-tag"),
+                        implements = listOf(interfaceId.value),
                         constructors = emptyList(),
                         functions = listOf(
                             ContractFunction(
-                                name = "setOwner",
-                                description = "",
+                                name = "Set owner",
+                                description = "Set contract owner",
                                 solidityName = "setOwner",
+                                signature = "setOwner(address)",
                                 inputs = listOf(
                                     ContractParameter(
-                                        name = "param1",
-                                        description = "",
+                                        name = "New owner",
+                                        description = "New owner of the contract",
                                         solidityName = "param1",
                                         solidityType = "address",
                                         recommendedTypes = emptyList(),
-                                        parameters = null,
-                                        hints = null
+                                        parameters = emptyList(),
+                                        hints = emptyList()
                                     )
                                 ),
                                 outputs = emptyList(),
@@ -318,13 +330,24 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                                 readOnly = false
                             ),
                             ContractFunction(
-                                name = "getOwner",
-                                description = "",
+                                name = "Get owner",
+                                description = "Get current contract owner",
                                 solidityName = "getOwner",
+                                signature = "getOwner()",
                                 inputs = emptyList(),
-                                outputs = emptyList(),
+                                outputs = listOf(
+                                    ContractParameter(
+                                        name = "Current owner",
+                                        description = "Current owner of the contract",
+                                        solidityName = "",
+                                        solidityType = "address",
+                                        recommendedTypes = emptyList(),
+                                        parameters = emptyList(),
+                                        hints = emptyList()
+                                    )
+                                ),
                                 emittableEvents = emptyList(),
-                                readOnly = false
+                                readOnly = true
                             )
                         ),
                         events = emptyList()
@@ -803,7 +826,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
             val importedContractDecorator = importedContractDecoratorRepository.getByContractIdAndProjectId(
                 contractId = importedContractId,
                 projectId = PROJECT_ID
-            )
+            )!!
 
             assertThat(importedContractDecorator).withMessage()
                 .isEqualTo(
@@ -820,6 +843,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                                 name = "setOwner",
                                 description = "",
                                 solidityName = "setOwner",
+                                signature = "setOwner(address)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "param1",
@@ -839,12 +863,15 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                                 name = "getOwner",
                                 description = "",
                                 solidityName = "getOwner",
+                                signature = "getOwner()",
                                 inputs = emptyList(),
                                 outputs = emptyList(),
                                 emittableEvents = emptyList(),
                                 readOnly = false
                             )
-                        )
+                        ),
+                        manifest = importedContractDecorator.manifest,
+                        artifact = importedContractDecorator.artifact
                     )
                 )
         }
@@ -1017,6 +1044,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                                 name = "implementation",
                                 description = "",
                                 solidityName = "implementation",
+                                signature = "implementation()",
                                 inputs = emptyList(),
                                 outputs = emptyList(),
                                 emittableEvents = emptyList(),
@@ -1026,6 +1054,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                                 name = "setOwner",
                                 description = "",
                                 solidityName = "setOwner",
+                                signature = "setOwner(address)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "param1",
@@ -1045,12 +1074,15 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                                 name = "getOwner",
                                 description = "",
                                 solidityName = "getOwner",
+                                signature = "getOwner()",
                                 inputs = emptyList(),
                                 outputs = emptyList(),
                                 emittableEvents = emptyList(),
                                 readOnly = false
                             )
-                        )
+                        ),
+                        manifest = importedContractDecorator.manifest,
+                        artifact = importedContractDecorator.artifact
                     )
                 )
         }

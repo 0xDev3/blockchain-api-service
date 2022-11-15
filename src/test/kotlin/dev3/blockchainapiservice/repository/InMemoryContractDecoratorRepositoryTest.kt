@@ -29,7 +29,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
             implements = emptyList(),
             constructors = emptyList(),
             functions = emptyList(),
-            events = emptyList()
+            events = emptyList(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
 
         val storedDecorator = suppose("some contract decorator is stored") {
@@ -126,7 +128,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
             implements = emptyList(),
             constructors = emptyList(),
             functions = emptyList(),
-            events = emptyList()
+            events = emptyList(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
 
         suppose("some contract decorator is stored") {
@@ -565,7 +569,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
             implements = implements,
             constructors = emptyList(),
             functions = emptyList(),
-            events = emptyList()
+            events = emptyList(),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
         )
 
     private fun decoratorAndManifest(

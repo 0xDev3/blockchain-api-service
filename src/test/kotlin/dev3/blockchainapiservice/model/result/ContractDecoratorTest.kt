@@ -224,6 +224,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "not-overridden-1",
                                 description = "not-overridden-1",
                                 solidityName = "fromDecorator",
+                                signature = "fromDecorator(string)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -243,6 +244,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-1-2",
                                 description = "overridden-1-2",
                                 solidityName = "fromOverride1",
+                                signature = "fromOverride1(uint)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -262,6 +264,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-2-3",
                                 description = "overridden-2-3",
                                 solidityName = "fromOverride2",
+                                signature = "fromOverride2(int)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -281,6 +284,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "extra-4",
                                 description = "extra-4",
                                 solidityName = "extraFunction",
+                                signature = "extraFunction(bool)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -302,6 +306,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "not-overridden-1",
                                 description = "not-overridden-1",
                                 solidityName = "FromDecorator",
+                                signature = "FromDecorator(string)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -318,6 +323,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-1-2",
                                 description = "overridden-1-2",
                                 solidityName = "FromOverride1",
+                                signature = "FromOverride1(uint)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -334,6 +340,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-2-3",
                                 description = "overridden-2-3",
                                 solidityName = "FromOverride2",
+                                signature = "FromOverride2(int)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -350,6 +357,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "extra-4",
                                 description = "extra-4",
                                 solidityName = "ExtraEvent",
+                                signature = "ExtraEvent(bool)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -362,7 +370,9 @@ class ContractDecoratorTest : TestBase() {
                                     )
                                 )
                             )
-                        )
+                        ),
+                        manifest = MANIFEST_JSON,
+                        artifact = ARTIFACT_JSON
                     )
                 )
         }
@@ -402,6 +412,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-1-1",
                                 description = "overridden-1-1",
                                 solidityName = "fromDecorator",
+                                signature = "fromDecorator(string)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -421,6 +432,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-1-2",
                                 description = "overridden-1-2",
                                 solidityName = "fromOverride1",
+                                signature = "fromOverride1(uint)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -440,6 +452,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-2-3",
                                 description = "overridden-2-3",
                                 solidityName = "fromOverride2",
+                                signature = "fromOverride2(int)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -459,6 +472,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "extra-4",
                                 description = "extra-4",
                                 solidityName = "extraFunction",
+                                signature = "extraFunction(bool)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -480,6 +494,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-1-1",
                                 description = "overridden-1-1",
                                 solidityName = "FromDecorator",
+                                signature = "FromDecorator(string)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -496,6 +511,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-1-2",
                                 description = "overridden-1-2",
                                 solidityName = "FromOverride1",
+                                signature = "FromOverride1(uint)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -512,6 +528,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "overridden-2-3",
                                 description = "overridden-2-3",
                                 solidityName = "FromOverride2",
+                                signature = "FromOverride2(int)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -528,6 +545,7 @@ class ContractDecoratorTest : TestBase() {
                                 name = "extra-4",
                                 description = "extra-4",
                                 solidityName = "ExtraEvent",
+                                signature = "ExtraEvent(bool)",
                                 inputs = listOf(
                                     ContractParameter(
                                         name = "Arg1",
@@ -540,7 +558,9 @@ class ContractDecoratorTest : TestBase() {
                                     )
                                 )
                             )
-                        )
+                        ),
+                        manifest = MANIFEST_JSON,
+                        artifact = ARTIFACT_JSON
                     )
                 )
         }

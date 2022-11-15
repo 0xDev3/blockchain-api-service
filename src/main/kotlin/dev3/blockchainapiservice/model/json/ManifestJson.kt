@@ -16,7 +16,11 @@ data class ManifestJson(
     val eventDecorators: List<EventDecorator>,
     val constructorDecorators: List<ConstructorDecorator>,
     val functionDecorators: List<FunctionDecorator>
-)
+) {
+    companion object {
+        val EMPTY = ManifestJson("", "", emptySet(), emptySet(), emptyList(), emptyList(), emptyList())
+    }
+}
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class InterfaceManifestJson(

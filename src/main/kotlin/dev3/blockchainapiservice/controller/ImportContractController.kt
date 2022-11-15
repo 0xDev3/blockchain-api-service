@@ -47,15 +47,17 @@ class ImportContractController(
             chainId = ChainId(chainId),
             customRpcUrl = customRpcUrl
         )
+        val safeContractAddress = ContractAddress(contractAddress)
+        val contractDecorator = contractImportService.previewImport(
+            contractAddress = safeContractAddress,
+            chainSpec = chainSpec
+        ).let {
+            if (it.implements.isEmpty() && it.id.value.startsWith("imported-")) {
+                contractInterfacesService.attachMatchingInterfacesToDecorator(it)
+            } else it
+        }
 
-        return ResponseEntity.ok(
-            ContractDecoratorResponse(
-                contractImportService.previewImport(
-                    contractAddress = ContractAddress(contractAddress),
-                    chainSpec = chainSpec
-                )
-            )
-        )
+        return ResponseEntity.ok(ContractDecoratorResponse(contractDecorator))
     }
 
     @PostMapping("/v1/import-smart-contract")

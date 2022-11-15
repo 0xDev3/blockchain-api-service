@@ -26,7 +26,9 @@ data class ContractDecorator(
     val implements: List<InterfaceId>,
     val constructors: List<ContractConstructor>,
     val functions: List<ContractFunction>,
-    val events: List<ContractEvent>
+    val events: List<ContractEvent>,
+    val manifest: ManifestJson,
+    val artifact: ArtifactJson
 ) {
     @Suppress("TooManyFunctions")
     companion object {
@@ -56,7 +58,9 @@ data class ContractDecorator(
                 implements = manifest.implements.map { InterfaceId(it) },
                 constructors = decorateConstructors(artifact, manifest),
                 functions = decorateFunctions(artifact, manifest, interfaceFunctions, imported),
-                events = decorateEvents(artifact, manifest, interfaceEvents, imported)
+                events = decorateEvents(artifact, manifest, interfaceEvents, imported),
+                manifest = manifest,
+                artifact = artifact
             )
         }
 
@@ -98,6 +102,7 @@ data class ContractDecorator(
                     solidityName = artifactFunction.name ?: throw ContractDecoratorException(
                         "Function ${it.signature} is missing function name in artifact.json"
                     ),
+                    signature = it.signature,
                     inputs = it.parameterDecorators.toContractParameters(artifactFunction.inputs.orEmpty()),
                     outputs = it.returnDecorators.returnTypeToContractParameters(
                         artifactFunction.outputs ?: throw ContractDecoratorException(
@@ -135,6 +140,7 @@ data class ContractDecorator(
                         solidityName = artifactEvent.name ?: throw ContractDecoratorException(
                             "Event ${decorator.signature} is missing event name in artifact.json"
                         ),
+                        signature = decorator.signature,
                         inputs = decorator.parameterDecorators.toContractParameters(artifactEvent.inputs.orEmpty())
                     )
                 }
@@ -210,6 +216,7 @@ data class ContractFunction(
     val name: String,
     val description: String,
     val solidityName: String,
+    val signature: String,
     val inputs: List<ContractParameter>,
     val outputs: List<ContractParameter>,
     val emittableEvents: List<String>,
@@ -220,5 +227,6 @@ data class ContractEvent(
     val name: String,
     val description: String,
     val solidityName: String,
+    val signature: String,
     val inputs: List<ContractParameter>
 )
