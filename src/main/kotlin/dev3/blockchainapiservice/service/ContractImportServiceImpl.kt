@@ -58,10 +58,17 @@ class ContractImportServiceImpl(
         private const val ETH_VALUE_LENGTH = 64
         private const val PROXY_FUNCTION_NAME = "implementation"
 
-        private val PROXY_IMPLEMENTATION_SLOT =
-            EthStorageSlot("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc")
-        private val PROXY_BEACON_SLOT =
+        private val PROXY_IMPLEMENTATION_SLOTS =
+            listOf(
+                // slot according to standard: https://eips.ethereum.org/EIPS/eip-1967
+                EthStorageSlot("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"),
+                // slot used by older OpenZeppelin proxies (keccak256("org.zeppelinos.proxy.implementation"))
+                EthStorageSlot("0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3")
+            )
+        private val PROXY_BEACON_SLOTS = listOf(
+            // slot according to standard: https://eips.ethereum.org/EIPS/eip-1967
             EthStorageSlot("0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50")
+        )
 
         private data class DecompiledContract(
             val contractId: ContractId,
@@ -419,26 +426,27 @@ class ContractImportServiceImpl(
         contractAddress: ContractAddress,
         chainSpec: ChainSpec
     ): ContractAddress {
-        val proxyImplementationSlotValue = blockchainService.readStorageSlot(
-            chainSpec = chainSpec,
-            contractAddress = contractAddress,
-            slot = PROXY_IMPLEMENTATION_SLOT
-        ).let { ContractAddress(it) }
+        val implementationValue = PROXY_IMPLEMENTATION_SLOTS.readSlots(chainSpec, contractAddress)
+        val beaconValue = implementationValue ?: PROXY_BEACON_SLOTS.readSlots(chainSpec, contractAddress)
 
-        val beaconImplementationSlotValue = blockchainService.readStorageSlot(
-            chainSpec = chainSpec,
-            contractAddress = contractAddress,
-            slot = PROXY_BEACON_SLOT
-        ).let { ContractAddress(it) }
-
-        return if (proxyImplementationSlotValue != ZeroAddress.toContractAddress()) {
-            proxyImplementationSlotValue
-        } else if (beaconImplementationSlotValue != ZeroAddress.toContractAddress()) {
-            beaconImplementationSlotValue.readProxyImplementationFunction(chainSpec)
-        } else {
-            contractAddress.readProxyImplementationFunction(chainSpec)
-        }
+        return implementationValue
+            ?: beaconValue?.readProxyImplementationFunction(chainSpec)
+            ?: contractAddress.readProxyImplementationFunction(chainSpec)
     }
+
+    private fun List<EthStorageSlot>.readSlots(
+        chainSpec: ChainSpec,
+        contractAddress: ContractAddress
+    ): ContractAddress? = asSequence()
+        .map {
+            blockchainService.readStorageSlot(
+                chainSpec = chainSpec,
+                contractAddress = contractAddress,
+                slot = it
+            ).let(::ContractAddress)
+        }
+        .filter { it != ZeroAddress.toContractAddress() }
+        .firstOrNull()
 
     private fun ContractAddress.readProxyImplementationFunction(chainSpec: ChainSpec): ContractAddress {
         val data = functionEncoderService.encode(

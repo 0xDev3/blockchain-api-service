@@ -67,6 +67,8 @@ class ContractImportServiceTest : TestBase() {
     companion object {
         private val PROXY_IMPLEMENTATION_SLOT =
             EthStorageSlot("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc")
+        private val OPENZEPPELIN_SLOT =
+            EthStorageSlot("0x7050c9e0f4ca769c69bd3a8ef740bc37934f8e2c036e5a723fd8ee048ed3f8c3")
         private val PROXY_BEACON_SLOT =
             EthStorageSlot("0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50")
         private val objectMapper = JsonConfig().objectMapper()
@@ -1392,6 +1394,8 @@ class ContractImportServiceTest : TestBase() {
         suppose("proxy contract slots will be empty") {
             given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_IMPLEMENTATION_SLOT))
                 .willReturn(ZeroAddress.rawValue)
+            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, OPENZEPPELIN_SLOT))
+                .willReturn(ZeroAddress.rawValue)
             given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_BEACON_SLOT))
                 .willReturn(ZeroAddress.rawValue)
         }
@@ -1751,8 +1755,10 @@ class ContractImportServiceTest : TestBase() {
                 .willReturn(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
-        suppose("proxy implementation slot will be empty") {
+        suppose("proxy implementation slots will be empty") {
             given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_IMPLEMENTATION_SLOT))
+                .willReturn(ZeroAddress.rawValue)
+            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, OPENZEPPELIN_SLOT))
                 .willReturn(ZeroAddress.rawValue)
         }
 
