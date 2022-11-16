@@ -45,7 +45,12 @@ class DeployedContractIdentifierResolverServiceImpl(
 
             is DeployedContractAddressIdentifier -> {
                 logger.info { "Using contract address for function call: ${identifier.contractAddress}" }
-                Pair<UUID?, ContractAddress>(null, identifier.contractAddress)
+                val deploymentRequest = contractDeploymentRequestRepository.getByContractAddressChainIdAndProjectId(
+                    contractAddress = identifier.contractAddress,
+                    chainId = project.chainId,
+                    projectId = project.id
+                )
+                Pair(deploymentRequest?.id, identifier.contractAddress)
             }
         }
 

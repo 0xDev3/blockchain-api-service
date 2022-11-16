@@ -3,8 +3,10 @@ package dev3.blockchainapiservice.model.params
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.result.ContractBinaryInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
+import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
@@ -76,24 +78,47 @@ data class StoreContractDeploymentRequestParams(
             createdAt: UtcDateTime,
             proxy: Boolean,
             implementationContractAddress: ContractAddress?
-        ) = StoreContractDeploymentRequestParams(
-            id = id,
-            alias = params.alias,
-            contractId = contractId,
-            contractData = ContractBinaryData(contractDeploymentTransactionInfo.data.value),
-            constructorParams = constructorParams,
-            deployerAddress = contractDeploymentTransactionInfo.from,
-            initialEthAmount = contractDeploymentTransactionInfo.value,
-            chainId = project.chainId,
-            redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
-            projectId = project.id,
-            createdAt = createdAt,
-            arbitraryData = params.arbitraryData,
-            screenConfig = params.screenConfig,
-            imported = true,
-            proxy = proxy,
-            implementationContractAddress = implementationContractAddress
-        )
+        ) = when (contractDeploymentTransactionInfo) {
+            is FullContractDeploymentTransactionInfo ->
+                StoreContractDeploymentRequestParams(
+                    id = id,
+                    alias = params.alias,
+                    contractId = contractId,
+                    contractData = ContractBinaryData(contractDeploymentTransactionInfo.data.value),
+                    constructorParams = constructorParams,
+                    deployerAddress = contractDeploymentTransactionInfo.from,
+                    initialEthAmount = contractDeploymentTransactionInfo.value,
+                    chainId = project.chainId,
+                    redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
+                    projectId = project.id,
+                    createdAt = createdAt,
+                    arbitraryData = params.arbitraryData,
+                    screenConfig = params.screenConfig,
+                    imported = true,
+                    proxy = proxy,
+                    implementationContractAddress = implementationContractAddress
+                )
+
+            is ContractBinaryInfo ->
+                StoreContractDeploymentRequestParams(
+                    id = id,
+                    alias = params.alias,
+                    contractId = contractId,
+                    contractData = ContractBinaryData(contractDeploymentTransactionInfo.binary.value),
+                    constructorParams = constructorParams,
+                    deployerAddress = null,
+                    initialEthAmount = Balance.ZERO,
+                    chainId = project.chainId,
+                    redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
+                    projectId = project.id,
+                    createdAt = createdAt,
+                    arbitraryData = params.arbitraryData,
+                    screenConfig = params.screenConfig,
+                    imported = true,
+                    proxy = proxy,
+                    implementationContractAddress = implementationContractAddress
+                )
+        }
 
         @Suppress("LongParameterList")
         fun fromContractDeploymentRequest(
