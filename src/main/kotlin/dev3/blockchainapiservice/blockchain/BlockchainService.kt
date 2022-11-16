@@ -13,10 +13,18 @@ import dev3.blockchainapiservice.util.BlockName
 import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.BlockParameter
 import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.EthStorageSlot
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 
 interface BlockchainService {
+    fun readStorageSlot(
+        chainSpec: ChainSpec,
+        contractAddress: ContractAddress,
+        slot: EthStorageSlot,
+        blockParameter: BlockParameter = BlockName.LATEST
+    ): String
+
     fun fetchAccountBalance(
         chainSpec: ChainSpec,
         walletAddress: WalletAddress,

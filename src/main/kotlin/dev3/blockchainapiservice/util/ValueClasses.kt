@@ -176,3 +176,15 @@ value class InterfaceId private constructor(val value: String) {
         operator fun invoke(value: String) = InterfaceId(value.replace('/', '.').lowercase())
     }
 }
+
+@JvmInline
+value class EthStorageSlot(val value: BigInteger) {
+    companion object {
+        private const val HEX_RADIX = 16
+
+        operator fun invoke(value: String) = EthStorageSlot(BigInteger(value.removePrefix("0x"), HEX_RADIX))
+    }
+
+    val hex: String
+        get() = "0x${value.toString(HEX_RADIX).lowercase().removePrefix("0x")}"
+}

@@ -13,11 +13,13 @@ import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.ImportContractParams
 import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
+import dev3.blockchainapiservice.model.result.ContractBinaryInfo
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractMetadata
 import dev3.blockchainapiservice.model.result.ContractParameter
+import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
@@ -26,7 +28,10 @@ import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.util.AddressType
 import dev3.blockchainapiservice.util.Constants
 import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
+import dev3.blockchainapiservice.util.EthStorageSlot
+import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.Tuple
 import dev3.blockchainapiservice.util.ZeroAddress
 import mu.KLogging
@@ -52,6 +57,11 @@ class ContractImportServiceImpl(
     companion object : KLogging() {
         private const val ETH_VALUE_LENGTH = 64
         private const val PROXY_FUNCTION_NAME = "implementation"
+
+        private val PROXY_IMPLEMENTATION_SLOT =
+            EthStorageSlot("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc")
+        private val PROXY_BEACON_SLOT =
+            EthStorageSlot("0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50")
 
         private data class DecompiledContract(
             val contractId: ContractId,
@@ -240,7 +250,10 @@ class ContractImportServiceImpl(
         val contractDeploymentTransactionInfo = findContractDeploymentTransaction(params.contractAddress, chainSpec)
 
         val decoratorBinary = contractDecorator.binary.withPrefix
-        val deployedBinary = contractDeploymentTransactionInfo.data.value
+        val deployedBinary = when (contractDeploymentTransactionInfo) {
+            is FullContractDeploymentTransactionInfo -> contractDeploymentTransactionInfo.data.value
+            is ContractBinaryInfo -> contractDeploymentTransactionInfo.binary.withPrefix
+        }
 
         if (deployedBinary.startsWith(decoratorBinary).not()) {
             throw ContractDecoratorBinaryMismatchException(params.contractAddress, contractId)
@@ -270,18 +283,23 @@ class ContractImportServiceImpl(
     ): DecompiledContract {
         val contractDeploymentTransactionInfo = findContractDeploymentTransaction(importContractAddress, chainSpec)
 
-        val fullBinary = contractDeploymentTransactionInfo.data.value
-        val shortBinary = contractDeploymentTransactionInfo.binary.value
+        val (fullBinary, shortBinary) = when (contractDeploymentTransactionInfo) {
+            is FullContractDeploymentTransactionInfo ->
+                Pair(contractDeploymentTransactionInfo.data.value, contractDeploymentTransactionInfo.binary.value)
+
+            is ContractBinaryInfo ->
+                Pair(contractDeploymentTransactionInfo.binary.value, contractDeploymentTransactionInfo.binary.value)
+        }
         val constructorParamsStart = fullBinary.indexOf(shortBinary) + shortBinary.length
 
         val constructorParams = fullBinary.substring(constructorParamsStart)
 
         val (decompiledContract, implementationAddress) = contractDecompilerService
-            .decompile(contractDeploymentTransactionInfo.binary).let {
+            .decompile(ContractBinaryData(shortBinary)).let {
                 it.copy(
                     artifact = it.artifact.copy(
-                        bytecode = contractDeploymentTransactionInfo.data.withoutPrefix.removeSuffix(constructorParams),
-                        deployedBytecode = contractDeploymentTransactionInfo.binary.value
+                        bytecode = FunctionData(fullBinary).withoutPrefix.removeSuffix(constructorParams),
+                        deployedBytecode = shortBinary
                     )
                 ).resolveProxyContract(importContractAddress, chainSpec)
             }
@@ -401,6 +419,28 @@ class ContractImportServiceImpl(
         contractAddress: ContractAddress,
         chainSpec: ChainSpec
     ): ContractAddress {
+        val proxyImplementationSlotValue = blockchainService.readStorageSlot(
+            chainSpec = chainSpec,
+            contractAddress = contractAddress,
+            slot = PROXY_IMPLEMENTATION_SLOT
+        ).let { ContractAddress(it) }
+
+        val beaconImplementationSlotValue = blockchainService.readStorageSlot(
+            chainSpec = chainSpec,
+            contractAddress = contractAddress,
+            slot = PROXY_BEACON_SLOT
+        ).let { ContractAddress(it) }
+
+        return if (proxyImplementationSlotValue != ZeroAddress.toContractAddress()) {
+            proxyImplementationSlotValue
+        } else if (beaconImplementationSlotValue != ZeroAddress.toContractAddress()) {
+            beaconImplementationSlotValue.readProxyImplementationFunction(chainSpec)
+        } else {
+            contractAddress.readProxyImplementationFunction(chainSpec)
+        }
+    }
+
+    private fun ContractAddress.readProxyImplementationFunction(chainSpec: ChainSpec): ContractAddress {
         val data = functionEncoderService.encode(
             functionName = PROXY_FUNCTION_NAME,
             arguments = emptyList()
@@ -409,7 +449,7 @@ class ContractImportServiceImpl(
         val implementation = blockchainService.callReadonlyFunction(
             chainSpec = chainSpec,
             params = ExecuteReadonlyFunctionCallParams(
-                contractAddress = contractAddress,
+                contractAddress = this,
                 callerAddress = ZeroAddress.toWalletAddress(),
                 functionName = PROXY_FUNCTION_NAME,
                 functionData = data,
@@ -460,11 +500,14 @@ class ContractImportServiceImpl(
             id = id,
             contractAddress = contractDeploymentTransactionInfo.deployedContractAddress
         )
-        contractDeploymentRequestRepository.setTxInfo(
-            id = id,
-            txHash = contractDeploymentTransactionInfo.hash,
-            deployer = contractDeploymentTransactionInfo.from
-        )
+
+        if (contractDeploymentTransactionInfo is FullContractDeploymentTransactionInfo) {
+            contractDeploymentRequestRepository.setTxInfo(
+                id = id,
+                txHash = contractDeploymentTransactionInfo.hash,
+                deployer = contractDeploymentTransactionInfo.from
+            )
+        }
 
         return id
     }

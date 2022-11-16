@@ -168,7 +168,9 @@ class ContractDeploymentRequestServiceImpl(
     private fun ContractDeploymentRequest.determineStatus(
         transactionInfo: BlockchainTransactionInfo?
     ): Status =
-        if (transactionInfo == null) { // implies that either txHash is null or transaction is not yet mined
+        if (imported) {
+            Status.SUCCESS
+        } else if (transactionInfo == null) { // implies that either txHash is null or transaction is not yet mined
             Status.PENDING
         } else if (isSuccess(transactionInfo)) {
             Status.SUCCESS

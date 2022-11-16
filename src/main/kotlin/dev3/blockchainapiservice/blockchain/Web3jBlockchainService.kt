@@ -11,7 +11,9 @@ import dev3.blockchainapiservice.features.payout.model.result.PayoutForInvestor
 import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.model.result.ContractBinaryInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
+import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.repository.Web3jBlockchainServiceCacheRepository
 import dev3.blockchainapiservice.service.AbiDecoderService
@@ -24,6 +26,7 @@ import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.BlockParameter
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
+import dev3.blockchainapiservice.util.EthStorageSlot
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UtcDateTime
@@ -75,6 +78,25 @@ class Web3jBlockchainService(
 
     private val chainHandler = ChainPropertiesHandler(applicationProperties)
     private val latestBlockCache = ConcurrentHashMap<ChainSpec, CachedBlockNumber>()
+
+    override fun readStorageSlot(
+        chainSpec: ChainSpec,
+        contractAddress: ContractAddress,
+        slot: EthStorageSlot,
+        blockParameter: BlockParameter
+    ): String {
+        logger.debug {
+            "Read ETH storage slot, chainSpec: $chainSpec, contractAddress: $contractAddress, slot: ${slot.hex}," +
+                " blockParameter: $blockParameter"
+        }
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
+        return blockchainProperties.web3j.ethGetStorageAt(
+            contractAddress.rawValue,
+            slot.value,
+            blockParameter.toWeb3Parameter()
+        ).sendSafely()?.data
+            ?: throw BlockchainReadException("Unable to read storage for contract at address: $contractAddress")
+    }
 
     override fun fetchAccountBalance(
         chainSpec: ChainSpec,
@@ -284,7 +306,7 @@ class Web3jBlockchainService(
                 web3j.ethGetTransactionCount(
                     contractAddress.rawValue,
                     DefaultBlockParameter.valueOf(currentBlock)
-                ).sendSafely()?.transactionCount ?: throw TemporaryBlockchainReadException()
+                ).sendSafely()?.transactionCount ?: BigInteger.ZERO
             },
             updateLowerBound = { txCount -> txCount == BigInteger.ZERO },
             updateUpperBound = { txCount -> txCount != BigInteger.ZERO }
@@ -308,20 +330,21 @@ class Web3jBlockchainService(
             ?.find {
                 it.first.isStatusOK && it.first.contractAddress?.let { ca -> ContractAddress(ca) } == contractAddress
             }
-        val binary = web3j.ethGetCode(contractAddress.rawValue, currentBlockNumber.toWeb3Parameter()).sendSafely()?.code
+        val binary = web3j.ethGetCode(contractAddress.rawValue, currentBlockNumber.toWeb3Parameter()).sendSafely()
+            ?.code?.let { ContractBinaryData(it) }?.takeIf { it.value.isNotEmpty() }
 
-        return deployTx?.let {
-            binary?.let {
-                ContractDeploymentTransactionInfo(
+        return binary?.let {
+            deployTx?.let {
+                FullContractDeploymentTransactionInfo(
                     hash = TransactionHash(deployTx.first.transactionHash),
                     from = WalletAddress(deployTx.first.from),
                     deployedContractAddress = ContractAddress(deployTx.first.contractAddress),
                     data = FunctionData(deployTx.second.input),
                     value = Balance(deployTx.second.value),
-                    binary = ContractBinaryData(binary),
+                    binary = binary,
                     blockNumber = BlockNumber(contractDeploymentBlock)
                 )
-            }
+            } ?: ContractBinaryInfo(deployedContractAddress = contractAddress, binary = binary)
         }
     }
 

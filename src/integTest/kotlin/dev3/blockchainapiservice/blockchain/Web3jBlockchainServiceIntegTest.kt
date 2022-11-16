@@ -13,7 +13,7 @@ import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
+import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.service.CurrentUtcDateTimeProvider
 import dev3.blockchainapiservice.service.EthereumAbiDecoderService
@@ -27,6 +27,7 @@ import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
+import dev3.blockchainapiservice.util.EthStorageSlot
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
@@ -64,6 +65,45 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @BeforeEach
     fun beforeEach() {
         hardhatContainer.reset()
+    }
+
+    @Test
+    fun mustCorrectlyReadStorageSlot() {
+        val mainAccount = accounts[0]
+        val proxyContractAddress = ContractAddress("abc123")
+
+        val contract = suppose("some simple proxy contract is deployed") {
+            DummyProxy.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                proxyContractAddress.rawValue
+            ).send()
+        }
+
+        verify("storage slot is correctly read") {
+            val service = createService()
+            val slotValue = service.readStorageSlot(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                contractAddress = ContractAddress(contract.contractAddress),
+                slot = EthStorageSlot("0x0")
+            )
+
+            assertThat(ContractAddress(slotValue)).withMessage()
+                .isEqualTo(proxyContractAddress)
+        }
+
+        verify("zero is returned for empty storage slot") {
+            val service = createService()
+            val slotValue = service.readStorageSlot(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                contractAddress = ContractAddress(contract.contractAddress),
+                slot = EthStorageSlot("0x123456")
+            )
+
+            assertThat(ContractAddress(slotValue)).withMessage()
+                .isEqualTo(ZeroAddress.toContractAddress())
+        }
     }
 
     @Test
@@ -730,7 +770,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
             assertThat(transactionInfo!!).withMessage()
                 .isEqualTo(
-                    ContractDeploymentTransactionInfo(
+                    FullContractDeploymentTransactionInfo(
                         hash = TransactionHash(deploymentTransaction.transactionHash),
                         from = WalletAddress(mainAccount.address),
                         deployedContractAddress = ContractAddress(contract.contractAddress),
