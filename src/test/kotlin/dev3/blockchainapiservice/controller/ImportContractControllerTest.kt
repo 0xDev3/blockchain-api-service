@@ -11,10 +11,10 @@ import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.params.ImportContractParams
 import dev3.blockchainapiservice.model.request.ImportContractRequest
 import dev3.blockchainapiservice.model.request.ImportedContractInterfacesRequest
-import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.model.response.ImportPreviewResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
@@ -85,7 +85,7 @@ class ImportContractControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
             assertThat(response).withMessage()
-                .isEqualTo(ResponseEntity.ok(ContractDecoratorResponse(result)))
+                .isEqualTo(ResponseEntity.ok(ImportPreviewResponse(result)))
         }
     }
 

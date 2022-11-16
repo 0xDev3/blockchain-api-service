@@ -15,6 +15,12 @@ interface ContractDeploymentRequestRepository {
     fun getById(id: UUID): ContractDeploymentRequest?
     fun getByAliasAndProjectId(alias: String, projectId: UUID): ContractDeploymentRequest?
     fun getByContractAddressAndChainId(contractAddress: ContractAddress, chainId: ChainId): ContractDeploymentRequest?
+    fun getByContractAddressChainIdAndProjectId(
+        contractAddress: ContractAddress,
+        chainId: ChainId,
+        projectId: UUID
+    ): ContractDeploymentRequest?
+
     fun getAllByProjectId(projectId: UUID, filters: ContractDeploymentRequestFilters): List<ContractDeploymentRequest>
     fun setTxInfo(id: UUID, txHash: TransactionHash, deployer: WalletAddress): Boolean
     fun setContractAddress(id: UUID, contractAddress: ContractAddress): Boolean

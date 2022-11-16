@@ -136,6 +136,29 @@ class JooqContractDeploymentRequestRepository(
             .fetchOne { it.toModel() }
     }
 
+    override fun getByContractAddressChainIdAndProjectId(
+        contractAddress: ContractAddress,
+        chainId: ChainId,
+        projectId: UUID
+    ): ContractDeploymentRequest? {
+        logger.debug {
+            "Get contract deployment request by contractAddress: $contractAddress, chainId: $chainId," +
+                " projectId: $projectId"
+        }
+        return dslContext.selectWithJoin()
+            .where(
+                DSL.and(
+                    ContractDeploymentRequestTable.CONTRACT_ADDRESS.eq(contractAddress),
+                    ContractDeploymentRequestTable.CHAIN_ID.eq(chainId),
+                    ContractDeploymentRequestTable.PROJECT_ID.eq(projectId),
+                    ContractDeploymentRequestTable.DELETED.eq(false)
+                )
+            )
+            .orderBy(ContractDeploymentRequestTable.CREATED_AT.asc())
+            .limit(1)
+            .fetchOne { it.toModel() }
+    }
+
     override fun getAllByProjectId(
         projectId: UUID,
         filters: ContractDeploymentRequestFilters

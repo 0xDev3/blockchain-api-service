@@ -23,6 +23,7 @@ import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.model.response.ImportPreviewResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractConstructor
 import dev3.blockchainapiservice.model.result.ContractDecorator
@@ -292,7 +293,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(response.response.contentAsString, ContractDecoratorResponse::class.java)
+            objectMapper.readValue(response.response.contentAsString, ImportPreviewResponse::class.java)
         }
 
         val importedContractId = ContractId("imported-${contractAddress.rawValue}-${chainId.value}")
@@ -300,57 +301,61 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         verify("correct response is returned") {
             assertThat(response).withMessage()
                 .isEqualTo(
-                    ContractDecoratorResponse(
-                        id = importedContractId.value,
-                        name = "Imported Contract",
-                        description = "Imported smart contract.",
-                        binary = response.binary,
-                        tags = listOf("interface-tag"),
-                        implements = listOf(interfaceId.value),
-                        constructors = emptyList(),
-                        functions = listOf(
-                            ContractFunction(
-                                name = "Set owner",
-                                description = "Set contract owner",
-                                solidityName = "setOwner",
-                                signature = "setOwner(address)",
-                                inputs = listOf(
-                                    ContractParameter(
-                                        name = "New owner",
-                                        description = "New owner of the contract",
-                                        solidityName = "param1",
-                                        solidityType = "address",
-                                        recommendedTypes = emptyList(),
-                                        parameters = emptyList(),
-                                        hints = emptyList()
-                                    )
+                    ImportPreviewResponse(
+                        manifest = response.manifest,
+                        artifact = response.artifact,
+                        decorator = ContractDecoratorResponse(
+                            id = importedContractId.value,
+                            name = "Imported Contract",
+                            description = "Imported smart contract.",
+                            binary = response.decorator.binary,
+                            tags = listOf("interface-tag"),
+                            implements = listOf(interfaceId.value),
+                            constructors = emptyList(),
+                            functions = listOf(
+                                ContractFunction(
+                                    name = "Set owner",
+                                    description = "Set contract owner",
+                                    solidityName = "setOwner",
+                                    signature = "setOwner(address)",
+                                    inputs = listOf(
+                                        ContractParameter(
+                                            name = "New owner",
+                                            description = "New owner of the contract",
+                                            solidityName = "param1",
+                                            solidityType = "address",
+                                            recommendedTypes = emptyList(),
+                                            parameters = emptyList(),
+                                            hints = emptyList()
+                                        )
+                                    ),
+                                    outputs = emptyList(),
+                                    emittableEvents = emptyList(),
+                                    readOnly = false
                                 ),
-                                outputs = emptyList(),
-                                emittableEvents = emptyList(),
-                                readOnly = false
+                                ContractFunction(
+                                    name = "Get owner",
+                                    description = "Get current contract owner",
+                                    solidityName = "getOwner",
+                                    signature = "getOwner()",
+                                    inputs = emptyList(),
+                                    outputs = listOf(
+                                        ContractParameter(
+                                            name = "Current owner",
+                                            description = "Current owner of the contract",
+                                            solidityName = "",
+                                            solidityType = "address",
+                                            recommendedTypes = emptyList(),
+                                            parameters = emptyList(),
+                                            hints = emptyList()
+                                        )
+                                    ),
+                                    emittableEvents = emptyList(),
+                                    readOnly = true
+                                )
                             ),
-                            ContractFunction(
-                                name = "Get owner",
-                                description = "Get current contract owner",
-                                solidityName = "getOwner",
-                                signature = "getOwner()",
-                                inputs = emptyList(),
-                                outputs = listOf(
-                                    ContractParameter(
-                                        name = "Current owner",
-                                        description = "Current owner of the contract",
-                                        solidityName = "",
-                                        solidityType = "address",
-                                        recommendedTypes = emptyList(),
-                                        parameters = emptyList(),
-                                        hints = emptyList()
-                                    )
-                                ),
-                                emittableEvents = emptyList(),
-                                readOnly = true
-                            )
-                        ),
-                        events = emptyList()
+                            events = emptyList()
+                        )
                     )
                 )
         }
