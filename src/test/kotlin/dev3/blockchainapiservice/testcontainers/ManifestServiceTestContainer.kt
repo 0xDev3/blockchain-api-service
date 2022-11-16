@@ -6,7 +6,7 @@ import java.time.Duration
 import java.time.temporal.ChronoUnit
 
 class ManifestServiceTestContainer : GenericContainer<ManifestServiceTestContainer>(
-    "ampnet/contracts-manifest-service:0.4.0"
+    "ampnet/contracts-manifest-service:0.5.0"
 ) {
 
     @Suppress("unused")

@@ -8,12 +8,22 @@ import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 
-data class ContractDeploymentTransactionInfo(
+sealed interface ContractDeploymentTransactionInfo {
+    val deployedContractAddress: ContractAddress
+    val binary: ContractBinaryData
+}
+
+data class FullContractDeploymentTransactionInfo(
     val hash: TransactionHash,
     val from: WalletAddress,
-    val deployedContractAddress: ContractAddress,
+    override val deployedContractAddress: ContractAddress,
     val data: FunctionData,
     val value: Balance,
-    val binary: ContractBinaryData,
+    override val binary: ContractBinaryData,
     val blockNumber: BlockNumber
-)
+) : ContractDeploymentTransactionInfo
+
+data class ContractBinaryInfo(
+    override val deployedContractAddress: ContractAddress,
+    override val binary: ContractBinaryData,
+) : ContractDeploymentTransactionInfo

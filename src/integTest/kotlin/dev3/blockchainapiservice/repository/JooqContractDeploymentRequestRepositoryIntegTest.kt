@@ -215,6 +215,58 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchContractDeploymentRequestByContractAddressChainIdAndProjectId() {
+        val metadata = createMetadataRecord()
+        val olderRecord = createRecord(
+            id = UUID.randomUUID(),
+            metadata = metadata,
+            createdAt = TestData.TIMESTAMP
+        )
+
+        suppose("some older contract deployment request exists in database") {
+            dslContext.executeInsert(metadata)
+            dslContext.executeInsert(olderRecord)
+            repository.setContractAddress(olderRecord.id, CONTRACT_ADDRESS)
+        }
+
+        val newerRecord = createRecord(
+            id = UUID.randomUUID(),
+            metadata = metadata,
+            createdAt = TestData.TIMESTAMP + Duration.ofDays(1L)
+        )
+
+        suppose("some newer contract deployment request exists in database with same contract address") {
+            dslContext.executeInsert(newerRecord)
+            repository.setContractAddress(newerRecord.id, CONTRACT_ADDRESS)
+        }
+
+        verify("contract deployment request is correctly fetched by contract address, chain ID and project ID") {
+            val result = repository.getByContractAddressChainIdAndProjectId(
+                contractAddress = CONTRACT_ADDRESS,
+                chainId = olderRecord.chainId,
+                projectId = olderRecord.projectId
+            )
+
+            assertThat(result).withMessage()
+                .isEqualTo(olderRecord.toModel(metadata))
+        }
+    }
+
+    @Test
+    fun mustReturnNullWhenFetchingNonExistentContractDeploymentRequestByContractAddressChainIdAndProjectId() {
+        verify("null is returned when fetching non-existent contract deployment request by c. address, CID and PID") {
+            val result = repository.getByContractAddressChainIdAndProjectId(
+                contractAddress = ContractAddress("dead"),
+                chainId = ChainId(1337L),
+                projectId = UUID.randomUUID()
+            )
+
+            assertThat(result).withMessage()
+                .isNull()
+        }
+    }
+
+    @Test
     fun mustCorrectlyFetchContractDeploymentRequestsByProjectIdAndFilters() {
         val cid1Metadata = createMetadataRecord(contractId = ContractId("cid-1"))
         val cid2Metadata = createMetadataRecord(contractId = ContractId("cid-2"))

@@ -6,10 +6,10 @@ import dev3.blockchainapiservice.config.validation.ValidEthAddress
 import dev3.blockchainapiservice.model.params.ImportContractParams
 import dev3.blockchainapiservice.model.request.ImportContractRequest
 import dev3.blockchainapiservice.model.request.ImportedContractInterfacesRequest
-import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.model.response.ImportPreviewResponse
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.service.ContractDeploymentRequestService
 import dev3.blockchainapiservice.service.ContractImportService
@@ -42,7 +42,7 @@ class ImportContractController(
         @PathVariable chainId: Long,
         @ValidEthAddress @PathVariable contractAddress: String,
         @RequestParam("customRpcUrl", required = false) customRpcUrl: String?
-    ): ResponseEntity<ContractDecoratorResponse> {
+    ): ResponseEntity<ImportPreviewResponse> {
         val chainSpec = ChainSpec(
             chainId = ChainId(chainId),
             customRpcUrl = customRpcUrl
@@ -57,7 +57,7 @@ class ImportContractController(
             } else it
         }
 
-        return ResponseEntity.ok(ContractDecoratorResponse(contractDecorator))
+        return ResponseEntity.ok(ImportPreviewResponse(contractDecorator))
     }
 
     @PostMapping("/v1/import-smart-contract")
