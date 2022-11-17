@@ -165,7 +165,10 @@ class ContractImportServiceImpl(
             metadataProjectId = Constants.NIL_UUID
         )
 
-        contractDeploymentRequestRepository.setTxInfo(id, request.txHash!!, request.deployerAddress!!)
+        if (request.txHash != null && request.deployerAddress != null) {
+            contractDeploymentRequestRepository.setTxInfo(id, request.txHash, request.deployerAddress)
+        }
+
         contractDeploymentRequestRepository.setContractAddress(id, params.contractAddress)
 
         return storedRequest.id
@@ -229,10 +232,7 @@ class ContractImportServiceImpl(
             metadataProjectId = project.id
         )
 
-        val txHash = request.txHash
-        val deployerAddress = request.deployerAddress
-
-        if (txHash != null && deployerAddress != null) {
+        if (request.txHash != null && request.deployerAddress != null) {
             contractDeploymentRequestRepository.setTxInfo(id, request.txHash, request.deployerAddress)
         }
 

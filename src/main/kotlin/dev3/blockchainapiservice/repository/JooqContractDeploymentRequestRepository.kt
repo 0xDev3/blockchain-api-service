@@ -171,7 +171,12 @@ class JooqContractDeploymentRequestRepository(
             filters.contractIds.orCondition(),
             filters.contractTags.orAndCondition { it.contractTagsAndCondition() },
             filters.contractImplements.orAndCondition { it.contractTraitsAndCondition() },
-            filters.deployedOnly.takeIf { it }?.let { ContractDeploymentRequestTable.TX_HASH.isNotNull() }
+            filters.deployedOnly.takeIf { it }?.let {
+                DSL.or(
+                    ContractDeploymentRequestTable.TX_HASH.isNotNull(),
+                    ContractDeploymentRequestTable.IMPORTED.isTrue()
+                )
+            }
         )
 
         return dslContext.selectWithJoin()
