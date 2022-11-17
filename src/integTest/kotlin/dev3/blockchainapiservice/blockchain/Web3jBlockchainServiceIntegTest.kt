@@ -808,8 +808,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some accounts get ERC20 tokens") {
             contract.transfer(accounts[1].address, BigInteger("100")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[2].address, BigInteger("200")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[3].address, BigInteger("300")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[4].address, BigInteger("400")).send()
             hardhatContainer.mine()
         }
@@ -821,7 +824,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some additional transactions of ERC20 token are made") {
             contract.transfer(accounts[1].address, BigInteger("900")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[5].address, BigInteger("1000")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[6].address, BigInteger("2000")).send()
             hardhatContainer.mine()
         }
@@ -888,8 +893,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some accounts get ERC20 tokens") {
             contract.transfer(accounts[1].address, BigInteger("100")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[2].address, BigInteger("200")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[3].address, BigInteger("300")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[4].address, BigInteger("400")).send()
             hardhatContainer.mine()
         }
@@ -901,7 +909,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some additional transactions of ERC20 token are made") {
             contract.transfer(accounts[1].address, BigInteger("900")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[5].address, BigInteger("1000")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[6].address, BigInteger("2000")).send()
             hardhatContainer.mine()
         }
@@ -948,8 +958,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some accounts get ERC20 tokens") {
             contract.transfer(accounts[1].address, BigInteger("100")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[2].address, BigInteger("200")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[3].address, BigInteger("300")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[4].address, BigInteger("400")).send()
             hardhatContainer.mine()
         }
@@ -961,7 +974,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some additional transactions of ERC20 token are made") {
             contract.transfer(accounts[1].address, BigInteger("900")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[5].address, BigInteger("1000")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[6].address, BigInteger("2000")).send()
             hardhatContainer.mine()
         }
@@ -1052,8 +1067,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         suppose("some investments are claimed") {
             payoutsAndInvestments.forEach {
                 manager.setClaim(it.second.payoutId, it.second.investor, it.second.amountClaimed).send()
+                hardhatContainer.mine()
             }
-            hardhatContainer.mine()
         }
 
         val investor1NullParams = GetPayoutsForInvestorParams(
