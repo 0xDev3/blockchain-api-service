@@ -31,7 +31,15 @@ class UserIdentifierResolver(
         binderFactory: WebDataBinderFactory?
     ): UserIdentifier {
         val principal = (SecurityContextHolder.getContext().authentication?.principal as? String)
-            ?.let { WalletAddress(it) } ?: throw BadAuthenticationException()
+            ?.let {
+                try {
+                    WalletAddress(it)
+                } catch (e: NumberFormatException) {
+                    null
+                }
+            }
+            ?: throw BadAuthenticationException()
+
         return userIdentifierRepository.getByWalletAddress(principal)
             ?: userIdentifierRepository.store(
                 UserWalletAddressIdentifier(
