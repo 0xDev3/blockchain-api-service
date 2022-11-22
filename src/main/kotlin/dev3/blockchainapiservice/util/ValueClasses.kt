@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.util
 
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Uint
+import org.web3j.crypto.Hash
 import org.web3j.protocol.core.DefaultBlockParameter
 import org.web3j.protocol.core.DefaultBlockParameterName
 import java.math.BigInteger
@@ -187,4 +188,12 @@ value class EthStorageSlot(val value: BigInteger) {
 
     val hex: String
         get() = "0x${value.toString(HEX_RADIX).lowercase().removePrefix("0x")}"
+}
+
+@JvmInline
+value class Keccak256Hash private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = Keccak256Hash(Hash.sha3String(value).lowercase().removePrefix("0x"))
+        fun raw(value: String) = Keccak256Hash(value.lowercase().removePrefix("0x"))
+    }
 }

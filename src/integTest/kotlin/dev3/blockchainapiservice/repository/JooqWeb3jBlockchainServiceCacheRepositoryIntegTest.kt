@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.model.EventLog
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.AccountBalance
@@ -54,7 +55,8 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
             value = Balance(BigInteger.TEN),
             blockConfirmations = BigInteger.TEN,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
     }
 
@@ -132,7 +134,13 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
                 chainSpec = CHAIN_SPEC,
                 txHash = TX_INFO.hash,
                 blockNumber = BlockNumber(BLOCK_NUMBER.value - TX_INFO.blockConfirmations),
-                txInfo = TX_INFO
+                txInfo = TX_INFO,
+                eventLogs = listOf(
+                    EventLog(
+                        data = "data",
+                        topics = listOf("topic")
+                    )
+                )
             )
         }
 
@@ -144,7 +152,7 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
                     currentBlockNumber = BLOCK_NUMBER
                 )
             ).withMessage()
-                .isEqualTo(TX_INFO)
+                .isEqualTo(Pair(TX_INFO, listOf(EventLog("data", listOf("topic")))))
         }
     }
 }

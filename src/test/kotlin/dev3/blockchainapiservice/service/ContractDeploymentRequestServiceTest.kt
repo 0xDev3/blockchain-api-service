@@ -142,7 +142,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             value = STORED_REQUEST.initialEthAmount,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
     }
 

@@ -377,7 +377,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = false
+            success = false,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -466,7 +467,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -555,7 +557,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -644,7 +647,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -733,7 +737,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -822,7 +827,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -911,7 +917,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -1000,7 +1007,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {

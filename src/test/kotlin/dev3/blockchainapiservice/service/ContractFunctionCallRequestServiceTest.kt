@@ -119,7 +119,8 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             value = STORED_REQUEST.ethAmount,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
         private val DEPLOYED_CONTRACT = ContractDeploymentRequest(
             id = DEPLOYED_CONTRACT_ID,

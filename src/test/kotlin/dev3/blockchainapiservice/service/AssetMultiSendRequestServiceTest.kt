@@ -113,7 +113,8 @@ class AssetMultiSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
         private val ENCODED_DISPERSE_ETHER_DATA = FunctionData("encoded-disperse-ether")
         private val DISPERSE_ETHER_TX_INFO = BlockchainTransactionInfo(
@@ -125,7 +126,8 @@ class AssetMultiSendRequestServiceTest : TestBase() {
             value = TOTAL_TOKEN_AMOUNT,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
         private val ENCODED_DISPERSE_TOKEN_DATA = FunctionData("encoded-disperse-token")
         private val DISPERSE_TOKEN_TX_INFO = DISPERSE_ETHER_TX_INFO.copy(

@@ -53,6 +53,16 @@ data class TypeDecorator(
 )
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
+data class EventTypeDecorator(
+    val name: String,
+    val description: String,
+    val indexed: Boolean,
+    val recommendedTypes: List<String>,
+    val parameters: List<TypeDecorator>?,
+    val hints: List<Any>?
+)
+
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class ReturnTypeDecorator(
     val name: String,
     val description: String,
@@ -71,7 +81,7 @@ data class EventDecorator(
     override val signature: String,
     val name: String,
     val description: String,
-    val parameterDecorators: List<TypeDecorator>
+    val parameterDecorators: List<EventTypeDecorator>
 ) : OverridableDecorator
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
