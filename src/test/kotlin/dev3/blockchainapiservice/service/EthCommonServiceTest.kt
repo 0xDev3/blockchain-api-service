@@ -125,7 +125,8 @@ class EthCommonServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ZERO,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         val blockchainService = mock<BlockchainService>()

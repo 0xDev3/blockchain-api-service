@@ -233,7 +233,8 @@ class ContractImportServiceTest : TestBase() {
             data = FunctionData("${ARTIFACT_JSON.bytecode}${ENCODED_CONSTRUCTOR_CALL.withoutPrefix}"),
             value = Balance.ZERO,
             binary = ContractBinaryData(ARTIFACT_JSON.deployedBytecode),
-            blockNumber = BlockNumber(BigInteger.ONE)
+            blockNumber = BlockNumber(BigInteger.ONE),
+            events = emptyList()
         )
         private val CONTRACT_BINARY_INFO = ContractBinaryInfo(
             deployedContractAddress = PARAMS.contractAddress,
@@ -316,7 +317,8 @@ class ContractImportServiceTest : TestBase() {
             data = FunctionData("${PROXY_ARTIFACT_JSON.bytecode}${ENCODED_CONSTRUCTOR_CALL.withoutPrefix}"),
             value = Balance.ZERO,
             binary = ContractBinaryData(PROXY_ARTIFACT_JSON.deployedBytecode),
-            blockNumber = BlockNumber(BigInteger.ONE)
+            blockNumber = BlockNumber(BigInteger.ONE),
+            events = emptyList()
         )
         private val PROXY_CONTRACT_DECORATOR = ContractDecorator(
             id = CONTRACT_ID,

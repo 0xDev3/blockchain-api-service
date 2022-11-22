@@ -7,6 +7,8 @@ import dev3.blockchainapiservice.generated.jooq.tables.FetchTransactionInfoCache
 import dev3.blockchainapiservice.generated.jooq.tables.records.FetchAccountBalanceCacheRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.FetchErc20AccountBalanceCacheRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.FetchTransactionInfoCacheRecord
+import dev3.blockchainapiservice.generated.jooq.udt.records.EventLogRecord
+import dev3.blockchainapiservice.model.EventLog
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.util.AccountBalance
 import dev3.blockchainapiservice.util.BlockNumber
@@ -89,7 +91,8 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
         chainSpec: ChainSpec,
         txHash: TransactionHash,
         blockNumber: BlockNumber,
-        txInfo: BlockchainTransactionInfo
+        txInfo: BlockchainTransactionInfo,
+        eventLogs: List<EventLog>
     ) {
         logger.info {
             "Caching fetchTransactionInfo call, id: $id, chainSpec: $chainSpec, txHash: $txHash," +
@@ -110,7 +113,13 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                     valueAmount = txInfo.value,
                     blockNumber = blockNumber,
                     timestamp = txInfo.timestamp,
-                    success = txInfo.success
+                    success = txInfo.success,
+                    eventLogs = eventLogs.map {
+                        EventLogRecord(
+                            logData = it.data,
+                            logTopics = it.topics.toTypedArray()
+                        )
+                    }.toTypedArray()
                 )
             )
         } catch (_: DuplicateKeyException) {
@@ -187,7 +196,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
         chainSpec: ChainSpec,
         txHash: TransactionHash,
         currentBlockNumber: BlockNumber
-    ): BlockchainTransactionInfo? {
+    ): Pair<BlockchainTransactionInfo, List<EventLog>>? {
         logger.debug {
             "Get cached fetchTransactionInfo call, chainSpec: $chainSpec, txHash: $txHash," +
                 " currentBlockNumber: $currentBlockNumber"
@@ -203,16 +212,25 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
             )
             .fetchOne()
             ?.let {
-                BlockchainTransactionInfo(
-                    hash = it.txHash,
-                    from = it.fromAddress,
-                    to = it.toAddress,
-                    deployedContractAddress = it.deployedContractAddress,
-                    data = it.txData,
-                    value = it.valueAmount,
-                    blockConfirmations = (currentBlockNumber.value - it.blockNumber.value).max(BigInteger.ZERO),
-                    timestamp = it.timestamp,
-                    success = it.success
+                Pair(
+                    BlockchainTransactionInfo(
+                        hash = it.txHash,
+                        from = it.fromAddress,
+                        to = it.toAddress,
+                        deployedContractAddress = it.deployedContractAddress,
+                        data = it.txData,
+                        value = it.valueAmount,
+                        blockConfirmations = (currentBlockNumber.value - it.blockNumber.value).max(BigInteger.ZERO),
+                        timestamp = it.timestamp,
+                        success = it.success,
+                        events = emptyList()
+                    ),
+                    it.eventLogs.map { l ->
+                        EventLog(
+                            data = l.logData ?: "",
+                            topics = l.logTopics?.filterNotNull()?.toList().orEmpty()
+                        )
+                    }
                 )
             }
     }

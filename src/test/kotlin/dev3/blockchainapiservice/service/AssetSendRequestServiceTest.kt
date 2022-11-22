@@ -437,7 +437,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = false
+            success = false,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -523,7 +524,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -609,7 +611,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -695,7 +698,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -781,7 +785,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -866,7 +871,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = sendRequest.assetAmount,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -936,7 +942,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance(BigInteger.ONE),
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -1007,7 +1014,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -1093,7 +1101,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -1178,7 +1187,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = sendRequest.assetAmount,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -1248,7 +1258,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = sendRequest.assetAmount,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -1319,7 +1330,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -1431,7 +1443,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
@@ -1520,7 +1533,8 @@ class AssetSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {

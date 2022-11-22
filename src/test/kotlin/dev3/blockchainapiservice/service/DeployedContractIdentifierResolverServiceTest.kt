@@ -80,7 +80,8 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
             value = DEPLOYED_CONTRACT.initialEthAmount,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
     }
 

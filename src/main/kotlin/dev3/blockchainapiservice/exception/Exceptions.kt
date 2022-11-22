@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.exception
 
+import dev3.blockchainapiservice.util.AbiType
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractId
@@ -251,5 +252,16 @@ class IpfsUploadFailedException : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = 7232463362753458703L
+    }
+}
+
+class AbiDecodingException(types: List<AbiType>, cause: Throwable) : ServiceException(
+    errorCode = ErrorCode.ABI_DECODING_FAILED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "ABI decoding failed for type list: ${types.joinToString(", ")}",
+    cause = cause
+) {
+    companion object {
+        private const val serialVersionUID: Long = -5755478462711202378L
     }
 }

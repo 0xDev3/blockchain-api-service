@@ -6,6 +6,7 @@ import dev3.blockchainapiservice.model.json.AbiInputOutput
 import dev3.blockchainapiservice.model.json.AbiObject
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.EventDecorator
+import dev3.blockchainapiservice.model.json.EventTypeDecorator
 import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.ManifestJson
@@ -141,7 +142,9 @@ data class ContractDecorator(
                             "Event ${decorator.signature} is missing event name in artifact.json"
                         ),
                         signature = decorator.signature,
-                        inputs = decorator.parameterDecorators.toContractParameters(artifactEvent.inputs.orEmpty())
+                        inputs = decorator.parameterDecorators.eventTypeToContractParameters(
+                            artifactEvent.inputs.orEmpty()
+                        )
                     )
                 }
             }
@@ -165,6 +168,22 @@ data class ContractDecorator(
                 ContractParameter(
                     name = it.first.name,
                     description = it.first.description,
+                    solidityName = it.second.name,
+                    solidityType = it.second.type,
+                    recommendedTypes = it.first.recommendedTypes,
+                    parameters = it.first.parameters?.toContractParameters(it.second.components ?: emptyList()),
+                    hints = it.first.hints
+                )
+            }
+
+        private fun List<EventTypeDecorator>.eventTypeToContractParameters(
+            abi: List<AbiInputOutput>
+        ): List<EventParameter> =
+            zip(abi).map {
+                EventParameter(
+                    name = it.first.name,
+                    description = it.first.description,
+                    indexed = it.first.indexed,
                     solidityName = it.second.name,
                     solidityType = it.second.type,
                     recommendedTypes = it.first.recommendedTypes,
@@ -206,6 +225,17 @@ data class ContractParameter(
     val hints: List<Any>?
 )
 
+data class EventParameter(
+    val name: String,
+    val description: String,
+    val indexed: Boolean?,
+    val solidityName: String,
+    val solidityType: String,
+    val recommendedTypes: List<String>,
+    val parameters: List<ContractParameter>?,
+    val hints: List<Any>?
+)
+
 data class ContractConstructor(
     val inputs: List<ContractParameter>,
     val description: String,
@@ -228,5 +258,5 @@ data class ContractEvent(
     val description: String,
     val solidityName: String,
     val signature: String,
-    val inputs: List<ContractParameter>
+    val inputs: List<EventParameter>
 )
