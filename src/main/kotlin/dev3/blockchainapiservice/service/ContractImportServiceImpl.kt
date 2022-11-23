@@ -6,6 +6,7 @@ import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.ContractDecoratorBinaryMismatchException
 import dev3.blockchainapiservice.exception.ContractNotFoundException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.DecompiledContractJson
 import dev3.blockchainapiservice.model.json.ManifestJson
@@ -260,7 +261,11 @@ class ContractImportServiceImpl(
             chainId = project.chainId,
             customRpcUrl = project.customRpcUrl
         )
-        val contractDeploymentTransactionInfo = findContractDeploymentTransaction(params.contractAddress, chainSpec)
+        val contractDeploymentTransactionInfo = findContractDeploymentTransaction(
+            contractAddress = params.contractAddress,
+            chainSpec = chainSpec,
+            events = contractDecorator.getDeserializableEvents(objectMapper)
+        )
 
         val decoratorBinary = contractDecorator.binary.withPrefix
         val deployedBinary = when (contractDeploymentTransactionInfo) {
@@ -294,7 +299,11 @@ class ContractImportServiceImpl(
         projectId: UUID,
         previewDecorator: Boolean
     ): DecompiledContract {
-        val contractDeploymentTransactionInfo = findContractDeploymentTransaction(importContractAddress, chainSpec)
+        val contractDeploymentTransactionInfo = findContractDeploymentTransaction(
+            contractAddress = importContractAddress,
+            chainSpec = chainSpec,
+            events = emptyList()
+        )
 
         val (fullBinary, shortBinary) = when (contractDeploymentTransactionInfo) {
             is FullContractDeploymentTransactionInfo ->
@@ -383,11 +392,15 @@ class ContractImportServiceImpl(
         )
     }
 
-    private fun findContractDeploymentTransaction(contractAddress: ContractAddress, chainSpec: ChainSpec) =
-        blockchainService.findContractDeploymentTransaction(
-            chainSpec = chainSpec,
-            contractAddress = contractAddress
-        ) ?: throw ContractNotFoundException(contractAddress)
+    private fun findContractDeploymentTransaction(
+        contractAddress: ContractAddress,
+        chainSpec: ChainSpec,
+        events: List<DeserializableEvent>
+    ) = blockchainService.findContractDeploymentTransaction(
+        chainSpec = chainSpec,
+        contractAddress = contractAddress,
+        events = events
+    ) ?: throw ContractNotFoundException(contractAddress)
 
     private fun DecompiledContractJson.resolveProxyContract(
         importContractAddress: ContractAddress,
@@ -395,7 +408,11 @@ class ContractImportServiceImpl(
     ): Pair<DecompiledContractJson, ContractAddress?> =
         if (this.manifest.functionDecorators.any { it.signature == "$PROXY_FUNCTION_NAME()" }) {
             val implementationAddress = findContractProxyImplementation(importContractAddress, chainSpec)
-            val implementationTransactionInfo = findContractDeploymentTransaction(implementationAddress, chainSpec)
+            val implementationTransactionInfo = findContractDeploymentTransaction(
+                contractAddress = implementationAddress,
+                chainSpec = chainSpec,
+                events = emptyList()
+            )
             val decompiledImplementation = contractDecompilerService.decompile(implementationTransactionInfo.binary)
 
             val implManifest = decompiledImplementation.manifest

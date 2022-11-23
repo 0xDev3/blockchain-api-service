@@ -4,6 +4,7 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ContractNotYetDeployedException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.DeployedContractAddressIdentifier
 import dev3.blockchainapiservice.model.params.DeployedContractAliasIdentifier
@@ -80,8 +81,10 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
             value = DEPLOYED_CONTRACT.initialEthAmount,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
+        private val EVENTS = listOf<DeserializableEvent>()
     }
 
     @Test
@@ -117,7 +120,8 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
                 ethCommonService.fetchTransactionInfo(
                     txHash = TX_HASH,
                     chainId = DEPLOYED_CONTRACT.chainId,
-                    customRpcUrl = PROJECT.customRpcUrl
+                    customRpcUrl = PROJECT.customRpcUrl,
+                    events = EVENTS
                 )
             ).willReturn(BLOCKCHAIN_TRANSACTION_INFO)
         }
@@ -199,7 +203,8 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
                 ethCommonService.fetchTransactionInfo(
                     txHash = TX_HASH,
                     chainId = DEPLOYED_CONTRACT.chainId,
-                    customRpcUrl = PROJECT.customRpcUrl
+                    customRpcUrl = PROJECT.customRpcUrl,
+                    events = EVENTS
                 )
             ).willReturn(BLOCKCHAIN_TRANSACTION_INFO)
         }

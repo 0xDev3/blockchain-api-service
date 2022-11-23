@@ -9,6 +9,7 @@ import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractEvent
 import dev3.blockchainapiservice.model.result.ContractFunction
 import dev3.blockchainapiservice.model.result.ContractParameter
+import dev3.blockchainapiservice.model.result.EventParameter
 import dev3.blockchainapiservice.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.repository.InMemoryContractDecoratorRepository
@@ -173,9 +174,10 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                 solidityName = "ExampleEvent",
                 signature = "ExampleEvent(address)",
                 inputs = listOf(
-                    ContractParameter(
+                    EventParameter(
                         name = "Arg",
                         description = "Arg description",
+                        indexed = false,
                         solidityName = "arg",
                         solidityType = "address",
                         recommendedTypes = listOf("example"),

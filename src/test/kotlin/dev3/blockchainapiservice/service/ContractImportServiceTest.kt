@@ -9,6 +9,7 @@ import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.exception.ContractDecoratorBinaryMismatchException
 import dev3.blockchainapiservice.exception.ContractNotFoundException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.json.AbiInputOutput
 import dev3.blockchainapiservice.model.json.AbiObject
@@ -233,7 +234,8 @@ class ContractImportServiceTest : TestBase() {
             data = FunctionData("${ARTIFACT_JSON.bytecode}${ENCODED_CONSTRUCTOR_CALL.withoutPrefix}"),
             value = Balance.ZERO,
             binary = ContractBinaryData(ARTIFACT_JSON.deployedBytecode),
-            blockNumber = BlockNumber(BigInteger.ONE)
+            blockNumber = BlockNumber(BigInteger.ONE),
+            events = emptyList()
         )
         private val CONTRACT_BINARY_INFO = ContractBinaryInfo(
             deployedContractAddress = PARAMS.contractAddress,
@@ -316,7 +318,8 @@ class ContractImportServiceTest : TestBase() {
             data = FunctionData("${PROXY_ARTIFACT_JSON.bytecode}${ENCODED_CONSTRUCTOR_CALL.withoutPrefix}"),
             value = Balance.ZERO,
             binary = ContractBinaryData(PROXY_ARTIFACT_JSON.deployedBytecode),
-            blockNumber = BlockNumber(BigInteger.ONE)
+            blockNumber = BlockNumber(BigInteger.ONE),
+            events = emptyList()
         )
         private val PROXY_CONTRACT_DECORATOR = ContractDecorator(
             id = CONTRACT_ID,
@@ -325,6 +328,7 @@ class ContractImportServiceTest : TestBase() {
             imported = true,
             interfacesProvider = null
         )
+        private val EVENTS = listOf<DeserializableEvent>()
     }
 
     @Test
@@ -764,7 +768,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -920,7 +924,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will not be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(null)
         }
 
@@ -965,7 +969,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.copy(data = FunctionData("ffff")))
         }
 
@@ -996,7 +1000,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -1135,7 +1139,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_BINARY_INFO)
         }
 
@@ -1268,7 +1272,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -1387,7 +1391,7 @@ class ContractImportServiceTest : TestBase() {
         val params = PARAMS.copy(contractAddress = proxyAddress)
 
         suppose("proxy contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress, EVENTS))
                 .willReturn(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -1443,7 +1447,7 @@ class ContractImportServiceTest : TestBase() {
         }
 
         suppose("implementation contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -1582,7 +1586,7 @@ class ContractImportServiceTest : TestBase() {
         val params = PARAMS.copy(contractAddress = proxyAddress)
 
         suppose("proxy contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress, EVENTS))
                 .willReturn(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -1612,7 +1616,7 @@ class ContractImportServiceTest : TestBase() {
         }
 
         suppose("implementation contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -1751,7 +1755,7 @@ class ContractImportServiceTest : TestBase() {
         val params = PARAMS.copy(contractAddress = proxyAddress)
 
         suppose("proxy contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress, EVENTS))
                 .willReturn(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -1812,7 +1816,7 @@ class ContractImportServiceTest : TestBase() {
         }
 
         suppose("implementation contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -2565,7 +2569,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(CHAIN_ID, null)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, CONTRACT_ADDRESS))
+            given(blockchainService.findContractDeploymentTransaction(chainSpec, CONTRACT_ADDRESS, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 

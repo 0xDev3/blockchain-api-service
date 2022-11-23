@@ -128,7 +128,8 @@ class ImportContractControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -222,7 +223,8 @@ class ImportContractControllerTest : TestBase() {
                             ),
                             imported = result.value.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = emptyList()
                         )
                     )
                 )
@@ -307,7 +309,8 @@ class ImportContractControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
         val project = Project(
@@ -373,7 +376,8 @@ class ImportContractControllerTest : TestBase() {
                             ),
                             imported = result.value.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = emptyList()
                         )
                     )
                 )
@@ -424,7 +428,8 @@ class ImportContractControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
         val project = Project(
@@ -490,7 +495,8 @@ class ImportContractControllerTest : TestBase() {
                             ),
                             imported = result.value.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = emptyList()
                         )
                     )
                 )
@@ -541,7 +547,8 @@ class ImportContractControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
         val project = Project(
@@ -607,7 +614,8 @@ class ImportContractControllerTest : TestBase() {
                             ),
                             imported = result.value.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = emptyList()
                         )
                     )
                 )

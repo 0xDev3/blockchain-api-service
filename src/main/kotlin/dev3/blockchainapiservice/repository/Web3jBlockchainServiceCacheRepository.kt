@@ -1,6 +1,7 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.model.EventLog
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.util.AccountBalance
 import dev3.blockchainapiservice.util.BlockNumber
@@ -18,12 +19,14 @@ interface Web3jBlockchainServiceCacheRepository {
         accountBalance: AccountBalance
     )
 
+    @Suppress("LongParameterList")
     fun cacheFetchTransactionInfo(
         id: UUID,
         chainSpec: ChainSpec,
         txHash: TransactionHash,
         blockNumber: BlockNumber,
-        txInfo: BlockchainTransactionInfo
+        txInfo: BlockchainTransactionInfo,
+        eventLogs: List<EventLog>
     )
 
     fun getCachedFetchAccountBalance(
@@ -43,5 +46,5 @@ interface Web3jBlockchainServiceCacheRepository {
         chainSpec: ChainSpec,
         txHash: TransactionHash,
         currentBlockNumber: BlockNumber
-    ): BlockchainTransactionInfo?
+    ): Pair<BlockchainTransactionInfo, List<EventLog>>?
 }

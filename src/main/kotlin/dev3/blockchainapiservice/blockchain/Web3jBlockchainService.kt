@@ -3,16 +3,22 @@ package dev3.blockchainapiservice.blockchain
 import dev3.blockchainapiservice.blockchain.properties.ChainPropertiesHandler
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.exception.AbiDecodingException
 import dev3.blockchainapiservice.exception.BlockchainEventReadException
 import dev3.blockchainapiservice.exception.BlockchainReadException
 import dev3.blockchainapiservice.exception.TemporaryBlockchainReadException
 import dev3.blockchainapiservice.features.payout.model.params.GetPayoutsForInvestorParams
 import dev3.blockchainapiservice.features.payout.model.result.PayoutForInvestor
 import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
+import dev3.blockchainapiservice.model.DeserializableEvent
+import dev3.blockchainapiservice.model.EventLog
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractBinaryInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
+import dev3.blockchainapiservice.model.result.EventArgumentHash
+import dev3.blockchainapiservice.model.result.EventArgumentValue
+import dev3.blockchainapiservice.model.result.EventInfo
 import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.repository.Web3jBlockchainServiceCacheRepository
@@ -28,6 +34,8 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.EthStorageSlot
 import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.Keccak256Hash
+import dev3.blockchainapiservice.util.StaticBytesType
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
@@ -44,6 +52,7 @@ import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.Response
 import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.protocol.core.methods.response.EthBlock
+import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.tx.ReadonlyTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
@@ -61,6 +70,9 @@ class Web3jBlockchainService(
 ) : BlockchainService {
 
     companion object : KLogging() {
+        private const val ETH_VALUE_LENGTH = 64
+        private val BYTES_32 = StaticBytesType(32)
+
         private data class BlockDescriptor(
             val blockNumber: BlockNumber,
             val blockConfirmations: BigInteger,
@@ -202,7 +214,11 @@ class Web3jBlockchainService(
         }
     }
 
-    override fun fetchTransactionInfo(chainSpec: ChainSpec, txHash: TransactionHash): BlockchainTransactionInfo? {
+    override fun fetchTransactionInfo(
+        chainSpec: ChainSpec,
+        txHash: TransactionHash,
+        events: List<DeserializableEvent>
+    ): BlockchainTransactionInfo? {
         logger.debug { "Fetching transaction, chainSpec: $chainSpec, txHash: $txHash" }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
         val web3j = blockchainProperties.web3j
@@ -214,7 +230,7 @@ class Web3jBlockchainService(
                 chainSpec = chainSpec,
                 txHash = txHash,
                 currentBlockNumber = currentBlockNumber
-            ) ?: run {
+            )?.let { it.first.copy(events = it.second.extractEvents(events)) } ?: run {
                 val transaction = web3j.ethGetTransactionByHash(txHash.value).sendSafely()
                     ?.transaction?.orElse(null).bind()
                 val receipt = web3j.ethGetTransactionReceipt(txHash.value).sendSafely()
@@ -223,6 +239,7 @@ class Web3jBlockchainService(
                 val txBlockNumber = transaction.blockNumber
                 val timestamp = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(txBlockNumber), false)
                     .sendSafely()?.block?.timestamp?.let { UtcDateTime.ofEpochSeconds(it.longValueExact()) }.bind()
+                val eventLogs = receipt.extractLogs()
                 val txInfo = BlockchainTransactionInfo(
                     hash = TransactionHash(transaction.hash),
                     from = WalletAddress(transaction.from),
@@ -232,7 +249,8 @@ class Web3jBlockchainService(
                     value = Balance(transaction.value),
                     blockConfirmations = blockConfirmations,
                     timestamp = timestamp,
-                    success = receipt.isStatusOK
+                    success = receipt.isStatusOK,
+                    events = eventLogs.extractEvents(events)
                 )
 
                 if (blockchainProperties.shouldCache(blockConfirmations)) {
@@ -241,7 +259,8 @@ class Web3jBlockchainService(
                         chainSpec = chainSpec,
                         txHash = txHash,
                         blockNumber = BlockNumber(txBlockNumber),
-                        txInfo = txInfo
+                        txInfo = txInfo,
+                        eventLogs = eventLogs
                     )
                 }
 
@@ -290,7 +309,8 @@ class Web3jBlockchainService(
 
     override fun findContractDeploymentTransaction(
         chainSpec: ChainSpec,
-        contractAddress: ContractAddress
+        contractAddress: ContractAddress,
+        events: List<DeserializableEvent>
     ): ContractDeploymentTransactionInfo? {
         logger.debug {
             "Searching for contract deployment transaction, chainSpec: $chainSpec, contractAddress: $contractAddress"
@@ -342,7 +362,8 @@ class Web3jBlockchainService(
                     data = FunctionData(deployTx.second.input),
                     value = Balance(deployTx.second.value),
                     binary = binary,
-                    blockNumber = BlockNumber(contractDeploymentBlock)
+                    blockNumber = BlockNumber(contractDeploymentBlock),
+                    events = deployTx.first.extractLogs().extractEvents(events)
                 )
             } ?: ContractBinaryInfo(deployedContractAddress = contractAddress, binary = binary)
         }
@@ -507,6 +528,88 @@ class Web3jBlockchainService(
             logger.warn("Failed smart contract call", ex)
             null
         }
+
+    private fun TransactionReceipt.extractLogs(): List<EventLog> =
+        logs.map { EventLog(data = it.data, topics = it.topics) }
+
+    private fun List<EventLog>.extractEvents(events: List<DeserializableEvent>): List<EventInfo> {
+        val eventsBySignature = events.associateBy { Keccak256Hash(it.selector) }
+
+        return this.map { log ->
+            val eventType = log.topics.firstOrNull()
+                ?.let { eventsBySignature[Keccak256Hash.raw(it)] }
+                ?: events.closestMatchingEvent(log)
+
+            if (eventType != null) {
+                try {
+                    log.decodeAsRegularEvent(eventType)
+                } catch (e: AbiDecodingException) {
+                    logger.warn(e) { "Failed to decode event: ${eventType.signature}" }
+                    log.decodeAsBytes32()
+                }
+            } else {
+                log.decodeAsBytes32()
+            }
+        }
+    }
+
+    private fun EventLog.decodeAsRegularEvent(eventType: DeserializableEvent): EventInfo {
+        val decodedRegularInputs = decodeRegularEventInputs(this, eventType)
+        val nonEventTopics = this.topics.filterNot { Keccak256Hash.raw(it) == Keccak256Hash(eventType.selector) }
+        val decodedIndexedInputs = decodeIndexedEventInputs(nonEventTopics, eventType)
+        val allInputsByName = (decodedRegularInputs + decodedIndexedInputs).associateBy { it.name }
+
+        return EventInfo(
+            signature = eventType.signature,
+            arguments = eventType.inputsOrder.map { allInputsByName[it]!! }
+        )
+    }
+
+    private fun decodeRegularEventInputs(log: EventLog, eventType: DeserializableEvent) =
+        abiDecoderService.decode(
+            types = eventType.regularInputs.map { it.abiType },
+            encodedInput = log.data
+        )
+            .zip(eventType.regularInputs)
+            .map { (value, input) -> EventArgumentValue(name = input.name, value = value) }
+
+    private fun decodeIndexedEventInputs(topics: List<String>, eventType: DeserializableEvent) =
+        topics.zip(eventType.indexedInputs)
+            .map { (topic, input) ->
+                if (input.abiType.isIndexHashed()) {
+                    EventArgumentHash(name = input.name, hash = topic)
+                } else {
+                    EventArgumentValue(
+                        name = input.name,
+                        value = abiDecoderService.decode(
+                            types = listOf(input.abiType),
+                            encodedInput = topic
+                        )[0]
+                    )
+                }
+            }
+
+    private fun EventLog.decodeAsBytes32(): EventInfo {
+        val data = this.data.removePrefix("0x")
+        val dataInputs = List(data.length / ETH_VALUE_LENGTH) { BYTES_32 }
+        val decodedDataInputs = abiDecoderService.decode(
+            types = dataInputs,
+            encodedInput = data
+        )
+            .withIndex()
+            .map { EventArgumentValue(name = "arg${it.index}", value = it.value) }
+        val topicInputs = this.topics
+            .withIndex()
+            .map { EventArgumentHash(name = "arg${it.index + decodedDataInputs.size}", hash = it.value) }
+
+        return EventInfo(
+            signature = null,
+            arguments = decodedDataInputs + topicInputs
+        )
+    }
+
+    private fun List<DeserializableEvent>.closestMatchingEvent(log: EventLog) =
+        filter { it.indexedInputs.size == log.topics.size }.takeIf { it.size == 1 }?.first()
 
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
     private fun <S, T : Response<*>?> Request<S, T>.sendSafely(): T? {

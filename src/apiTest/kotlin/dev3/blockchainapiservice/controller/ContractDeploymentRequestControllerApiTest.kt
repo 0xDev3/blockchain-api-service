@@ -17,12 +17,17 @@ import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestsResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponseType
+import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractConstructor
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.model.result.ContractEvent
 import dev3.blockchainapiservice.model.result.ContractFunction
 import dev3.blockchainapiservice.model.result.ContractParameter
+import dev3.blockchainapiservice.model.result.EventParameter
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
@@ -113,9 +118,77 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf(),
+            events = listOf(
+                ContractEvent(
+                    name = "Example event",
+                    description = "Example event",
+                    solidityName = "ExampleEvent",
+                    signature = "ExampleEvent(tuple(address),tuple(address))",
+                    inputs = listOf(
+                        EventParameter(
+                            name = "Non-indexed struct",
+                            description = "Non-indexed struct",
+                            indexed = false,
+                            solidityName = "nonIndexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        ),
+                        EventParameter(
+                            name = "Indexed struct",
+                            description = "Indexed struct",
+                            indexed = true,
+                            solidityName = "indexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        )
+                    )
+                )
+            ),
             manifest = ManifestJson.EMPTY,
             artifact = ArtifactJson.EMPTY
+        )
+        private val EVENTS = listOf(
+            EventInfoResponse(
+                signature = "ExampleEvent(tuple(address),tuple(address))",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "nonIndexedStruct",
+                        type = EventArgumentResponseType.VALUE,
+                        value = listOf(WalletAddress("a").rawValue),
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "indexedStruct",
+                        type = EventArgumentResponseType.HASH,
+                        value = null,
+                        hash = "0xc65a7bb8d6351c1cf70c95a316cc6a92839c986682d98bc35f958f4883f9d2a8"
+                    )
+                )
+            )
         )
     }
 
@@ -264,7 +337,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = null
                     )
                 )
 
@@ -401,7 +475,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = null
                     )
                 )
 
@@ -826,7 +901,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS
                     )
                 )
 
@@ -966,7 +1042,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS
                     )
                 )
 
@@ -1107,7 +1184,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS
                     )
                 )
 
@@ -1251,7 +1329,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS
                     )
                 )
 
@@ -1425,7 +1504,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                 ),
                                 imported = false,
                                 proxy = false,
-                                implementationContractAddress = null
+                                implementationContractAddress = null,
+                                events = EVENTS
                             )
                         )
                     )
@@ -1576,7 +1656,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                 ),
                                 imported = false,
                                 proxy = false,
-                                implementationContractAddress = null
+                                implementationContractAddress = null,
+                                events = EVENTS
                             )
                         )
                     )

@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 contract SimpleERC20 {
 
     event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
 
     mapping(address => uint256) private _balances;
     mapping(address => mapping (address => uint256)) private _approvals;
@@ -25,6 +26,7 @@ contract SimpleERC20 {
 
     function approve(address spender, uint256 amount) public {
         _approvals[spender][msg.sender] = amount;
+        emit Approval(msg.sender, spender, amount);
     }
 
     function transfer(address recipient, uint256 amount) public returns (bool) {

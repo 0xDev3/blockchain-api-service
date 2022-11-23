@@ -1,6 +1,7 @@
 package dev3.blockchainapiservice.util
 
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.model.result.EventInfo
 import java.math.BigInteger
 
 data class WithTransactionData<T>(val value: T, val status: Status, val transactionData: TransactionData)
@@ -20,7 +21,8 @@ data class TransactionData(
     val data: FunctionData?,
     val value: Balance,
     val blockConfirmations: BigInteger?,
-    val timestamp: UtcDateTime?
+    val timestamp: UtcDateTime?,
+    val events: List<EventInfo>?
 ) {
     constructor(
         txHash: TransactionHash?,
@@ -36,6 +38,7 @@ data class TransactionData(
         data = transactionInfo?.data ?: data,
         value = transactionInfo?.value ?: value ?: Balance.ZERO,
         blockConfirmations = transactionInfo?.blockConfirmations,
-        timestamp = transactionInfo?.timestamp
+        timestamp = transactionInfo?.timestamp,
+        events = transactionInfo?.events
     )
 }

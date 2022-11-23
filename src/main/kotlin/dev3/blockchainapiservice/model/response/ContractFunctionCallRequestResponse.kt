@@ -31,7 +31,8 @@ data class ContractFunctionCallRequestResponse(
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig?,
     val callerAddress: String?,
-    val functionCallTx: TransactionResponse
+    val functionCallTx: TransactionResponse,
+    val events: List<EventInfoResponse>?
 ) {
     constructor(contractFunctionCallRequest: WithFunctionData<ContractFunctionCallRequest>) : this(
         id = contractFunctionCallRequest.value.id,
@@ -54,7 +55,8 @@ data class ContractFunctionCallRequestResponse(
             to = contractFunctionCallRequest.value.contractAddress,
             data = contractFunctionCallRequest.data,
             value = contractFunctionCallRequest.value.ethAmount,
-        )
+        ),
+        events = null
     )
 
     constructor(contractFunctionCallRequest: WithTransactionAndFunctionData<ContractFunctionCallRequest>) : this(
@@ -73,7 +75,8 @@ data class ContractFunctionCallRequestResponse(
         arbitraryData = contractFunctionCallRequest.value.arbitraryData,
         screenConfig = contractFunctionCallRequest.value.screenConfig.orEmpty(),
         callerAddress = contractFunctionCallRequest.value.callerAddress?.rawValue,
-        functionCallTx = TransactionResponse(contractFunctionCallRequest.transactionData)
+        functionCallTx = TransactionResponse(contractFunctionCallRequest.transactionData),
+        events = contractFunctionCallRequest.transactionData.events?.map { EventInfoResponse(it) }
     )
 
     @Suppress("unused") // used for JSON schema generation
