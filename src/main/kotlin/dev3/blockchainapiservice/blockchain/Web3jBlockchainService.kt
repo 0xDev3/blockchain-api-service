@@ -533,7 +533,7 @@ class Web3jBlockchainService(
         logs.map { EventLog(data = it.data, topics = it.topics) }
 
     private fun List<EventLog>.extractEvents(events: List<DeserializableEvent>): List<EventInfo> {
-        val eventsBySignature = events.associateBy { Keccak256Hash(it.signature) }
+        val eventsBySignature = events.associateBy { Keccak256Hash(it.selector) }
 
         return this.map { log ->
             val eventType = log.topics.firstOrNull()
@@ -555,7 +555,7 @@ class Web3jBlockchainService(
 
     private fun EventLog.decodeAsRegularEvent(eventType: DeserializableEvent): EventInfo {
         val decodedRegularInputs = decodeRegularEventInputs(this, eventType)
-        val nonEventTopics = this.topics.filterNot { Keccak256Hash.raw(it) == Keccak256Hash(eventType.signature) }
+        val nonEventTopics = this.topics.filterNot { Keccak256Hash.raw(it) == Keccak256Hash(eventType.selector) }
         val decodedIndexedInputs = decodeIndexedEventInputs(nonEventTopics, eventType)
         val allInputsByName = (decodedRegularInputs + decodedIndexedInputs).associateBy { it.name }
 

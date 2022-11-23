@@ -12,6 +12,7 @@ import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.PredefinedEvents
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
@@ -158,7 +159,8 @@ class AssetMultiSendRequestServiceImpl(
             val disperseTransactionInfo = ethCommonService.fetchTransactionInfo(
                 txHash = disperseTxHash,
                 chainId = chainId,
-                customRpcUrl = project.customRpcUrl
+                customRpcUrl = project.customRpcUrl,
+                events = listOf(PredefinedEvents.ERC20_TRANSFER)
             )
             val disperseData =
                 tokenAddress?.let { encodeDisperseTokenFunctionData(it, assetRecipientAddresses, assetAmounts) }
@@ -196,7 +198,8 @@ class AssetMultiSendRequestServiceImpl(
             val approveTransactionInfo = ethCommonService.fetchTransactionInfo(
                 txHash = approveTxHash,
                 chainId = chainId,
-                customRpcUrl = project.customRpcUrl
+                customRpcUrl = project.customRpcUrl,
+                events = listOf(PredefinedEvents.ERC20_APPROVAL)
             )
             val approveData = encodeApproveFunctionData(disperseContractAddress, totalAssetAmount)
             val approveStatus = determineApproveStatus(approveTransactionInfo, approveData, tokenAddress)

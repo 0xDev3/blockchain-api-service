@@ -7,6 +7,7 @@ import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
@@ -146,6 +147,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             proxy = false,
             implementationContractAddress = null
         )
+        private val EVENTS = listOf<DeserializableEvent>()
     }
 
     @Test
@@ -195,6 +197,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
@@ -227,6 +232,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -269,6 +277,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -303,7 +314,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(null)
         }
 
@@ -323,6 +334,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -358,7 +372,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(success = false)
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -378,6 +392,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -413,7 +430,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(hash = TransactionHash("other-tx-hash"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -433,6 +450,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -468,7 +488,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(from = WalletAddress("dead"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -488,6 +508,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -523,7 +546,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(to = ContractAddress("dead"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -543,6 +566,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -578,7 +604,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(data = FunctionData("dead"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -598,6 +624,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -633,7 +662,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(value = Balance(BigInteger.valueOf(123456L)))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -653,6 +682,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -688,7 +720,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(from = WalletAddress("dead"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -708,6 +740,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -743,7 +778,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -763,6 +798,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -815,6 +853,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -850,6 +891,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = mock(),
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -879,6 +923,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -911,6 +958,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
             deployedContractIdentifierResolverService = service(mock()),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),

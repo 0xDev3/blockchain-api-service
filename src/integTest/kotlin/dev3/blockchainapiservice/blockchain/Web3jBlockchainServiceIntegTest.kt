@@ -39,6 +39,7 @@ import dev3.blockchainapiservice.util.EthStorageSlot
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.Keccak256Hash
+import dev3.blockchainapiservice.util.PredefinedEvents
 import dev3.blockchainapiservice.util.StringType
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UintType
@@ -407,19 +408,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
                 txHash = txHash,
-                events = listOf(
-                    DeserializableEvent(
-                        signature = "Transfer(address,address,uint256)",
-                        inputsOrder = listOf("from", "to", "value"),
-                        indexedInputs = listOf(
-                            DeserializableEventInput("from", AddressType),
-                            DeserializableEventInput("to", AddressType)
-                        ),
-                        regularInputs = listOf(
-                            DeserializableEventInput("value", UintType)
-                        )
-                    )
-                )
+                events = listOf(PredefinedEvents.ERC20_TRANSFER)
             )
 
             assertThat(transactionInfo).withMessage()
@@ -507,7 +496,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                txHash = txHash,
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()
@@ -567,7 +557,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                txHash = txHash,
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()
@@ -634,7 +625,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                txHash = txHash,
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()
@@ -994,7 +986,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = TransactionHash("0x123456")
+                txHash = TransactionHash("0x123456"),
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()
@@ -1125,7 +1118,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.findContractDeploymentTransaction(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                contractAddress = ContractAddress(contract.contractAddress)
+                contractAddress = ContractAddress(contract.contractAddress),
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()

@@ -26,7 +26,8 @@ data class Erc20LockRequestResponse(
     val screenConfig: ScreenConfig?,
     val redirectUrl: String,
     val lockTx: TransactionResponse,
-    val createdAt: OffsetDateTime
+    val createdAt: OffsetDateTime,
+    val events: List<EventInfoResponse>?
 ) {
     constructor(lockRequest: WithFunctionData<Erc20LockRequest>) : this(
         id = lockRequest.value.id,
@@ -48,7 +49,8 @@ data class Erc20LockRequestResponse(
             data = lockRequest.data,
             value = Balance.ZERO
         ),
-        createdAt = lockRequest.value.createdAt.value
+        createdAt = lockRequest.value.createdAt.value,
+        events = null
     )
 
     constructor(lockRequest: WithTransactionData<Erc20LockRequest>) : this(
@@ -66,6 +68,7 @@ data class Erc20LockRequestResponse(
         screenConfig = lockRequest.value.screenConfig.orEmpty(),
         redirectUrl = lockRequest.value.redirectUrl,
         lockTx = TransactionResponse(lockRequest.transactionData),
-        createdAt = lockRequest.value.createdAt.value
+        createdAt = lockRequest.value.createdAt.value,
+        events = lockRequest.transactionData.events?.map { EventInfoResponse(it) }
     )
 }

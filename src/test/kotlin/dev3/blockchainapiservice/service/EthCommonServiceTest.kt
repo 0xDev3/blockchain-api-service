@@ -132,7 +132,7 @@ class EthCommonServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("some transaction info is fetched from blockchain") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, txHash))
+            given(blockchainService.fetchTransactionInfo(chainSpec, txHash, emptyList()))
                 .willReturn(transactionInfo)
         }
 
@@ -146,7 +146,8 @@ class EthCommonServiceTest : TestBase() {
             val result = service.fetchTransactionInfo(
                 txHash = txHash,
                 chainId = chainSpec.chainId,
-                customRpcUrl = chainSpec.customRpcUrl
+                customRpcUrl = chainSpec.customRpcUrl,
+                events = emptyList()
             )
 
             assertThat(result).withMessage()
@@ -166,7 +167,8 @@ class EthCommonServiceTest : TestBase() {
             val result = service.fetchTransactionInfo(
                 txHash = null,
                 chainId = Chain.HARDHAT_TESTNET.id,
-                customRpcUrl = null
+                customRpcUrl = null,
+                events = emptyList()
             )
 
             assertThat(result).withMessage()
