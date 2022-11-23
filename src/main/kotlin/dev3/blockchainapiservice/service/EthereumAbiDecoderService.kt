@@ -29,6 +29,7 @@ class EthereumAbiDecoderService : AbiDecoderService {
         private val MAX_UINT_256 = BigInteger("f".repeat(VALUE_LENGTH), HEX_RADIX)
     }
 
+    @Suppress("TooGenericExceptionCaught")
     override fun decode(types: List<AbiType>, encodedInput: String): List<Any> {
         try {
             return unsafeDecode(types, encodedInput)

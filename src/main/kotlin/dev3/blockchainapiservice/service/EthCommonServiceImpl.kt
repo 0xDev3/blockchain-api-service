@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.params.ParamsFactory
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.Project
@@ -32,14 +33,16 @@ class EthCommonServiceImpl(
     override fun fetchTransactionInfo(
         txHash: TransactionHash?,
         chainId: ChainId,
-        customRpcUrl: String?
+        customRpcUrl: String?,
+        events: List<DeserializableEvent>
     ): BlockchainTransactionInfo? = txHash?.let {
         blockchainService.fetchTransactionInfo(
             chainSpec = ChainSpec(
                 chainId = chainId,
                 customRpcUrl = customRpcUrl
             ),
-            txHash = txHash
+            txHash = txHash,
+            events = events
         )
     }
 }

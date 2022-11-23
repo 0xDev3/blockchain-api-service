@@ -1,7 +1,10 @@
 package dev3.blockchainapiservice.model.result
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.ContractDecoratorException
 import dev3.blockchainapiservice.exception.ContractInterfaceNotFoundException
+import dev3.blockchainapiservice.model.DeserializableEvent
+import dev3.blockchainapiservice.model.DeserializableEventInput
 import dev3.blockchainapiservice.model.json.AbiInputOutput
 import dev3.blockchainapiservice.model.json.AbiObject
 import dev3.blockchainapiservice.model.json.ArtifactJson
@@ -13,6 +16,7 @@ import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.json.OverridableDecorator
 import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.json.TypeDecorator
+import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
@@ -213,6 +217,33 @@ data class ContractDecorator(
         private fun <T> concatByPriority(manifestItems: List<T>, interfaceItems: List<T>, imported: Boolean): List<T> =
             if (imported) interfaceItems + manifestItems else manifestItems + interfaceItems
     }
+
+    fun getDeserializableEvents(objectMapper: ObjectMapper): List<DeserializableEvent> =
+        events.map { event ->
+            val (indexedInputs, regularInputs) = event.inputs.partition { it.indexed }
+
+            DeserializableEvent(
+                signature = event.signature,
+                inputsOrder = event.inputs.map { it.solidityName },
+                indexedInputs = indexedInputs.map { it.toDeserializableEventInput(objectMapper) },
+                regularInputs = regularInputs.map { it.toDeserializableEventInput(objectMapper) }
+            )
+        }
+
+    private fun EventParameter.toDeserializableEventInput(objectMapper: ObjectMapper): DeserializableEventInput {
+        val abiType = objectMapper.readValue(solidityType.toOutputTypeJson(parameters), OutputParameter::class.java)
+        return DeserializableEventInput(
+            name = solidityName,
+            abiType = abiType.deserializedType
+        )
+    }
+
+    private fun String.toOutputTypeJson(parameters: List<ContractParameter>?): String =
+        if (startsWith("tuple")) {
+            val elems = parameters?.map { it.solidityType.toOutputTypeJson(it.parameters) }
+                .orEmpty().joinToString(separator = ",", prefix = "[", postfix = "]")
+            "{\"type\":\"$this\",\"elems\":$elems}"
+        } else "\"$this\""
 }
 
 data class ContractParameter(
@@ -228,7 +259,7 @@ data class ContractParameter(
 data class EventParameter(
     val name: String,
     val description: String,
-    val indexed: Boolean?,
+    val indexed: Boolean,
     val solidityName: String,
     val solidityType: String,
     val recommendedTypes: List<String>,

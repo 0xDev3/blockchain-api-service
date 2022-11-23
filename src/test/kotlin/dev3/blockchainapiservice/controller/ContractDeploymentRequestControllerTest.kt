@@ -151,7 +151,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                             ),
                             imported = result.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = null
                         )
                     )
                 )
@@ -223,7 +224,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -273,7 +275,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                             ),
                             imported = result.value.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = emptyList()
                         )
                     )
                 )
@@ -321,7 +324,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -386,7 +390,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                     ),
                                     imported = result.value.imported,
                                     proxy = false,
-                                    implementationContractAddress = null
+                                    implementationContractAddress = null,
+                                    events = emptyList()
                                 )
                             )
                         )
@@ -437,7 +442,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -487,7 +493,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                             ),
                             imported = result.value.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = emptyList()
                         )
                     )
                 )

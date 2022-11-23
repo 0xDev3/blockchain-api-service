@@ -19,6 +19,7 @@ interface Web3jBlockchainServiceCacheRepository {
         accountBalance: AccountBalance
     )
 
+    @Suppress("LongParameterList")
     fun cacheFetchTransactionInfo(
         id: UUID,
         chainSpec: ChainSpec,

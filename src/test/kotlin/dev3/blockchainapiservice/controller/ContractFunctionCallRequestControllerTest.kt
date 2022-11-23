@@ -139,7 +139,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                                 value = result.value.ethAmount.rawValue,
                                 blockConfirmations = null,
                                 timestamp = null
-                            )
+                            ),
+                            events = null
                         )
                     )
                 )
@@ -180,7 +181,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -223,7 +225,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                                 value = result.transactionData.value.rawValue,
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = result.transactionData.timestamp?.value
-                            )
+                            ),
+                            events = emptyList()
                         )
                     )
                 )
@@ -264,7 +267,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -318,7 +322,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                                         value = result.transactionData.value.rawValue,
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = result.transactionData.timestamp?.value
-                                    )
+                                    ),
+                                    events = emptyList()
                                 )
                             )
                         )

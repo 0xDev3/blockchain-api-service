@@ -7,6 +7,7 @@ import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import dev3.blockchainapiservice.model.params.StoreErc20LockRequestParams
@@ -64,6 +65,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             )
         )
         private val TX_HASH = TransactionHash("tx-hash")
+        private val EVENTS = listOf<DeserializableEvent>()
     }
 
     @Test
@@ -291,7 +293,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(lockRequest.chainId, null)
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(null)
         }
 
@@ -382,7 +384,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -472,7 +474,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -562,7 +564,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -652,7 +654,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -742,7 +744,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -832,7 +834,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -922,7 +924,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1012,7 +1014,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 

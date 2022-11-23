@@ -153,7 +153,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                 timestamp = null
                             ),
                             disperseTx = null,
-                            createdAt = TestData.TIMESTAMP.value
+                            createdAt = TestData.TIMESTAMP.value,
+                            approveEvents = null,
+                            disperseEvents = null
                         )
                     )
                 )
@@ -199,7 +201,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("approve-data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             ),
             disperseStatus = Status.SUCCESS,
             disperseTransactionData = TransactionData(
@@ -209,7 +212,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("disperse-data"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -267,7 +271,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                 blockConfirmations = result.disperseTransactionData?.blockConfirmations!!,
                                 timestamp = result.disperseTransactionData?.timestamp?.value!!
                             ),
-                            createdAt = TestData.TIMESTAMP.value
+                            createdAt = TestData.TIMESTAMP.value,
+                            approveEvents = emptyList(),
+                            disperseEvents = emptyList()
                         )
                     )
                 )
@@ -314,7 +320,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("approve-data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             ),
             disperseStatus = Status.SUCCESS,
             disperseTransactionData = TransactionData(
@@ -324,7 +331,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("disperse-data"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -384,7 +392,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.disperseTransactionData?.blockConfirmations!!,
                                         timestamp = result.disperseTransactionData?.timestamp?.value!!
                                     ),
-                                    createdAt = TestData.TIMESTAMP.value
+                                    createdAt = TestData.TIMESTAMP.value,
+                                    approveEvents = emptyList(),
+                                    disperseEvents = emptyList()
                                 )
                             )
                         )
@@ -433,7 +443,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("approve-data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             ),
             disperseStatus = Status.SUCCESS,
             disperseTransactionData = TransactionData(
@@ -443,7 +454,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("disperse-data"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -503,7 +515,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.disperseTransactionData?.blockConfirmations!!,
                                         timestamp = result.disperseTransactionData?.timestamp?.value!!
                                     ),
-                                    createdAt = TestData.TIMESTAMP.value
+                                    createdAt = TestData.TIMESTAMP.value,
+                                    approveEvents = emptyList(),
+                                    disperseEvents = emptyList()
                                 )
                             )
                         )

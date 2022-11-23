@@ -21,6 +21,7 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.PredefinedEvents
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
@@ -61,6 +62,7 @@ class AssetSendRequestServiceTest : TestBase() {
             )
         )
         private val TX_HASH = TransactionHash("tx-hash")
+        private val TRANSFER_EVENTS = listOf(PredefinedEvents.ERC20_TRANSFER)
     }
 
     @Test
@@ -354,7 +356,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(sendRequest.chainId, null)
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(null)
         }
 
@@ -442,7 +444,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -529,7 +531,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -616,7 +618,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -703,7 +705,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -790,7 +792,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -876,7 +878,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -947,7 +949,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1019,7 +1021,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1106,7 +1108,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1192,7 +1194,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1263,7 +1265,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1335,7 +1337,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1448,7 +1450,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1538,7 +1540,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 

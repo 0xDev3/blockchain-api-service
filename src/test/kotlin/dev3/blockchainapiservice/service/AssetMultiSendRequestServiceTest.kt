@@ -20,6 +20,7 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.PredefinedEvents
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
@@ -134,6 +135,8 @@ class AssetMultiSendRequestServiceTest : TestBase() {
             data = ENCODED_DISPERSE_TOKEN_DATA,
             value = Balance.ZERO
         )
+        private val APPROVAL_EVENTS = listOf(PredefinedEvents.ERC20_APPROVAL)
+        private val TRANSFER_EVENTS = listOf(PredefinedEvents.ERC20_TRANSFER)
     }
 
     @Test
@@ -402,7 +405,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(storedRequest.chainId, null)
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(null)
         }
 
@@ -462,7 +465,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(storedRequest.chainId, null)
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(null)
         }
 
@@ -523,7 +526,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(success = false)
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -584,7 +587,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(success = false)
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -645,7 +648,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(hash = TransactionHash("wrong"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -706,7 +709,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(hash = TransactionHash("wrong"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -767,7 +770,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(from = WalletAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -828,7 +831,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(from = WalletAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -889,7 +892,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(to = WalletAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -950,7 +953,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(to = WalletAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1011,7 +1014,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(deployedContractAddress = ContractAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1072,7 +1075,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(deployedContractAddress = ContractAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1133,7 +1136,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(data = FunctionData("mismatching"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1194,7 +1197,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(data = FunctionData("mismatching"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1255,7 +1258,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(value = Balance(BigInteger.ONE))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1316,7 +1319,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(value = Balance.ZERO)
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1377,7 +1380,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1452,7 +1455,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1513,7 +1516,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1592,7 +1595,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1655,12 +1658,12 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(storedRequest.chainId, null)
 
         suppose("approve transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(APPROVE_TX_INFO)
         }
 
         suppose("disperse transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(DISPERSE_TOKEN_TX_INFO)
         }
 
