@@ -9,7 +9,10 @@ import dev3.blockchainapiservice.model.params.StoreContractFunctionCallRequestPa
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractFunctionCallRequest
 import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.repository.ContractDecoratorRepository
+import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractFunctionCallRequestRepository
+import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
@@ -28,6 +31,9 @@ class ContractFunctionCallRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val contractFunctionCallRequestRepository: ContractFunctionCallRequestRepository,
     private val deployedContractIdentifierResolverService: DeployedContractIdentifierResolverService,
+    private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,
+    private val contractDecoratorRepository: ContractDecoratorRepository,
+    private val importedContractDecoratorRepository: ImportedContractDecoratorRepository,
     private val ethCommonService: EthCommonService,
     private val projectRepository: ProjectRepository,
     private val objectMapper: ObjectMapper
@@ -100,10 +106,18 @@ class ContractFunctionCallRequestServiceImpl(
     private fun ContractFunctionCallRequest.appendTransactionData(
         project: Project
     ): WithTransactionAndFunctionData<ContractFunctionCallRequest> {
+        val decorator = this.deployedContractId
+            ?.let { contractDeploymentRequestRepository.getById(it)?.contractId }
+            ?.let {
+                contractDecoratorRepository.getById(it)
+                    ?: importedContractDecoratorRepository.getByContractIdAndProjectId(it, projectId)
+            }
+
         val transactionInfo = ethCommonService.fetchTransactionInfo(
             txHash = txHash,
             chainId = chainId,
-            customRpcUrl = project.customRpcUrl
+            customRpcUrl = project.customRpcUrl,
+            events = decorator?.getDeserializableEvents(objectMapper).orEmpty()
         )
         val data = functionEncoderService.encode(
             functionName = functionName,

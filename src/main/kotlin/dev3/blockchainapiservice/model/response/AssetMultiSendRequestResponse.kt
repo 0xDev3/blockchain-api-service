@@ -29,7 +29,9 @@ data class AssetMultiSendRequestResponse(
     val redirectUrl: String,
     val approveTx: TransactionResponse?,
     val disperseTx: TransactionResponse?,
-    val createdAt: OffsetDateTime
+    val createdAt: OffsetDateTime,
+    val approveEvents: List<EventInfoResponse>?,
+    val disperseEvents: List<EventInfoResponse>?
 ) {
     constructor(request: WithFunctionDataOrEthValue<AssetMultiSendRequest>) : this(
         id = request.value.id,
@@ -71,7 +73,9 @@ data class AssetMultiSendRequestResponse(
                 value = request.ethValue ?: Balance.ZERO
             )
         } else null,
-        createdAt = request.value.createdAt.value
+        createdAt = request.value.createdAt.value,
+        approveEvents = null,
+        disperseEvents = null
     )
 
     constructor(request: WithMultiTransactionData<AssetMultiSendRequest>) : this(
@@ -100,7 +104,9 @@ data class AssetMultiSendRequestResponse(
         redirectUrl = request.value.redirectUrl,
         approveTx = request.approveTransactionData?.let { TransactionResponse(it) },
         disperseTx = request.disperseTransactionData?.let { TransactionResponse(it) },
-        createdAt = request.value.createdAt.value
+        createdAt = request.value.createdAt.value,
+        approveEvents = request.approveTransactionData?.events?.map { EventInfoResponse(it) },
+        disperseEvents = request.disperseTransactionData?.events?.map { EventInfoResponse(it) }
     )
 }
 

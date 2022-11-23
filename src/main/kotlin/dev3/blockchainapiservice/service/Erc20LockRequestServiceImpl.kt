@@ -102,7 +102,8 @@ class Erc20LockRequestServiceImpl(
         val transactionInfo = ethCommonService.fetchTransactionInfo(
             txHash = txHash,
             chainId = chainId,
-            customRpcUrl = project.customRpcUrl
+            customRpcUrl = project.customRpcUrl,
+            events = emptyList()
         )
         val data = encodeFunctionData(
             tokenAddress = tokenAddress,

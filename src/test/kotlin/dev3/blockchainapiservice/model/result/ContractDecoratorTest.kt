@@ -5,6 +5,7 @@ import dev3.blockchainapiservice.model.json.AbiInputOutput
 import dev3.blockchainapiservice.model.json.AbiObject
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.EventDecorator
+import dev3.blockchainapiservice.model.json.EventTypeDecorator
 import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.ManifestJson
@@ -179,9 +180,10 @@ class ContractDecoratorTest : TestBase() {
                 name = description,
                 description = description,
                 parameterDecorators = listOf(
-                    TypeDecorator(
+                    EventTypeDecorator(
                         name = "Arg1",
                         description = "Arg1",
+                        indexed = false,
                         recommendedTypes = emptyList(),
                         parameters = null,
                         hints = null
@@ -308,9 +310,10 @@ class ContractDecoratorTest : TestBase() {
                                 solidityName = "FromDecorator",
                                 signature = "FromDecorator(string)",
                                 inputs = listOf(
-                                    ContractParameter(
+                                    EventParameter(
                                         name = "Arg1",
                                         description = "Arg1",
+                                        indexed = false,
                                         solidityType = "string",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
@@ -325,9 +328,10 @@ class ContractDecoratorTest : TestBase() {
                                 solidityName = "FromOverride1",
                                 signature = "FromOverride1(uint)",
                                 inputs = listOf(
-                                    ContractParameter(
+                                    EventParameter(
                                         name = "Arg1",
                                         description = "Arg1",
+                                        indexed = false,
                                         solidityType = "uint",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
@@ -342,9 +346,10 @@ class ContractDecoratorTest : TestBase() {
                                 solidityName = "FromOverride2",
                                 signature = "FromOverride2(int)",
                                 inputs = listOf(
-                                    ContractParameter(
+                                    EventParameter(
                                         name = "Arg1",
                                         description = "Arg1",
+                                        indexed = false,
                                         solidityType = "int",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
@@ -359,9 +364,10 @@ class ContractDecoratorTest : TestBase() {
                                 solidityName = "ExtraEvent",
                                 signature = "ExtraEvent(bool)",
                                 inputs = listOf(
-                                    ContractParameter(
+                                    EventParameter(
                                         name = "Arg1",
                                         description = "Arg1",
+                                        indexed = false,
                                         solidityType = "bool",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
@@ -496,9 +502,10 @@ class ContractDecoratorTest : TestBase() {
                                 solidityName = "FromDecorator",
                                 signature = "FromDecorator(string)",
                                 inputs = listOf(
-                                    ContractParameter(
+                                    EventParameter(
                                         name = "Arg1",
                                         description = "Arg1",
+                                        indexed = false,
                                         solidityType = "string",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
@@ -513,9 +520,10 @@ class ContractDecoratorTest : TestBase() {
                                 solidityName = "FromOverride1",
                                 signature = "FromOverride1(uint)",
                                 inputs = listOf(
-                                    ContractParameter(
+                                    EventParameter(
                                         name = "Arg1",
                                         description = "Arg1",
+                                        indexed = false,
                                         solidityType = "uint",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
@@ -530,9 +538,10 @@ class ContractDecoratorTest : TestBase() {
                                 solidityName = "FromOverride2",
                                 signature = "FromOverride2(int)",
                                 inputs = listOf(
-                                    ContractParameter(
+                                    EventParameter(
                                         name = "Arg1",
                                         description = "Arg1",
+                                        indexed = false,
                                         solidityType = "int",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),
@@ -547,9 +556,10 @@ class ContractDecoratorTest : TestBase() {
                                 solidityName = "ExtraEvent",
                                 signature = "ExtraEvent(bool)",
                                 inputs = listOf(
-                                    ContractParameter(
+                                    EventParameter(
                                         name = "Arg1",
                                         description = "Arg1",
+                                        indexed = false,
                                         solidityType = "bool",
                                         solidityName = "arg1",
                                         recommendedTypes = emptyList(),

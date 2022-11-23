@@ -4,6 +4,7 @@ import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.features.payout.model.params.GetPayoutsForInvestorParams
 import dev3.blockchainapiservice.features.payout.model.result.PayoutForInvestor
 import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
@@ -38,7 +39,11 @@ interface BlockchainService {
         blockParameter: BlockParameter = BlockName.LATEST
     ): AccountBalance
 
-    fun fetchTransactionInfo(chainSpec: ChainSpec, txHash: TransactionHash): BlockchainTransactionInfo?
+    fun fetchTransactionInfo(
+        chainSpec: ChainSpec,
+        txHash: TransactionHash,
+        events: List<DeserializableEvent>
+    ): BlockchainTransactionInfo?
 
     fun callReadonlyFunction(
         chainSpec: ChainSpec,
@@ -48,7 +53,8 @@ interface BlockchainService {
 
     fun findContractDeploymentTransaction(
         chainSpec: ChainSpec,
-        contractAddress: ContractAddress
+        contractAddress: ContractAddress,
+        events: List<DeserializableEvent>
     ): ContractDeploymentTransactionInfo?
 
     fun fetchErc20AccountBalances(

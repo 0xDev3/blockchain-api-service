@@ -23,13 +23,18 @@ import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponseType
+import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.ImportPreviewResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractConstructor
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.model.result.ContractEvent
 import dev3.blockchainapiservice.model.result.ContractFunction
 import dev3.blockchainapiservice.model.result.ContractParameter
+import dev3.blockchainapiservice.model.result.EventParameter
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
@@ -124,7 +129,56 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf(),
+            listOf(
+                ContractEvent(
+                    name = "Example event",
+                    description = "Example event",
+                    solidityName = "ExampleEvent",
+                    signature = "ExampleEvent(tuple(address),tuple(address))",
+                    inputs = listOf(
+                        EventParameter(
+                            name = "Non-indexed struct",
+                            description = "Non-indexed struct",
+                            indexed = false,
+                            solidityName = "nonIndexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        ),
+                        EventParameter(
+                            name = "Indexed struct",
+                            description = "Indexed struct",
+                            indexed = true,
+                            solidityName = "indexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        )
+                    )
+                )
+            ),
             manifest = ManifestJson.EMPTY,
             artifact = ArtifactJson.EMPTY
         )
@@ -185,6 +239,44 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     returnDecorators = emptyList(),
                     emittableEvents = emptyList(),
                     readOnly = false
+                )
+            )
+        )
+        private val EVENTS_1 = listOf(
+            EventInfoResponse(
+                signature = "ExampleEvent(tuple(address),tuple(address))",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "nonIndexedStruct",
+                        type = EventArgumentResponseType.VALUE,
+                        value = listOf(WalletAddress("a").rawValue),
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "indexedStruct",
+                        type = EventArgumentResponseType.HASH,
+                        value = null,
+                        hash = "0xc65a7bb8d6351c1cf70c95a316cc6a92839c986682d98bc35f958f4883f9d2a8"
+                    )
+                )
+            )
+        )
+        private val EVENTS_2 = listOf(
+            EventInfoResponse(
+                signature = "ExampleEvent(tuple(address),tuple(address))",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "nonIndexedStruct",
+                        type = EventArgumentResponseType.VALUE,
+                        value = listOf("0x35e13c4870077f4610b74f23e887cbb10e21c19f"),
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "indexedStruct",
+                        type = EventArgumentResponseType.HASH,
+                        value = null,
+                        hash = "0xe412d7b15343cf0762057bcdfc6e0e1196c887a6e48273443abb85a65433a9e2"
+                    )
                 )
             )
         )
@@ -509,7 +601,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS_1
                     )
                 )
 
@@ -644,7 +737,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS_2
                     )
                 )
 
@@ -781,7 +875,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = response.events
                     )
                 )
 
@@ -981,7 +1076,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = true,
-                        implementationContractAddress = ContractAddress(contract.contractAddress).rawValue
+                        implementationContractAddress = ContractAddress(contract.contractAddress).rawValue,
+                        events = emptyList()
                     )
                 )
 
@@ -1392,7 +1488,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = interfacesResponse.events
                     )
                 )
         }
@@ -1665,7 +1762,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = interfacesResponse.events
                     )
                 )
         }
@@ -1786,7 +1884,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = interfacesResponse.events
                     )
                 )
         }

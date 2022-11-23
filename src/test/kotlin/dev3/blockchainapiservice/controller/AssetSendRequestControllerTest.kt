@@ -125,7 +125,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                 blockConfirmations = null,
                                 timestamp = null
                             ),
-                            createdAt = TestData.TIMESTAMP.value
+                            createdAt = TestData.TIMESTAMP.value,
+                            events = null
                         )
                     )
                 )
@@ -163,7 +164,8 @@ class AssetSendRequestControllerTest : TestBase() {
                 data = FunctionData("data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -204,7 +206,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = TestData.TIMESTAMP.value
                             ),
-                            createdAt = result.value.createdAt.value
+                            createdAt = result.value.createdAt.value,
+                            events = emptyList()
                         )
                     )
                 )
@@ -243,7 +246,8 @@ class AssetSendRequestControllerTest : TestBase() {
                 data = FunctionData("data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -286,7 +290,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
-                                    createdAt = result.value.createdAt.value
+                                    createdAt = result.value.createdAt.value,
+                                    events = emptyList()
                                 )
                             )
                         )
@@ -327,7 +332,8 @@ class AssetSendRequestControllerTest : TestBase() {
                 data = FunctionData("data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -370,7 +376,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
-                                    createdAt = result.value.createdAt.value
+                                    createdAt = result.value.createdAt.value,
+                                    events = emptyList()
                                 )
                             )
                         )
@@ -411,7 +418,8 @@ class AssetSendRequestControllerTest : TestBase() {
                 data = FunctionData("data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -454,7 +462,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
-                                    createdAt = result.value.createdAt.value
+                                    createdAt = result.value.createdAt.value,
+                                    events = emptyList()
                                 )
                             )
                         )

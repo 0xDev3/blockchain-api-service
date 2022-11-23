@@ -20,7 +20,8 @@ data class FullContractDeploymentTransactionInfo(
     val data: FunctionData,
     val value: Balance,
     override val binary: ContractBinaryData,
-    val blockNumber: BlockNumber
+    val blockNumber: BlockNumber,
+    val events: List<EventInfo>
 ) : ContractDeploymentTransactionInfo
 
 data class ContractBinaryInfo(

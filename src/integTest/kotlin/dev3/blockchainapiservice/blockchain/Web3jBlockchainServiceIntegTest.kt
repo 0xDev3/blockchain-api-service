@@ -10,9 +10,14 @@ import dev3.blockchainapiservice.features.payout.model.result.PayoutForInvestor
 import dev3.blockchainapiservice.features.payout.util.HashFunction
 import dev3.blockchainapiservice.features.payout.util.MerkleHash
 import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
+import dev3.blockchainapiservice.model.DeserializableEvent
+import dev3.blockchainapiservice.model.DeserializableEventInput
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.model.result.EventArgumentHash
+import dev3.blockchainapiservice.model.result.EventArgumentValue
+import dev3.blockchainapiservice.model.result.EventInfo
 import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.service.CurrentUtcDateTimeProvider
@@ -22,14 +27,20 @@ import dev3.blockchainapiservice.service.RandomUuidProvider
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.AccountBalance
+import dev3.blockchainapiservice.util.AddressType
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BlockNumber
+import dev3.blockchainapiservice.util.BoolType
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
+import dev3.blockchainapiservice.util.DynamicArrayType
 import dev3.blockchainapiservice.util.EthStorageSlot
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.Keccak256Hash
+import dev3.blockchainapiservice.util.PredefinedEvents
+import dev3.blockchainapiservice.util.StringType
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UintType
 import dev3.blockchainapiservice.util.UtcDateTime
@@ -396,7 +407,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                txHash = txHash,
+                events = listOf(PredefinedEvents.ERC20_TRANSFER)
             )
 
             assertThat(transactionInfo).withMessage()
@@ -413,7 +425,17 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         value = Balance.ZERO,
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
-                        success = true
+                        success = true,
+                        events = listOf(
+                            EventInfo(
+                                signature = "Transfer(address,address,uint256)",
+                                arguments = listOf(
+                                    EventArgumentValue("from", mainAccount.address),
+                                    EventArgumentValue("to", accounts[1].address),
+                                    EventArgumentValue("value", accountBalance.amount.rawValue)
+                                )
+                            )
+                        )
                     )
                 )
 
@@ -474,7 +496,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                txHash = txHash,
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()
@@ -491,7 +514,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         value = Balance.ZERO,
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
-                        success = false
+                        success = false,
+                        events = emptyList()
                     )
                 )
 
@@ -533,7 +557,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                txHash = txHash,
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()
@@ -550,7 +575,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         value = Balance(value.toBigInteger()),
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
-                        success = true
+                        success = true,
+                        events = emptyList()
                     )
                 )
 
@@ -599,7 +625,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                txHash = txHash,
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()
@@ -616,7 +643,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         value = Balance.ZERO,
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
-                        success = true
+                        success = true,
+                        events = emptyList()
                     )
                 )
 
@@ -626,12 +654,340 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyReadWellDefinedEventsFromContractDeploymentTransaction() {
+        val mainAccount = accounts[0]
+        val owner = WalletAddress("cafebabe")
+        val message = "message"
+        val amount = Balance(BigInteger.valueOf(123L))
+        val value = Balance(BigInteger.valueOf(456L))
+        val example = true
+
+        val contract = suppose("event emitter contract is deployed") {
+            EventEmitter.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                owner.rawValue,
+                message,
+                amount.rawValue,
+                value.rawValue,
+                example
+            ).send()
+        }
+
+        val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.mine()
+        }
+
+        verify("transaction info events are correctly decoded") {
+            val service = createService()
+            val transactionInfo = service.fetchTransactionInfo(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                txHash = txHash,
+                events = listOf(
+                    DeserializableEvent(
+                        signature = "ExampleEvent(address,string,uint256,uint256,bool)",
+                        inputsOrder = listOf("owner", "message", "amount", "value", "example"),
+                        indexedInputs = listOf(
+                            DeserializableEventInput("owner", AddressType),
+                            DeserializableEventInput("message", StringType),
+                            DeserializableEventInput("value", UintType)
+                        ),
+                        regularInputs = listOf(
+                            DeserializableEventInput("amount", UintType),
+                            DeserializableEventInput("example", BoolType)
+                        )
+                    ),
+                    DeserializableEvent(
+                        signature = "AnonymousEvent(address,string)",
+                        inputsOrder = listOf("owner", "message"),
+                        indexedInputs = listOf(
+                            DeserializableEventInput("owner", AddressType)
+                        ),
+                        regularInputs = listOf(
+                            DeserializableEventInput("message", StringType)
+                        )
+                    )
+                )
+            )!!
+
+            assertThat(transactionInfo.events).withMessage()
+                .isEqualTo(
+                    listOf(
+                        EventInfo(
+                            signature = "ExampleEvent(address,string,uint256,uint256,bool)",
+                            arguments = listOf(
+                                EventArgumentValue("owner", owner.rawValue),
+                                EventArgumentHash("message", "0x${Keccak256Hash(message).value}"),
+                                EventArgumentValue("amount", amount.rawValue),
+                                EventArgumentValue("value", value.rawValue),
+                                EventArgumentValue("example", example)
+                            )
+                        ),
+                        EventInfo(
+                            signature = "AnonymousEvent(address,string)",
+                            arguments = listOf(
+                                EventArgumentValue("owner", owner.rawValue),
+                                EventArgumentValue("message", message)
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReadEventsWhenNoneAreSpecifiedFromContractDeploymentTransaction() {
+        val mainAccount = accounts[0]
+        val owner = WalletAddress("cafebabe")
+        val message = "message"
+        val amount = Balance(BigInteger.valueOf(123L))
+        val value = Balance(BigInteger.valueOf(456L))
+        val example = true
+
+        val contract = suppose("event emitter contract is deployed") {
+            EventEmitter.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                owner.rawValue,
+                message,
+                amount.rawValue,
+                value.rawValue,
+                example
+            ).send()
+        }
+
+        val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.mine()
+        }
+
+        verify("transaction info events are correctly decoded") {
+            val service = createService()
+            val transactionInfo = service.fetchTransactionInfo(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                txHash = txHash,
+                events = emptyList()
+            )!!
+
+            assertThat(transactionInfo.events).withMessage()
+                .isEqualTo(
+                    listOf(
+                        EventInfo(
+                            signature = null,
+                            arguments = listOf(
+                                EventArgumentValue(
+                                    name = "arg0",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 123
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg1",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 1
+                                    )
+                                ),
+                                EventArgumentHash(
+                                    name = "arg2",
+                                    hash = "0x465bc6257dcfc79569508750afdabc2aa7d499dd8de935aa5324446084c99397"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg3",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000cafebabe"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg4",
+                                    hash = "0xc2baf6c66618acd49fb133cebc22f55bd907fe9f0d69a726d45b7539ba6bbe08"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg5",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000000001c8"
+                                )
+                            )
+                        ),
+                        EventInfo(
+                            signature = null,
+                            arguments = listOf(
+                                EventArgumentValue(
+                                    name = "arg0",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 32
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg1",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 7
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg2",
+                                    value = byteList(
+                                        109, 101, 115, 115, 97, 103, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                                    )
+                                ),
+                                EventArgumentHash(
+                                    name = "arg3",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000cafebabe"
+                                )
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReadEventsWhenMalformedEventsAreSpecifiedFromContractDeploymentTransaction() {
+        val mainAccount = accounts[0]
+        val owner = WalletAddress("cafebabe")
+        val message = "message"
+        val amount = Balance(BigInteger.valueOf(123L))
+        val value = Balance(BigInteger.valueOf(456L))
+        val example = true
+
+        val contract = suppose("event emitter contract is deployed") {
+            EventEmitter.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                owner.rawValue,
+                message,
+                amount.rawValue,
+                value.rawValue,
+                example
+            ).send()
+        }
+
+        val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.mine()
+        }
+
+        verify("transaction info events are correctly decoded") {
+            val service = createService()
+            val transactionInfo = service.fetchTransactionInfo(
+                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                txHash = txHash,
+                events = listOf(
+                    DeserializableEvent(
+                        signature = "ExampleEvent(address,string,uint256,uint256,bool)",
+                        inputsOrder = listOf("owner", "message", "amount", "value", "example"),
+                        indexedInputs = listOf(
+                            DeserializableEventInput("owner", StringType),
+                            DeserializableEventInput("message", StringType),
+                            DeserializableEventInput("value", StringType)
+                        ),
+                        regularInputs = listOf(
+                            DeserializableEventInput("amount", DynamicArrayType(StringType)),
+                            DeserializableEventInput("example", DynamicArrayType(StringType))
+                        )
+                    ),
+                    DeserializableEvent(
+                        signature = "AnonymousEvent(address,string)",
+                        inputsOrder = listOf("owner", "message"),
+                        indexedInputs = listOf(
+                            DeserializableEventInput("owner", StringType)
+                        ),
+                        regularInputs = listOf(
+                            DeserializableEventInput("message", DynamicArrayType(StringType))
+                        )
+                    )
+                )
+            )!!
+
+            assertThat(transactionInfo.events).withMessage()
+                .isEqualTo(
+                    listOf(
+                        EventInfo(
+                            signature = null,
+                            arguments = listOf(
+                                EventArgumentValue(
+                                    name = "arg0",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 123
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg1",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 1
+                                    )
+                                ),
+                                EventArgumentHash(
+                                    name = "arg2",
+                                    hash = "0x465bc6257dcfc79569508750afdabc2aa7d499dd8de935aa5324446084c99397"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg3",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000cafebabe"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg4",
+                                    hash = "0xc2baf6c66618acd49fb133cebc22f55bd907fe9f0d69a726d45b7539ba6bbe08"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg5",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000000001c8"
+                                )
+                            )
+                        ),
+                        EventInfo(
+                            signature = null,
+                            arguments = listOf(
+                                EventArgumentValue(
+                                    name = "arg0",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 32
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg1",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 7
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg2",
+                                    value = byteList(
+                                        109, 101, 115, 115, 97, 103, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                                    )
+                                ),
+                                EventArgumentHash(
+                                    name = "arg3",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000cafebabe"
+                                )
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
     fun mustReturnNullWhenFetchingNonExistentTransactionInfo() {
         verify("null is returned for non existent transaction") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = TransactionHash("0x123456")
+                txHash = TransactionHash("0x123456"),
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()
@@ -762,7 +1118,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             val service = createService()
             val transactionInfo = service.findContractDeploymentTransaction(
                 chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                contractAddress = ContractAddress(contract.contractAddress)
+                contractAddress = ContractAddress(contract.contractAddress),
+                events = emptyList()
             )
 
             assertThat(transactionInfo).withMessage()
@@ -777,7 +1134,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         data = FunctionData(data),
                         value = Balance.ZERO,
                         binary = ContractBinaryData(SimpleERC20.BINARY.substring(rawBinaryIndex)),
-                        blockNumber = BlockNumber(deploymentTransaction.blockNumber)
+                        blockNumber = BlockNumber(deploymentTransaction.blockNumber),
+                        events = emptyList()
                     )
                 )
         }
@@ -1183,4 +1541,6 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 PayoutForInvestor(it.first, PayoutStateForInvestor(state.payoutId, investor.rawValue, BigInteger.ZERO))
             }
         }
+
+    private fun byteList(vararg bytes: Byte): List<Byte> = bytes.toList()
 }

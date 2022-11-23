@@ -15,6 +15,9 @@ import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
 import dev3.blockchainapiservice.model.response.AssetMultiSendRequestResponse
 import dev3.blockchainapiservice.model.response.AssetMultiSendRequestsResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponseType
+import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.MultiSendItemResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.AssetMultiSendRequest
@@ -57,6 +60,79 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
             createdAt = TestData.TIMESTAMP
         )
         private const val API_KEY = "api-key"
+        private val APPROVE_EVENTS = listOf(
+            EventInfoResponse(
+                signature = "Approval(address,address,uint256)",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "owner",
+                        type = EventArgumentResponseType.VALUE,
+                        value = HardhatTestContainer.ACCOUNT_ADDRESS_1,
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "spender",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "{disperseContractAddress}",
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "value",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "10",
+                        hash = null
+                    )
+                )
+            )
+        )
+        private val DISPERSE_EVENTS = listOf(
+            EventInfoResponse(
+                signature = "Transfer(address,address,uint256)",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "from",
+                        type = EventArgumentResponseType.VALUE,
+                        value = HardhatTestContainer.ACCOUNT_ADDRESS_1,
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "to",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "{disperseContractAddress}",
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "value",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "10",
+                        hash = null
+                    )
+                )
+            ),
+            EventInfoResponse(
+                signature = "Transfer(address,address,uint256)",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "from",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "{disperseContractAddress}",
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "to",
+                        type = EventArgumentResponseType.VALUE,
+                        value = HardhatTestContainer.ACCOUNT_ADDRESS_2,
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "value",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "10",
+                        hash = null
+                    )
+                )
+            )
+        )
     }
 
     private val accounts = HardhatTestContainer.ACCOUNTS
@@ -189,7 +265,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             timestamp = null
                         ),
                         disperseTx = null,
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        approveEvents = null,
+                        disperseEvents = null
                     )
                 )
 
@@ -323,7 +401,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             timestamp = null
                         ),
                         disperseTx = null,
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        approveEvents = null,
+                        disperseEvents = null
                     )
                 )
 
@@ -453,7 +533,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        approveEvents = null,
+                        disperseEvents = null
                     )
                 )
 
@@ -585,7 +667,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        approveEvents = null,
+                        disperseEvents = null
                     )
                 )
 
@@ -931,7 +1015,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
                             timestamp = fetchResponse.disperseTx!!.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                        disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                     )
                 )
 
@@ -1114,7 +1200,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
                             timestamp = fetchResponse.disperseTx!!.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                        disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                     )
                 )
 
@@ -1264,7 +1352,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
                             timestamp = fetchResponse.disperseTx!!.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        approveEvents = null,
+                        disperseEvents = emptyList()
                     )
                 )
 
@@ -1419,7 +1509,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
                             timestamp = fetchResponse.disperseTx!!.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        approveEvents = null,
+                        disperseEvents = emptyList()
                     )
                 )
 
@@ -1615,7 +1707,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                                disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                             )
                         )
                     )
@@ -1798,7 +1892,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                                disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                             )
                         )
                     )
@@ -1977,7 +2073,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                                disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                             )
                         )
                     )
@@ -2160,7 +2258,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                                disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                             )
                         )
                     )
@@ -2448,4 +2548,16 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         return Triple(projectId, chainId, apiKey)
     }
+
+    private fun List<EventInfoResponse>.withDisperseContractAddress(disperseContractAddress: ContractAddress) =
+        map { event ->
+            event.copy(
+                arguments = event.arguments.map { arg ->
+                    arg.copy(
+                        value = arg.value?.toString()
+                            ?.replace("{disperseContractAddress}", disperseContractAddress.rawValue)
+                    )
+                }
+            )
+        }
 }

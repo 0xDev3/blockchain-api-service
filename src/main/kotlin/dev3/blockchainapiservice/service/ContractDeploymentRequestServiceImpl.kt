@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
@@ -12,6 +13,7 @@ import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractMetadataRepository
+import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.util.Constants
 import dev3.blockchainapiservice.util.ContractAddress
@@ -32,8 +34,10 @@ class ContractDeploymentRequestServiceImpl(
     private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,
     private val contractMetadataRepository: ContractMetadataRepository,
     private val contractDecoratorRepository: ContractDecoratorRepository,
+    private val importedContractDecoratorRepository: ImportedContractDecoratorRepository,
     private val ethCommonService: EthCommonService,
-    private val projectRepository: ProjectRepository
+    private val projectRepository: ProjectRepository,
+    private val objectMapper: ObjectMapper
 ) : ContractDeploymentRequestService {
 
     companion object : KLogging()
@@ -139,10 +143,16 @@ class ContractDeploymentRequestServiceImpl(
     private fun ContractDeploymentRequest.appendTransactionData(
         project: Project
     ): WithTransactionData<ContractDeploymentRequest> {
+        val decorator = contractDecoratorRepository.getById(contractId)
+            ?: importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, projectId)
+            ?: throw ResourceNotFoundException(
+                "Contract decorator not found for contract ID: $contractId, project ID: $projectId"
+            )
         val transactionInfo = ethCommonService.fetchTransactionInfo(
             txHash = txHash,
             chainId = chainId,
-            customRpcUrl = project.customRpcUrl
+            customRpcUrl = project.customRpcUrl,
+            events = decorator.getDeserializableEvents(objectMapper)
         )
 
         val request = setContractAddressIfNecessary(transactionInfo?.deployedContractAddress)

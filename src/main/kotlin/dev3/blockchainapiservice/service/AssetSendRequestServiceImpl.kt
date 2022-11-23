@@ -11,6 +11,7 @@ import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.PredefinedEvents
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
@@ -107,7 +108,8 @@ class AssetSendRequestServiceImpl(
         val transactionInfo = ethCommonService.fetchTransactionInfo(
             txHash = txHash,
             chainId = chainId,
-            customRpcUrl = project.customRpcUrl
+            customRpcUrl = project.customRpcUrl,
+            events = listOf(PredefinedEvents.ERC20_TRANSFER)
         )
         val data = tokenAddress?.let { encodeFunctionData(assetRecipientAddress, assetAmount) }
         val status = determineStatus(transactionInfo, data)

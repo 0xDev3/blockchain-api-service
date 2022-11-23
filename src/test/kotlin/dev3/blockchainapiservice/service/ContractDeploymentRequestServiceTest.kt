@@ -4,8 +4,10 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.model.filters.OrList
@@ -132,8 +134,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             proxy = STORE_PARAMS.proxy,
             implementationContractAddress = STORE_PARAMS.implementationContractAddress
         )
-        val CHAIN_SPEC = ChainSpec(STORED_REQUEST.chainId, null)
-        val TRANSACTION_INFO = BlockchainTransactionInfo(
+        private val CHAIN_SPEC = ChainSpec(STORED_REQUEST.chainId, null)
+        private val TRANSACTION_INFO = BlockchainTransactionInfo(
             hash = TX_HASH,
             from = STORED_REQUEST.deployerAddress!!,
             to = ZeroAddress,
@@ -142,8 +144,11 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             value = STORED_REQUEST.initialEthAmount,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
+        private val OBJECT_MAPPER = JsonConfig().objectMapper()
+        private val EVENTS = emptyList<DeserializableEvent>()
     }
 
     @Test
@@ -188,12 +193,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
                 blockchainService = mock()
             ),
-            projectRepository = mock()
+            projectRepository = mock(),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request is correctly created") {
@@ -219,13 +226,15 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = mock()
+            projectRepository = mock(),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -249,12 +258,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = contractMetadataRepositoryMock(exists = false),
             contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = mock()
+            projectRepository = mock(),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("ResourceNotFoundException is thrown") {
@@ -278,12 +289,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = mock()
+            projectRepository = mock(),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request is successfully marked as deleted") {
@@ -311,12 +324,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = mock()
+            projectRepository = mock(),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request is successfully marked as deleted") {
@@ -344,12 +359,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
             contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = mock()
+            projectRepository = mock(),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request is successfully marked as deleted") {
@@ -379,12 +396,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = mock()
+            projectRepository = mock(),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("ResourceNotFoundException is thrown when fetching by id") {
@@ -418,17 +437,26 @@ class ContractDeploymentRequestServiceTest : TestBase() {
                 .willReturn(request)
         }
 
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
+        }
+
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with pending status is returned") {
@@ -467,21 +495,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(null)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with pending status is returned") {
@@ -521,21 +558,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(success = false)
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with failed status is returned") {
@@ -575,21 +621,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(hash = TransactionHash("wrong"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with failed status is returned") {
@@ -629,21 +684,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(from = WalletAddress("1337"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with failed status is returned") {
@@ -683,21 +747,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(deployedContractAddress = null)
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with failed status is returned") {
@@ -737,21 +810,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(deployedContractAddress = ContractAddress("1337"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with failed status is returned") {
@@ -791,21 +873,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(data = FunctionData("wrong"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with failed status is returned") {
@@ -845,21 +936,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(value = Balance(BigInteger("123456789")))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request with failed status is returned") {
@@ -899,21 +999,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with successful status is returned") {
@@ -952,21 +1061,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request by id with successful status is returned") {
@@ -1008,21 +1126,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request with successful status is returned") {
@@ -1067,21 +1194,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request with successful status is returned") {
@@ -1125,21 +1261,30 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH))
+            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
+        }
+
+        val contractDecoratorRepository = mock<ContractDecoratorRepository>()
+
+        suppose("contract decorator is returned") {
+            given(contractDecoratorRepository.getById(CONTRACT_ID))
+                .willReturn(CONTRACT_DECORATOR)
         }
 
         val service = ContractDeploymentRequestServiceImpl(
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
-            contractDecoratorRepository = mock(),
+            contractDecoratorRepository = contractDecoratorRepository,
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = blockchainService
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("contract deployment request with successful status is returned") {
@@ -1170,12 +1315,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = projectRepositoryMock(projectId)
+            projectRepository = projectRepositoryMock(projectId),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("empty list is returned") {
@@ -1201,12 +1348,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("txInfo was successfully attached") {
@@ -1233,12 +1382,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepositoryMock(exists = true),
             contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
                 blockchainService = mock()
             ),
-            projectRepository = projectRepositoryMock(PROJECT.id)
+            projectRepository = projectRepositoryMock(PROJECT.id),
+            objectMapper = OBJECT_MAPPER
         )
 
         verify("CannotAttachTxInfoException is thrown") {

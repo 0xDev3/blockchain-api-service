@@ -86,5 +86,11 @@ enum class ErrorCode {
     CONTRACT_INTERFACE_NOT_FOUND,
 
     @Description("Indicates that file upload to IPFS has failed")
-    IPFS_UPLOAD_FAILED
+    IPFS_UPLOAD_FAILED,
+
+    @Description(
+        "Indicates that error occurred while decoding ABI-encoded response. This is most likely caused by" +
+            " incompatible ABI types (e.g. decoding an int as a string)"
+    )
+    ABI_DECODING_FAILED
 }

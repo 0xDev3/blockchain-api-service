@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.service
 
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.params.ParamsFactory
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.Project
@@ -12,6 +13,7 @@ interface EthCommonService {
     fun fetchTransactionInfo(
         txHash: TransactionHash?,
         chainId: ChainId,
-        customRpcUrl: String?
+        customRpcUrl: String?,
+        events: List<DeserializableEvent>
     ): BlockchainTransactionInfo?
 }
