@@ -38,6 +38,7 @@ import dev3.blockchainapiservice.util.ZeroAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.UUID
+import kotlin.math.min
 
 @Service
 @Suppress("LongParameterList", "TooManyFunctions")
@@ -312,7 +313,7 @@ class ContractImportServiceImpl(
             is ContractBinaryInfo ->
                 Pair(contractDeploymentTransactionInfo.binary.value, contractDeploymentTransactionInfo.binary.value)
         }
-        val constructorParamsStart = fullBinary.indexOf(shortBinary) + shortBinary.length
+        val constructorParamsStart = min(fullBinary.indexOf(shortBinary) + shortBinary.length, fullBinary.length)
 
         val constructorParams = fullBinary.substring(constructorParamsStart)
 
