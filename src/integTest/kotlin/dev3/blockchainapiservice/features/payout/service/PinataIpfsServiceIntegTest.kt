@@ -12,9 +12,12 @@ import dev3.blockchainapiservice.config.WebConfig
 import dev3.blockchainapiservice.exception.IpfsUploadFailedException
 import dev3.blockchainapiservice.features.payout.util.IpfsHash
 import dev3.blockchainapiservice.repository.ApiKeyRepository
+import dev3.blockchainapiservice.repository.ApiRateLimitRepository
+import dev3.blockchainapiservice.repository.ProjectIdResolverRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.repository.UserIdentifierRepository
-import dev3.blockchainapiservice.service.RandomUuidProvider
+import dev3.blockchainapiservice.service.UtcDateTimeProvider
+import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.wiremock.WireMock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -32,9 +35,12 @@ import org.springframework.http.MediaType
 @RestClientTest
 @Import(PinataIpfsService::class, ApplicationProperties::class, WebConfig::class)
 @MockBeans(
-    MockBean(RandomUuidProvider::class),
+    MockBean(UuidProvider::class),
+    MockBean(UtcDateTimeProvider::class),
     MockBean(UserIdentifierRepository::class),
     MockBean(ApiKeyRepository::class),
+    MockBean(ApiRateLimitRepository::class),
+    MockBean(ProjectIdResolverRepository::class),
     MockBean(ProjectRepository::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
