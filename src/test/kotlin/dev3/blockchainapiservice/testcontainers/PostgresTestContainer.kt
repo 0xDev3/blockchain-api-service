@@ -2,6 +2,9 @@ package dev3.blockchainapiservice.testcontainers
 
 import dev3.blockchainapiservice.generated.jooq.tables.AddressBookTable
 import dev3.blockchainapiservice.generated.jooq.tables.ApiKeyTable
+import dev3.blockchainapiservice.generated.jooq.tables.ApiReadCallTable
+import dev3.blockchainapiservice.generated.jooq.tables.ApiUsagePeriodTable
+import dev3.blockchainapiservice.generated.jooq.tables.ApiWriteCallTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
@@ -29,26 +32,31 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
     }
 
     fun cleanAllDatabaseTables(dslContext: DSLContext) {
-        dslContext.deleteFrom(AddressBookTable).execute()
-        dslContext.deleteFrom(AuthorizationRequestTable).execute()
-        dslContext.deleteFrom(AssetBalanceRequestTable).execute()
-        dslContext.deleteFrom(AssetSendRequestTable).execute()
-        dslContext.deleteFrom(AssetMultiSendRequestTable).execute()
-        dslContext.deleteFrom(ContractFunctionCallRequestTable).execute()
-        dslContext.deleteFrom(ContractDeploymentRequestTable).execute()
-        dslContext.deleteFrom(ContractMetadataTable).execute()
-        dslContext.deleteFrom(Erc20LockRequestTable).execute()
-        dslContext.deleteFrom(MultiPaymentTemplateItemTable).execute()
-        dslContext.deleteFrom(MultiPaymentTemplateTable).execute()
-        dslContext.deleteFrom(ImportedContractDecoratorTable).execute()
-        dslContext.deleteFrom(ApiKeyTable).execute()
-        dslContext.deleteFrom(ProjectTable).execute()
-        dslContext.deleteFrom(UserIdentifierTable).execute()
-        dslContext.deleteFrom(FetchAccountBalanceCacheTable).execute()
-        dslContext.deleteFrom(FetchErc20AccountBalanceCacheTable).execute()
-        dslContext.deleteFrom(FetchTransactionInfoCacheTable).execute()
-        // TODO dslContext.deleteFrom(SnapshotTable).execute()
-        // TODO dslContext.deleteFrom(MerkleTreeLeafNodeTable).execute()
-        // TODO dslContext.deleteFrom(MerkleTreeRootTable).execute()
+        dslContext.apply {
+            deleteFrom(AddressBookTable).execute()
+            deleteFrom(AuthorizationRequestTable).execute()
+            deleteFrom(AssetBalanceRequestTable).execute()
+            deleteFrom(AssetSendRequestTable).execute()
+            deleteFrom(AssetMultiSendRequestTable).execute()
+            deleteFrom(ContractFunctionCallRequestTable).execute()
+            deleteFrom(ContractDeploymentRequestTable).execute()
+            deleteFrom(ContractMetadataTable).execute()
+            deleteFrom(Erc20LockRequestTable).execute()
+            deleteFrom(MultiPaymentTemplateItemTable).execute()
+            deleteFrom(MultiPaymentTemplateTable).execute()
+            deleteFrom(ImportedContractDecoratorTable).execute()
+            deleteFrom(ApiUsagePeriodTable).execute()
+            deleteFrom(ApiWriteCallTable).execute()
+            deleteFrom(ApiReadCallTable).execute()
+            deleteFrom(ApiKeyTable).execute()
+            deleteFrom(ProjectTable).execute()
+            deleteFrom(UserIdentifierTable).execute()
+            deleteFrom(FetchAccountBalanceCacheTable).execute()
+            deleteFrom(FetchErc20AccountBalanceCacheTable).execute()
+            deleteFrom(FetchTransactionInfoCacheTable).execute()
+            // TODO deleteFrom(SnapshotTable).execute()
+            // TODO deleteFrom(MerkleTreeLeafNodeTable).execute()
+            // TODO deleteFrom(MerkleTreeRootTable).execute()
+        }
     }
 }

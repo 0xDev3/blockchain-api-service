@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.config.binding
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.exception.NonExistentApiKeyException
 import dev3.blockchainapiservice.model.result.ApiKey
@@ -79,7 +80,7 @@ class ProjectApiKeyResolverTest : TestBase() {
         val httpServletRequest = mock<HttpServletRequest>()
 
         suppose("API key will be returned from header") {
-            given(httpServletRequest.getHeader(ProjectApiKeyResolver.API_KEY_HEADER))
+            given(httpServletRequest.getHeader(CustomHeaders.API_KEY_HEADER))
                 .willReturn(apiKeyValue)
         }
 
@@ -133,7 +134,7 @@ class ProjectApiKeyResolverTest : TestBase() {
         val httpServletRequest = mock<HttpServletRequest>()
 
         suppose("API key will be returned from header") {
-            given(httpServletRequest.getHeader(ProjectApiKeyResolver.API_KEY_HEADER))
+            given(httpServletRequest.getHeader(CustomHeaders.API_KEY_HEADER))
                 .willReturn(apiKeyValue)
         }
 

@@ -78,20 +78,18 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
             val id = it.key
             val interfaceDecorator = it.value
             val matchingFunctions = findMatches(interfaceDecorator.functionDecorators, abiFunctionSignatures)
-            // events do not need to match inteface definition
+            // events do not need to match interface definition
             val matchingEvents = findMatches(interfaceDecorator.eventDecorators, abiEventSignatures) ?: emptyList()
 
             matchingFunctions?.let {
-                matchingEvents?.let {
-                    InterfaceManifestJsonWithId(
-                        id = id,
-                        name = interfaceDecorator.name,
-                        description = interfaceDecorator.description,
-                        tags = interfaceDecorator.tags,
-                        eventDecorators = matchingEvents,
-                        functionDecorators = matchingFunctions
-                    )
-                }
+                InterfaceManifestJsonWithId(
+                    id = id,
+                    name = interfaceDecorator.name,
+                    description = interfaceDecorator.description,
+                    tags = interfaceDecorator.tags,
+                    eventDecorators = matchingEvents,
+                    functionDecorators = matchingFunctions
+                )
             }
         }
     }

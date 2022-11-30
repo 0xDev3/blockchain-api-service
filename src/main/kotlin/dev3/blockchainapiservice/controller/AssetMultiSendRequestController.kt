@@ -1,6 +1,9 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
 import dev3.blockchainapiservice.model.params.CreateAssetMultiSendRequestParams
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
@@ -15,9 +18,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
@@ -26,7 +28,7 @@ import javax.validation.Valid
 @RestController
 class AssetMultiSendRequestController(private val assetMultiSendRequestService: AssetMultiSendRequestService) {
 
-    @PostMapping("/v1/multi-send")
+    @ApiWriteLimitedMapping(IdType.PROJECT_ID, RequestMethod.POST, "/v1/multi-send")
     fun createAssetMultiSendRequest(
         @ApiKeyBinding project: Project,
         @Valid @RequestBody requestBody: CreateAssetMultiSendRequest
@@ -36,7 +38,7 @@ class AssetMultiSendRequestController(private val assetMultiSendRequestService: 
         return ResponseEntity.ok(AssetMultiSendRequestResponse(createdRequest))
     }
 
-    @GetMapping("/v1/multi-send/{id}")
+    @ApiReadLimitedMapping(IdType.ASSET_MULTI_SEND_REQUEST_ID, "/v1/multi-send/{id}")
     fun getAssetMultiSendRequest(
         @PathVariable("id") id: UUID
     ): ResponseEntity<AssetMultiSendRequestResponse> {
@@ -44,7 +46,7 @@ class AssetMultiSendRequestController(private val assetMultiSendRequestService: 
         return ResponseEntity.ok(AssetMultiSendRequestResponse(request))
     }
 
-    @GetMapping("/v1/multi-send/by-project/{projectId}")
+    @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/multi-send/by-project/{projectId}")
     fun getAssetMultiSendRequestsByProjectId(
         @PathVariable("projectId") projectId: UUID
     ): ResponseEntity<AssetMultiSendRequestsResponse> {
@@ -60,7 +62,7 @@ class AssetMultiSendRequestController(private val assetMultiSendRequestService: 
         return ResponseEntity.ok(AssetMultiSendRequestsResponse(requests.map { AssetMultiSendRequestResponse(it) }))
     }
 
-    @PutMapping("/v1/multi-send/{id}/approve")
+    @ApiWriteLimitedMapping(IdType.ASSET_MULTI_SEND_REQUEST_ID, RequestMethod.PUT, "/v1/multi-send/{id}/approve")
     fun attachApproveTransactionInfo(
         @PathVariable("id") id: UUID,
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest
@@ -72,7 +74,7 @@ class AssetMultiSendRequestController(private val assetMultiSendRequestService: 
         )
     }
 
-    @PutMapping("/v1/multi-send/{id}/disperse")
+    @ApiWriteLimitedMapping(IdType.ASSET_MULTI_SEND_REQUEST_ID, RequestMethod.PUT, "/v1/multi-send/{id}/disperse")
     fun attachDisperseTransactionInfo(
         @PathVariable("id") id: UUID,
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest

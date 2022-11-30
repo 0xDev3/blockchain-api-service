@@ -1,6 +1,9 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import dev3.blockchainapiservice.model.request.CreateErc20LockRequest
@@ -12,11 +15,9 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
@@ -25,7 +26,7 @@ import javax.validation.Valid
 @RestController
 class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockRequestService) {
 
-    @PostMapping("/v1/lock")
+    @ApiWriteLimitedMapping(IdType.PROJECT_ID, RequestMethod.POST, "/v1/lock")
     fun createErc20LockRequest(
         @ApiKeyBinding project: Project,
         @Valid @RequestBody requestBody: CreateErc20LockRequest
@@ -35,7 +36,7 @@ class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockR
         return ResponseEntity.ok(Erc20LockRequestResponse(createdRequest))
     }
 
-    @GetMapping("/v1/lock/{id}")
+    @ApiReadLimitedMapping(IdType.ERC20_LOCK_REQUEST_ID, "/v1/lock/{id}")
     fun getErc20LockRequest(
         @PathVariable("id") id: UUID
     ): ResponseEntity<Erc20LockRequestResponse> {
@@ -43,7 +44,7 @@ class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockR
         return ResponseEntity.ok(Erc20LockRequestResponse(lockRequest))
     }
 
-    @GetMapping("/v1/lock/by-project/{projectId}")
+    @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/lock/by-project/{projectId}")
     fun getErc20LockRequestsByProjectId(
         @PathVariable("projectId") projectId: UUID
     ): ResponseEntity<Erc20LockRequestsResponse> {
@@ -51,7 +52,7 @@ class Erc20LockRequestController(private val erc20LockRequestService: Erc20LockR
         return ResponseEntity.ok(Erc20LockRequestsResponse(lockRequests.map { Erc20LockRequestResponse(it) }))
     }
 
-    @PutMapping("/v1/lock/{id}")
+    @ApiWriteLimitedMapping(IdType.ERC20_LOCK_REQUEST_ID, RequestMethod.PUT, "/v1/lock/{id}")
     fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest

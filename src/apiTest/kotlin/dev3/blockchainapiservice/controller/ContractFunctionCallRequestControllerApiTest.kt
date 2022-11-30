@@ -4,7 +4,7 @@ import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.ExampleContract
 import dev3.blockchainapiservice.blockchain.properties.Chain
-import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
+import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
@@ -298,7 +298,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create contract function call request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -421,7 +421,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create contract function call request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -539,7 +539,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create contract function call request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -663,7 +663,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create contract function call request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -774,7 +774,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("400 is returned when creating contract function call request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -815,7 +815,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("400 is returned when creating contract function call request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -849,7 +849,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("404 is returned when creating contract function call request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -884,7 +884,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("404 is returned when creating contract function call request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -923,7 +923,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("400 is returned when creating contract function call request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -962,7 +962,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("400 is returned when creating contract function call request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -997,7 +997,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("401 is returned when creating contract function call request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
+                    .header(CustomHeaders.API_KEY_HEADER, "invalid-api-key")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1067,7 +1067,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract function call request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1219,7 +1219,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract function call request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1374,7 +1374,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract function call request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1527,7 +1527,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract function call request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/function-call")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
