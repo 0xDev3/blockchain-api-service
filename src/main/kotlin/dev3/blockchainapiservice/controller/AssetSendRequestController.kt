@@ -1,6 +1,9 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
 import dev3.blockchainapiservice.model.params.CreateAssetSendRequestParams
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
@@ -15,9 +18,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
@@ -26,7 +28,7 @@ import javax.validation.Valid
 @RestController
 class AssetSendRequestController(private val assetSendRequestService: AssetSendRequestService) {
 
-    @PostMapping("/v1/send")
+    @ApiWriteLimitedMapping(IdType.PROJECT_ID, RequestMethod.POST, "/v1/send")
     fun createAssetSendRequest(
         @ApiKeyBinding project: Project,
         @Valid @RequestBody requestBody: CreateAssetSendRequest
@@ -36,7 +38,7 @@ class AssetSendRequestController(private val assetSendRequestService: AssetSendR
         return ResponseEntity.ok(AssetSendRequestResponse(createdRequest))
     }
 
-    @GetMapping("/v1/send/{id}")
+    @ApiReadLimitedMapping(IdType.ASSET_SEND_REQUEST_ID, "/v1/send/{id}")
     fun getAssetSendRequest(
         @PathVariable("id") id: UUID
     ): ResponseEntity<AssetSendRequestResponse> {
@@ -44,7 +46,7 @@ class AssetSendRequestController(private val assetSendRequestService: AssetSendR
         return ResponseEntity.ok(AssetSendRequestResponse(sendRequest))
     }
 
-    @GetMapping("/v1/send/by-project/{projectId}")
+    @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/send/by-project/{projectId}")
     fun getAssetSendRequestsByProjectId(
         @PathVariable("projectId") projectId: UUID
     ): ResponseEntity<AssetSendRequestsResponse> {
@@ -68,7 +70,7 @@ class AssetSendRequestController(private val assetSendRequestService: AssetSendR
         return ResponseEntity.ok(AssetSendRequestsResponse(sendRequests.map { AssetSendRequestResponse(it) }))
     }
 
-    @PutMapping("/v1/send/{id}")
+    @ApiWriteLimitedMapping(IdType.ASSET_SEND_REQUEST_ID, RequestMethod.PUT, "/v1/send/{id}")
     fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest

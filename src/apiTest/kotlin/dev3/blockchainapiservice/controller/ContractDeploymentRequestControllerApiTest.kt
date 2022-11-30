@@ -4,7 +4,7 @@ import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.ExampleContract
 import dev3.blockchainapiservice.blockchain.properties.Chain
-import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
+import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
@@ -273,7 +273,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create contract deployment request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -410,7 +410,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create contract deployment request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -533,7 +533,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-existent contract decorator") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -576,7 +576,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         verify("401 is returned for invalid API key") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
+                    .header(CustomHeaders.API_KEY_HEADER, "invalid-api-key")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -634,7 +634,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -672,7 +672,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         suppose("request to delete contract deployment request is made") {
             mockMvc.perform(
                 MockMvcRequestBuilders.delete("/v1/deploy/${createResponse.id}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -709,7 +709,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -749,7 +749,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-existent contract deployment request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/v1/deploy/${createResponse.id}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -768,7 +768,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-existent contract deployment request") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/v1/deploy/${UUID.randomUUID()}")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -802,7 +802,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -940,7 +940,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1085,7 +1085,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1227,7 +1227,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1397,7 +1397,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1549,7 +1549,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """

@@ -1,6 +1,9 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
@@ -15,11 +18,9 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
@@ -31,7 +32,7 @@ class ContractFunctionCallRequestController(
     private val contractFunctionCallRequestService: ContractFunctionCallRequestService
 ) {
 
-    @PostMapping("/v1/function-call")
+    @ApiWriteLimitedMapping(IdType.PROJECT_ID, RequestMethod.POST, "/v1/function-call")
     fun createContractFunctionCallRequest(
         @ApiKeyBinding project: Project,
         @Valid @RequestBody requestBody: CreateContractFunctionCallRequest
@@ -41,7 +42,7 @@ class ContractFunctionCallRequestController(
         return ResponseEntity.ok(ContractFunctionCallRequestResponse(createdRequest))
     }
 
-    @GetMapping("/v1/function-call/{id}")
+    @ApiReadLimitedMapping(IdType.FUNCTION_CALL_REQUEST_ID, "/v1/function-call/{id}")
     fun getContractFunctionCallRequest(
         @PathVariable("id") id: UUID
     ): ResponseEntity<ContractFunctionCallRequestResponse> {
@@ -49,7 +50,7 @@ class ContractFunctionCallRequestController(
         return ResponseEntity.ok(ContractFunctionCallRequestResponse(contractFunctionCallRequest))
     }
 
-    @GetMapping("/v1/function-call/by-project/{projectId}")
+    @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/function-call/by-project/{projectId}")
     fun getContractFunctionCallRequestsByProjectIdAndFilters(
         @PathVariable("projectId") projectId: UUID,
         @RequestParam("deployedContractId", required = false) deployedContractId: UUID?,
@@ -70,7 +71,7 @@ class ContractFunctionCallRequestController(
         )
     }
 
-    @PutMapping("/v1/function-call/{id}")
+    @ApiWriteLimitedMapping(IdType.FUNCTION_CALL_REQUEST_ID, RequestMethod.PUT, "/v1/function-call/{id}")
     fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest

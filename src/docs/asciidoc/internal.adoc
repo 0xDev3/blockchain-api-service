@@ -24,6 +24,12 @@ include::src/docs/asciidoc/project/fetch-all.adoc[]
 include::src/docs/asciidoc/project/create-api-key.adoc[]
 include::src/docs/asciidoc/project/fetch-api-key.adoc[]
 
+== API Usage Info API
+*Some* endpoints require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/api-usage/fetch-by-project-id.adoc[]
+include::src/docs/asciidoc/api-usage/fetch-by-api-key.adoc[]
+
 == Address Book Management API
 All endpoints require `Authorization: Bearer JWT` header.
 

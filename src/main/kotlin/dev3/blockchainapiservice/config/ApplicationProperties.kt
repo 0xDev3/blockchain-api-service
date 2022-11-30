@@ -34,6 +34,7 @@ class ApplicationProperties {
     val contractDecorators = ContractDecoratorProperties()
     val metaPixelProperties = MetaPixelProperties()
     val contractManifestService = ContractManifestServiceProperties()
+    val apiRate = ApiRateProperties()
 }
 
 class JwtProperties {
@@ -77,4 +78,11 @@ class ContractManifestServiceProperties {
 class QueueProperties {
     var polling: Long = 5_000L
     var initialDelay: Long = 15_000L
+}
+
+@Suppress("MagicNumber")
+class ApiRateProperties {
+    var usagePeriodDuration: Duration = Duration.ofDays(30L)
+    var freeTierWriteRequests: Int = 200
+    var freeTierReadRequests: Int = 500_000
 }
