@@ -1,6 +1,9 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.model.params.CreateAuthorizationRequestParams
 import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
 import dev3.blockchainapiservice.model.request.CreateAuthorizationRequest
@@ -12,11 +15,9 @@ import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
@@ -25,7 +26,7 @@ import javax.validation.Valid
 @RestController
 class AuthorizationRequestController(private val authorizationRequestService: AuthorizationRequestService) {
 
-    @PostMapping("/v1/wallet-authorization")
+    @ApiWriteLimitedMapping(IdType.PROJECT_ID, RequestMethod.POST, "/v1/wallet-authorization")
     fun createAuthorizationRequest(
         @ApiKeyBinding project: Project,
         @Valid @RequestBody requestBody: CreateAuthorizationRequest
@@ -35,7 +36,7 @@ class AuthorizationRequestController(private val authorizationRequestService: Au
         return ResponseEntity.ok(AuthorizationRequestResponse(createdRequest))
     }
 
-    @GetMapping("/v1/wallet-authorization/{id}")
+    @ApiReadLimitedMapping(IdType.AUTHORIZATION_REQUEST_ID, "/v1/wallet-authorization/{id}")
     fun getAuthorizationRequest(
         @PathVariable("id") id: UUID
     ): ResponseEntity<AuthorizationRequestResponse> {
@@ -43,7 +44,7 @@ class AuthorizationRequestController(private val authorizationRequestService: Au
         return ResponseEntity.ok(AuthorizationRequestResponse(authorizationRequest))
     }
 
-    @GetMapping("/v1/wallet-authorization/by-project/{projectId}")
+    @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/wallet-authorization/by-project/{projectId}")
     fun getAuthorizationRequestsByProjectId(
         @PathVariable("projectId") projectId: UUID
     ): ResponseEntity<AuthorizationRequestsResponse> {
@@ -53,7 +54,7 @@ class AuthorizationRequestController(private val authorizationRequestService: Au
         )
     }
 
-    @PutMapping("/v1/wallet-authorization/{id}")
+    @ApiWriteLimitedMapping(IdType.AUTHORIZATION_REQUEST_ID, RequestMethod.PUT, "/v1/wallet-authorization/{id}")
     fun attachSignedMessage(
         @PathVariable("id") id: UUID,
         @Valid @RequestBody requestBody: AttachSignedMessageRequest

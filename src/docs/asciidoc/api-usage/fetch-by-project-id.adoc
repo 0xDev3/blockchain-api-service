@@ -1,0 +1,18 @@
+=== Fetch API Usage by Project ID
+Fetches API usage by project ID.
+
+*This endpoint requires `Authorization: Bearer JWT` header.*
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/ApiUsageControllerApiTest/mustCorrectlyFetchApiUsageForProject/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/ApiUsageControllerApiTest/mustCorrectlyFetchApiUsageForProject/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/dev3.blockchainapiservice.model.response.ApiUsagePeriodResponse.adoc[]
