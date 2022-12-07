@@ -30,6 +30,7 @@ class ApiUsageControllerTest : TestBase() {
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
         private val PROJECT = Project(

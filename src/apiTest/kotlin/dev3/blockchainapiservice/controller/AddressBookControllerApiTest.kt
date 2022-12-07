@@ -44,7 +44,8 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = WalletAddress(OWNER_ADDRESS).rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -52,7 +53,8 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OTHER_OWNER_ID,
                 userIdentifier = WalletAddress(OTHER_OWNER_ADDRESS).rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
     }

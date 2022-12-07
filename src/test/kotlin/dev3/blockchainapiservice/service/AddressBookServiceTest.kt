@@ -22,6 +22,7 @@ class AddressBookServiceTest : TestBase() {
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("cafebabe")
         )
         private val ENTRY = AddressBookEntry(

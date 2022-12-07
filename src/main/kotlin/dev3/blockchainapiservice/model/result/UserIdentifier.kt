@@ -8,10 +8,12 @@ sealed interface UserIdentifier {
     val id: UUID
     val userIdentifier: String
     val identifierType: UserIdentifierType
+    val stripeClientId: String?
 }
 
 data class UserWalletAddressIdentifier(
     override val id: UUID,
+    override val stripeClientId: String?,
     val walletAddress: WalletAddress
 ) : UserIdentifier {
     override val userIdentifier = walletAddress.rawValue

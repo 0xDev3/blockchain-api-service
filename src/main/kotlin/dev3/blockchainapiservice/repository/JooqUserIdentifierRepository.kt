@@ -22,7 +22,8 @@ class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIde
         val record = UserIdentifierRecord(
             id = userIdentifier.id,
             userIdentifier = userIdentifier.userIdentifier,
-            identifierType = userIdentifier.identifierType
+            identifierType = userIdentifier.identifierType,
+            stripeClientId = null
         )
         dslContext.executeInsert(record)
         return record.toModel()
@@ -52,7 +53,8 @@ class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIde
             UserIdentifierType.ETH_WALLET_ADDRESS ->
                 UserWalletAddressIdentifier(
                     id = id,
-                    walletAddress = WalletAddress(userIdentifier)
+                    walletAddress = WalletAddress(userIdentifier),
+                    stripeClientId = null
                 )
         }
 }

@@ -35,6 +35,7 @@ class ApplicationProperties {
     val metaPixelProperties = MetaPixelProperties()
     val contractManifestService = ContractManifestServiceProperties()
     val apiRate = ApiRateProperties()
+    val stripe = StripeProperties()
 }
 
 class JwtProperties {
@@ -85,4 +86,10 @@ class ApiRateProperties {
     var usagePeriodDuration: Duration = Duration.ofDays(30L)
     var freeTierWriteRequests: Int = 200
     var freeTierReadRequests: Int = 500_000
+}
+
+class StripeProperties {
+    var publishableKey: String? = null
+    var secretKey: String? = null
+    var webhookSecret: String? = null
 }

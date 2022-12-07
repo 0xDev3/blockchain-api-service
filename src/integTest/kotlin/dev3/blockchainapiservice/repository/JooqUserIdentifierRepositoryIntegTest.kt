@@ -51,7 +51,8 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 UserIdentifierRecord(
                     id = id,
                     userIdentifier = USER_WALLET_ADDRESS.rawValue,
-                    identifierType = IDENTIFIER_TYPE
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = null
                 )
             )
         }
@@ -63,6 +64,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
+                        stripeClientId = null,
                         walletAddress = USER_WALLET_ADDRESS
                     )
                 )
@@ -88,7 +90,8 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 UserIdentifierRecord(
                     id = id,
                     userIdentifier = USER_WALLET_ADDRESS.rawValue,
-                    identifierType = IDENTIFIER_TYPE
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = null
                 )
             )
         }
@@ -100,6 +103,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
+                        stripeClientId = null,
                         walletAddress = USER_WALLET_ADDRESS
                     )
                 )
@@ -126,7 +130,8 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 UserIdentifierRecord(
                     id = id,
                     userIdentifier = walletAddress.rawValue,
-                    identifierType = IDENTIFIER_TYPE
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = null
                 )
             )
         }
@@ -138,6 +143,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
+                        stripeClientId = null,
                         walletAddress = walletAddress
                     )
                 )
@@ -159,6 +165,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val userIdentifier = UserWalletAddressIdentifier(
             id = id,
+            stripeClientId = null,
             walletAddress = USER_WALLET_ADDRESS
         )
 
