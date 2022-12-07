@@ -97,6 +97,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = response.ownerId,
+                        stripeClientId = null,
                         walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
                     )
                 )
@@ -130,6 +131,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectById() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -201,6 +203,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonOwnedProjectId() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("0cafe0babe")
         )
 
@@ -238,6 +241,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectByIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -311,6 +315,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonOwnedProjectIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("0cafe0babe")
         )
 
@@ -350,6 +355,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnAllProjectsForSomeUser() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -434,6 +440,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -499,6 +506,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForProjectWithoutApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -536,6 +544,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -604,6 +613,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn400BadRequestWhenCreatingAnotherApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -652,6 +662,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundWhenCreatingApiKeyByNonProjectOwner() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 

@@ -102,7 +102,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = "user-identifier",
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 

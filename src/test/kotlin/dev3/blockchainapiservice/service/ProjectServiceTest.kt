@@ -55,6 +55,7 @@ class ProjectServiceTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
         val project = Project(
@@ -107,6 +108,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = project.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 
@@ -135,6 +137,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 
@@ -173,6 +176,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 
@@ -211,6 +215,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = project.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 
@@ -242,6 +247,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 
@@ -280,6 +286,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 
@@ -302,6 +309,7 @@ class ProjectServiceTest : TestBase() {
     fun mustCorrectlyFetchAllProjectsForUser() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
         val projects = listOf(
@@ -365,6 +373,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = project.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 
@@ -424,6 +433,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 
@@ -497,6 +507,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = project.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 
@@ -534,6 +545,7 @@ class ProjectServiceTest : TestBase() {
 
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
 

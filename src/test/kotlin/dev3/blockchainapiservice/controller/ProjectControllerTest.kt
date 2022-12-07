@@ -54,6 +54,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = result.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -97,6 +98,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = result.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -133,6 +135,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = result.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -164,6 +167,7 @@ class ProjectControllerTest : TestBase() {
     fun mustCorrectlyGetAllProjectsForUser() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
         val result = listOf(
@@ -217,6 +221,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -245,6 +250,7 @@ class ProjectControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -275,6 +281,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -313,6 +320,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 

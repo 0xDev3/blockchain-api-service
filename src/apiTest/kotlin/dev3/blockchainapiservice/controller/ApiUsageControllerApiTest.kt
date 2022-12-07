@@ -58,7 +58,8 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1).rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 

@@ -13,6 +13,10 @@ interface UserIdentifierRepository {
 
     fun getByWalletAddress(walletAddress: WalletAddress): UserWalletAddressIdentifier? =
         getByUserIdentifier(walletAddress.rawValue, UserIdentifierType.ETH_WALLET_ADDRESS)?.let {
-            UserWalletAddressIdentifier(it.id, WalletAddress(it.userIdentifier))
+            UserWalletAddressIdentifier(
+                id = it.id,
+                stripeClientId = it.stripeClientId,
+                walletAddress = WalletAddress(it.userIdentifier)
+            )
         }
 }
