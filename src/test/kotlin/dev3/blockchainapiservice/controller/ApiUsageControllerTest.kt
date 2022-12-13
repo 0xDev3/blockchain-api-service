@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.response.ApiUsagePeriodResponse
 import dev3.blockchainapiservice.model.result.ApiUsagePeriod
@@ -38,7 +37,7 @@ class ApiUsageControllerTest : TestBase() {
             ownerId = USER_IDENTIFIER.id,
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = TestData.TIMESTAMP
         )

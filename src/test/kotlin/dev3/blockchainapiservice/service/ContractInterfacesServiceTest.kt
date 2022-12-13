@@ -2,7 +2,6 @@ package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.exception.ContractInterfaceNotFoundException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.ScreenConfig
@@ -52,7 +51,7 @@ class ContractInterfacesServiceTest : TestBase() {
             contractTags = emptyList(),
             contractImplements = emptyList(),
             initialEthAmount = Balance.ZERO,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url",
             projectId = PROJECT_ID,
             createdAt = TestData.TIMESTAMP,

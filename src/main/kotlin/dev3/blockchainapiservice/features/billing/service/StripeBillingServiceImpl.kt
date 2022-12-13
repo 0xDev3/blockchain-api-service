@@ -17,7 +17,6 @@ import com.stripe.param.ProductListParams
 import com.stripe.param.SubscriptionCreateParams
 import com.stripe.param.SubscriptionListParams
 import com.stripe.param.SubscriptionUpdateParams
-import dev3.blockchainapiservice.config.ApplicationProperties
 import dev3.blockchainapiservice.config.StripeProperties
 import dev3.blockchainapiservice.config.interceptors.ProjectIdResolver
 import dev3.blockchainapiservice.exception.CustomerAlreadyExistsException
@@ -294,13 +293,13 @@ class StripeBillingServiceImpl( // TODO refactor and test
 
         when (event.type) {
             // TODO
-//            "customer.subscription.updated" -> {
-//                val subscription = stripeObject as? Subscription ?: throw WebhookException()
-//            }
+            //  "customer.subscription.updated" -> {
+            //      val subscription = stripeObject as? Subscription ?: throw WebhookException()
+            //  }
 
             "invoice.paid" -> {
                 val invoice = stripeObject as? Invoice ?: throw WebhookException()
-                val subscription = Subscription.retrieve(invoice.subscription) //?.takeIf { it.status == "active" }
+                val subscription = Subscription.retrieve(invoice.subscription) // ?.takeIf { it.status == "active" }
 
                 logger.debug { "[TRACK] Subscription event: ${subscription.toJson()}" }
 
@@ -313,7 +312,6 @@ class StripeBillingServiceImpl( // TODO refactor and test
             }
 
             else -> {
-
             }
         }
     }

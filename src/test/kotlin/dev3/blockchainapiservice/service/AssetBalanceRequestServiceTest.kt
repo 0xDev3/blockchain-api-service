@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachSignedMessageException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
@@ -168,7 +167,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -232,7 +231,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -319,7 +318,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -406,7 +405,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -505,7 +504,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -604,7 +603,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -703,7 +702,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = null,
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -801,7 +800,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = null,
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -899,7 +898,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),

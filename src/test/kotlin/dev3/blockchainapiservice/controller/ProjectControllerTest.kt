@@ -2,7 +2,7 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ApiKeyAlreadyExistsException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.params.CreateProjectParams
@@ -40,7 +40,7 @@ class ProjectControllerTest : TestBase() {
         val params = CreateProjectParams(
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url"
         )
         val result = Project(
@@ -92,7 +92,7 @@ class ProjectControllerTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -129,7 +129,7 @@ class ProjectControllerTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -176,7 +176,7 @@ class ProjectControllerTest : TestBase() {
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("155034a"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-1"),
-                chainId = Chain.HARDHAT_TESTNET.id,
+                chainId = TestData.CHAIN_ID,
                 customRpcUrl = "custom-rpc-url-1",
                 createdAt = CREATED_AT
             ),
@@ -185,7 +185,7 @@ class ProjectControllerTest : TestBase() {
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("155034b"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-2"),
-                chainId = Chain.HARDHAT_TESTNET.id,
+                chainId = TestData.CHAIN_ID,
                 customRpcUrl = "custom-rpc-url-2",
                 createdAt = CREATED_AT
             )

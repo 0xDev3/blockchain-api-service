@@ -1,7 +1,7 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.ControllerTestBase
-import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.model.response.ApiKeyResponse
 import dev3.blockchainapiservice.model.response.ProjectResponse
@@ -53,7 +53,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateProject() {
         val issuerContractAddress = ContractAddress("a")
         val baseRedirectUrl = BaseUrl("base-redirect-url")
-        val chainId = Chain.HARDHAT_TESTNET.id
+        val chainId = TestData.CHAIN_ID
         val customRpcUrl = "custom-rpc-url"
 
         val response = suppose("request to create project is made") {
@@ -144,7 +144,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -216,7 +216,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -254,7 +254,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -328,7 +328,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -368,7 +368,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -377,7 +377,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -453,7 +453,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -519,7 +519,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -557,7 +557,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -626,7 +626,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -675,7 +675,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
