@@ -317,55 +317,75 @@ class Web3jBlockchainService(
         }
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
         val web3j = blockchainProperties.web3j
-        val currentBlockNumber = web3j.latestBlockNumber(chainSpec, blockchainProperties.latestBlockCacheDuration)
 
-        val searchResult = BinarySearch(
-            lowerBound = BigInteger.ZERO,
-            upperBound = currentBlockNumber.value,
-            getValue = { currentBlock ->
+        return web3jBlockchainServiceCacheRepository.getCachedContractDeploymentTransaction(
+            chainSpec = chainSpec,
+            contractAddress = contractAddress
+        )?.let { it.first.withEvents { it.second.extractEvents(events) } } ?: run {
+            val currentBlockNumber = web3j.latestBlockNumber(chainSpec, blockchainProperties.latestBlockCacheDuration)
+
+            val searchResult = BinarySearch(
+                lowerBound = BigInteger.ZERO,
+                upperBound = currentBlockNumber.value,
+                getValue = { currentBlock ->
+                    web3j.ethGetTransactionCount(
+                        contractAddress.rawValue,
+                        DefaultBlockParameter.valueOf(currentBlock)
+                    ).sendSafely()?.transactionCount ?: BigInteger.ZERO
+                },
+                updateLowerBound = { txCount -> txCount == BigInteger.ZERO },
+                updateUpperBound = { txCount -> txCount != BigInteger.ZERO }
+            )
+            val contractDeploymentBlock = listOf(searchResult, searchResult + BigInteger.ONE).find {
                 web3j.ethGetTransactionCount(
                     contractAddress.rawValue,
-                    DefaultBlockParameter.valueOf(currentBlock)
-                ).sendSafely()?.transactionCount ?: BigInteger.ZERO
-            },
-            updateLowerBound = { txCount -> txCount == BigInteger.ZERO },
-            updateUpperBound = { txCount -> txCount != BigInteger.ZERO }
-        )
-        val contractDeploymentBlock = listOf(searchResult, searchResult + BigInteger.ONE).find {
-            web3j.ethGetTransactionCount(
-                contractAddress.rawValue,
-                DefaultBlockParameter.valueOf(it)
-            ).sendSafely()?.transactionCount != BigInteger.ZERO
-        }
-
-        val deployTx = contractDeploymentBlock?.let {
-            web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(it), true).sendSafely()?.block?.transactions
-        }
-            ?.mapNotNull { it as? EthBlock.TransactionObject }
-            ?.filter { it.to == null || it.to?.let { t -> WalletAddress(t) } == ZeroAddress.toWalletAddress() }
-            ?.asSequence()
-            ?.mapNotNull {
-                web3j.ethGetTransactionReceipt(it.hash).sendSafely()?.transactionReceipt?.orElse(null)?.pairWith(it)
+                    DefaultBlockParameter.valueOf(it)
+                ).sendSafely()?.transactionCount != BigInteger.ZERO
             }
-            ?.find {
-                it.first.isStatusOK && it.first.contractAddress?.let { ca -> ContractAddress(ca) } == contractAddress
-            }
-        val binary = web3j.ethGetCode(contractAddress.rawValue, currentBlockNumber.toWeb3Parameter()).sendSafely()
-            ?.code?.let { ContractBinaryData(it) }?.takeIf { it.value.isNotEmpty() }
 
-        return binary?.let {
-            deployTx?.let {
-                FullContractDeploymentTransactionInfo(
-                    hash = TransactionHash(deployTx.first.transactionHash),
-                    from = WalletAddress(deployTx.first.from),
-                    deployedContractAddress = ContractAddress(deployTx.first.contractAddress),
-                    data = FunctionData(deployTx.second.input),
-                    value = Balance(deployTx.second.value),
-                    binary = binary,
-                    blockNumber = BlockNumber(contractDeploymentBlock),
-                    events = deployTx.first.extractLogs().extractEvents(events)
+            val deployTx = contractDeploymentBlock?.let {
+                web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(it), true).sendSafely()?.block?.transactions
+            }
+                ?.mapNotNull { it as? EthBlock.TransactionObject }
+                ?.filter { it.to == null || it.to?.let { t -> WalletAddress(t) } == ZeroAddress.toWalletAddress() }
+                ?.asSequence()
+                ?.mapNotNull {
+                    web3j.ethGetTransactionReceipt(it.hash).sendSafely()?.transactionReceipt?.orElse(null)?.pairWith(it)
+                }
+                ?.find {
+                    it.first.isStatusOK && it.first.contractAddress?.let { ca -> ContractAddress(ca) } == contractAddress
+                }
+            val binary = web3j.ethGetCode(contractAddress.rawValue, currentBlockNumber.toWeb3Parameter()).sendSafely()
+                ?.code?.let { ContractBinaryData(it) }?.takeIf { it.value.isNotEmpty() }
+
+            val result = binary?.let {
+                deployTx?.let {
+                    val eventLogs = deployTx.first.extractLogs()
+
+                    FullContractDeploymentTransactionInfo(
+                        hash = TransactionHash(deployTx.first.transactionHash),
+                        from = WalletAddress(deployTx.first.from),
+                        deployedContractAddress = ContractAddress(deployTx.first.contractAddress),
+                        data = FunctionData(deployTx.second.input),
+                        value = Balance(deployTx.second.value),
+                        binary = binary,
+                        blockNumber = BlockNumber(contractDeploymentBlock),
+                        events = eventLogs.extractEvents(events)
+                    ) to eventLogs
+                } ?: (ContractBinaryInfo(deployedContractAddress = contractAddress, binary = binary) to emptyList())
+            }
+
+            if (result != null) {
+                web3jBlockchainServiceCacheRepository.cacheContractDeploymentTransaction(
+                    id = uuidProvider.getUuid(),
+                    chainSpec = chainSpec,
+                    contractAddress = contractAddress,
+                    contractDeploymentTransactionInfo = result.first,
+                    eventLogs = result.second
                 )
-            } ?: ContractBinaryInfo(deployedContractAddress = contractAddress, binary = binary)
+            }
+
+            result?.first
         }
     }
 
@@ -610,6 +630,12 @@ class Web3jBlockchainService(
 
     private fun List<DeserializableEvent>.closestMatchingEvent(log: EventLog) =
         filter { it.indexedInputs.size == log.topics.size }.takeIf { it.size == 1 }?.first()
+
+    private fun ContractDeploymentTransactionInfo.withEvents(events: () -> List<EventInfo>) =
+        when (this) {
+            is FullContractDeploymentTransactionInfo -> this.copy(events = events())
+            is ContractBinaryInfo -> this
+        }
 
     @Suppress("ReturnCount", "TooGenericExceptionCaught")
     private fun <S, T : Response<*>?> Request<S, T>.sendSafely(): T? {

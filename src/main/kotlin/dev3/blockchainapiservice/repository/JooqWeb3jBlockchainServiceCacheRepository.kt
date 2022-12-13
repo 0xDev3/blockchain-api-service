@@ -1,18 +1,24 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.generated.jooq.tables.ContractDeploymentTransactionCacheTable
 import dev3.blockchainapiservice.generated.jooq.tables.FetchAccountBalanceCacheTable
 import dev3.blockchainapiservice.generated.jooq.tables.FetchErc20AccountBalanceCacheTable
 import dev3.blockchainapiservice.generated.jooq.tables.FetchTransactionInfoCacheTable
+import dev3.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentTransactionCacheRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.FetchAccountBalanceCacheRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.FetchErc20AccountBalanceCacheRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.FetchTransactionInfoCacheRecord
 import dev3.blockchainapiservice.generated.jooq.udt.records.EventLogRecord
 import dev3.blockchainapiservice.model.EventLog
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.model.result.ContractBinaryInfo
+import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
+import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.util.AccountBalance
 import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import mu.KLogging
@@ -130,6 +136,51 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
         }
     }
 
+    override fun cacheContractDeploymentTransaction(
+        id: UUID,
+        chainSpec: ChainSpec,
+        contractAddress: ContractAddress,
+        contractDeploymentTransactionInfo: ContractDeploymentTransactionInfo,
+        eventLogs: List<EventLog>
+    ) {
+        logger.info {
+            "Caching findContractDeploymentTransaction call, id: $id, chainSpec: $chainSpec," +
+                " contractAddress: $contractAddress, contractDeploymentTransactionInfo:" +
+                " $contractDeploymentTransactionInfo, eventLogs: $eventLogs"
+        }
+
+        val fullTransactionInfo = contractDeploymentTransactionInfo as? FullContractDeploymentTransactionInfo
+
+        try {
+            dslContext.executeInsert(
+                ContractDeploymentTransactionCacheRecord(
+                    id = id,
+                    chainId = chainSpec.chainId,
+                    customRpcUrl = chainSpec.customRpcUrl ?: "",
+                    contractAddress = contractAddress,
+                    txHash = fullTransactionInfo?.hash,
+                    fromAddress = fullTransactionInfo?.from,
+                    txData = fullTransactionInfo?.data,
+                    valueAmount = fullTransactionInfo?.value,
+                    contractBinary = contractDeploymentTransactionInfo.binary.binary,
+                    blockNumber = fullTransactionInfo?.blockNumber,
+                    eventLogs = eventLogs.map {
+                        EventLogRecord(
+                            logData = it.data,
+                            logTopics = it.topics.toTypedArray()
+                        )
+                    }.toTypedArray()
+                )
+            )
+        } catch (_: DuplicateKeyException) {
+            logger.info {
+                "Already cached findContractDeploymentTransaction call, id: $id, chainSpec: $chainSpec," +
+                    " contractAddress: $contractAddress, contractDeploymentTransactionInfo:" +
+                    " $contractDeploymentTransactionInfo, eventLogs: $eventLogs"
+            }
+        }
+    }
+
     override fun getCachedFetchAccountBalance(
         chainSpec: ChainSpec,
         walletAddress: WalletAddress,
@@ -233,5 +284,63 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                     }
                 )
             }
+    }
+
+    override fun getCachedContractDeploymentTransaction(
+        chainSpec: ChainSpec,
+        contractAddress: ContractAddress
+    ): Pair<ContractDeploymentTransactionInfo, List<EventLog>>? {
+        logger.debug {
+            "Get cached findContractDeploymentTransaction call, chainSpec: $chainSpec," +
+                " contractAddress: $contractAddress"
+        }
+
+        return dslContext.selectFrom(ContractDeploymentTransactionCacheTable)
+            .where(
+                DSL.and(
+                    ContractDeploymentTransactionCacheTable.CHAIN_ID.eq(chainSpec.chainId),
+                    ContractDeploymentTransactionCacheTable.CUSTOM_RPC_URL.eq(chainSpec.customRpcUrl ?: ""),
+                    ContractDeploymentTransactionCacheTable.CONTRACT_ADDRESS.eq(contractAddress)
+                )
+            )
+            .fetchOne()
+            ?.let {
+                Pair(
+                    it.toModel(),
+                    it.eventLogs.map { l ->
+                        EventLog(
+                            data = l.logData ?: "",
+                            topics = l.logTopics?.filterNotNull()?.toList().orEmpty()
+                        )
+                    }
+                )
+            }
+    }
+
+    private fun ContractDeploymentTransactionCacheRecord.toModel(): ContractDeploymentTransactionInfo {
+        val hash = txHash
+        val from = fromAddress
+        val data = txData
+        val value = valueAmount
+        val binary = ContractBinaryData(contractBinary)
+        val blockNumber = this.blockNumber
+
+        return if (hash != null && from != null && data != null && value != null && blockNumber != null) {
+            FullContractDeploymentTransactionInfo(
+                hash = hash,
+                from = from,
+                deployedContractAddress = contractAddress,
+                data = data,
+                value = value,
+                binary = binary,
+                blockNumber = blockNumber,
+                events = emptyList()
+            )
+        } else {
+            ContractBinaryInfo(
+                deployedContractAddress = contractAddress,
+                binary = binary
+            )
+        }
     }
 }
