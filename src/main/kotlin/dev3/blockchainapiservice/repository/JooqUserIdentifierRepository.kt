@@ -48,13 +48,21 @@ class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIde
             .fetchOne { it.toModel() }
     }
 
+    override fun setStripeClientId(id: UUID, stripeClientId: String): Boolean {
+        logger.info { "Set Stripe client id, id: $id, stripeClientId: $stripeClientId" }
+        return dslContext.update(UserIdentifierTable)
+            .set(UserIdentifierTable.STRIPE_CLIENT_ID, stripeClientId)
+            .where(UserIdentifierTable.ID.eq(id))
+            .execute() > 0
+    }
+
     private fun UserIdentifierRecord.toModel(): UserIdentifier =
         when (identifierType) {
             UserIdentifierType.ETH_WALLET_ADDRESS ->
                 UserWalletAddressIdentifier(
                     id = id,
                     walletAddress = WalletAddress(userIdentifier),
-                    stripeClientId = null
+                    stripeClientId = stripeClientId
                 )
         }
 }

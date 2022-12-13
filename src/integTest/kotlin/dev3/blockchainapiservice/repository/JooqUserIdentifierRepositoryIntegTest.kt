@@ -185,4 +185,34 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 .isEqualTo(userIdentifier)
         }
     }
+
+    @Test
+    fun mustCorrectlySetStripeClientId() {
+        val id = UUID.randomUUID()
+        val userIdentifier = UserWalletAddressIdentifier(
+            id = id,
+            stripeClientId = null,
+            walletAddress = USER_WALLET_ADDRESS
+        )
+
+        suppose("user identifier is stored in database") {
+            repository.store(userIdentifier)
+        }
+
+        val stripeClientId = "stripe-client-id"
+
+        val updateStatus = suppose("stripe client id is set in the database") {
+            repository.setStripeClientId(id, stripeClientId)
+        }
+
+        verify("stripe client id was stored in database") {
+            assertThat(updateStatus).withMessage()
+                .isTrue()
+
+            val result = repository.getById(id)
+
+            assertThat(result).withMessage()
+                .isEqualTo(userIdentifier.copy(stripeClientId = stripeClientId))
+        }
+    }
 }

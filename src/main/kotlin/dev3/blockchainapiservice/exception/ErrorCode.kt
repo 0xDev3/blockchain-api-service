@@ -95,5 +95,14 @@ enum class ErrorCode {
         "Indicates that error occurred while decoding ABI-encoded response. This is most likely caused by" +
             " incompatible ABI types (e.g. decoding an int as a string)"
     )
-    ABI_DECODING_FAILED
+    ABI_DECODING_FAILED,
+
+    @Description("Indicates that customer has already been created for the authenticated wallet")
+    CUSTOMER_ALREADY_EXISTS,
+
+    @Description("Indicates that customer has failed created due to an error")
+    CUSTOMER_CREATION_FAILED,
+
+    @Description("Indicates that customer has not been created yet for the authenticated wallet")
+    CUSTOMER_NOT_YET_CREATED
 }

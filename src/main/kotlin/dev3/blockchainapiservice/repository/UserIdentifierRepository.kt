@@ -19,4 +19,6 @@ interface UserIdentifierRepository {
                 walletAddress = WalletAddress(it.userIdentifier)
             )
         }
+
+    fun setStripeClientId(id: UUID, stripeClientId: String): Boolean
 }
