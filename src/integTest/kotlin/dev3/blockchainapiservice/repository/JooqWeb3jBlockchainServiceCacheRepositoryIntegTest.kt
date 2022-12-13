@@ -5,12 +5,14 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.model.EventLog
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.AccountBalance
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
@@ -56,6 +58,16 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
             blockConfirmations = BigInteger.TEN,
             timestamp = TestData.TIMESTAMP,
             success = true,
+            events = emptyList()
+        )
+        val CONTRACT_DEPLOYMENT_TRANSACTION_INFO = FullContractDeploymentTransactionInfo(
+            hash = TX_INFO.hash,
+            from = TX_INFO.from,
+            deployedContractAddress = CONTRACT_ADDRESS,
+            data = TX_INFO.data,
+            value = TX_INFO.value,
+            binary = ContractBinaryData("abc1223"),
+            blockNumber = BLOCK_NUMBER,
             events = emptyList()
         )
     }
@@ -153,6 +165,36 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
                 )
             ).withMessage()
                 .isEqualTo(Pair(TX_INFO, listOf(EventLog("data", listOf("topic")))))
+        }
+    }
+
+    @Test
+    fun mustCorrectlyCacheContractDeploymentTransaction() {
+        val id = UUID.randomUUID()
+
+        suppose("findContractDeploymentTransaction call will be cached") {
+            repository.cacheContractDeploymentTransaction(
+                id = id,
+                chainSpec = CHAIN_SPEC,
+                contractAddress = CONTRACT_ADDRESS,
+                contractDeploymentTransactionInfo = CONTRACT_DEPLOYMENT_TRANSACTION_INFO,
+                eventLogs = listOf(
+                    EventLog(
+                        data = "data",
+                        topics = listOf("topic")
+                    )
+                )
+            )
+        }
+
+        verify("findContractDeploymentTransaction call is correctly cached") {
+            assertThat(
+                repository.getCachedContractDeploymentTransaction(
+                    chainSpec = CHAIN_SPEC,
+                    contractAddress = CONTRACT_ADDRESS
+                )
+            ).withMessage()
+                .isEqualTo(Pair(CONTRACT_DEPLOYMENT_TRANSACTION_INFO, listOf(EventLog("data", listOf("topic")))))
         }
     }
 }
