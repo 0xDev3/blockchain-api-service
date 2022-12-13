@@ -4,7 +4,7 @@ import dev3.blockchainapiservice.util.UtcDateTime
 import java.util.UUID
 
 data class ApiUsagePeriod(
-    val projectId: UUID,
+    val userId: UUID,
     val writeRequestUsage: RequestUsage,
     val readRequestUsage: RequestUsage,
     val startDate: UtcDateTime,

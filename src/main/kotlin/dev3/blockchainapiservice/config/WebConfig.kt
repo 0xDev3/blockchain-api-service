@@ -7,8 +7,8 @@ import dev3.blockchainapiservice.config.interceptors.ApiKeyWriteCallInterceptor
 import dev3.blockchainapiservice.config.interceptors.ProjectReadCallInterceptor
 import dev3.blockchainapiservice.repository.ApiKeyRepository
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.ProjectIdResolverRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
+import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
@@ -29,7 +29,7 @@ class WebConfig(
     private val userIdentifierRepository: UserIdentifierRepository,
     private val apiKeyRepository: ApiKeyRepository,
     private val apiRateLimitRepository: ApiRateLimitRepository,
-    private val projectIdResolverRepository: ProjectIdResolverRepository,
+    private val userIdResolverRepository: UserIdResolverRepository,
     private val projectRepository: ProjectRepository,
     private val objectMapper: ObjectMapper
 ) : WebMvcConfigurer {
@@ -67,7 +67,7 @@ class WebConfig(
             ApiKeyWriteCallInterceptor(
                 apiKeyRepository = apiKeyRepository,
                 apiRateLimitRepository = apiRateLimitRepository,
-                projectIdResolverRepository = projectIdResolverRepository,
+                userIdResolverRepository = userIdResolverRepository,
                 utcDateTimeProvider = utcDateTimeProvider,
                 objectMapper = objectMapper
             )
@@ -75,7 +75,7 @@ class WebConfig(
         registry.addInterceptor(
             ProjectReadCallInterceptor(
                 apiRateLimitRepository = apiRateLimitRepository,
-                projectIdResolverRepository = projectIdResolverRepository,
+                userIdResolverRepository = userIdResolverRepository,
                 utcDateTimeProvider = utcDateTimeProvider,
                 objectMapper = objectMapper
             )

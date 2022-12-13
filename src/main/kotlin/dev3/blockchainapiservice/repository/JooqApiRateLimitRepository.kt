@@ -27,10 +27,10 @@ class JooqApiRateLimitRepository(
 
     companion object : KLogging()
 
-    override fun getCurrentApiUsagePeriod(projectId: UUID, currentTime: UtcDateTime): ApiUsagePeriod {
-        logger.debug { "Get current API usage period, projectId: $projectId, currentTime: $currentTime" }
+    override fun getCurrentApiUsagePeriod(userId: UUID, currentTime: UtcDateTime): ApiUsagePeriod {
+        logger.debug { "Get current API usage period, userId: $userId, currentTime: $currentTime" }
 
-        val currentPeriod = getOrCreateApiUsagePeriod(projectId, currentTime)
+        val currentPeriod = getOrCreateApiUsagePeriod(userId, currentTime)
 
         val periodWriteCount = currentPeriod.countWriteCalls()
         val totalAllowedWrites = apiRateProperties.freeTierWriteRequests + currentPeriod.additionalWriteRequests
@@ -39,7 +39,7 @@ class JooqApiRateLimitRepository(
         val totalAllowedReads = apiRateProperties.freeTierReadRequests + currentPeriod.additionalReadRequests
 
         return ApiUsagePeriod(
-            projectId = projectId,
+            userId = userId,
             writeRequestUsage = calculateUsage(periodWriteCount, totalAllowedWrites),
             readRequestUsage = calculateUsage(periodReadCount, totalAllowedReads),
             startDate = currentPeriod.startDate,
@@ -47,28 +47,28 @@ class JooqApiRateLimitRepository(
         )
     }
 
-    override fun remainingWriteLimit(projectId: UUID, currentTime: UtcDateTime): Int {
-        val currentPeriod = getOrCreateApiUsagePeriod(projectId, currentTime)
+    override fun remainingWriteLimit(userId: UUID, currentTime: UtcDateTime): Int {
+        val currentPeriod = getOrCreateApiUsagePeriod(userId, currentTime)
         val periodWriteCount = currentPeriod.countWriteCalls()
         val totalAllowedWrites = apiRateProperties.freeTierWriteRequests + currentPeriod.additionalWriteRequests
         return calculateUsage(periodWriteCount, totalAllowedWrites).remaining
     }
 
-    override fun remainingReadLimit(projectId: UUID, currentTime: UtcDateTime): Int {
-        val currentPeriod = getOrCreateApiUsagePeriod(projectId, currentTime)
+    override fun remainingReadLimit(userId: UUID, currentTime: UtcDateTime): Int {
+        val currentPeriod = getOrCreateApiUsagePeriod(userId, currentTime)
         val periodReadCount = currentPeriod.countReadCalls()
         val totalAllowedReads = apiRateProperties.freeTierReadRequests + currentPeriod.additionalReadRequests
         return calculateUsage(periodReadCount, totalAllowedReads).remaining
     }
 
-    override fun addWriteCall(projectId: UUID, currentTime: UtcDateTime, method: RequestMethod, endpoint: String) {
+    override fun addWriteCall(userId: UUID, currentTime: UtcDateTime, method: RequestMethod, endpoint: String) {
         logger.info {
-            "Adding write call, projectId: $projectId, currentTime: $currentTime, method: $method, endpoint: $endpoint"
+            "Adding write call, userId: $userId, currentTime: $currentTime, method: $method, endpoint: $endpoint"
         }
 
         dslContext.executeInsert(
             ApiWriteCallRecord(
-                projectId = projectId,
+                userId = userId,
                 requestMethod = DbRequestMethod.valueOf(method.name),
                 requestPath = endpoint,
                 createdAt = currentTime
@@ -76,39 +76,39 @@ class JooqApiRateLimitRepository(
         )
     }
 
-    override fun addReadCall(projectId: UUID, currentTime: UtcDateTime, endpoint: String) {
-        logger.info { "Adding read call, projectId: $projectId, currentTime: $currentTime, endpoint: $endpoint" }
+    override fun addReadCall(userId: UUID, currentTime: UtcDateTime, endpoint: String) {
+        logger.info { "Adding read call, userId: $userId, currentTime: $currentTime, endpoint: $endpoint" }
 
         dslContext.executeInsert(
             ApiReadCallRecord(
-                projectId = projectId,
+                userId = userId,
                 requestPath = endpoint,
                 createdAt = currentTime
             )
         )
     }
 
-    private fun getOrCreateApiUsagePeriod(projectId: UUID, currentTime: UtcDateTime): ApiUsagePeriodRecord =
+    private fun getOrCreateApiUsagePeriod(userId: UUID, currentTime: UtcDateTime): ApiUsagePeriodRecord =
         dslContext.selectFrom(ApiUsagePeriodTable)
             .where(
                 DSL.and(
-                    ApiUsagePeriodTable.PROJECT_ID.eq(projectId),
+                    ApiUsagePeriodTable.USER_ID.eq(userId),
                     ApiUsagePeriodTable.END_DATE.ge(currentTime)
                 )
             )
             .orderBy(ApiUsagePeriodTable.END_DATE.desc())
             .limit(1)
-            .fetchOne() ?: insertNewApiUsagePeriodRecord(projectId, currentTime)
+            .fetchOne() ?: insertNewApiUsagePeriodRecord(userId, currentTime)
 
-    private fun insertNewApiUsagePeriodRecord(projectId: UUID, startDate: UtcDateTime): ApiUsagePeriodRecord {
+    private fun insertNewApiUsagePeriodRecord(userId: UUID, startDate: UtcDateTime): ApiUsagePeriodRecord {
         val endDate = startDate + apiRateProperties.usagePeriodDuration
 
         logger.info {
-            "Creating API usage period for projectId: $projectId, period: [${startDate.value}, ${endDate.value}]"
+            "Creating API usage period for userId: $userId, period: [${startDate.value}, ${endDate.value}]"
         }
 
         val record = ApiUsagePeriodRecord(
-            projectId = projectId,
+            userId = userId,
             additionalWriteRequests = 0,
             additionalReadRequests = 0,
             startDate = startDate,
@@ -124,7 +124,7 @@ class JooqApiRateLimitRepository(
         dslContext.fetchCount(
             ApiWriteCallTable,
             DSL.and(
-                ApiWriteCallTable.PROJECT_ID.eq(projectId),
+                ApiWriteCallTable.USER_ID.eq(userId),
                 ApiWriteCallTable.CREATED_AT.between(startDate, endDate)
             )
         )
@@ -133,7 +133,7 @@ class JooqApiRateLimitRepository(
         dslContext.fetchCount(
             ApiReadCallTable,
             DSL.and(
-                ApiReadCallTable.PROJECT_ID.eq(projectId),
+                ApiReadCallTable.USER_ID.eq(userId),
                 ApiReadCallTable.CREATED_AT.between(startDate, endDate)
             )
         )

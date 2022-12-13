@@ -40,7 +40,7 @@ import java.math.BigInteger
 import java.util.UUID
 
 @JooqTest
-@Import(JooqProjectIdResolverRepository::class)
+@Import(JooqUserIdResolverRepository::class)
 @DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
@@ -57,7 +57,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         private val ACTUAL_WALLET_ADDRESS = WalletAddress("c")
         private val SIGNED_MESSAGE = SignedMessage("signed-message")
         private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val USER_ID = UUID.randomUUID()
         private val DISPERSE_CONTRACT_ADDRESS = ContractAddress("b")
         private val ASSET_AMOUNTS = listOf(Balance(BigInteger.valueOf(123456L)), Balance(BigInteger.valueOf(789L)))
         private val ASSET_RECIPIENT_ADDRESSES = listOf(WalletAddress("c"), WalletAddress("d"))
@@ -103,7 +103,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
     private val postgresContainer = SharedTestContainers.postgresContainer
 
     @Autowired
-    private lateinit var repository: JooqProjectIdResolverRepository
+    private lateinit var repository: JooqUserIdResolverRepository
 
     @Autowired
     private lateinit var dslContext: DSLContext
@@ -114,7 +114,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
 
         dslContext.executeInsert(
             UserIdentifierRecord(
-                id = OWNER_ID,
+                id = USER_ID,
                 userIdentifier = "user-identifier",
                 identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
                 stripeClientId = null
@@ -124,7 +124,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         dslContext.executeInsert(
             ProjectRecord(
                 id = PROJECT_ID,
-                ownerId = OWNER_ID,
+                ownerId = USER_ID,
                 issuerContractAddress = ContractAddress("0"),
                 baseRedirectUrl = BaseUrl("base-redirect-url"),
                 chainId = ChainId(1337L),
@@ -135,15 +135,15 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyReturnProjectIdForProject() {
-        verify("correct projectId is returned") {
-            assertThat(repository.getProjectId(IdType.PROJECT_ID, PROJECT_ID)).withMessage()
-                .isEqualTo(PROJECT_ID)
+    fun mustCorrectlyReturnUserIdForProject() {
+        verify("correct userId is returned") {
+            assertThat(repository.getUserId(IdType.PROJECT_ID, PROJECT_ID)).withMessage()
+                .isEqualTo(USER_ID)
         }
     }
 
     @Test
-    fun mustCorrectlyReturnProjectIdForAssetBalanceRequest() {
+    fun mustCorrectlyReturnUserIdForAssetBalanceRequest() {
         val id = UUID.randomUUID()
 
         suppose("some asset balance request exists in database") {
@@ -166,14 +166,14 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
             )
         }
 
-        verify("correct projectId is returned") {
-            assertThat(repository.getProjectId(IdType.ASSET_BALANCE_REQUEST_ID, id)).withMessage()
-                .isEqualTo(PROJECT_ID)
+        verify("correct userId is returned") {
+            assertThat(repository.getUserId(IdType.ASSET_BALANCE_REQUEST_ID, id)).withMessage()
+                .isEqualTo(USER_ID)
         }
     }
 
     @Test
-    fun mustCorrectlyReturnProjectForAssetMultiSendRequest() {
+    fun mustCorrectlyReturnUserIdForAssetMultiSendRequest() {
         val id = UUID.randomUUID()
 
         suppose("some asset multi-send request exists in database") {
@@ -202,14 +202,14 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
             )
         }
 
-        verify("correct projectId is returned") {
-            assertThat(repository.getProjectId(IdType.ASSET_MULTI_SEND_REQUEST_ID, id)).withMessage()
-                .isEqualTo(PROJECT_ID)
+        verify("correct userId is returned") {
+            assertThat(repository.getUserId(IdType.ASSET_MULTI_SEND_REQUEST_ID, id)).withMessage()
+                .isEqualTo(USER_ID)
         }
     }
 
     @Test
-    fun mustCorrectlyReturnProjectForAssetSendRequest() {
+    fun mustCorrectlyReturnUserIdForAssetSendRequest() {
         val id = UUID.randomUUID()
 
         suppose("some asset send request exists in database") {
@@ -232,14 +232,14 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
             )
         }
 
-        verify("correct projectId is returned") {
-            assertThat(repository.getProjectId(IdType.ASSET_SEND_REQUEST_ID, id)).withMessage()
-                .isEqualTo(PROJECT_ID)
+        verify("correct userId is returned") {
+            assertThat(repository.getUserId(IdType.ASSET_SEND_REQUEST_ID, id)).withMessage()
+                .isEqualTo(USER_ID)
         }
     }
 
     @Test
-    fun mustCorrectlyReturnProjectForAuthorizationRequest() {
+    fun mustCorrectlyReturnUserIdForAuthorizationRequest() {
         val id = UUID.randomUUID()
 
         suppose("some authorization request exists in database") {
@@ -261,14 +261,14 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
             )
         }
 
-        verify("correct projectId is returned") {
-            assertThat(repository.getProjectId(IdType.AUTHORIZATION_REQUEST_ID, id)).withMessage()
-                .isEqualTo(PROJECT_ID)
+        verify("correct userId is returned") {
+            assertThat(repository.getUserId(IdType.AUTHORIZATION_REQUEST_ID, id)).withMessage()
+                .isEqualTo(USER_ID)
         }
     }
 
     @Test
-    fun mustCorrectlyReturnProjectForContractDeploymentSendRequest() {
+    fun mustCorrectlyReturnUserIdForContractDeploymentSendRequest() {
         val id = UUID.randomUUID()
 
         suppose("some contract deployment request exists in database") {
@@ -312,14 +312,14 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
             )
         }
 
-        verify("correct projectId is returned") {
-            assertThat(repository.getProjectId(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, id)).withMessage()
-                .isEqualTo(PROJECT_ID)
+        verify("correct userId is returned") {
+            assertThat(repository.getUserId(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, id)).withMessage()
+                .isEqualTo(USER_ID)
         }
     }
 
     @Test
-    fun mustCorrectlyReturnProjectForContractFunctionCallRequest() {
+    fun mustCorrectlyReturnUserIdForContractFunctionCallRequest() {
         val id = UUID.randomUUID()
 
         suppose("some contract function call request exists in database") {
@@ -344,14 +344,14 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
             )
         }
 
-        verify("correct projectId is returned") {
-            assertThat(repository.getProjectId(IdType.FUNCTION_CALL_REQUEST_ID, id)).withMessage()
-                .isEqualTo(PROJECT_ID)
+        verify("correct userId is returned") {
+            assertThat(repository.getUserId(IdType.FUNCTION_CALL_REQUEST_ID, id)).withMessage()
+                .isEqualTo(USER_ID)
         }
     }
 
     @Test
-    fun mustCorrectlyReturnProjectForErc20LockRequest() {
+    fun mustCorrectlyReturnUserIdForErc20LockRequest() {
         val id = UUID.randomUUID()
 
         suppose("some ERC20 lock request exists in database") {
@@ -375,9 +375,9 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
             )
         }
 
-        verify("correct projectId is returned") {
-            assertThat(repository.getProjectId(IdType.ERC20_LOCK_REQUEST_ID, id)).withMessage()
-                .isEqualTo(PROJECT_ID)
+        verify("correct userId is returned") {
+            assertThat(repository.getUserId(IdType.ERC20_LOCK_REQUEST_ID, id)).withMessage()
+                .isEqualTo(USER_ID)
         }
     }
 }

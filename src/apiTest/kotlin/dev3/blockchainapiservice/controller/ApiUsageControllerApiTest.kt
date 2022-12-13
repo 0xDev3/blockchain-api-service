@@ -86,10 +86,10 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
 
     @Test
     @WithMockUser
-    fun mustCorrectlyFetchApiUsageForProject() {
-        val response = suppose("request to API usage for project is made") {
+    fun mustCorrectlyFetchApiUsageForUser() {
+        val response = suppose("request to API usage for user is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/api-usage/by-project/$PROJECT_ID")
+                MockMvcRequestBuilders.get("/v1/api-usage")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -101,7 +101,7 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
             assertThat(response).withMessage()
                 .isEqualTo(
                     ApiUsagePeriodResponse(
-                        projectId = PROJECT_ID,
+                        userId = OWNER_ID,
                         writeRequestUsage = RequestUsage(
                             used = 0,
                             remaining = apiRateProperties.freeTierWriteRequests
@@ -118,10 +118,10 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    fun mustReturn401UnauthorizedWhenFetchingApiUsageForProjectWithoutJwt() {
+    fun mustReturn401UnauthorizedWhenFetchingApiUsageForUserWithoutJwt() {
         verify("401 is returned for missing JWT") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/api-usage/by-project/$PROJECT_ID")
+                MockMvcRequestBuilders.get("/v1/api-usage")
             )
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
@@ -131,24 +131,10 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
     }
 
     @Test
-    @WithMockUser
-    fun mustReturn404NotFoundWhenFetchingApiUsageForNonExistentProject() {
-        verify("404 is returned for non-existent project") {
-            val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/api-usage/by-project/${UUID.randomUUID()}")
-            )
-                .andExpect(MockMvcResultMatchers.status().isNotFound)
-                .andReturn()
-
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
-        }
-    }
-
-    @Test
     fun mustCorrectlyFetchApiUsageForApiKey() {
         val response = suppose("request to API usage for API key is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/api-usage")
+                MockMvcRequestBuilders.get("/v1/api-usage/by-api-key")
                     .header(CustomHeaders.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
@@ -161,7 +147,7 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
             assertThat(response).withMessage()
                 .isEqualTo(
                     ApiUsagePeriodResponse(
-                        projectId = PROJECT_ID,
+                        userId = OWNER_ID,
                         writeRequestUsage = RequestUsage(
                             used = 0,
                             remaining = apiRateProperties.freeTierWriteRequests
@@ -181,7 +167,7 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
     fun mustReturn401UnauthorizedWhenFetchingApiUsageForInvalidApiKey() {
         verify("401 is returned for invalid API key") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/api-usage")
+                MockMvcRequestBuilders.get("/v1/api-usage/by-api-key")
                     .header(CustomHeaders.API_KEY_HEADER, "invalid-api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)

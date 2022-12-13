@@ -6,14 +6,14 @@ import java.time.OffsetDateTime
 import java.util.UUID
 
 data class ApiUsagePeriodResponse(
-    val projectId: UUID,
+    val userId: UUID,
     val writeRequestUsage: RequestUsage,
     val readRequestUsage: RequestUsage,
     val startDate: OffsetDateTime,
     val endDate: OffsetDateTime
 ) {
     constructor(apiUsagePeriod: ApiUsagePeriod) : this(
-        projectId = apiUsagePeriod.projectId,
+        userId = apiUsagePeriod.userId,
         writeRequestUsage = apiUsagePeriod.writeRequestUsage,
         readRequestUsage = apiUsagePeriod.readRequestUsage,
         startDate = apiUsagePeriod.startDate.value,

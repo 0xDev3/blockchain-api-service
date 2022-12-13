@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestMethod
 import java.util.UUID
 
 interface ApiRateLimitRepository {
-    fun getCurrentApiUsagePeriod(projectId: UUID, currentTime: UtcDateTime): ApiUsagePeriod
-    fun remainingWriteLimit(projectId: UUID, currentTime: UtcDateTime): Int
-    fun remainingReadLimit(projectId: UUID, currentTime: UtcDateTime): Int
-    fun addWriteCall(projectId: UUID, currentTime: UtcDateTime, method: RequestMethod, endpoint: String)
-    fun addReadCall(projectId: UUID, currentTime: UtcDateTime, endpoint: String)
+    fun getCurrentApiUsagePeriod(userId: UUID, currentTime: UtcDateTime): ApiUsagePeriod
+    fun remainingWriteLimit(userId: UUID, currentTime: UtcDateTime): Int
+    fun remainingReadLimit(userId: UUID, currentTime: UtcDateTime): Int
+    fun addWriteCall(userId: UUID, currentTime: UtcDateTime, method: RequestMethod, endpoint: String)
+    fun addReadCall(userId: UUID, currentTime: UtcDateTime, endpoint: String)
 }

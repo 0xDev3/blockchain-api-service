@@ -14,8 +14,8 @@ import dev3.blockchainapiservice.exception.IpfsUploadFailedException
 import dev3.blockchainapiservice.features.payout.util.IpfsHash
 import dev3.blockchainapiservice.repository.ApiKeyRepository
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.ProjectIdResolverRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
+import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
@@ -41,7 +41,7 @@ import org.springframework.http.MediaType
     MockBean(UserIdentifierRepository::class),
     MockBean(ApiKeyRepository::class),
     MockBean(ApiRateLimitRepository::class),
-    MockBean(ProjectIdResolverRepository::class),
+    MockBean(UserIdResolverRepository::class),
     MockBean(ProjectRepository::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
