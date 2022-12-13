@@ -4,7 +4,6 @@ import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.DummyProxy
 import dev3.blockchainapiservice.blockchain.ExampleContract
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -78,7 +77,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
             ownerId = OWNER_ID,
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
@@ -374,7 +373,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
             ).send()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
+        val chainId = TestData.CHAIN_ID
         val contractAddress = ContractAddress(contract.contractAddress)
 
         val response = suppose("request to preview smart contract import is made") {

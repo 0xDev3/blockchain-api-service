@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
 import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
@@ -131,7 +130,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
             id = id,
             projectId = UUID.randomUUID(),
             status = Status.SUCCESS,
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -205,7 +204,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
             id = id,
             projectId = projectId,
             status = Status.SUCCESS,
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),

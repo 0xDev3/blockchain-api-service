@@ -2,8 +2,10 @@
 
 package dev3.blockchainapiservice.config
 
+import dev3.blockchainapiservice.util.ChainId
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Configuration
 import java.math.BigInteger
 import java.nio.file.Path
@@ -13,24 +15,7 @@ import java.time.Duration
 @ConfigurationPropertiesScan
 @ConfigurationProperties(prefix = "blockchain-api-service")
 class ApplicationProperties {
-    val chainEthereum = ChainProperties()
-    val chainGoerli = ChainProperties()
-    val chainMatic = ChainProperties()
-    val chainMumbai = ChainProperties()
-    val chainHardhatTestnet = ChainProperties()
-    val chainBsc = ChainProperties()
-    val chainXdai = ChainProperties()
-    val chainFantom = ChainProperties()
-    val chainMoonriver = ChainProperties()
-    val chainAvalanche = ChainProperties()
-    val chainAurora = ChainProperties()
-    val chainArbitrum = ChainProperties()
-    val chainOptimism = ChainProperties()
-    val chainCelo = ChainProperties()
-    val chainParaTime = ChainProperties()
-    val chainMoonbeam = ChainProperties()
-    val chainPolygonZkEvmTestnet = ChainProperties()
-    val chainCeloAlfajoresTestnet = ChainProperties()
+    var chain: Map<ChainId, ChainProperties> = emptyMap()
     var infuraId: String = ""
 }
 
@@ -46,12 +31,15 @@ class IpfsProperties {
     var secretApiKey = ""
 }
 
-class ChainProperties {
-    var minBlockConfirmationsForCaching: BigInteger? = null
+@ConstructorBinding
+class ChainProperties(
+    var name: String,
+    var rpcUrl: String,
+    var infuraUrl: String?,
+    var startBlockNumber: BigInteger?,
+    var minBlockConfirmationsForCaching: BigInteger?,
     var latestBlockCacheDuration: Duration = Duration.ofSeconds(5L)
-    var rpcUrlOverride: String? = null
-    var startBlockNumber: BigInteger? = null
-}
+)
 
 @ConfigurationProperties(prefix = "blockchain-api-service.create-payout-queue")
 class PayoutQueueProperties {

@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
@@ -264,7 +263,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -331,7 +330,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -406,7 +405,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -493,7 +492,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -580,7 +579,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -667,7 +666,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -754,7 +753,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -841,7 +840,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = null,
             assetAmount = Balance(BigInteger.TEN),
@@ -912,7 +911,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = null,
             assetAmount = Balance(BigInteger.TEN),
@@ -983,7 +982,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -1070,7 +1069,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -1157,7 +1156,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = null,
             assetAmount = Balance(BigInteger.TEN),
@@ -1228,7 +1227,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = null,
             assetAmount = Balance(BigInteger.TEN),
@@ -1299,7 +1298,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -1412,7 +1411,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),
@@ -1502,7 +1501,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             assetAmount = Balance(BigInteger.TEN),

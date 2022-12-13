@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
@@ -197,7 +196,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -267,7 +266,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -345,7 +344,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -435,7 +434,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -525,7 +524,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -615,7 +614,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -705,7 +704,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -795,7 +794,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -885,7 +884,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -975,7 +974,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),

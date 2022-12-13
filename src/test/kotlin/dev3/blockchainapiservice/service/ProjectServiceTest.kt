@@ -1,7 +1,7 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.params.CreateProjectParams
 import dev3.blockchainapiservice.model.result.ApiKey
@@ -50,7 +50,7 @@ class ProjectServiceTest : TestBase() {
         val params = CreateProjectParams(
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url"
         )
         val userIdentifier = UserWalletAddressIdentifier(
@@ -95,7 +95,7 @@ class ProjectServiceTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -163,7 +163,7 @@ class ProjectServiceTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -202,7 +202,7 @@ class ProjectServiceTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -273,7 +273,7 @@ class ProjectServiceTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -318,7 +318,7 @@ class ProjectServiceTest : TestBase() {
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("a1"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-1"),
-                chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+                chainId = TestData.CHAIN_ID,
                 customRpcUrl = "custom-rpc-url-1",
                 createdAt = CREATED_AT
             ),
@@ -327,7 +327,7 @@ class ProjectServiceTest : TestBase() {
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("a2"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-2"),
-                chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+                chainId = TestData.CHAIN_ID,
                 customRpcUrl = "custom-rpc-url-2",
                 createdAt = CREATED_AT
             )
@@ -360,7 +360,7 @@ class ProjectServiceTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -420,7 +420,7 @@ class ProjectServiceTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -459,7 +459,7 @@ class ProjectServiceTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -532,7 +532,7 @@ class ProjectServiceTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
