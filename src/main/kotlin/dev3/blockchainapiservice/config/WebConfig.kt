@@ -40,21 +40,20 @@ class WebConfig(
     }
 
     @Bean("externalContractDecompilerServiceRestTemplate")
-    fun externalContractDecompilerServiceRestTemplate(applicationProperties: ApplicationProperties): RestTemplate =
+    fun externalContractDecompilerServiceRestTemplate(
+        contractManifestServiceProperties: ContractManifestServiceProperties
+    ): RestTemplate =
         RestTemplateBuilder()
-            .rootUri(
-                applicationProperties.contractManifestService.baseUrl
-                    ?: throw BeanCreationException(MISSING_PROPERTY_MESSAGE)
-            )
+            .rootUri(contractManifestServiceProperties.baseUrl ?: throw BeanCreationException(MISSING_PROPERTY_MESSAGE))
             .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .build()
 
     @Bean("pinataRestTemplate")
-    fun pinataRestTemplate(applicationProperties: ApplicationProperties): RestTemplate =
+    fun pinataRestTemplate(ipfsProperties: IpfsProperties): RestTemplate =
         RestTemplateBuilder()
-            .rootUri(applicationProperties.ipfs.url)
-            .defaultHeader("pinata_api_key", applicationProperties.ipfs.apiKey)
-            .defaultHeader("pinata_secret_api_key", applicationProperties.ipfs.secretApiKey)
+            .rootUri(ipfsProperties.url)
+            .defaultHeader("pinata_api_key", ipfsProperties.apiKey)
+            .defaultHeader("pinata_secret_api_key", ipfsProperties.secretApiKey)
             .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
             .build()
 

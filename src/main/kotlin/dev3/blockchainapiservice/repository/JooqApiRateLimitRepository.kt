@@ -1,7 +1,6 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.config.ApiRateProperties
-import dev3.blockchainapiservice.config.ApplicationProperties
 import dev3.blockchainapiservice.generated.jooq.tables.ApiReadCallTable
 import dev3.blockchainapiservice.generated.jooq.tables.ApiUsagePeriodTable
 import dev3.blockchainapiservice.generated.jooq.tables.ApiWriteCallTable
@@ -23,13 +22,10 @@ import dev3.blockchainapiservice.generated.jooq.enums.RequestMethod as DbRequest
 @Repository
 class JooqApiRateLimitRepository(
     private val dslContext: DSLContext,
-    private val applicationProperties: ApplicationProperties
+    private val apiRateProperties: ApiRateProperties
 ) : ApiRateLimitRepository {
 
     companion object : KLogging()
-
-    private val apiRate: ApiRateProperties
-        get() = applicationProperties.apiRate
 
     override fun getCurrentApiUsagePeriod(projectId: UUID, currentTime: UtcDateTime): ApiUsagePeriod {
         logger.debug { "Get current API usage period, projectId: $projectId, currentTime: $currentTime" }
@@ -37,10 +33,10 @@ class JooqApiRateLimitRepository(
         val currentPeriod = getOrCreateApiUsagePeriod(projectId, currentTime)
 
         val periodWriteCount = currentPeriod.countWriteCalls()
-        val totalAllowedWrites = apiRate.freeTierWriteRequests + currentPeriod.additionalWriteRequests
+        val totalAllowedWrites = apiRateProperties.freeTierWriteRequests + currentPeriod.additionalWriteRequests
 
         val periodReadCount = currentPeriod.countReadCalls()
-        val totalAllowedReads = apiRate.freeTierReadRequests + currentPeriod.additionalReadRequests
+        val totalAllowedReads = apiRateProperties.freeTierReadRequests + currentPeriod.additionalReadRequests
 
         return ApiUsagePeriod(
             projectId = projectId,
@@ -54,14 +50,14 @@ class JooqApiRateLimitRepository(
     override fun remainingWriteLimit(projectId: UUID, currentTime: UtcDateTime): Int {
         val currentPeriod = getOrCreateApiUsagePeriod(projectId, currentTime)
         val periodWriteCount = currentPeriod.countWriteCalls()
-        val totalAllowedWrites = apiRate.freeTierWriteRequests + currentPeriod.additionalWriteRequests
+        val totalAllowedWrites = apiRateProperties.freeTierWriteRequests + currentPeriod.additionalWriteRequests
         return calculateUsage(periodWriteCount, totalAllowedWrites).remaining
     }
 
     override fun remainingReadLimit(projectId: UUID, currentTime: UtcDateTime): Int {
         val currentPeriod = getOrCreateApiUsagePeriod(projectId, currentTime)
         val periodReadCount = currentPeriod.countReadCalls()
-        val totalAllowedReads = apiRate.freeTierReadRequests + currentPeriod.additionalReadRequests
+        val totalAllowedReads = apiRateProperties.freeTierReadRequests + currentPeriod.additionalReadRequests
         return calculateUsage(periodReadCount, totalAllowedReads).remaining
     }
 
@@ -105,7 +101,7 @@ class JooqApiRateLimitRepository(
             .fetchOne() ?: insertNewApiUsagePeriodRecord(projectId, currentTime)
 
     private fun insertNewApiUsagePeriodRecord(projectId: UUID, startDate: UtcDateTime): ApiUsagePeriodRecord {
-        val endDate = startDate + apiRate.usagePeriodDuration
+        val endDate = startDate + apiRateProperties.usagePeriodDuration
 
         logger.info {
             "Creating API usage period for projectId: $projectId, period: [${startDate.value}, ${endDate.value}]"

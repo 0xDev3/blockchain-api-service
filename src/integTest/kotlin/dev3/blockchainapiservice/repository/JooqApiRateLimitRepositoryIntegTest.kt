@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.ApiRateProperties
-import dev3.blockchainapiservice.config.ApplicationProperties
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.ApiUsagePeriodTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiUsagePeriodRecord
@@ -29,7 +28,7 @@ import java.time.Duration
 import java.util.UUID
 
 @JooqTest
-@Import(JooqApiRateLimitRepository::class, ApplicationProperties::class)
+@Import(JooqApiRateLimitRepository::class, ApiRateProperties::class)
 @DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JooqApiRateLimitRepositoryIntegTest : TestBase() {

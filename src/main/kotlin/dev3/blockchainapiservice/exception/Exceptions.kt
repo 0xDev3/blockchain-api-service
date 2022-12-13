@@ -265,3 +265,43 @@ class AbiDecodingException(types: List<AbiType>, cause: Throwable) : ServiceExce
         private const val serialVersionUID: Long = -5755478462711202378L
     }
 }
+
+class CustomerAlreadyExistsException : ServiceException(
+    errorCode = ErrorCode.CUSTOMER_ALREADY_EXISTS,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Customer already exists for the authorized wallet"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 7597674635139449827L
+    }
+}
+
+class CustomerCreationFailed(email: String) : ServiceException(
+    errorCode = ErrorCode.CUSTOMER_CREATION_FAILED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Failed creating customer with email: $email"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -1730618502241859961L
+    }
+}
+
+class CustomerNotYetCreatedException : ServiceException(
+    errorCode = ErrorCode.CUSTOMER_NOT_YET_CREATED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Customer has not yet been created for the requesting user; create the customer and then try again"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -2626102372526080893L
+    }
+}
+
+class WebhookException : ServiceException(
+    errorCode = ErrorCode.INVALID_REQUEST_BODY,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Webhook data has invalid format"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 7893680094807460298L
+    }
+}

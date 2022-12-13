@@ -7,7 +7,8 @@ import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.ContractManifestServiceProperties
+import dev3.blockchainapiservice.config.IpfsProperties
 import dev3.blockchainapiservice.config.WebConfig
 import dev3.blockchainapiservice.exception.IpfsUploadFailedException
 import dev3.blockchainapiservice.features.payout.util.IpfsHash
@@ -33,7 +34,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 
 @RestClientTest
-@Import(PinataIpfsService::class, ApplicationProperties::class, WebConfig::class)
+@Import(PinataIpfsService::class, IpfsProperties::class, ContractManifestServiceProperties::class, WebConfig::class)
 @MockBeans(
     MockBean(UuidProvider::class),
     MockBean(UtcDateTimeProvider::class),

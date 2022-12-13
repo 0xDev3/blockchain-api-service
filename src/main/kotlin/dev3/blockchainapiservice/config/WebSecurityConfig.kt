@@ -26,8 +26,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 class WebSecurityConfig(private val objectMapper: ObjectMapper) {
 
     @Autowired
-    fun authBuilder(authBuilder: AuthenticationManagerBuilder, applicationProperties: ApplicationProperties) {
-        authBuilder.authenticationProvider(JwtAuthenticationProvider(applicationProperties.jwt.publicKey))
+    fun authBuilder(authBuilder: AuthenticationManagerBuilder, jwtProperties: JwtProperties) {
+        authBuilder.authenticationProvider(JwtAuthenticationProvider(jwtProperties.publicKey))
     }
 
     @Bean
@@ -81,6 +81,9 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) {
             .antMatchers(HttpMethod.GET, "/v1/multi-payment-template/**").permitAll()
             .antMatchers(HttpMethod.GET, "/v1/api-usage").permitAll()
             .antMatchers("/v1/api-usage/by-project/**").authenticated()
+            .antMatchers("/v1/billing/**").authenticated()
+            .antMatchers(HttpMethod.GET, "/v1/billing/available-plans").permitAll()
+            .antMatchers(HttpMethod.GET, "/v1/billing/webhook").permitAll()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling().authenticationEntryPoint(authenticationHandler).and()

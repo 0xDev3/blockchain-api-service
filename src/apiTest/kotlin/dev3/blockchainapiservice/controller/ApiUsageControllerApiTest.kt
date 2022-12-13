@@ -3,7 +3,7 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.Chain
-import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.ApiRateProperties
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -45,7 +45,7 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
     }
 
     @Autowired
-    private lateinit var applicationProperties: ApplicationProperties
+    private lateinit var apiRateProperties: ApiRateProperties
 
     @Autowired
     private lateinit var dslContext: DSLContext
@@ -105,11 +105,11 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
                         projectId = PROJECT_ID,
                         writeRequestUsage = RequestUsage(
                             used = 0,
-                            remaining = applicationProperties.apiRate.freeTierWriteRequests
+                            remaining = apiRateProperties.freeTierWriteRequests
                         ),
                         readRequestUsage = RequestUsage(
                             used = 0,
-                            remaining = applicationProperties.apiRate.freeTierReadRequests
+                            remaining = apiRateProperties.freeTierReadRequests
                         ),
                         startDate = response.startDate,
                         endDate = response.endDate
@@ -165,11 +165,11 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
                         projectId = PROJECT_ID,
                         writeRequestUsage = RequestUsage(
                             used = 0,
-                            remaining = applicationProperties.apiRate.freeTierWriteRequests
+                            remaining = apiRateProperties.freeTierWriteRequests
                         ),
                         readRequestUsage = RequestUsage(
                             used = 0,
-                            remaining = applicationProperties.apiRate.freeTierReadRequests
+                            remaining = apiRateProperties.freeTierReadRequests
                         ),
                         startDate = response.startDate,
                         endDate = response.endDate

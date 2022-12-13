@@ -11,5 +11,5 @@ data class SubscriptionPriceResponse(
 )
 
 enum class IntervalType {
-    DAY, WEEK, MONTH
+    DAY, WEEK, MONTH, YEAR
 }

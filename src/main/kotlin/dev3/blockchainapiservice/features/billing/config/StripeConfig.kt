@@ -1,13 +1,13 @@
 package dev3.blockchainapiservice.features.billing.config
 
 import com.stripe.Stripe
-import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.StripeProperties
 import mu.KLogging
 import org.springframework.context.annotation.Configuration
 import javax.annotation.PostConstruct
 
 @Configuration
-class StripeConfig(private val applicationProperties: ApplicationProperties) {
+class StripeConfig(private val stripeProperties: StripeProperties) {
 
     companion object : KLogging()
 
@@ -15,10 +15,10 @@ class StripeConfig(private val applicationProperties: ApplicationProperties) {
     fun configureStripe() {
         logger.info { "Configuring Stripe payment API..." }
 
-        requireNotNull(applicationProperties.stripe.publishableKey) { "Stripe publishable key is not set!" }
-        requireNotNull(applicationProperties.stripe.secretKey) { "Stripe secret key is not set!" }
-        requireNotNull(applicationProperties.stripe.webhookSecret) { "Stripe webhook secret is not set!" }
+        requireNotNull(stripeProperties.publishableKey) { "Stripe publishable key is not set!" }
+        requireNotNull(stripeProperties.secretKey) { "Stripe secret key is not set!" }
+        requireNotNull(stripeProperties.webhookSecret) { "Stripe webhook secret is not set!" }
 
-        Stripe.apiKey = applicationProperties.stripe.secretKey
+        Stripe.apiKey = stripeProperties.secretKey
     }
 }
