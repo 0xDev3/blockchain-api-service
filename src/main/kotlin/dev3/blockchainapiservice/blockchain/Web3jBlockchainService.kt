@@ -307,6 +307,7 @@ class Web3jBlockchainService(
         )
     }
 
+    @Suppress("LongMethod", "ComplexMethod")
     override fun findContractDeploymentTransaction(
         chainSpec: ChainSpec,
         contractAddress: ContractAddress,
@@ -353,7 +354,8 @@ class Web3jBlockchainService(
                     web3j.ethGetTransactionReceipt(it.hash).sendSafely()?.transactionReceipt?.orElse(null)?.pairWith(it)
                 }
                 ?.find {
-                    it.first.isStatusOK && it.first.contractAddress?.let { ca -> ContractAddress(ca) } == contractAddress
+                    it.first.isStatusOK &&
+                        it.first.contractAddress?.let { ca -> ContractAddress(ca) } == contractAddress
                 }
             val binary = web3j.ethGetCode(contractAddress.rawValue, currentBlockNumber.toWeb3Parameter()).sendSafely()
                 ?.code?.let { ContractBinaryData(it) }?.takeIf { it.value.isNotEmpty() }

@@ -11,7 +11,7 @@ import dev3.blockchainapiservice.exception.ErrorResponse
 import dev3.blockchainapiservice.model.result.ApiKey
 import dev3.blockchainapiservice.repository.ApiKeyRepository
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.ProjectIdResolverRepository
+import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -53,14 +53,14 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
     fun mustNotHandleNonAnnotatedMethod() {
         val apiKeyRepository = mock<ApiKeyRepository>()
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
-        val projectIdResolverRepository = mock<ProjectIdResolverRepository>()
+        val userIdResolverRepository = mock<UserIdResolverRepository>()
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         val handler = HandlerMethod(Companion, Companion::class.java.methods.find { it.name == "nonAnnotated" }!!)
         val interceptor = ApiKeyWriteCallInterceptor(
             apiKeyRepository = apiKeyRepository,
             apiRateLimitRepository = apiRateLimitRepository,
-            projectIdResolverRepository = projectIdResolverRepository,
+            userIdResolverRepository = userIdResolverRepository,
             utcDateTimeProvider = utcDateTimeProvider,
             objectMapper = OBJECT_MAPPER
         )
@@ -74,7 +74,7 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
 
             verifyNoInteractions(apiKeyRepository)
             verifyNoInteractions(apiRateLimitRepository)
-            verifyNoInteractions(projectIdResolverRepository)
+            verifyNoInteractions(userIdResolverRepository)
             verifyNoInteractions(utcDateTimeProvider)
             verifyNoInteractions(request)
             verifyNoInteractions(response)
@@ -106,6 +106,14 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
                 )
         }
 
+        val userIdResolverRepository = mock<UserIdResolverRepository>()
+        val userId = UUID.randomUUID()
+
+        suppose("userId will be resolved in the repository") {
+            given(userIdResolverRepository.getUserId(IdType.PROJECT_ID, projectId))
+                .willReturn(userId)
+        }
+
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some date-time will be returned") {
@@ -116,7 +124,7 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
 
         suppose("remaining read API rate limit will not be zero") {
-            given(apiRateLimitRepository.remainingWriteLimit(projectId, TestData.TIMESTAMP))
+            given(apiRateLimitRepository.remainingWriteLimit(userId, TestData.TIMESTAMP))
                 .willReturn(1)
         }
 
@@ -127,13 +135,11 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
                 .willReturn(HttpStatus.OK.value())
         }
 
-        val projectIdResolverRepository = mock<ProjectIdResolverRepository>()
-
         val handler = HandlerMethod(Companion, Companion::class.java.methods.find { it.name == "projectIdAnnotated" }!!)
         val interceptor = ApiKeyWriteCallInterceptor(
             apiKeyRepository = apiKeyRepository,
             apiRateLimitRepository = apiRateLimitRepository,
-            projectIdResolverRepository = projectIdResolverRepository,
+            userIdResolverRepository = userIdResolverRepository,
             utcDateTimeProvider = utcDateTimeProvider,
             objectMapper = OBJECT_MAPPER
         )
@@ -151,12 +157,14 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
             verifyNoMoreInteractions(apiKeyRepository)
 
             verifyMock(apiRateLimitRepository)
-                .remainingWriteLimit(projectId, TestData.TIMESTAMP)
+                .remainingWriteLimit(userId, TestData.TIMESTAMP)
             verifyMock(apiRateLimitRepository)
-                .addWriteCall(projectId, TestData.TIMESTAMP, RequestMethod.POST, "/test-path")
+                .addWriteCall(userId, TestData.TIMESTAMP, RequestMethod.POST, "/test-path")
             verifyNoMoreInteractions(apiRateLimitRepository)
 
-            verifyNoInteractions(projectIdResolverRepository)
+            verifyMock(userIdResolverRepository, times(2))
+                .getUserId(IdType.PROJECT_ID, projectId)
+            verifyNoMoreInteractions(userIdResolverRepository)
         }
     }
 
@@ -171,11 +179,12 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
                 .willReturn(mapOf(idType.idVariableName to projectId.toString()))
         }
 
-        val projectIdResolverRepository = mock<ProjectIdResolverRepository>()
+        val userIdResolverRepository = mock<UserIdResolverRepository>()
+        val userId = UUID.randomUUID()
 
-        suppose("projectId will be resolved in the repository") {
-            given(projectIdResolverRepository.getProjectId(idType, projectId))
-                .willReturn(projectId)
+        suppose("userId will be resolved in the repository") {
+            given(userIdResolverRepository.getUserId(idType, projectId))
+                .willReturn(userId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -188,7 +197,7 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
 
         suppose("remaining read API rate limit will not be zero") {
-            given(apiRateLimitRepository.remainingWriteLimit(projectId, TestData.TIMESTAMP))
+            given(apiRateLimitRepository.remainingWriteLimit(userId, TestData.TIMESTAMP))
                 .willReturn(1)
         }
 
@@ -205,7 +214,7 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
         val interceptor = ApiKeyWriteCallInterceptor(
             apiKeyRepository = apiKeyRepository,
             apiRateLimitRepository = apiRateLimitRepository,
-            projectIdResolverRepository = projectIdResolverRepository,
+            userIdResolverRepository = userIdResolverRepository,
             utcDateTimeProvider = utcDateTimeProvider,
             objectMapper = OBJECT_MAPPER
         )
@@ -221,14 +230,14 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
             verifyNoInteractions(apiKeyRepository)
 
             verifyMock(apiRateLimitRepository)
-                .remainingWriteLimit(projectId, TestData.TIMESTAMP)
+                .remainingWriteLimit(userId, TestData.TIMESTAMP)
             verifyMock(apiRateLimitRepository)
-                .addWriteCall(projectId, TestData.TIMESTAMP, RequestMethod.POST, "/test-path/{id}")
+                .addWriteCall(userId, TestData.TIMESTAMP, RequestMethod.POST, "/test-path/{id}")
             verifyNoMoreInteractions(apiRateLimitRepository)
 
-            verifyMock(projectIdResolverRepository, times(2))
-                .getProjectId(idType, projectId)
-            verifyNoMoreInteractions(projectIdResolverRepository)
+            verifyMock(userIdResolverRepository, times(2))
+                .getUserId(idType, projectId)
+            verifyNoMoreInteractions(userIdResolverRepository)
         }
     }
 
@@ -243,11 +252,12 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
                 .willReturn(mapOf(idType.idVariableName to projectId.toString()))
         }
 
-        val projectIdResolverRepository = mock<ProjectIdResolverRepository>()
+        val userIdResolverRepository = mock<UserIdResolverRepository>()
+        val userId = UUID.randomUUID()
 
-        suppose("projectId will be resolved in the repository") {
-            given(projectIdResolverRepository.getProjectId(idType, projectId))
-                .willReturn(projectId)
+        suppose("userId will be resolved in the repository") {
+            given(userIdResolverRepository.getUserId(idType, projectId))
+                .willReturn(userId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -260,7 +270,7 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
 
         suppose("remaining read API rate limit will be zero") {
-            given(apiRateLimitRepository.remainingWriteLimit(projectId, TestData.TIMESTAMP))
+            given(apiRateLimitRepository.remainingWriteLimit(userId, TestData.TIMESTAMP))
                 .willReturn(0)
         }
 
@@ -284,7 +294,7 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
         val interceptor = ApiKeyWriteCallInterceptor(
             apiKeyRepository = apiKeyRepository,
             apiRateLimitRepository = apiRateLimitRepository,
-            projectIdResolverRepository = projectIdResolverRepository,
+            userIdResolverRepository = userIdResolverRepository,
             utcDateTimeProvider = utcDateTimeProvider,
             objectMapper = OBJECT_MAPPER
         )
@@ -300,12 +310,12 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
             verifyNoInteractions(apiKeyRepository)
 
             verifyMock(apiRateLimitRepository)
-                .remainingWriteLimit(projectId, TestData.TIMESTAMP)
+                .remainingWriteLimit(userId, TestData.TIMESTAMP)
             verifyNoMoreInteractions(apiRateLimitRepository)
 
-            verifyMock(projectIdResolverRepository, times(2))
-                .getProjectId(idType, projectId)
-            verifyNoMoreInteractions(projectIdResolverRepository)
+            verifyMock(userIdResolverRepository, times(2))
+                .getUserId(idType, projectId)
+            verifyNoMoreInteractions(userIdResolverRepository)
 
             verifyMock(response)
                 .status = HttpStatus.PAYMENT_REQUIRED.value()

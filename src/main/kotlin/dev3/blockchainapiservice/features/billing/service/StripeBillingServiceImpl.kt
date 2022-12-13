@@ -18,7 +18,6 @@ import com.stripe.param.SubscriptionCreateParams
 import com.stripe.param.SubscriptionListParams
 import com.stripe.param.SubscriptionUpdateParams
 import dev3.blockchainapiservice.config.StripeProperties
-import dev3.blockchainapiservice.config.interceptors.ProjectIdResolver
 import dev3.blockchainapiservice.exception.CustomerAlreadyExistsException
 import dev3.blockchainapiservice.exception.CustomerCreationFailed
 import dev3.blockchainapiservice.exception.CustomerNotYetCreatedException
@@ -31,18 +30,15 @@ import dev3.blockchainapiservice.features.billing.model.response.IntervalType
 import dev3.blockchainapiservice.features.billing.model.response.SubscriptionPriceResponse
 import dev3.blockchainapiservice.features.billing.model.response.SubscriptionResponse
 import dev3.blockchainapiservice.model.result.UserIdentifier
-import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.util.UtcDateTime
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.math.BigInteger
-import java.util.UUID
 
 @Service
 class StripeBillingServiceImpl( // TODO refactor and test
     private val userIdentifierRepository: UserIdentifierRepository,
-    private val projectRepository: ProjectRepository,
     private val stripeProperties: StripeProperties,
     private val objectMapper: ObjectMapper
 ) : StripeBillingService {
@@ -52,7 +48,6 @@ class StripeBillingServiceImpl( // TODO refactor and test
         private val NON_DIGIT_REGEX = "[^0-9]".toRegex()
         private const val READ_REQUESTS_KEY = "read_requests"
         private const val WRITE_REQUESTS_KEY = "write_requests"
-        private const val PROJECT_ID_KEY = "project_id"
     }
 
     override fun listAvailableSubscriptions(currency: String): List<AvailableSubscriptionResponse> {
@@ -139,15 +134,12 @@ class StripeBillingServiceImpl( // TODO refactor and test
         val subscriptions = Subscription.list(params)
 
         return subscriptions.data.mapNotNull { subscription ->
-            subscription.mapMetadataUuidValue(PROJECT_ID_KEY) {
-                SubscriptionResponse(
-                    id = subscription.id,
-                    projectId = it,
-                    currentPeriodStart = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart).value,
-                    currentPeriodEnd = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd).value,
-                    stripeSubscriptionData = objectMapper.readTree(subscription.toJson())
-                )
-            }
+            SubscriptionResponse(
+                id = subscription.id,
+                currentPeriodStart = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart).value,
+                currentPeriodEnd = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd).value,
+                stripeSubscriptionData = objectMapper.readTree(subscription.toJson())
+            )
         }
     }
 
@@ -161,9 +153,6 @@ class StripeBillingServiceImpl( // TODO refactor and test
             throw CustomerNotYetCreatedException()
         }
 
-        projectRepository.getById(requestBody.projectId)?.takeIf { it.ownerId == userIdentifier.id }
-            ?: throw ResourceNotFoundException("Project does not exist for ID: ${requestBody.projectId}")
-
         val params = SubscriptionCreateParams.builder()
             .setCustomer(userIdentifier.stripeClientId)
             .addItem(
@@ -172,7 +161,6 @@ class StripeBillingServiceImpl( // TODO refactor and test
                     .setPrice(requestBody.priceId)
                     .build()
             )
-            .putMetadata(PROJECT_ID_KEY, requestBody.projectId.toString())
             .setPaymentBehavior(SubscriptionCreateParams.PaymentBehavior.DEFAULT_INCOMPLETE)
             .addAllExpand(listOf("latest_invoice.payment_intent"))
             .build()
@@ -182,7 +170,6 @@ class StripeBillingServiceImpl( // TODO refactor and test
 
         return SubscriptionResponse(
             id = subscription.id,
-            projectId = requestBody.projectId,
             currentPeriodStart = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart).value,
             currentPeriodEnd = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd).value,
             stripeSubscriptionData = stripeSubscriptionJson
@@ -220,15 +207,12 @@ class StripeBillingServiceImpl( // TODO refactor and test
 
         val updatedSubscription = subscription.update(params)
 
-        return updatedSubscription.mapMetadataUuidValue(PROJECT_ID_KEY) {
-            SubscriptionResponse(
-                id = subscription.id,
-                projectId = it,
-                currentPeriodStart = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart).value,
-                currentPeriodEnd = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd).value,
-                stripeSubscriptionData = objectMapper.readTree(subscription.toJson())
-            )
-        }!!
+        return SubscriptionResponse(
+            id = updatedSubscription.id,
+            currentPeriodStart = UtcDateTime.ofEpochSeconds(updatedSubscription.currentPeriodStart).value,
+            currentPeriodEnd = UtcDateTime.ofEpochSeconds(updatedSubscription.currentPeriodEnd).value,
+            stripeSubscriptionData = objectMapper.readTree(updatedSubscription.toJson())
+        )
     }
 
     override fun cancelSubscription(subscriptionId: String, userIdentifier: UserIdentifier) {
@@ -304,10 +288,8 @@ class StripeBillingServiceImpl( // TODO refactor and test
                 logger.debug { "[TRACK] Subscription event: ${subscription.toJson()}" }
 
                 if (subscription.status == "active") {
-                    subscription.mapMetadataUuidValue(PROJECT_ID_KEY) { projectId ->
-                        val start = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart)
-                        val end = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd)
-                    }
+                    val start = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart)
+                    val end = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd)
                 }
             }
 
@@ -321,16 +303,6 @@ class StripeBillingServiceImpl( // TODO refactor and test
 
         if (result == null) {
             logger.warn { "Metadata key $key is not set correctly for product with id: $id, name: $name, skipping" }
-        }
-
-        return result
-    }
-
-    private fun <T> Subscription.mapMetadataUuidValue(key: String, mapping: (UUID) -> T): T? {
-        val result = ProjectIdResolver.parseUuid(this.metadata[key])?.let(mapping)
-
-        if (result == null) {
-            logger.warn { "Metadata key $key is not set correctly for subscription with id: $id, skipping" }
         }
 
         return result

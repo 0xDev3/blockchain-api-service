@@ -317,6 +317,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
             }
     }
 
+    @Suppress("ComplexCondition") // needed to get non-null check
     private fun ContractDeploymentTransactionCacheRecord.toModel(): ContractDeploymentTransactionInfo {
         val hash = txHash
         val from = fromAddress

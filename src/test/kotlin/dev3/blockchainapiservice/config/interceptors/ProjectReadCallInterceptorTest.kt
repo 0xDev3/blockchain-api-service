@@ -8,7 +8,7 @@ import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.exception.ErrorResponse
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.ProjectIdResolverRepository
+import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -45,13 +45,13 @@ class ProjectReadCallInterceptorTest : TestBase() {
     @Test
     fun mustNotHandleNonAnnotatedMethod() {
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
-        val projectIdResolverRepository = mock<ProjectIdResolverRepository>()
+        val userIdResolverRepository = mock<UserIdResolverRepository>()
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         val handler = HandlerMethod(Companion, Companion::class.java.methods.find { it.name == "nonAnnotated" }!!)
         val interceptor = ProjectReadCallInterceptor(
             apiRateLimitRepository = apiRateLimitRepository,
-            projectIdResolverRepository = projectIdResolverRepository,
+            userIdResolverRepository = userIdResolverRepository,
             utcDateTimeProvider = utcDateTimeProvider,
             objectMapper = OBJECT_MAPPER
         )
@@ -64,7 +64,7 @@ class ProjectReadCallInterceptorTest : TestBase() {
             interceptor.afterCompletion(request, response, handler, null)
 
             verifyNoInteractions(apiRateLimitRepository)
-            verifyNoInteractions(projectIdResolverRepository)
+            verifyNoInteractions(userIdResolverRepository)
             verifyNoInteractions(utcDateTimeProvider)
             verifyNoInteractions(request)
             verifyNoInteractions(response)
@@ -82,11 +82,12 @@ class ProjectReadCallInterceptorTest : TestBase() {
                 .willReturn(mapOf(idType.idVariableName to projectId.toString()))
         }
 
-        val projectIdResolverRepository = mock<ProjectIdResolverRepository>()
+        val userIdResolverRepository = mock<UserIdResolverRepository>()
+        val userId = UUID.randomUUID()
 
-        suppose("projectId will be resolved in the repository") {
-            given(projectIdResolverRepository.getProjectId(idType, projectId))
-                .willReturn(projectId)
+        suppose("userId will be resolved in the repository") {
+            given(userIdResolverRepository.getUserId(idType, projectId))
+                .willReturn(userId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -99,7 +100,7 @@ class ProjectReadCallInterceptorTest : TestBase() {
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
 
         suppose("remaining read API rate limit will not be zero") {
-            given(apiRateLimitRepository.remainingReadLimit(projectId, TestData.TIMESTAMP))
+            given(apiRateLimitRepository.remainingReadLimit(userId, TestData.TIMESTAMP))
                 .willReturn(1)
         }
 
@@ -113,7 +114,7 @@ class ProjectReadCallInterceptorTest : TestBase() {
         val handler = HandlerMethod(Companion, Companion::class.java.methods.find { it.name == "annotated" }!!)
         val interceptor = ProjectReadCallInterceptor(
             apiRateLimitRepository = apiRateLimitRepository,
-            projectIdResolverRepository = projectIdResolverRepository,
+            userIdResolverRepository = userIdResolverRepository,
             utcDateTimeProvider = utcDateTimeProvider,
             objectMapper = OBJECT_MAPPER
         )
@@ -127,14 +128,14 @@ class ProjectReadCallInterceptorTest : TestBase() {
             interceptor.afterCompletion(request, response, handler, null)
 
             verifyMock(apiRateLimitRepository)
-                .remainingReadLimit(projectId, TestData.TIMESTAMP)
+                .remainingReadLimit(userId, TestData.TIMESTAMP)
             verifyMock(apiRateLimitRepository)
-                .addReadCall(projectId, TestData.TIMESTAMP, "/test-path/{projectId}")
+                .addReadCall(userId, TestData.TIMESTAMP, "/test-path/{projectId}")
             verifyNoMoreInteractions(apiRateLimitRepository)
 
-            verifyMock(projectIdResolverRepository, times(2))
-                .getProjectId(idType, projectId)
-            verifyNoMoreInteractions(projectIdResolverRepository)
+            verifyMock(userIdResolverRepository, times(2))
+                .getUserId(idType, projectId)
+            verifyNoMoreInteractions(userIdResolverRepository)
         }
     }
 
@@ -149,11 +150,12 @@ class ProjectReadCallInterceptorTest : TestBase() {
                 .willReturn(mapOf(idType.idVariableName to projectId.toString()))
         }
 
-        val projectIdResolverRepository = mock<ProjectIdResolverRepository>()
+        val userIdResolverRepository = mock<UserIdResolverRepository>()
+        val userId = UUID.randomUUID()
 
-        suppose("projectId will be resolved in the repository") {
-            given(projectIdResolverRepository.getProjectId(idType, projectId))
-                .willReturn(projectId)
+        suppose("userId will be resolved in the repository") {
+            given(userIdResolverRepository.getUserId(idType, projectId))
+                .willReturn(userId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -166,7 +168,7 @@ class ProjectReadCallInterceptorTest : TestBase() {
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
 
         suppose("remaining read API rate limit will be zero") {
-            given(apiRateLimitRepository.remainingReadLimit(projectId, TestData.TIMESTAMP))
+            given(apiRateLimitRepository.remainingReadLimit(userId, TestData.TIMESTAMP))
                 .willReturn(0)
         }
 
@@ -187,7 +189,7 @@ class ProjectReadCallInterceptorTest : TestBase() {
         val handler = HandlerMethod(Companion, Companion::class.java.methods.find { it.name == "annotated" }!!)
         val interceptor = ProjectReadCallInterceptor(
             apiRateLimitRepository = apiRateLimitRepository,
-            projectIdResolverRepository = projectIdResolverRepository,
+            userIdResolverRepository = userIdResolverRepository,
             utcDateTimeProvider = utcDateTimeProvider,
             objectMapper = OBJECT_MAPPER
         )
@@ -201,12 +203,12 @@ class ProjectReadCallInterceptorTest : TestBase() {
             interceptor.afterCompletion(request, response, handler, null)
 
             verifyMock(apiRateLimitRepository)
-                .remainingReadLimit(projectId, TestData.TIMESTAMP)
+                .remainingReadLimit(userId, TestData.TIMESTAMP)
             verifyNoMoreInteractions(apiRateLimitRepository)
 
-            verifyMock(projectIdResolverRepository, times(2))
-                .getProjectId(idType, projectId)
-            verifyNoMoreInteractions(projectIdResolverRepository)
+            verifyMock(userIdResolverRepository, times(2))
+                .getUserId(idType, projectId)
+            verifyNoMoreInteractions(userIdResolverRepository)
 
             verifyMock(response)
                 .status = HttpStatus.PAYMENT_REQUIRED.value()
