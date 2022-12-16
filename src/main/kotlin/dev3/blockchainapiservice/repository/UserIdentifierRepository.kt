@@ -20,5 +20,6 @@ interface UserIdentifierRepository {
             )
         }
 
+    fun getByStripeClientId(stripeClientId: String): UserIdentifier?
     fun setStripeClientId(id: UUID, stripeClientId: String): Boolean
 }

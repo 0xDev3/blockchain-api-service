@@ -49,6 +49,7 @@ import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
@@ -68,6 +69,7 @@ import org.web3j.utils.Numeric
 import java.math.BigDecimal
 import java.math.BigInteger
 
+@Disabled("test only locally due to instability")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Web3jBlockchainServiceIntegTest : TestBase() {
 

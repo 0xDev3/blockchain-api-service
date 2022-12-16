@@ -296,6 +296,16 @@ class CustomerNotYetCreatedException : ServiceException(
     }
 }
 
+class SubscriptionAlreadyActiveException : ServiceException(
+    errorCode = ErrorCode.SUBSCRIPTION_ALREADY_ACTIVE,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Customer has an already active subscription"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -8446687908034212249L
+    }
+}
+
 class WebhookException : ServiceException(
     errorCode = ErrorCode.INVALID_REQUEST_BODY,
     httpStatus = HttpStatus.BAD_REQUEST,

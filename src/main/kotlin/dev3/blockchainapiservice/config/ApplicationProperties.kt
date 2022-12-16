@@ -71,8 +71,8 @@ class ContractManifestServiceProperties {
 @ConfigurationProperties(prefix = "blockchain-api-service.api-rate")
 class ApiRateProperties {
     var usagePeriodDuration: Duration = Duration.ofDays(30L)
-    var freeTierWriteRequests: Int = 200
-    var freeTierReadRequests: Int = 500_000
+    var freeTierWriteRequests: Long = 200L
+    var freeTierReadRequests: Long = 500_000L
 }
 
 @ConfigurationProperties(prefix = "blockchain-api-service.stripe")

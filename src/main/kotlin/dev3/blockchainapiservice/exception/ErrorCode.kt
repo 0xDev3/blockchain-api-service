@@ -104,5 +104,8 @@ enum class ErrorCode {
     CUSTOMER_CREATION_FAILED,
 
     @Description("Indicates that customer has not been created yet for the authenticated wallet")
-    CUSTOMER_NOT_YET_CREATED
+    CUSTOMER_NOT_YET_CREATED,
+
+    @Description("Indicates that customer has an already active subscription")
+    SUBSCRIPTION_ALREADY_ACTIVE
 }

@@ -1,6 +1,5 @@
 package dev3.blockchainapiservice.features.billing.service
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.stripe.exception.SignatureVerificationException
 import com.stripe.exception.StripeException
@@ -11,34 +10,40 @@ import com.stripe.model.Product
 import com.stripe.model.Subscription
 import com.stripe.net.Webhook
 import com.stripe.param.CustomerCreateParams
-import com.stripe.param.InvoiceUpcomingParams
 import com.stripe.param.PriceListParams
 import com.stripe.param.ProductListParams
 import com.stripe.param.SubscriptionCreateParams
 import com.stripe.param.SubscriptionListParams
-import com.stripe.param.SubscriptionUpdateParams
 import dev3.blockchainapiservice.config.StripeProperties
 import dev3.blockchainapiservice.exception.CustomerAlreadyExistsException
 import dev3.blockchainapiservice.exception.CustomerCreationFailed
 import dev3.blockchainapiservice.exception.CustomerNotYetCreatedException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.exception.SubscriptionAlreadyActiveException
 import dev3.blockchainapiservice.exception.WebhookException
 import dev3.blockchainapiservice.features.billing.model.request.CreateSubscriptionRequest
-import dev3.blockchainapiservice.features.billing.model.request.UpdateSubscriptionRequest
 import dev3.blockchainapiservice.features.billing.model.response.AvailableSubscriptionResponse
 import dev3.blockchainapiservice.features.billing.model.response.IntervalType
+import dev3.blockchainapiservice.features.billing.model.response.PayableSubscriptionResponse
 import dev3.blockchainapiservice.features.billing.model.response.SubscriptionPriceResponse
 import dev3.blockchainapiservice.features.billing.model.response.SubscriptionResponse
+import dev3.blockchainapiservice.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.model.result.UserIdentifier
+import dev3.blockchainapiservice.repository.ApiRateLimitRepository
 import dev3.blockchainapiservice.repository.UserIdentifierRepository
+import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.math.BigInteger
+import java.time.Duration
+import java.util.UUID
 
 @Service
-class StripeBillingServiceImpl( // TODO refactor and test
+@Suppress("TooManyFunctions")
+class StripeBillingServiceImpl( // TODO test
     private val userIdentifierRepository: UserIdentifierRepository,
+    private val apiRateLimitRepository: ApiRateLimitRepository,
+    private val utcDateTimeProvider: UtcDateTimeProvider,
     private val stripeProperties: StripeProperties,
     private val objectMapper: ObjectMapper
 ) : StripeBillingService {
@@ -46,6 +51,7 @@ class StripeBillingServiceImpl( // TODO refactor and test
     companion object : KLogging() {
         private val SUPPORTED_INTERVALS = listOf(IntervalType.MONTH, IntervalType.YEAR)
         private val NON_DIGIT_REGEX = "[^0-9]".toRegex()
+        private val SUBSCRIPTION_PERIOD_DURATION = Duration.ofDays(30L)
         private const val READ_REQUESTS_KEY = "read_requests"
         private const val WRITE_REQUESTS_KEY = "write_requests"
     }
@@ -58,14 +64,14 @@ class StripeBillingServiceImpl( // TODO refactor and test
             .build()
 
         val products = Product.list(productParams).data.mapNotNull {
-            it.mapMetadataBigIntValue(READ_REQUESTS_KEY) { readRequests ->
-                it.mapMetadataBigIntValue(WRITE_REQUESTS_KEY) { writeRequests ->
+            it.mapMetadataLongValue(READ_REQUESTS_KEY) { readRequests ->
+                it.mapMetadataLongValue(WRITE_REQUESTS_KEY) { writeRequests ->
                     AvailableSubscriptionResponse(
                         id = it.id,
                         name = it.name,
                         description = it.description ?: "",
-                        readRequests = readRequests,
-                        writeRequests = writeRequests,
+                        readRequests = readRequests.toBigInteger(),
+                        writeRequests = writeRequests.toBigInteger(),
                         prices = emptyList()
                     )
                 }
@@ -136,6 +142,7 @@ class StripeBillingServiceImpl( // TODO refactor and test
         return subscriptions.data.mapNotNull { subscription ->
             SubscriptionResponse(
                 id = subscription.id,
+                isActive = subscription.isActive(),
                 currentPeriodStart = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart).value,
                 currentPeriodEnd = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd).value,
                 stripeSubscriptionData = objectMapper.readTree(subscription.toJson())
@@ -146,14 +153,25 @@ class StripeBillingServiceImpl( // TODO refactor and test
     override fun createSubscription(
         requestBody: CreateSubscriptionRequest,
         userIdentifier: UserIdentifier
-    ): SubscriptionResponse {
+    ): PayableSubscriptionResponse {
         logger.info { "Create subscription for user: $userIdentifier, params: $requestBody" }
 
         if (userIdentifier.stripeClientId == null) {
             throw CustomerNotYetCreatedException()
         }
 
-        val params = SubscriptionCreateParams.builder()
+        val getParams = SubscriptionListParams.builder()
+            .setStatus(SubscriptionListParams.Status.ACTIVE)
+            .setCustomer(userIdentifier.stripeClientId)
+            .build()
+
+        val activeSubscriptions = Subscription.list(getParams)
+
+        if (activeSubscriptions.data.isNotEmpty()) {
+            throw SubscriptionAlreadyActiveException()
+        }
+
+        val createParams = SubscriptionCreateParams.builder()
             .setCustomer(userIdentifier.stripeClientId)
             .addItem(
                 SubscriptionCreateParams.Item
@@ -165,53 +183,16 @@ class StripeBillingServiceImpl( // TODO refactor and test
             .addAllExpand(listOf("latest_invoice.payment_intent"))
             .build()
 
-        val subscription = Subscription.create(params)
+        val subscription = Subscription.create(createParams)
         val stripeSubscriptionJson = objectMapper.readTree(subscription.toJson())
 
-        return SubscriptionResponse(
+        return PayableSubscriptionResponse(
             id = subscription.id,
+            isActive = subscription.isActive(),
+            stripePublishableKey = stripeProperties.publishableKey!!,
             currentPeriodStart = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart).value,
             currentPeriodEnd = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd).value,
             stripeSubscriptionData = stripeSubscriptionJson
-        )
-    }
-
-    override fun updateSubscription(
-        subscriptionId: String,
-        requestBody: UpdateSubscriptionRequest,
-        userIdentifier: UserIdentifier
-    ): SubscriptionResponse {
-        logger.info {
-            "Update subscription for user: $userIdentifier, subscriptionId: $subscriptionId, params: $requestBody"
-        }
-
-        if (userIdentifier.stripeClientId == null) {
-            throw CustomerNotYetCreatedException()
-        }
-
-        val subscription = Subscription.retrieve(subscriptionId)
-            ?.takeIf { it.customer == userIdentifier.stripeClientId }
-            ?: throw ResourceNotFoundException(
-                "Subscription with id: $subscriptionId not found for user: ${userIdentifier.userIdentifier}"
-            )
-
-        val params = SubscriptionUpdateParams.builder()
-            .addItem(
-                SubscriptionUpdateParams.Item.builder()
-                    .setId(subscription.items.data[0].id)
-                    .setPrice(requestBody.newPriceId)
-                    .build()
-            )
-            .setCancelAtPeriodEnd(false)
-            .build()
-
-        val updatedSubscription = subscription.update(params)
-
-        return SubscriptionResponse(
-            id = updatedSubscription.id,
-            currentPeriodStart = UtcDateTime.ofEpochSeconds(updatedSubscription.currentPeriodStart).value,
-            currentPeriodEnd = UtcDateTime.ofEpochSeconds(updatedSubscription.currentPeriodEnd).value,
-            stripeSubscriptionData = objectMapper.readTree(updatedSubscription.toJson())
         )
     }
 
@@ -231,38 +212,6 @@ class StripeBillingServiceImpl( // TODO refactor and test
         subscription.cancel()
     }
 
-    override fun getInvoicePreview(subscriptionId: String, priceId: String, userIdentifier: UserIdentifier): JsonNode {
-        logger.debug {
-            "Get invoice preview for user: $userIdentifier, subscriptionId: $subscriptionId, priceId: $priceId"
-        }
-
-        if (userIdentifier.stripeClientId == null) {
-            throw CustomerNotYetCreatedException()
-        }
-
-        val subscription = Subscription.retrieve(subscriptionId)
-            ?.takeIf { it.customer == userIdentifier.stripeClientId }
-            ?: throw ResourceNotFoundException(
-                "Subscription with id: $subscriptionId not found for user: ${userIdentifier.userIdentifier}"
-            )
-
-        val params = InvoiceUpcomingParams.builder()
-            .setCustomer(userIdentifier.stripeClientId)
-            .setSubscription(subscriptionId)
-            .addSubscriptionItem(
-                InvoiceUpcomingParams
-                    .SubscriptionItem.builder()
-                    .setId(subscription.items.data[0].id)
-                    .setPrice(priceId)
-                    .build()
-            )
-            .build()
-
-        val invoice = Invoice.upcoming(params)
-
-        return objectMapper.readTree(invoice.toJson())
-    }
-
     override fun webhook(payload: String, stripeSignature: String) {
         val event = try {
             Webhook.constructEvent(payload, stripeSignature, stripeProperties.webhookSecret)
@@ -273,38 +222,74 @@ class StripeBillingServiceImpl( // TODO refactor and test
 
         val stripeObject = event.dataObjectDeserializer.`object`.orElse(null)
 
-        logger.debug { "[TRACK] Got webhook event: ${event.type}, json: ${stripeObject?.toJson()}".replace('\n', ' ') }
+        logger.debug { "Got webhook event: ${event.type}" }
 
         when (event.type) {
-            // TODO
-            //  "customer.subscription.updated" -> {
-            //      val subscription = stripeObject as? Subscription ?: throw WebhookException()
-            //  }
-
             "invoice.paid" -> {
                 val invoice = stripeObject as? Invoice ?: throw WebhookException()
-                val subscription = Subscription.retrieve(invoice.subscription) // ?.takeIf { it.status == "active" }
+                val clientId = invoice.customer
+                val userId = userIdentifierRepository.getByStripeClientId(clientId)?.id
+                val subscription = Subscription.retrieve(invoice.subscription)
 
-                logger.debug { "[TRACK] Subscription event: ${subscription.toJson()}" }
-
-                if (subscription.status == "active") {
-                    val start = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart)
-                    val end = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd)
+                if (userId != null && subscription.isActive()) {
+                    subscription.activateNewSubscription(userId)
+                } else {
+                    logger.error {
+                        "Active subscription or user does not exist for Stripe client ID," +
+                            " subscription.status: ${subscription.status}, clientId: $clientId, userId: $userId"
+                    }
+                    throw WebhookException()
                 }
             }
 
             else -> {
+                logger.debug { "Unhandled webhook events: ${event.type}" }
             }
         }
     }
 
-    private fun <T> Product.mapMetadataBigIntValue(key: String, mapping: (BigInteger) -> T): T? {
-        val result = this.metadata[key]?.replace(NON_DIGIT_REGEX, "")?.toBigIntegerOrNull()?.let(mapping)
+    private fun <T> Product.mapMetadataLongValue(key: String, mapping: (Long) -> T): T? {
+        val result = this.metadata[key]?.replace(NON_DIGIT_REGEX, "")?.toLongOrNull()?.let(mapping)
 
         if (result == null) {
             logger.warn { "Metadata key $key is not set correctly for product with id: $id, name: $name, skipping" }
         }
 
         return result
+    }
+
+    private fun Subscription.isActive() = status == "active"
+
+    private fun Subscription.activateNewSubscription(userId: UUID) {
+        val start = UtcDateTime.ofEpochSeconds(currentPeriodStart)
+        val end = UtcDateTime.ofEpochSeconds(currentPeriodEnd)
+        val data = this.items.data[0]
+        val intervalDurationInMonths = data.plan.let {
+            IntervalType.valueOf(it.interval.uppercase()).toMonths(it.intervalCount)
+        }
+        val product = Product.retrieve(data.plan.product)
+        val writeRequests = product.mapMetadataLongValue(WRITE_REQUESTS_KEY) { it }
+            ?: throw WebhookException()
+        val readRequests = product.mapMetadataLongValue(READ_REQUESTS_KEY) { it }
+            ?: throw WebhookException()
+
+        val intervals = (0 until intervalDurationInMonths)
+            .map { start + SUBSCRIPTION_PERIOD_DURATION.multipliedBy(it) } + end
+        val limits = intervals.zipWithNext()
+            .map {
+                ApiUsageLimit(
+                    userId = userId,
+                    allowedWriteRequests = writeRequests,
+                    allowedReadRequests = readRequests,
+                    startDate = it.first,
+                    endDate = it.second
+                )
+            }
+
+        apiRateLimitRepository.createNewFutureUsageLimits(
+            userId = userId,
+            currentTime = utcDateTimeProvider.getUtcDateTime(),
+            limits = limits
+        )
     }
 }

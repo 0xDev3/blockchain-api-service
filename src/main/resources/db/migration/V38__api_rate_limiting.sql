@@ -1,8 +1,8 @@
 CREATE TABLE blockchain_api_service.api_usage_period (
     id                        UUID                     PRIMARY KEY,
     user_id                   UUID                     NOT NULL REFERENCES blockchain_api_service.user_identifier(id),
-    additional_write_requests BIGINT                   NOT NULL,
-    additional_read_requests  BIGINT                   NOT NULL,
+    allowed_write_requests    BIGINT                   NOT NULL,
+    allowed_read_requests     BIGINT                   NOT NULL,
     used_write_requests       BIGINT                   NOT NULL,
     used_read_requests        BIGINT                   NOT NULL,
     start_date                TIMESTAMP WITH TIME ZONE NOT NULL,

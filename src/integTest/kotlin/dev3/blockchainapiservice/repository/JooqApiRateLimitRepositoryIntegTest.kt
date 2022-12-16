@@ -7,6 +7,7 @@ import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.ApiUsagePeriodTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiUsagePeriodRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
+import dev3.blockchainapiservice.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.model.result.ApiUsagePeriod
 import dev3.blockchainapiservice.model.result.RequestUsage
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
@@ -58,6 +59,106 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyCreateFutureUsageLimits() {
+        suppose("some current and future usage periods exist for the user") {
+            dslContext.executeInsert(
+                ApiUsagePeriodRecord( // past, should be kept
+                    id = UUID.randomUUID(),
+                    userId = USER_ID,
+                    allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                    allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                    usedWriteRequests = 0L,
+                    usedReadRequests = 0L,
+                    startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration,
+                    endDate = TestData.TIMESTAMP
+                )
+            )
+            dslContext.executeInsert(
+                ApiUsagePeriodRecord( // current, should be ended
+                    id = UUID.randomUUID(),
+                    userId = USER_ID,
+                    allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                    allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                    usedWriteRequests = 0L,
+                    usedReadRequests = 0L,
+                    startDate = TestData.TIMESTAMP,
+                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                )
+            )
+            dslContext.executeInsert(
+                ApiUsagePeriodRecord( // future, should be deleted
+                    id = UUID.randomUUID(),
+                    userId = USER_ID,
+                    allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                    allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                    usedWriteRequests = 0L,
+                    usedReadRequests = 0L,
+                    startDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration,
+                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.multipliedBy(2)
+                )
+            )
+        }
+
+        suppose("some future usage period is created") {
+            repository.createNewFutureUsageLimits(
+                userId = USER_ID,
+                currentTime = TestData.TIMESTAMP + Duration.ofDays(1L),
+                limits = listOf(
+                    ApiUsageLimit(
+                        userId = USER_ID,
+                        allowedWriteRequests = 1L,
+                        allowedReadRequests = 2L,
+                        startDate = TestData.TIMESTAMP + Duration.ofDays(1L),
+                        endDate = TestData.TIMESTAMP + Duration.ofDays(2L)
+                    )
+                )
+            )
+        }
+
+        verify("future usage periods are deleted and current one is ended") {
+            val result = dslContext.selectFrom(ApiUsagePeriodTable)
+                .where(ApiUsagePeriodTable.USER_ID.eq(USER_ID))
+                .orderBy(ApiUsagePeriodTable.END_DATE.desc())
+                .fetch {
+                    ApiUsageLimit(
+                        userId = it.userId,
+                        allowedWriteRequests = it.allowedWriteRequests,
+                        allowedReadRequests = it.allowedReadRequests,
+                        startDate = it.startDate,
+                        endDate = it.endDate
+                    )
+                }
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    listOf(
+                        ApiUsageLimit( // new
+                            userId = USER_ID,
+                            allowedWriteRequests = 1L,
+                            allowedReadRequests = 2L,
+                            startDate = TestData.TIMESTAMP + Duration.ofDays(1L),
+                            endDate = TestData.TIMESTAMP + Duration.ofDays(2L)
+                        ),
+                        ApiUsageLimit( // ended current
+                            userId = USER_ID,
+                            allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                            allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                            startDate = TestData.TIMESTAMP,
+                            endDate = TestData.TIMESTAMP + Duration.ofDays(1L)
+                        ),
+                        ApiUsageLimit( // past
+                            userId = USER_ID,
+                            allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                            allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                            startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration,
+                            endDate = TestData.TIMESTAMP
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
     fun mustCorrectlyGetCurrentUsagePeriodWhenThereAreNoPreviousPeriods() {
         val usagePeriod = suppose("current API usage period is requested") {
             repository.getCurrentApiUsagePeriod(USER_ID, TestData.TIMESTAMP)
@@ -90,9 +191,12 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
             assertThat(record).withMessage()
                 .isEqualTo(
                     ApiUsagePeriodRecord(
+                        id = record!!.id,
                         userId = USER_ID,
-                        additionalWriteRequests = 0,
-                        additionalReadRequests = 0,
+                        allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                        allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                        usedWriteRequests = 0L,
+                        usedReadRequests = 0L,
                         startDate = TestData.TIMESTAMP,
                         endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
                     )
@@ -105,9 +209,12 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         suppose("some too old usage period exists for the user") {
             dslContext.executeInsert(
                 ApiUsagePeriodRecord(
+                    id = UUID.randomUUID(),
                     userId = USER_ID,
-                    additionalWriteRequests = 0,
-                    additionalReadRequests = 0,
+                    allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                    allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                    usedWriteRequests = 0L,
+                    usedReadRequests = 0L,
                     startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.multipliedBy(3L),
                     endDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.multipliedBy(2L)
                 )
@@ -147,9 +254,12 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
             assertThat(record).withMessage()
                 .isEqualTo(
                     ApiUsagePeriodRecord(
+                        id = record!!.id,
                         userId = USER_ID,
-                        additionalWriteRequests = 0,
-                        additionalReadRequests = 0,
+                        allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                        allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                        usedWriteRequests = 0L,
+                        usedReadRequests = 0L,
                         startDate = TestData.TIMESTAMP,
                         endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
                     )
@@ -162,9 +272,12 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         suppose("some current usage period exists for the user") {
             dslContext.executeInsert(
                 ApiUsagePeriodRecord(
+                    id = UUID.randomUUID(),
                     userId = USER_ID,
-                    additionalWriteRequests = 0,
-                    additionalReadRequests = 0,
+                    allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                    allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                    usedWriteRequests = 0L,
+                    usedReadRequests = 0L,
                     startDate = TestData.TIMESTAMP,
                     endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
                 )
@@ -218,7 +331,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         }
 
         verify("remaining rate limit is correctly fetched") {
-            val remainingLimit = repository.remainingWriteLimit(USER_ID, TestData.TIMESTAMP - Duration.ofDays(1L))
+            val remainingLimit = repository.remainingWriteLimit(USER_ID, TestData.TIMESTAMP)
 
             assertThat(remainingLimit).withMessage()
                 .isEqualTo(DEFAULT_PROPERTIES.freeTierWriteRequests - 2)
@@ -230,9 +343,12 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         suppose("some current usage period exists for the user") {
             dslContext.executeInsert(
                 ApiUsagePeriodRecord(
+                    id = UUID.randomUUID(),
                     userId = USER_ID,
-                    additionalWriteRequests = 0,
-                    additionalReadRequests = 0,
+                    allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                    allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                    usedWriteRequests = 0L,
+                    usedReadRequests = 0L,
                     startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration,
                     endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
                 )
@@ -260,7 +376,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         }
 
         verify("remaining rate limit is correctly fetched") {
-            val remainingLimit = repository.remainingReadLimit(USER_ID, TestData.TIMESTAMP - Duration.ofDays(1L))
+            val remainingLimit = repository.remainingReadLimit(USER_ID, TestData.TIMESTAMP)
 
             assertThat(remainingLimit).withMessage()
                 .isEqualTo(DEFAULT_PROPERTIES.freeTierReadRequests - 2)
@@ -272,9 +388,12 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         suppose("some current usage period exists for the user") {
             dslContext.executeInsert(
                 ApiUsagePeriodRecord(
+                    id = UUID.randomUUID(),
                     userId = USER_ID,
-                    additionalWriteRequests = 0,
-                    additionalReadRequests = 0,
+                    allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
+                    allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
+                    usedWriteRequests = 0L,
+                    usedReadRequests = 0L,
                     startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration,
                     endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
                 )

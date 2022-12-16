@@ -187,6 +187,46 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyFetchUserByStripeClientId() {
+        val id = UUID.randomUUID()
+        val clientId = "client-id"
+
+        suppose("some user identifier is stored in database") {
+            dslContext.executeInsert(
+                UserIdentifierRecord(
+                    id = id,
+                    userIdentifier = USER_WALLET_ADDRESS.rawValue,
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = clientId
+                )
+            )
+        }
+
+        verify("user identifier is correctly fetched by Stripe client ID") {
+            val result = repository.getByStripeClientId(clientId)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    UserWalletAddressIdentifier(
+                        id = id,
+                        stripeClientId = clientId,
+                        walletAddress = USER_WALLET_ADDRESS
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustReturnNullWhenFetchingUserByNonExistentStripeClientId() {
+        verify("null is returned when fetching non-existent Stripe client ID") {
+            val result = repository.getByStripeClientId("non-existent")
+
+            assertThat(result).withMessage()
+                .isNull()
+        }
+    }
+
+    @Test
     fun mustCorrectlySetStripeClientId() {
         val id = UUID.randomUUID()
         val userIdentifier = UserWalletAddressIdentifier(
