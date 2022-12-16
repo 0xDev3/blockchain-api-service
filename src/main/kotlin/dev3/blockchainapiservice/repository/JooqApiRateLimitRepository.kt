@@ -1,17 +1,17 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.config.ApiRateProperties
-import dev3.blockchainapiservice.generated.jooq.tables.ApiReadCallTable
 import dev3.blockchainapiservice.generated.jooq.tables.ApiUsagePeriodTable
-import dev3.blockchainapiservice.generated.jooq.tables.ApiWriteCallTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiReadCallRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiUsagePeriodRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiWriteCallRecord
+import dev3.blockchainapiservice.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.model.result.ApiUsagePeriod
 import dev3.blockchainapiservice.model.result.RequestUsage
 import dev3.blockchainapiservice.util.UtcDateTime
 import mu.KLogging
 import org.jooq.DSLContext
+import org.jooq.TableField
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
 import org.springframework.web.bind.annotation.RequestMethod
@@ -20,6 +20,7 @@ import kotlin.math.max
 import dev3.blockchainapiservice.generated.jooq.enums.RequestMethod as DbRequestMethod
 
 @Repository
+@Suppress("TooManyFunctions")
 class JooqApiRateLimitRepository(
     private val dslContext: DSLContext,
     private val apiRateProperties: ApiRateProperties
@@ -27,38 +28,70 @@ class JooqApiRateLimitRepository(
 
     companion object : KLogging()
 
+    override fun createNewFutureUsageLimits(userId: UUID, currentTime: UtcDateTime, limits: List<ApiUsageLimit>) {
+        logger.info { "Create future API usage limits, userId: $userId, currentTime: $currentTime, limits: $limits" }
+
+        // delete all future usage limits
+        dslContext.deleteFrom(ApiUsagePeriodTable)
+            .where(
+                DSL.and(
+                    ApiUsagePeriodTable.USER_ID.eq(userId),
+                    ApiUsagePeriodTable.START_DATE.ge(currentTime)
+                )
+            )
+            .execute()
+
+        // end current usage period
+        dslContext.update(ApiUsagePeriodTable)
+            .set(ApiUsagePeriodTable.END_DATE, currentTime)
+            .where(
+                DSL.and(
+                    ApiUsagePeriodTable.USER_ID.eq(userId),
+                    ApiUsagePeriodTable.START_DATE.le(currentTime),
+                    ApiUsagePeriodTable.END_DATE.ge(currentTime)
+                )
+            )
+            .execute()
+
+        val records = limits.map {
+            ApiUsagePeriodRecord(
+                id = UUID.randomUUID(),
+                userId = userId,
+                allowedWriteRequests = it.allowedWriteRequests,
+                allowedReadRequests = it.allowedReadRequests,
+                usedWriteRequests = 0L,
+                usedReadRequests = 0L,
+                startDate = it.startDate,
+                endDate = it.endDate
+            )
+        }
+
+        // insert new usage periods
+        dslContext.batchInsert(records).execute()
+    }
+
     override fun getCurrentApiUsagePeriod(userId: UUID, currentTime: UtcDateTime): ApiUsagePeriod {
         logger.debug { "Get current API usage period, userId: $userId, currentTime: $currentTime" }
 
         val currentPeriod = getOrCreateApiUsagePeriod(userId, currentTime)
 
-        val periodWriteCount = currentPeriod.countWriteCalls()
-        val totalAllowedWrites = apiRateProperties.freeTierWriteRequests + currentPeriod.additionalWriteRequests
-
-        val periodReadCount = currentPeriod.countReadCalls()
-        val totalAllowedReads = apiRateProperties.freeTierReadRequests + currentPeriod.additionalReadRequests
-
         return ApiUsagePeriod(
             userId = userId,
-            writeRequestUsage = calculateUsage(periodWriteCount, totalAllowedWrites),
-            readRequestUsage = calculateUsage(periodReadCount, totalAllowedReads),
+            writeRequestUsage = calculateUsage(currentPeriod.usedWriteRequests, currentPeriod.allowedWriteRequests),
+            readRequestUsage = calculateUsage(currentPeriod.usedReadRequests, currentPeriod.allowedReadRequests),
             startDate = currentPeriod.startDate,
             endDate = currentPeriod.endDate
         )
     }
 
-    override fun remainingWriteLimit(userId: UUID, currentTime: UtcDateTime): Int {
+    override fun remainingWriteLimit(userId: UUID, currentTime: UtcDateTime): Long {
         val currentPeriod = getOrCreateApiUsagePeriod(userId, currentTime)
-        val periodWriteCount = currentPeriod.countWriteCalls()
-        val totalAllowedWrites = apiRateProperties.freeTierWriteRequests + currentPeriod.additionalWriteRequests
-        return calculateUsage(periodWriteCount, totalAllowedWrites).remaining
+        return calculateUsage(currentPeriod.usedWriteRequests, currentPeriod.allowedWriteRequests).remaining
     }
 
-    override fun remainingReadLimit(userId: UUID, currentTime: UtcDateTime): Int {
+    override fun remainingReadLimit(userId: UUID, currentTime: UtcDateTime): Long {
         val currentPeriod = getOrCreateApiUsagePeriod(userId, currentTime)
-        val periodReadCount = currentPeriod.countReadCalls()
-        val totalAllowedReads = apiRateProperties.freeTierReadRequests + currentPeriod.additionalReadRequests
-        return calculateUsage(periodReadCount, totalAllowedReads).remaining
+        return calculateUsage(currentPeriod.usedReadRequests, currentPeriod.allowedReadRequests).remaining
     }
 
     override fun addWriteCall(userId: UUID, currentTime: UtcDateTime, method: RequestMethod, endpoint: String) {
@@ -74,6 +107,8 @@ class JooqApiRateLimitRepository(
                 createdAt = currentTime
             )
         )
+
+        getOrCreateApiUsagePeriod(userId, currentTime).incrementField(ApiUsagePeriodTable.USED_WRITE_REQUESTS)
     }
 
     override fun addReadCall(userId: UUID, currentTime: UtcDateTime, endpoint: String) {
@@ -86,6 +121,8 @@ class JooqApiRateLimitRepository(
                 createdAt = currentTime
             )
         )
+
+        getOrCreateApiUsagePeriod(userId, currentTime).incrementField(ApiUsagePeriodTable.USED_READ_REQUESTS)
     }
 
     private fun getOrCreateApiUsagePeriod(userId: UUID, currentTime: UtcDateTime): ApiUsagePeriodRecord =
@@ -93,6 +130,7 @@ class JooqApiRateLimitRepository(
             .where(
                 DSL.and(
                     ApiUsagePeriodTable.USER_ID.eq(userId),
+                    ApiUsagePeriodTable.START_DATE.le(currentTime),
                     ApiUsagePeriodTable.END_DATE.ge(currentTime)
                 )
             )
@@ -108,9 +146,12 @@ class JooqApiRateLimitRepository(
         }
 
         val record = ApiUsagePeriodRecord(
+            id = UUID.randomUUID(),
             userId = userId,
-            additionalWriteRequests = 0,
-            additionalReadRequests = 0,
+            allowedWriteRequests = apiRateProperties.freeTierWriteRequests,
+            allowedReadRequests = apiRateProperties.freeTierReadRequests,
+            usedWriteRequests = 0L,
+            usedReadRequests = 0L,
             startDate = startDate,
             endDate = endDate
         )
@@ -120,25 +161,13 @@ class JooqApiRateLimitRepository(
         return record
     }
 
-    private fun ApiUsagePeriodRecord.countWriteCalls(): Int =
-        dslContext.fetchCount(
-            ApiWriteCallTable,
-            DSL.and(
-                ApiWriteCallTable.USER_ID.eq(userId),
-                ApiWriteCallTable.CREATED_AT.between(startDate, endDate)
-            )
-        )
+    private fun ApiUsagePeriodRecord.incrementField(field: TableField<ApiUsagePeriodRecord, Long>) =
+        dslContext.update(ApiUsagePeriodTable)
+            .set(field, field.plus(1))
+            .where(ApiUsagePeriodTable.ID.eq(this.id))
+            .execute()
 
-    private fun ApiUsagePeriodRecord.countReadCalls(): Int =
-        dslContext.fetchCount(
-            ApiReadCallTable,
-            DSL.and(
-                ApiReadCallTable.USER_ID.eq(userId),
-                ApiReadCallTable.CREATED_AT.between(startDate, endDate)
-            )
-        )
-
-    private fun calculateUsage(count: Int, total: Int): RequestUsage =
+    private fun calculateUsage(count: Long, total: Long): RequestUsage =
         RequestUsage(
             used = count,
             remaining = max(total - count, 0)

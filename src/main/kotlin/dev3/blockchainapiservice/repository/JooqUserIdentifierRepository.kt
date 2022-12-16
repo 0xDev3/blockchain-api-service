@@ -48,6 +48,13 @@ class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIde
             .fetchOne { it.toModel() }
     }
 
+    override fun getByStripeClientId(stripeClientId: String): UserIdentifier? {
+        logger.debug { "Get user by Stripe client id, stripeClientId: $stripeClientId" }
+        return dslContext.selectFrom(UserIdentifierTable)
+            .where(UserIdentifierTable.STRIPE_CLIENT_ID.eq(stripeClientId))
+            .fetchOne { it.toModel() }
+    }
+
     override fun setStripeClientId(id: UUID, stripeClientId: String): Boolean {
         logger.info { "Set Stripe client id, id: $id, stripeClientId: $stripeClientId" }
         return dslContext.update(UserIdentifierTable)

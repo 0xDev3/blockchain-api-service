@@ -10,6 +10,8 @@ data class SubscriptionPriceResponse(
     val intervalDuration: Long
 )
 
-enum class IntervalType {
-    DAY, WEEK, MONTH, YEAR
+enum class IntervalType(private val months: Int) {
+    DAY(months = 0), WEEK(months = 0), MONTH(months = 1), YEAR(months = 12);
+
+    fun toMonths(intervalLength: Long): Long = intervalLength * months
 }
