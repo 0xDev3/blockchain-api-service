@@ -2,7 +2,6 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -38,7 +37,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         private val OTHER_OWNER_ID = UUID.randomUUID()
         private const val OTHER_OWNER_ADDRESS = "def456"
         private const val TEMPLATE_NAME = "templateName"
-        private val CHAIN_ID = Chain.HARDHAT_TESTNET.id
+        private val CHAIN_ID = TestData.CHAIN_ID
         private val WALLET_ADDRESS = WalletAddress("a")
         private const val ITEM_NAME = "itemName"
         private val TOKEN_ADDRESS = ContractAddress("b")
@@ -59,7 +58,8 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = WalletAddress(OWNER_ADDRESS).rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -67,7 +67,8 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OTHER_OWNER_ID,
                 userIdentifier = WalletAddress(OTHER_OWNER_ADDRESS).rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
     }
@@ -203,7 +204,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         val newTemplateName = "newTemplateName"
-        val newChainId = Chain.ETHEREUM_MAIN.id
+        val newChainId = TestData.CHAIN_ID
 
         val response = suppose("request to update multi-payment template is made") {
             val response = mockMvc.perform(
@@ -293,7 +294,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         val newTemplateName = "newTemplateName"
-        val newChainId = Chain.ETHEREUM_MAIN.id
+        val newChainId = TestData.CHAIN_ID
 
         verify("404 is returned for non-owned multi-payment template") {
             val response = mockMvc.perform(
@@ -321,7 +322,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @WithMockUser(OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenUpdatingNonExistentMultiPaymentTemplate() {
         val newTemplateName = "newTemplateName"
-        val newChainId = Chain.ETHEREUM_MAIN.id
+        val newChainId = TestData.CHAIN_ID
 
         verify("404 is returned for non-existent multi-payment template") {
             val response = mockMvc.perform(

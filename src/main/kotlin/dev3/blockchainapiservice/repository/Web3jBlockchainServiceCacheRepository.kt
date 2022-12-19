@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.model.EventLog
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.util.AccountBalance
 import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.ContractAddress
@@ -29,6 +30,14 @@ interface Web3jBlockchainServiceCacheRepository {
         eventLogs: List<EventLog>
     )
 
+    fun cacheContractDeploymentTransaction(
+        id: UUID,
+        chainSpec: ChainSpec,
+        contractAddress: ContractAddress,
+        contractDeploymentTransactionInfo: ContractDeploymentTransactionInfo,
+        eventLogs: List<EventLog>
+    )
+
     fun getCachedFetchAccountBalance(
         chainSpec: ChainSpec,
         walletAddress: WalletAddress,
@@ -47,4 +56,9 @@ interface Web3jBlockchainServiceCacheRepository {
         txHash: TransactionHash,
         currentBlockNumber: BlockNumber
     ): Pair<BlockchainTransactionInfo, List<EventLog>>?
+
+    fun getCachedContractDeploymentTransaction(
+        chainSpec: ChainSpec,
+        contractAddress: ContractAddress,
+    ): Pair<ContractDeploymentTransactionInfo, List<EventLog>>?
 }

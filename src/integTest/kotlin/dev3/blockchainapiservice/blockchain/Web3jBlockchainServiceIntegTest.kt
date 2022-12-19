@@ -1,9 +1,10 @@
 package dev3.blockchainapiservice.blockchain
 
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.ChainProperties
 import dev3.blockchainapiservice.exception.BlockchainReadException
 import dev3.blockchainapiservice.features.payout.model.params.GetPayoutsForInvestorParams
 import dev3.blockchainapiservice.features.payout.model.result.PayoutForInvestor
@@ -48,6 +49,7 @@ import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
@@ -67,6 +69,7 @@ import org.web3j.utils.Numeric
 import java.math.BigDecimal
 import java.math.BigInteger
 
+@Disabled("test only locally due to instability")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Web3jBlockchainServiceIntegTest : TestBase() {
 
@@ -95,7 +98,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("storage slot is correctly read") {
             val service = createService()
             val slotValue = service.readStorageSlot(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 slot = EthStorageSlot("0x0")
             )
@@ -107,7 +110,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("zero is returned for empty storage slot") {
             val service = createService()
             val slotValue = service.readStorageSlot(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 slot = EthStorageSlot("0x123456")
             )
@@ -145,11 +148,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct account balance is fetched for latest block") {
             val service = createService()
             service.fetchAccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 walletAddress = accountBalance.wallet
             )
             val fetchedAccountBalance = service.fetchAccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 walletAddress = accountBalance.wallet
             )
 
@@ -206,7 +209,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ETH balance is fetched for block number before ETH transfer is made") {
             val fetchedAccountBalance = service.fetchAccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 walletAddress = accountBalance.wallet,
                 blockParameter = blockNumberBeforeSendingBalance
             )
@@ -226,7 +229,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ETH balance is fetched for block number after ETH transfer is made") {
             val fetchedAccountBalance = service.fetchAccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 walletAddress = accountBalance.wallet,
                 blockParameter = blockNumberAfterSendingBalance
             )
@@ -268,7 +271,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct ERC20 balance is fetched for latest block") {
             val service = createService()
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 walletAddress = accountBalance.wallet
             )
@@ -318,7 +321,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ERC20 balance is fetched for block number before ERC20 transfer is made") {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 walletAddress = accountBalance.wallet,
                 blockParameter = blockNumberBeforeSendingBalance
@@ -339,7 +342,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ERC20 balance is fetched for block number after ERC20 transfer is made") {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 walletAddress = accountBalance.wallet,
                 blockParameter = blockNumberAfterSendingBalance
@@ -365,7 +368,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
             assertThrows<BlockchainReadException>(message) {
                 service.fetchErc20AccountBalance(
-                    chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                    chainSpec = TestData.CHAIN_ID.toSpec(),
                     contractAddress = ContractAddress(accounts[0].address),
                     walletAddress = WalletAddress(accounts[0].address)
                 )
@@ -406,7 +409,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct transaction info is fetched") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 txHash = txHash,
                 events = listOf(PredefinedEvents.ERC20_TRANSFER)
             )
@@ -495,7 +498,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct transaction info is fetched") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 txHash = txHash,
                 events = emptyList()
             )
@@ -556,7 +559,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct transaction info is fetched") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 txHash = txHash,
                 events = emptyList()
             )
@@ -624,7 +627,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct transaction info is fetched") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 txHash = txHash,
                 events = emptyList()
             )
@@ -684,7 +687,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("transaction info events are correctly decoded") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 txHash = txHash,
                 events = listOf(
                     DeserializableEvent(
@@ -769,7 +772,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("transaction info events are correctly decoded") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 txHash = txHash,
                 events = emptyList()
             )!!
@@ -878,7 +881,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("transaction info events are correctly decoded") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 txHash = txHash,
                 events = listOf(
                     DeserializableEvent(
@@ -985,7 +988,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("null is returned for non existent transaction") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 txHash = TransactionHash("0x123456"),
                 events = emptyList()
             )
@@ -1017,7 +1020,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct value is returned for latest block") {
             val service = createService()
             val result = service.callReadonlyFunction(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 params = ExecuteReadonlyFunctionCallParams(
                     contractAddress = ContractAddress(contract.contractAddress),
                     callerAddress = WalletAddress("a"),
@@ -1058,7 +1061,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
             assertThrows<BlockchainReadException>(message) {
                 service.callReadonlyFunction(
-                    chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                    chainSpec = TestData.CHAIN_ID.toSpec(),
                     params = ExecuteReadonlyFunctionCallParams(
                         contractAddress = ContractAddress("dead"),
                         callerAddress = WalletAddress("a"),
@@ -1117,7 +1120,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("contract deployment transaction is correctly found") {
             val service = createService()
             val transactionInfo = service.findContractDeploymentTransaction(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 events = emptyList()
             )
@@ -1192,7 +1195,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched for first end block") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = emptySet(),
                 startBlock = startBlock,
@@ -1213,7 +1216,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched for second end block") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = emptySet(),
                 startBlock = startBlock,
@@ -1283,7 +1286,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = ignoredAddresses,
                 startBlock = startBlock,
@@ -1342,7 +1345,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched for first end block") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = emptySet(),
                 startBlock = startBlock,
@@ -1363,7 +1366,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched for second end block") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = emptySet(),
                 startBlock = startBlock,
@@ -1436,7 +1439,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         )
         val investor2NullParams = investor1NullParams.copy(investor = investor2)
         val blockchainService = createService()
-        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
+        val chainSpec = TestData.CHAIN_ID.toSpec()
 
         verify("all payouts states are fetched") {
             // investor 1
@@ -1459,7 +1462,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             investor = WalletAddress("1")
         )
         val blockchainService = createService()
-        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
+        val chainSpec = TestData.CHAIN_ID.toSpec()
 
         verify("exception is thrown") {
             assertThrows<BlockchainReadException>(message) {
@@ -1468,7 +1471,17 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
     }
 
-    private fun hardhatProperties() = ApplicationProperties().apply { infuraId = hardhatContainer.mappedPort }
+    private fun hardhatProperties() = ApplicationProperties().apply {
+        chain = mapOf(
+            TestData.CHAIN_ID to ChainProperties(
+                name = "HARDHAT_TESTNET",
+                rpcUrl = "http://localhost:${hardhatContainer.mappedPort}",
+                infuraUrl = null,
+                startBlockNumber = null,
+                minBlockConfirmationsForCaching = null
+            )
+        )
+    }
 
     private fun ChainId.toSpec() = ChainSpec(this, null)
 

@@ -1,7 +1,7 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.ControllerTestBase
-import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.model.response.ApiKeyResponse
 import dev3.blockchainapiservice.model.response.ProjectResponse
@@ -53,7 +53,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateProject() {
         val issuerContractAddress = ContractAddress("a")
         val baseRedirectUrl = BaseUrl("base-redirect-url")
-        val chainId = Chain.HARDHAT_TESTNET.id
+        val chainId = TestData.CHAIN_ID
         val customRpcUrl = "custom-rpc-url"
 
         val response = suppose("request to create project is made") {
@@ -97,6 +97,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = response.ownerId,
+                        stripeClientId = null,
                         walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
                     )
                 )
@@ -130,6 +131,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectById() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -142,7 +144,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -201,6 +203,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonOwnedProjectId() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("0cafe0babe")
         )
 
@@ -213,7 +216,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -238,6 +241,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectByIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -250,7 +254,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -311,6 +315,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonOwnedProjectIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("0cafe0babe")
         )
 
@@ -323,7 +328,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -350,6 +355,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnAllProjectsForSomeUser() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -362,7 +368,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -371,7 +377,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -434,6 +440,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -446,7 +453,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -499,6 +506,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForProjectWithoutApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -511,7 +519,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -536,6 +544,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -548,7 +557,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -604,6 +613,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn400BadRequestWhenCreatingAnotherApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -616,7 +626,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -652,6 +662,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundWhenCreatingApiKeyByNonProjectOwner() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -664,7 +675,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
