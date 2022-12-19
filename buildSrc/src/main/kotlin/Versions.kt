@@ -2,7 +2,7 @@ import org.gradle.api.JavaVersion
 
 object Versions {
 
-    const val project = "2.0.0"
+    const val project = "2.2.0"
 
     object Compile {
         const val kotlin = "1.7.20"
@@ -44,5 +44,6 @@ object Versions {
         const val jwt = "1.0.1"
         const val sentry = "6.5.0"
         const val facebookSdk = "14.0.0"
+        const val stripe = "22.1.0"
     }
 }

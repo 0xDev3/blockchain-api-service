@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.params.ParamsFactory
@@ -112,7 +111,7 @@ class EthCommonServiceTest : TestBase() {
     @Test
     fun mustCorrectlyFetchTransactionInfoWhenTxHashIsNotNull() {
         val chainSpec = ChainSpec(
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url"
         )
         val txHash = TransactionHash("tx-hash")
@@ -166,7 +165,7 @@ class EthCommonServiceTest : TestBase() {
         verify("null is returned") {
             val result = service.fetchTransactionInfo(
                 txHash = null,
-                chainId = Chain.HARDHAT_TESTNET.id,
+                chainId = TestData.CHAIN_ID,
                 customRpcUrl = null,
                 events = emptyList()
             )

@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.ExampleContract
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -68,7 +67,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             ownerId = OWNER_ID,
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
@@ -82,7 +81,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             constructorParams = TestData.EMPTY_JSON_ARRAY,
             deployerAddress = null,
             initialEthAmount = Balance.ZERO,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url",
             projectId = PROJECT_ID,
             createdAt = TestData.TIMESTAMP,
@@ -246,7 +245,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = "user-identifier",
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -1648,7 +1648,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     functionName = "test",
                     functionParams = TestData.EMPTY_JSON_ARRAY,
                     ethAmount = Balance(BigInteger.TEN),
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,
@@ -1704,7 +1704,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     functionName = "test",
                     functionParams = TestData.EMPTY_JSON_ARRAY,
                     ethAmount = Balance(BigInteger.TEN),
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,

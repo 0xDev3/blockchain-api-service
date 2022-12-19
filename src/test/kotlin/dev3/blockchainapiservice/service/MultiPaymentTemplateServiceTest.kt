@@ -32,6 +32,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("cafebabe")
         )
         private val TEMPLATE_ID = UUID.randomUUID()

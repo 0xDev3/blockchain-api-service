@@ -92,6 +92,7 @@ class UserIdentifierResolverTest : TestBase() {
         val repository = mock<UserIdentifierRepository>()
         val identifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = walletAddress
         )
 
@@ -143,6 +144,7 @@ class UserIdentifierResolverTest : TestBase() {
 
         val identifier = UserWalletAddressIdentifier(
             id = uuid,
+            stripeClientId = null,
             walletAddress = walletAddress
         )
 

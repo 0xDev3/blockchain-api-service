@@ -8,7 +8,7 @@ import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.exception.ErrorResponse
 import dev3.blockchainapiservice.repository.ApiKeyRepository
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.ProjectIdResolverRepository
+import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import mu.KLogging
 import org.springframework.http.HttpStatus
@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse
 class ApiKeyWriteCallInterceptor(
     private val apiKeyRepository: ApiKeyRepository,
     private val apiRateLimitRepository: ApiRateLimitRepository,
-    private val projectIdResolverRepository: ProjectIdResolverRepository,
+    private val userIdResolverRepository: UserIdResolverRepository,
     private val utcDateTimeProvider: UtcDateTimeProvider,
     private val objectMapper: ObjectMapper
 ) : HandlerInterceptor {
@@ -29,16 +29,16 @@ class ApiKeyWriteCallInterceptor(
     companion object : KLogging()
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean =
-        handleAnnotatedMethod(request, handler) { projectId, _ ->
+        handleAnnotatedMethod(request, handler) { userId, _ ->
             val remainingWriteLimit = apiRateLimitRepository.remainingWriteLimit(
-                projectId = projectId,
+                userId = userId,
                 currentTime = utcDateTimeProvider.getUtcDateTime()
             )
 
             if (remainingWriteLimit > 0) {
                 true
             } else {
-                logger.warn { "API key rate limit exceeded for projectId: $projectId" }
+                logger.warn { "API key rate limit exceeded for userId: $userId" }
 
                 response.status = HttpStatus.PAYMENT_REQUIRED.value()
                 response.writer.println(
@@ -60,10 +60,10 @@ class ApiKeyWriteCallInterceptor(
         handler: Any,
         ex: Exception?
     ) {
-        handleAnnotatedMethod(request, handler) { projectId, annotation ->
+        handleAnnotatedMethod(request, handler) { userId, annotation ->
             if (HttpStatus.resolve(response.status)?.is2xxSuccessful == true) {
                 apiRateLimitRepository.addWriteCall(
-                    projectId = projectId,
+                    userId = userId,
                     currentTime = utcDateTimeProvider.getUtcDateTime(),
                     method = annotation.method,
                     endpoint = annotation.path
@@ -82,19 +82,20 @@ class ApiKeyWriteCallInterceptor(
         val annotation = (handler as? HandlerMethod)?.method?.getAnnotation(ApiWriteLimitedMapping::class.java)
 
         return if (annotation != null) {
-            annotation.resolveProjectId(request)
+            annotation.resolveUserId(request)
                 ?.let { handle(it, annotation) }
                 ?: true
         } else true
     }
 
-    private fun ApiWriteLimitedMapping.resolveProjectId(request: HttpServletRequest): UUID? =
+    private fun ApiWriteLimitedMapping.resolveUserId(request: HttpServletRequest): UUID? =
         if (idType == IdType.PROJECT_ID) {
             request.getHeader(CustomHeaders.API_KEY_HEADER)
                 ?.let { apiKeyRepository.getByValue(it)?.projectId }
+                ?.let { userIdResolverRepository.getUserId(idType, it) }
         } else {
-            ProjectIdResolver.resolve(
-                projectIdResolverRepository = projectIdResolverRepository,
+            UserIdResolver.resolve(
+                userIdResolverRepository = userIdResolverRepository,
                 interceptorName = "ApiKeyWriteCallInterceptor",
                 request = request,
                 idType = idType,

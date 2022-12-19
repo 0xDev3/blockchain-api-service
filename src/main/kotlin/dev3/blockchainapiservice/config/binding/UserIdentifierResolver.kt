@@ -44,7 +44,8 @@ class UserIdentifierResolver(
             ?: userIdentifierRepository.store(
                 UserWalletAddressIdentifier(
                     id = uuidProvider.getUuid(),
-                    walletAddress = principal
+                    walletAddress = principal,
+                    stripeClientId = null
                 )
             )
     }

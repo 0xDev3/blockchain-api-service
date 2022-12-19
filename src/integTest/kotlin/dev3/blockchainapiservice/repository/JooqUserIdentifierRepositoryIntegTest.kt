@@ -51,7 +51,8 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 UserIdentifierRecord(
                     id = id,
                     userIdentifier = USER_WALLET_ADDRESS.rawValue,
-                    identifierType = IDENTIFIER_TYPE
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = null
                 )
             )
         }
@@ -63,6 +64,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
+                        stripeClientId = null,
                         walletAddress = USER_WALLET_ADDRESS
                     )
                 )
@@ -88,7 +90,8 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 UserIdentifierRecord(
                     id = id,
                     userIdentifier = USER_WALLET_ADDRESS.rawValue,
-                    identifierType = IDENTIFIER_TYPE
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = null
                 )
             )
         }
@@ -100,6 +103,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
+                        stripeClientId = null,
                         walletAddress = USER_WALLET_ADDRESS
                     )
                 )
@@ -126,7 +130,8 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 UserIdentifierRecord(
                     id = id,
                     userIdentifier = walletAddress.rawValue,
-                    identifierType = IDENTIFIER_TYPE
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = null
                 )
             )
         }
@@ -138,6 +143,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
+                        stripeClientId = null,
                         walletAddress = walletAddress
                     )
                 )
@@ -159,6 +165,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val userIdentifier = UserWalletAddressIdentifier(
             id = id,
+            stripeClientId = null,
             walletAddress = USER_WALLET_ADDRESS
         )
 
@@ -176,6 +183,76 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
             assertThat(result).withMessage()
                 .isEqualTo(userIdentifier)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchUserByStripeClientId() {
+        val id = UUID.randomUUID()
+        val clientId = "client-id"
+
+        suppose("some user identifier is stored in database") {
+            dslContext.executeInsert(
+                UserIdentifierRecord(
+                    id = id,
+                    userIdentifier = USER_WALLET_ADDRESS.rawValue,
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = clientId
+                )
+            )
+        }
+
+        verify("user identifier is correctly fetched by Stripe client ID") {
+            val result = repository.getByStripeClientId(clientId)
+
+            assertThat(result).withMessage()
+                .isEqualTo(
+                    UserWalletAddressIdentifier(
+                        id = id,
+                        stripeClientId = clientId,
+                        walletAddress = USER_WALLET_ADDRESS
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustReturnNullWhenFetchingUserByNonExistentStripeClientId() {
+        verify("null is returned when fetching non-existent Stripe client ID") {
+            val result = repository.getByStripeClientId("non-existent")
+
+            assertThat(result).withMessage()
+                .isNull()
+        }
+    }
+
+    @Test
+    fun mustCorrectlySetStripeClientId() {
+        val id = UUID.randomUUID()
+        val userIdentifier = UserWalletAddressIdentifier(
+            id = id,
+            stripeClientId = null,
+            walletAddress = USER_WALLET_ADDRESS
+        )
+
+        suppose("user identifier is stored in database") {
+            repository.store(userIdentifier)
+        }
+
+        val stripeClientId = "stripe-client-id"
+
+        val updateStatus = suppose("stripe client id is set in the database") {
+            repository.setStripeClientId(id, stripeClientId)
+        }
+
+        verify("stripe client id was stored in database") {
+            assertThat(updateStatus).withMessage()
+                .isTrue()
+
+            val result = repository.getById(id)
+
+            assertThat(result).withMessage()
+                .isEqualTo(userIdentifier.copy(stripeClientId = stripeClientId))
         }
     }
 }

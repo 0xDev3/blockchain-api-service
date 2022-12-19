@@ -2,7 +2,7 @@ package dev3.blockchainapiservice.config.interceptors
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
-import dev3.blockchainapiservice.repository.ProjectIdResolverRepository
+import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -12,22 +12,22 @@ import org.springframework.web.servlet.HandlerMapping
 import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 
-class ProjectIdResolverTest : TestBase() {
+class UserIdResolverTest : TestBase() {
 
     companion object {
         private val PATH_VARIABLES = HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE
     }
 
     @Test
-    fun mustCorrectlyResolveSomeIdToProjectId() {
+    fun mustCorrectlyResolveSomeIdToUserId() {
         val id = UUID.randomUUID()
-        val projectId = UUID.randomUUID()
+        val userId = UUID.randomUUID()
         val idType = IdType.ASSET_SEND_REQUEST_ID
-        val projectIdResolverRepository = mock<ProjectIdResolverRepository>()
+        val userIdResolverRepository = mock<UserIdResolverRepository>()
 
-        suppose("projectId will be resolved in the repository") {
-            given(projectIdResolverRepository.getProjectId(idType, id))
-                .willReturn(projectId)
+        suppose("userId will be resolved in the repository") {
+            given(userIdResolverRepository.getUserId(idType, id))
+                .willReturn(userId)
         }
 
         val request = mock<HttpServletRequest>()
@@ -37,30 +37,30 @@ class ProjectIdResolverTest : TestBase() {
                 .willReturn(mapOf(idType.idVariableName to id.toString()))
         }
 
-        verify("projectId is correctly resolved") {
-            val resolvedProjectId = ProjectIdResolver.resolve(
-                projectIdResolverRepository = projectIdResolverRepository,
+        verify("userId is correctly resolved") {
+            val resolvedUserId = UserIdResolver.resolve(
+                userIdResolverRepository = userIdResolverRepository,
                 interceptorName = "test",
                 request = request,
                 idType = idType,
                 path = "/test-path/{${idType.idVariableName}}/rest"
             )
 
-            assertThat(resolvedProjectId).withMessage()
-                .isEqualTo(projectId)
+            assertThat(resolvedUserId).withMessage()
+                .isEqualTo(userId)
         }
     }
 
     @Test
     fun mustThrowIllegalStateExceptionWhenIdIsNotPresentInTheRequest() {
         val id = UUID.randomUUID()
-        val projectId = UUID.randomUUID()
+        val userId = UUID.randomUUID()
         val idType = IdType.ASSET_SEND_REQUEST_ID
-        val projectIdResolverRepository = mock<ProjectIdResolverRepository>()
+        val userIdResolverRepository = mock<UserIdResolverRepository>()
 
-        suppose("projectId will be resolved in the repository") {
-            given(projectIdResolverRepository.getProjectId(idType, id))
-                .willReturn(projectId)
+        suppose("userId will be resolved in the repository") {
+            given(userIdResolverRepository.getUserId(idType, id))
+                .willReturn(userId)
         }
 
         val request = mock<HttpServletRequest>()
@@ -72,8 +72,8 @@ class ProjectIdResolverTest : TestBase() {
 
         verify("IllegalStateException is thrown") {
             assertThrows<IllegalStateException>(message) {
-                ProjectIdResolver.resolve(
-                    projectIdResolverRepository = projectIdResolverRepository,
+                UserIdResolver.resolve(
+                    userIdResolverRepository = userIdResolverRepository,
                     interceptorName = "test",
                     request = request,
                     idType = idType,
@@ -93,16 +93,16 @@ class ProjectIdResolverTest : TestBase() {
                 .willReturn(mapOf(idType.idVariableName to "invalid-id"))
         }
 
-        verify("projectId is correctly resolved") {
-            val resolvedProjectId = ProjectIdResolver.resolve(
-                projectIdResolverRepository = mock(),
+        verify("userId is correctly resolved") {
+            val resolvedUserId = UserIdResolver.resolve(
+                userIdResolverRepository = mock(),
                 interceptorName = "test",
                 request = request,
                 idType = idType,
                 path = "/test-path/{${idType.idVariableName}}/rest"
             )
 
-            assertThat(resolvedProjectId).withMessage()
+            assertThat(resolvedUserId).withMessage()
                 .isNull()
         }
     }

@@ -7,14 +7,15 @@ import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.ContractManifestServiceProperties
+import dev3.blockchainapiservice.config.IpfsProperties
 import dev3.blockchainapiservice.config.WebConfig
 import dev3.blockchainapiservice.exception.IpfsUploadFailedException
 import dev3.blockchainapiservice.features.payout.util.IpfsHash
 import dev3.blockchainapiservice.repository.ApiKeyRepository
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.ProjectIdResolverRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
+import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
@@ -33,14 +34,14 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 
 @RestClientTest
-@Import(PinataIpfsService::class, ApplicationProperties::class, WebConfig::class)
+@Import(PinataIpfsService::class, IpfsProperties::class, ContractManifestServiceProperties::class, WebConfig::class)
 @MockBeans(
     MockBean(UuidProvider::class),
     MockBean(UtcDateTimeProvider::class),
     MockBean(UserIdentifierRepository::class),
     MockBean(ApiKeyRepository::class),
     MockBean(ApiRateLimitRepository::class),
-    MockBean(ProjectIdResolverRepository::class),
+    MockBean(UserIdResolverRepository::class),
     MockBean(ProjectRepository::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

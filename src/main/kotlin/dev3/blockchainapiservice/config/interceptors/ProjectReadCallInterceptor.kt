@@ -5,7 +5,7 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMa
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.exception.ErrorResponse
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.ProjectIdResolverRepository
+import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import mu.KLogging
 import org.springframework.http.HttpStatus
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse
 
 class ProjectReadCallInterceptor(
     private val apiRateLimitRepository: ApiRateLimitRepository,
-    private val projectIdResolverRepository: ProjectIdResolverRepository,
+    private val userIdResolverRepository: UserIdResolverRepository,
     private val utcDateTimeProvider: UtcDateTimeProvider,
     private val objectMapper: ObjectMapper
 ) : HandlerInterceptor {
@@ -25,16 +25,16 @@ class ProjectReadCallInterceptor(
     companion object : KLogging()
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean =
-        handleAnnotatedMethod(request, handler) { projectId, _ ->
+        handleAnnotatedMethod(request, handler) { userId, _ ->
             val remainingReadLimit = apiRateLimitRepository.remainingReadLimit(
-                projectId = projectId,
+                userId = userId,
                 currentTime = utcDateTimeProvider.getUtcDateTime()
             )
 
             if (remainingReadLimit > 0) {
                 true
             } else {
-                logger.warn { "Project limit exceeded: $projectId" }
+                logger.warn { "User API limit exceeded: $userId" }
 
                 response.status = HttpStatus.PAYMENT_REQUIRED.value()
                 response.writer.println(
@@ -56,10 +56,10 @@ class ProjectReadCallInterceptor(
         handler: Any,
         ex: Exception?
     ) {
-        handleAnnotatedMethod(request, handler) { projectId, annotation ->
+        handleAnnotatedMethod(request, handler) { userId, annotation ->
             if (HttpStatus.resolve(response.status)?.is2xxSuccessful == true) {
                 apiRateLimitRepository.addReadCall(
-                    projectId = projectId,
+                    userId = userId,
                     currentTime = utcDateTimeProvider.getUtcDateTime(),
                     endpoint = annotation.path
                 )
@@ -77,8 +77,8 @@ class ProjectReadCallInterceptor(
         val annotation = (handler as? HandlerMethod)?.method?.getAnnotation(ApiReadLimitedMapping::class.java)
 
         return if (annotation != null) {
-            ProjectIdResolver.resolve(
-                projectIdResolverRepository = projectIdResolverRepository,
+            UserIdResolver.resolve(
+                userIdResolverRepository = userIdResolverRepository,
                 interceptorName = "ProjectReadCallInterceptor",
                 request = request,
                 idType = annotation.idType,

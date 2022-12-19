@@ -1,5 +1,5 @@
-=== Fetch API Usage for Provided API Key
-Fetches API usage for provided API key.
+=== Fetch API Usage by API Key
+Fetches API usage for owner of the provided API key.
 
 *This request requires an API key present in the `X-API-KEY` header.*
 
