@@ -163,7 +163,7 @@ class JooqApiRateLimitRepository(
 
     private fun ApiUsagePeriodRecord.incrementField(field: TableField<ApiUsagePeriodRecord, Long>) =
         dslContext.update(ApiUsagePeriodTable)
-            .set(field, field.plus(1))
+            .set(field, field + 1)
             .where(ApiUsagePeriodTable.ID.eq(this.id))
             .execute()
 
