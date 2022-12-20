@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository
 import org.springframework.web.bind.annotation.RequestMethod
 import java.util.UUID
 import kotlin.math.max
+import kotlin.time.toKotlinDuration
 import dev3.blockchainapiservice.generated.jooq.enums.RequestMethod as DbRequestMethod
 
 @Repository
@@ -139,7 +140,7 @@ class JooqApiRateLimitRepository(
             .fetchOne() ?: insertNewApiUsagePeriodRecord(userId, currentTime)
 
     private fun insertNewApiUsagePeriodRecord(userId: UUID, startDate: UtcDateTime): ApiUsagePeriodRecord {
-        val endDate = startDate + apiRateProperties.usagePeriodDuration
+        val endDate = startDate + apiRateProperties.usagePeriodDuration.toKotlinDuration()
 
         logger.info {
             "Creating API usage period for userId: $userId, period: [${startDate.value}, ${endDate.value}]"
@@ -163,7 +164,7 @@ class JooqApiRateLimitRepository(
 
     private fun ApiUsagePeriodRecord.incrementField(field: TableField<ApiUsagePeriodRecord, Long>) =
         dslContext.update(ApiUsagePeriodTable)
-            .set(field, field.plus(1))
+            .set(field, field + 1)
             .where(ApiUsagePeriodTable.ID.eq(this.id))
             .execute()
 

@@ -23,7 +23,7 @@ class ContractDecoratorFileWatcherConfig {
         contractInterfacesRepository: ContractInterfacesRepository,
         contractMetadataRepository: ContractMetadataRepository,
         objectMapper: ObjectMapper,
-        contractDecoratorProperties: ContractDecoratorProperties,
+        contractDecoratorProperties: ContractDecoratorProperties
     ): FileSystemWatcher? {
         val interfacesDir = contractDecoratorProperties.interfacesDirectory
 

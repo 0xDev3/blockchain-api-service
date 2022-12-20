@@ -1,0 +1,14 @@
+=== Use Promo Code
+Uses specified promo code.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyAllowUserToUsePromoCode/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyAllowUserToUsePromoCode/http-response.adoc[]
+====

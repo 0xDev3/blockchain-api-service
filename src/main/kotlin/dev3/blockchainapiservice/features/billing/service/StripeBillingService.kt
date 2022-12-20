@@ -9,6 +9,7 @@ import dev3.blockchainapiservice.model.result.UserIdentifier
 interface StripeBillingService {
     fun listAvailableSubscriptions(currency: String): List<AvailableSubscriptionResponse>
     fun createCustomer(email: String, userIdentifier: UserIdentifier)
+    fun hasActiveSubscription(userIdentifier: UserIdentifier): Boolean
     fun getSubscriptions(userIdentifier: UserIdentifier): List<SubscriptionResponse>
     fun createSubscription(
         requestBody: CreateSubscriptionRequest,

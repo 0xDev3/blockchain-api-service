@@ -35,8 +35,8 @@ import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 
 @Service
 @Suppress("TooManyFunctions")
@@ -51,7 +51,7 @@ class StripeBillingServiceImpl( // TODO test
     companion object : KLogging() {
         private val SUPPORTED_INTERVALS = listOf(IntervalType.MONTH, IntervalType.YEAR)
         private val NON_DIGIT_REGEX = "[^0-9]".toRegex()
-        private val SUBSCRIPTION_PERIOD_DURATION = Duration.ofDays(30L)
+        private val SUBSCRIPTION_PERIOD_DURATION = 30.days
         private const val READ_REQUESTS_KEY = "read_requests"
         private const val WRITE_REQUESTS_KEY = "write_requests"
     }
@@ -124,6 +124,20 @@ class StripeBillingServiceImpl( // TODO test
             ?: throw CustomerCreationFailed(email)
     }
 
+    override fun hasActiveSubscription(userIdentifier: UserIdentifier): Boolean {
+        logger.info { "Checking if user has active subscription: $userIdentifier" }
+
+        return if (userIdentifier.stripeClientId == null) {
+            false
+        } else {
+            val params = SubscriptionListParams.builder()
+                .setStatus(SubscriptionListParams.Status.ACTIVE)
+                .setCustomer(userIdentifier.stripeClientId)
+                .build()
+            Subscription.list(params).data.isNotEmpty()
+        }
+    }
+
     override fun getSubscriptions(userIdentifier: UserIdentifier): List<SubscriptionResponse> {
         logger.debug { "Get subscriptions for user: $userIdentifier" }
 
@@ -160,14 +174,7 @@ class StripeBillingServiceImpl( // TODO test
             throw CustomerNotYetCreatedException()
         }
 
-        val getParams = SubscriptionListParams.builder()
-            .setStatus(SubscriptionListParams.Status.ACTIVE)
-            .setCustomer(userIdentifier.stripeClientId)
-            .build()
-
-        val activeSubscriptions = Subscription.list(getParams)
-
-        if (activeSubscriptions.data.isNotEmpty()) {
+        if (hasActiveSubscription(userIdentifier)) {
             throw SubscriptionAlreadyActiveException()
         }
 
@@ -189,7 +196,7 @@ class StripeBillingServiceImpl( // TODO test
         return PayableSubscriptionResponse(
             id = subscription.id,
             isActive = subscription.isActive(),
-            stripePublishableKey = stripeProperties.publishableKey!!,
+            stripePublishableKey = stripeProperties.publishableKey,
             currentPeriodStart = UtcDateTime.ofEpochSeconds(subscription.currentPeriodStart).value,
             currentPeriodEnd = UtcDateTime.ofEpochSeconds(subscription.currentPeriodEnd).value,
             stripeSubscriptionData = stripeSubscriptionJson
@@ -266,7 +273,7 @@ class StripeBillingServiceImpl( // TODO test
         val data = this.items.data[0]
         val intervalDurationInMonths = data.plan.let {
             IntervalType.valueOf(it.interval.uppercase()).toMonths(it.intervalCount)
-        }
+        }.toInt()
         val product = Product.retrieve(data.plan.product)
         val writeRequests = product.mapMetadataLongValue(WRITE_REQUESTS_KEY) { it }
             ?: throw WebhookException()
@@ -274,7 +281,7 @@ class StripeBillingServiceImpl( // TODO test
             ?: throw WebhookException()
 
         val intervals = (0 until intervalDurationInMonths)
-            .map { start + SUBSCRIPTION_PERIOD_DURATION.multipliedBy(it) } + end
+            .map { start + SUBSCRIPTION_PERIOD_DURATION * it } + end
         val limits = intervals.zipWithNext()
             .map {
                 ApiUsageLimit(
