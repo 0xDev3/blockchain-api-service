@@ -1,13 +1,19 @@
 package dev3.blockchainapiservice.features.promo_codes.repository
 
 import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCode
+import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeAlreadyUsed
+import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeDoesNotExist
+import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeResult
 import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeTable
+import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeUsageTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.PromoCodeRecord
+import dev3.blockchainapiservice.generated.jooq.tables.records.PromoCodeUsageRecord
 import dev3.blockchainapiservice.util.UtcDateTime
 import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
+import java.util.UUID
 
 @Repository
 class JooqPromoCodeRepository(private val dslContext: DSLContext) : PromoCodeRepository {
@@ -41,9 +47,26 @@ class JooqPromoCodeRepository(private val dslContext: DSLContext) : PromoCodeRep
             .fetch { it.toModel() }
     }
 
-    override fun useCode(code: String, currentTime: UtcDateTime): PromoCode? {
-        logger.info { "Using promo code, code: $code, currentTime: $currentTime" }
-        return dslContext.update(PromoCodeTable)
+    override fun useCode(code: String, userId: UUID, currentTime: UtcDateTime): PromoCodeResult {
+        logger.info { "Using promo code, code: $code, userId: $userId, currentTime: $currentTime" }
+
+        return dslContext.insertInto(PromoCodeUsageTable)
+            .set(
+                PromoCodeUsageRecord(
+                    userId = userId,
+                    code = code,
+                    usedAt = currentTime
+                )
+            )
+            .onConflictDoNothing()
+            .returning()
+            .fetchOne()
+            ?.let { usePromoCodeIfExists(code, userId, currentTime) }
+            ?: PromoCodeAlreadyUsed
+    }
+
+    private fun usePromoCodeIfExists(code: String, userId: UUID, currentTime: UtcDateTime): PromoCodeResult {
+        val result = dslContext.update(PromoCodeTable)
             .set(PromoCodeTable.NUM_OF_USAGES, PromoCodeTable.NUM_OF_USAGES + 1)
             .where(
                 DSL.and(
@@ -53,6 +76,20 @@ class JooqPromoCodeRepository(private val dslContext: DSLContext) : PromoCodeRep
             )
             .returning()
             .fetchOne { it.toModel() }
+
+        return if (result != null) {
+            result
+        } else {
+            dslContext.deleteFrom(PromoCodeUsageTable)
+                .where(
+                    DSL.and(
+                        PromoCodeUsageTable.USER_ID.eq(userId),
+                        PromoCodeUsageTable.CODE.eq(code)
+                    )
+                )
+                .execute()
+            PromoCodeDoesNotExist
+        }
     }
 
     private fun PromoCodeRecord.toModel() =

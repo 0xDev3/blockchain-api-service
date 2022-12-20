@@ -14,11 +14,6 @@ class StripeConfig(private val stripeProperties: StripeProperties) {
     @PostConstruct
     fun configureStripe() {
         logger.info { "Configuring Stripe payment API..." }
-
-        requireNotNull(stripeProperties.publishableKey) { "Stripe publishable key is not set!" }
-        requireNotNull(stripeProperties.secretKey) { "Stripe secret key is not set!" }
-        requireNotNull(stripeProperties.webhookSecret) { "Stripe webhook secret is not set!" }
-
         Stripe.apiKey = stripeProperties.secretKey
     }
 }
