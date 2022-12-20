@@ -11,15 +11,18 @@ import org.springframework.context.annotation.Configuration
 import java.math.BigInteger
 import java.nio.file.Path
 import java.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 @Configuration
-@ConstructorBinding
 @ConfigurationPropertiesScan
 @ConfigurationProperties(prefix = "blockchain-api-service")
-data class ApplicationProperties(
-    val chain: Map<ChainId, ChainProperties> = emptyMap(),
-    val infuraId: String = ""
-)
+class ApplicationProperties {
+    var chain: Map<ChainId, ChainProperties> = emptyMap()
+    var infuraId: String = ""
+}
 
 @ConstructorBinding
 @ConfigurationProperties(prefix = "blockchain-api-service.jwt")
@@ -42,7 +45,7 @@ data class ChainProperties(
     val infuraUrl: String?,
     val startBlockNumber: BigInteger?,
     val minBlockConfirmationsForCaching: BigInteger?,
-    val latestBlockCacheDuration: Duration = Duration.ofSeconds(5L)
+    val latestBlockCacheDuration: Duration = 5.seconds.toJavaDuration()
 )
 
 @ConstructorBinding
@@ -58,8 +61,8 @@ data class ContractDecoratorProperties(
     val contractsDirectory: Path?,
     val interfacesDirectory: Path?,
     val ignoredDirs: List<String> = listOf(".git"),
-    val fillChangePollInterval: Duration = Duration.ofMinutes(1L),
-    val fileChangeQuietInterval: Duration = Duration.ofSeconds(30L)
+    val fillChangePollInterval: Duration = 1.minutes.toJavaDuration(),
+    val fileChangeQuietInterval: Duration = 30.seconds.toJavaDuration()
 )
 
 @ConstructorBinding
@@ -79,7 +82,7 @@ data class ContractManifestServiceProperties(
 @ConstructorBinding
 @ConfigurationProperties(prefix = "blockchain-api-service.api-rate")
 data class ApiRateProperties(
-    val usagePeriodDuration: Duration = Duration.ofDays(30L),
+    val usagePeriodDuration: Duration = 30.days.toJavaDuration(),
     val freeTierWriteRequests: Long = 200L,
     val freeTierReadRequests: Long = 500_000L
 )

@@ -1,6 +1,6 @@
-package dev3.blockchainapiservice.features.promo_codes.service
+package dev3.blockchainapiservice.features.promocodes.service
 
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCode
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCode
 import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.util.UtcDateTime
 

@@ -23,8 +23,8 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 import org.mockito.kotlin.verify as verifyMock
 
 class MultiPaymentTemplateServiceTest : TestBase() {
@@ -116,7 +116,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
     @Test
     fun mustCorrectlyUpdateMultiPaymentTemplate() {
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
-        val updatedAt = TestData.TIMESTAMP + Duration.ofSeconds(10L)
+        val updatedAt = TestData.TIMESTAMP + 10.seconds
 
         suppose("some timestamp will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())
@@ -392,7 +392,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
-        val newItemTimestamp = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+        val newItemTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())
@@ -479,7 +479,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
-        val newItemTimestamp = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+        val newItemTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())
@@ -529,7 +529,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyUpdateMultiPaymentTemplateItem() {
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
-        val updateTimestamp = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+        val updateTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())
@@ -615,7 +615,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
     @Test
     fun mustThrowResourceNotFoundExceptionWhenUpdatingMultiTemplateItemForNonExistentTemplate() {
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
-        val updateTimestamp = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+        val updateTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())
@@ -671,7 +671,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyDeleteMultiPaymentTemplateItem() {
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
-        val updateTimestamp = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+        val updateTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())
@@ -737,7 +737,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
     @Test
     fun mustThrowResourceNotFoundExceptionWhenDeletingMultiTemplateItemForNonExistentTemplate() {
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
-        val updateTimestamp = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+        val updateTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
             given(utcDateTimeProvider.getUtcDateTime())

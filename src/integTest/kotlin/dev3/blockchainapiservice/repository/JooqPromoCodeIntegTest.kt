@@ -2,10 +2,11 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCode
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeAlreadyUsed
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeDoesNotExist
-import dev3.blockchainapiservice.features.promo_codes.repository.JooqPromoCodeRepository
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCode
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeAlreadyUsed
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeDoesNotExist
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeExpired
+import dev3.blockchainapiservice.features.promocodes.repository.JooqPromoCodeRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeTable
 import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeUsageTable
@@ -22,8 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 
 @JooqTest
 @Import(JooqPromoCodeRepository::class)
@@ -86,7 +87,7 @@ class JooqPromoCodeIntegTest : TestBase() {
             writeRequests = 1L,
             readRequests = 2L,
             numOfUsages = 0L,
-            validUntil = TestData.TIMESTAMP - Duration.ofDays(30L)
+            validUntil = TestData.TIMESTAMP - 30.days
         )
         val currentCode = PromoCode(
             code = "current-code",
@@ -100,7 +101,7 @@ class JooqPromoCodeIntegTest : TestBase() {
             writeRequests = 100L,
             readRequests = 200L,
             numOfUsages = 0L,
-            validUntil = TestData.TIMESTAMP + Duration.ofDays(30L)
+            validUntil = TestData.TIMESTAMP + 30.days
         )
 
         suppose("some promo codes are stored into the database") {
@@ -126,8 +127,8 @@ class JooqPromoCodeIntegTest : TestBase() {
 
         verify("correct promo code is fetched for some time frame") {
             val result = repository.getCodes(
-                validFrom = TestData.TIMESTAMP - Duration.ofDays(15L),
-                validUntil = TestData.TIMESTAMP + Duration.ofDays(15L)
+                validFrom = TestData.TIMESTAMP - 15.days,
+                validUntil = TestData.TIMESTAMP + 15.days
             )
 
             assertThat(result).withMessage()
@@ -171,7 +172,7 @@ class JooqPromoCodeIntegTest : TestBase() {
             val result = repository.useCode(
                 code = promoCode.code,
                 userId = userId,
-                currentTime = TestData.TIMESTAMP - Duration.ofDays(1L)
+                currentTime = TestData.TIMESTAMP - 1.days
             )
 
             assertThat(result).withMessage()
@@ -228,7 +229,7 @@ class JooqPromoCodeIntegTest : TestBase() {
             val result = repository.useCode(
                 code = promoCode.code,
                 userId = userId,
-                currentTime = TestData.TIMESTAMP - Duration.ofDays(1L)
+                currentTime = TestData.TIMESTAMP - 1.days
             )
 
             assertThat(result).withMessage()
@@ -239,7 +240,7 @@ class JooqPromoCodeIntegTest : TestBase() {
             val result = repository.useCode(
                 code = promoCode.code,
                 userId = userId,
-                currentTime = TestData.TIMESTAMP - Duration.ofDays(1L)
+                currentTime = TestData.TIMESTAMP - 1.days
             )
 
             assertThat(result).withMessage()
@@ -296,7 +297,47 @@ class JooqPromoCodeIntegTest : TestBase() {
             val result = repository.useCode(
                 code = promoCode.code,
                 userId = userId,
-                currentTime = TestData.TIMESTAMP + Duration.ofDays(1L)
+                currentTime = TestData.TIMESTAMP + 1.days
+            )
+
+            assertThat(result).withMessage()
+                .isEqualTo(PromoCodeExpired)
+        }
+
+        verify("promo code usage record is not inserted") {
+            val result = dslContext.fetchExists(
+                PromoCodeUsageTable,
+                DSL.and(
+                    PromoCodeUsageTable.USER_ID.eq(userId),
+                    PromoCodeUsageTable.CODE.eq(promoCode.code)
+                )
+            )
+
+            assertThat(result).withMessage()
+                .isFalse()
+        }
+    }
+
+    @Test
+    fun mustNotUseNonExistentPromoCode() {
+        val userId = UUID.randomUUID()
+
+        suppose("some user exists in the database") {
+            dslContext.executeInsert(
+                UserIdentifierRecord(
+                    id = userId,
+                    userIdentifier = "user-identifier",
+                    identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                    stripeClientId = null
+                )
+            )
+        }
+
+        verify("some non-existent promo code is used") {
+            val result = repository.useCode(
+                code = "test",
+                userId = userId,
+                currentTime = TestData.TIMESTAMP + 1.days
             )
 
             assertThat(result).withMessage()
@@ -308,7 +349,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 PromoCodeUsageTable,
                 DSL.and(
                     PromoCodeUsageTable.USER_ID.eq(userId),
-                    PromoCodeUsageTable.CODE.eq(promoCode.code)
+                    PromoCodeUsageTable.CODE.eq("test")
                 )
             )
 

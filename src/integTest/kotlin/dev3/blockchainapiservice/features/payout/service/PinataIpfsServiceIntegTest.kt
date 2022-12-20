@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.mock.mockito.MockBeans
@@ -34,7 +35,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 
 @RestClientTest
-@Import(PinataIpfsService::class, IpfsProperties::class, ContractManifestServiceProperties::class, WebConfig::class)
+@Import(PinataIpfsService::class, WebConfig::class)
 @MockBeans(
     MockBean(UuidProvider::class),
     MockBean(UtcDateTimeProvider::class),
@@ -45,6 +46,7 @@ import org.springframework.http.MediaType
     MockBean(ProjectRepository::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@EnableConfigurationProperties(IpfsProperties::class, ContractManifestServiceProperties::class)
 class PinataIpfsServiceIntegTest : TestBase() {
 
     @Autowired

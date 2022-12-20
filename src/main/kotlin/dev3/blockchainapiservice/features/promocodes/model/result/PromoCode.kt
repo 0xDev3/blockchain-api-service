@@ -1,12 +1,12 @@
-package dev3.blockchainapiservice.features.promo_codes.model.result
+package dev3.blockchainapiservice.features.promocodes.model.result
 
 import dev3.blockchainapiservice.util.UtcDateTime
 
 sealed interface PromoCodeResult
 
-object PromoCodeAlreadyUsed : PromoCodeResult
-
+object PromoCodeExpired : PromoCodeResult
 object PromoCodeDoesNotExist : PromoCodeResult
+object PromoCodeAlreadyUsed : PromoCodeResult
 
 data class PromoCode(
     val code: String,

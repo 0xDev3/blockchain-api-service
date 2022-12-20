@@ -1,0 +1,31 @@
+=== Fetch All Available Promo Codes
+Fetches all available promo codes for specified time range. Only application admin wallets can call this endpoint.
+
+.Query Parameters
+[%collapsible]
+====
+[cols="1,1"]
+|===
+|Parameter |Description
+
+|`from`
+|Lower date-time bound for fetching promo codes, in ISO format. Default value: `1970-01-01T00:00:00Z`
+
+|`to`
+|Upper date-time bound for fetching promo codes, in ISO format. Default value: `9999-12-31T23:59:59Z`
+|===
+====
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyGetPromoCodesForAllowedUser/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyGetPromoCodesForAllowedUser/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/dev3.blockchainapiservice.features.promocodes.model.response.PromoCodesResponse.adoc[]

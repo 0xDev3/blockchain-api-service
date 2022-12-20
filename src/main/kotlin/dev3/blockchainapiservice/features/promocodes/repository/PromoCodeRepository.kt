@@ -1,7 +1,7 @@
-package dev3.blockchainapiservice.features.promo_codes.repository
+package dev3.blockchainapiservice.features.promocodes.repository
 
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCode
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeResult
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCode
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeResult
 import dev3.blockchainapiservice.util.UtcDateTime
 import java.util.UUID
 

@@ -5,14 +5,16 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.PromoCodeProperties
 import dev3.blockchainapiservice.exception.AccessForbiddenException
 import dev3.blockchainapiservice.exception.PromoCodeAlreadyUsedException
+import dev3.blockchainapiservice.exception.PromoCodeExpiredException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.exception.SubscriptionAlreadyActiveException
 import dev3.blockchainapiservice.features.billing.service.StripeBillingService
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCode
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeAlreadyUsed
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeDoesNotExist
-import dev3.blockchainapiservice.features.promo_codes.repository.PromoCodeRepository
-import dev3.blockchainapiservice.features.promo_codes.service.PromoCodeServiceImpl
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCode
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeAlreadyUsed
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeDoesNotExist
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeExpired
+import dev3.blockchainapiservice.features.promocodes.repository.PromoCodeRepository
+import dev3.blockchainapiservice.features.promocodes.service.PromoCodeServiceImpl
 import dev3.blockchainapiservice.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
@@ -26,8 +28,8 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 import org.mockito.kotlin.verify as verifyMock
 
 class PromoCodeServiceTest : TestBase() {
@@ -61,7 +63,6 @@ class PromoCodeServiceTest : TestBase() {
         }
 
         val promoCodeRepository = mock<PromoCodeRepository>()
-
 
         suppose("promo code will be stored into the database") {
             given(
@@ -135,7 +136,7 @@ class PromoCodeServiceTest : TestBase() {
         val promoCodeRepository = mock<PromoCodeRepository>()
 
         suppose("some promo codes will be returned") {
-            given(promoCodeRepository.getCodes(TestData.TIMESTAMP, TestData.TIMESTAMP + Duration.ofDays(1L)))
+            given(promoCodeRepository.getCodes(TestData.TIMESTAMP, TestData.TIMESTAMP + 1.days))
                 .willReturn(listOf(PROMO_CODE))
         }
 
@@ -152,7 +153,7 @@ class PromoCodeServiceTest : TestBase() {
             val result = service.getPromoCodes(
                 userIdentifier = USER_IDENTIFIER,
                 validFrom = TestData.TIMESTAMP,
-                validUntil = TestData.TIMESTAMP + Duration.ofDays(1L)
+                validUntil = TestData.TIMESTAMP + 1.days
             )
 
             assertThat(result).withMessage()
@@ -180,7 +181,7 @@ class PromoCodeServiceTest : TestBase() {
                 service.getPromoCodes(
                     userIdentifier = USER_IDENTIFIER,
                     validFrom = TestData.TIMESTAMP,
-                    validUntil = TestData.TIMESTAMP + Duration.ofDays(1L)
+                    validUntil = TestData.TIMESTAMP + 1.days
                 )
             }
         }
@@ -238,7 +239,7 @@ class PromoCodeServiceTest : TestBase() {
                             allowedWriteRequests = PROMO_CODE.writeRequests,
                             allowedReadRequests = PROMO_CODE.readRequests,
                             startDate = TestData.TIMESTAMP,
-                            endDate = TestData.TIMESTAMP + Duration.ofDays(30L)
+                            endDate = TestData.TIMESTAMP + 30.days
                         )
                     )
                 )
@@ -267,6 +268,54 @@ class PromoCodeServiceTest : TestBase() {
 
         verify("SubscriptionAlreadyActiveException is thrown") {
             assertThrows<SubscriptionAlreadyActiveException>(message) {
+                service.usePromoCode(USER_IDENTIFIER, PROMO_CODE.code)
+            }
+
+            verifyNoInteractions(apiRateLimitRepository)
+        }
+    }
+
+    @Test
+    fun mustThrowPromoCodeExpiredExceptionWhenPromoCodeHasExpired() {
+        val billingService = mock<StripeBillingService>()
+
+        suppose("user does not have an active subscription") {
+            given(billingService.hasActiveSubscription(USER_IDENTIFIER))
+                .willReturn(false)
+        }
+
+        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
+
+        suppose("some timestamp will be returned") {
+            given(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(TestData.TIMESTAMP)
+        }
+
+        val promoCodeRepository = mock<PromoCodeRepository>()
+
+        suppose("some promo code has expired") {
+            given(
+                promoCodeRepository.useCode(
+                    code = PROMO_CODE.code,
+                    userId = USER_IDENTIFIER.id,
+                    currentTime = TestData.TIMESTAMP
+                )
+            )
+                .willReturn(PromoCodeExpired)
+        }
+
+        val apiRateLimitRepository = mock<ApiRateLimitRepository>()
+        val service = PromoCodeServiceImpl(
+            billingService = billingService,
+            promoCodeRepository = promoCodeRepository,
+            apiRateLimitRepository = apiRateLimitRepository,
+            randomProvider = mock(),
+            utcDateTimeProvider = utcDateTimeProvider,
+            promoCodeProperties = PromoCodeProperties()
+        )
+
+        verify("PromoCodeExpiredException is thrown") {
+            assertThrows<PromoCodeExpiredException>(message) {
                 service.usePromoCode(USER_IDENTIFIER, PROMO_CODE.code)
             }
 
