@@ -17,17 +17,20 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.web.bind.annotation.RequestMethod
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
+import kotlin.time.toKotlinDuration
 
 @JooqTest
-@Import(JooqApiRateLimitRepository::class, ApiRateProperties::class)
+@Import(JooqApiRateLimitRepository::class)
 @DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@EnableConfigurationProperties(ApiRateProperties::class)
 class JooqApiRateLimitRepositoryIntegTest : TestBase() {
 
     companion object {
@@ -69,7 +72,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                     allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
                     usedWriteRequests = 0L,
                     usedReadRequests = 0L,
-                    startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration,
+                    startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration(),
                     endDate = TestData.TIMESTAMP
                 )
             )
@@ -82,7 +85,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                     usedWriteRequests = 0L,
                     usedReadRequests = 0L,
                     startDate = TestData.TIMESTAMP,
-                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration()
                 )
             )
             dslContext.executeInsert(
@@ -93,8 +96,8 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                     allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
                     usedWriteRequests = 0L,
                     usedReadRequests = 0L,
-                    startDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration,
-                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.multipliedBy(2)
+                    startDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration(),
+                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration() * 2
                 )
             )
         }
@@ -102,14 +105,14 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         suppose("some future usage period is created") {
             repository.createNewFutureUsageLimits(
                 userId = USER_ID,
-                currentTime = TestData.TIMESTAMP + Duration.ofDays(1L),
+                currentTime = TestData.TIMESTAMP + 1.days,
                 limits = listOf(
                     ApiUsageLimit(
                         userId = USER_ID,
                         allowedWriteRequests = 1L,
                         allowedReadRequests = 2L,
-                        startDate = TestData.TIMESTAMP + Duration.ofDays(1L),
-                        endDate = TestData.TIMESTAMP + Duration.ofDays(2L)
+                        startDate = TestData.TIMESTAMP + 1.days,
+                        endDate = TestData.TIMESTAMP + 2.days
                     )
                 )
             )
@@ -136,21 +139,21 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                             userId = USER_ID,
                             allowedWriteRequests = 1L,
                             allowedReadRequests = 2L,
-                            startDate = TestData.TIMESTAMP + Duration.ofDays(1L),
-                            endDate = TestData.TIMESTAMP + Duration.ofDays(2L)
+                            startDate = TestData.TIMESTAMP + 1.days,
+                            endDate = TestData.TIMESTAMP + 2.days
                         ),
                         ApiUsageLimit( // ended current
                             userId = USER_ID,
                             allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
                             allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
                             startDate = TestData.TIMESTAMP,
-                            endDate = TestData.TIMESTAMP + Duration.ofDays(1L)
+                            endDate = TestData.TIMESTAMP + 1.days
                         ),
                         ApiUsageLimit( // past
                             userId = USER_ID,
                             allowedWriteRequests = DEFAULT_PROPERTIES.freeTierWriteRequests,
                             allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
-                            startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration,
+                            startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration(),
                             endDate = TestData.TIMESTAMP
                         )
                     )
@@ -178,7 +181,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                             remaining = DEFAULT_PROPERTIES.freeTierReadRequests
                         ),
                         startDate = TestData.TIMESTAMP,
-                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration()
                     )
                 )
         }
@@ -198,7 +201,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                         usedWriteRequests = 0L,
                         usedReadRequests = 0L,
                         startDate = TestData.TIMESTAMP,
-                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration()
                     )
                 )
         }
@@ -215,8 +218,8 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                     allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
                     usedWriteRequests = 0L,
                     usedReadRequests = 0L,
-                    startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.multipliedBy(3L),
-                    endDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.multipliedBy(2L)
+                    startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration() * 3,
+                    endDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration() * 2
                 )
             )
         }
@@ -239,7 +242,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                             remaining = DEFAULT_PROPERTIES.freeTierReadRequests
                         ),
                         startDate = TestData.TIMESTAMP,
-                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration()
                     )
                 )
         }
@@ -261,7 +264,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                         usedWriteRequests = 0L,
                         usedReadRequests = 0L,
                         startDate = TestData.TIMESTAMP,
-                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration()
                     )
                 )
         }
@@ -279,12 +282,12 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                     usedWriteRequests = 0L,
                     usedReadRequests = 0L,
                     startDate = TestData.TIMESTAMP,
-                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration()
                 )
             )
         }
 
-        val timestamp = TestData.TIMESTAMP + Duration.ofDays(1L)
+        val timestamp = TestData.TIMESTAMP + 1.days
 
         suppose("some read and write requests exist inside current period") {
             repository.addReadCall(USER_ID, timestamp, "/test")
@@ -310,7 +313,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                             remaining = DEFAULT_PROPERTIES.freeTierReadRequests - 1
                         ),
                         startDate = TestData.TIMESTAMP,
-                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                        endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration()
                     )
                 )
         }
@@ -349,8 +352,8 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                     allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
                     usedWriteRequests = 0L,
                     usedReadRequests = 0L,
-                    startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration,
-                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                    startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration(),
+                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration()
                 )
             )
         }
@@ -361,7 +364,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         }
 
         verify("remaining rate limit is correctly fetched") {
-            val remainingLimit = repository.remainingWriteLimit(USER_ID, TestData.TIMESTAMP - Duration.ofDays(1L))
+            val remainingLimit = repository.remainingWriteLimit(USER_ID, TestData.TIMESTAMP - 1.days)
 
             assertThat(remainingLimit).withMessage()
                 .isEqualTo(DEFAULT_PROPERTIES.freeTierWriteRequests - 2)
@@ -394,8 +397,8 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                     allowedReadRequests = DEFAULT_PROPERTIES.freeTierReadRequests,
                     usedWriteRequests = 0L,
                     usedReadRequests = 0L,
-                    startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration,
-                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration
+                    startDate = TestData.TIMESTAMP - DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration(),
+                    endDate = TestData.TIMESTAMP + DEFAULT_PROPERTIES.usagePeriodDuration.toKotlinDuration()
                 )
             )
         }
@@ -406,7 +409,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         }
 
         verify("remaining rate limit is correctly fetched") {
-            val remainingLimit = repository.remainingReadLimit(USER_ID, TestData.TIMESTAMP - Duration.ofDays(1L))
+            val remainingLimit = repository.remainingReadLimit(USER_ID, TestData.TIMESTAMP - 1.days)
 
             assertThat(remainingLimit).withMessage()
                 .isEqualTo(DEFAULT_PROPERTIES.freeTierReadRequests - 2)

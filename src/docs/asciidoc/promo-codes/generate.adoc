@@ -1,0 +1,42 @@
+=== Generate Promo Code
+Generates promo code with specified parameters. Only application admin wallets can call this endpoint.
+
+All request body parameters are optional and their default values are:
+
+.Default Values
+[%collapsible]
+====
+[cols="1,1"]
+|===
+|Parameter |Default Value
+
+|`prefix`
+|`DEV3-`
+
+|`write_requests`
+|`5000`
+
+|`read_requests`
+|`1000000`
+
+|`validity_in_days`
+|`30`
+
+|===
+====
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyGeneratePromoCodeForAllowedUserWithSomeParameters/http-request.adoc[]
+====
+.Request Schema
+include::{snippets}/dev3.blockchainapiservice.features.promocodes.model.request.GeneratePromoCodeRequest.adoc[]
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyGeneratePromoCodeForAllowedUserWithSomeParameters/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/dev3.blockchainapiservice.features.promocodes.model.response.PromoCodeResponse.adoc[]

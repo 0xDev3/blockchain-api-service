@@ -38,8 +38,8 @@ import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
 import java.math.BigInteger
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 
 @JooqTest
 @Import(JooqContractDeploymentRequestRepository::class)
@@ -189,7 +189,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         val newerRecord = createRecord(
             id = UUID.randomUUID(),
             metadata = metadata,
-            createdAt = TestData.TIMESTAMP + Duration.ofDays(1L)
+            createdAt = TestData.TIMESTAMP + 1.days
         )
 
         suppose("some newer contract deployment request exists in database with same contract address") {
@@ -233,7 +233,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         val newerRecord = createRecord(
             id = UUID.randomUUID(),
             metadata = metadata,
-            createdAt = TestData.TIMESTAMP + Duration.ofDays(1L)
+            createdAt = TestData.TIMESTAMP + 1.days
         )
 
         suppose("some newer contract deployment request exists in database with same contract address") {

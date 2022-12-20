@@ -10,6 +10,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTabl
 import dev3.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
+import dev3.blockchainapiservice.generated.jooq.tables.ContractDeploymentTransactionCacheTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import dev3.blockchainapiservice.generated.jooq.tables.Erc20LockRequestTable
@@ -20,6 +21,8 @@ import dev3.blockchainapiservice.generated.jooq.tables.ImportedContractDecorator
 import dev3.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateItemTable
 import dev3.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateTable
 import dev3.blockchainapiservice.generated.jooq.tables.ProjectTable
+import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeTable
+import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeUsageTable
 import dev3.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import org.jooq.DSLContext
 import org.testcontainers.containers.PostgreSQLContainer
@@ -48,12 +51,15 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
             deleteFrom(ApiUsagePeriodTable).execute()
             deleteFrom(ApiWriteCallTable).execute()
             deleteFrom(ApiReadCallTable).execute()
-            deleteFrom(ApiKeyTable).execute()
-            deleteFrom(ProjectTable).execute()
-            deleteFrom(UserIdentifierTable).execute()
             deleteFrom(FetchAccountBalanceCacheTable).execute()
             deleteFrom(FetchErc20AccountBalanceCacheTable).execute()
             deleteFrom(FetchTransactionInfoCacheTable).execute()
+            deleteFrom(ContractDeploymentTransactionCacheTable).execute()
+            deleteFrom(PromoCodeUsageTable).execute()
+            deleteFrom(PromoCodeTable).execute()
+            deleteFrom(ApiKeyTable).execute()
+            deleteFrom(ProjectTable).execute()
+            deleteFrom(UserIdentifierTable).execute()
             // TODO deleteFrom(SnapshotTable).execute()
             // TODO deleteFrom(MerkleTreeLeafNodeTable).execute()
             // TODO deleteFrom(MerkleTreeRootTable).execute()

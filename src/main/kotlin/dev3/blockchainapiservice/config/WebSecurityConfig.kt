@@ -84,6 +84,8 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) {
             .antMatchers("/v1/billing/**").authenticated()
             .antMatchers(HttpMethod.GET, "/v1/billing/available-plans").permitAll()
             .antMatchers(HttpMethod.GET, "/v1/billing/webhook").permitAll()
+            .antMatchers("/v1/promo-codes").authenticated()
+            .antMatchers("/v1/use-promo-code").authenticated()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling().authenticationEntryPoint(authenticationHandler).and()

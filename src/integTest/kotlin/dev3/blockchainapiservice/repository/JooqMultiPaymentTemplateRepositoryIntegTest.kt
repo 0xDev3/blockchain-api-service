@@ -22,8 +22,8 @@ import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
 import java.math.BigInteger
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 @JooqTest
 @Import(JooqMultiPaymentTemplateRepository::class)
@@ -205,7 +205,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
             walletAddress = WalletAddress("abc"),
             itemName = "newItemName",
             assetAmount = Balance(BigInteger.TWO),
-            createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+            createdAt = TestData.TIMESTAMP + 1.seconds
         )
 
         val templateWithAddedItem = suppose("item is added to multi-payment template") {
@@ -236,7 +236,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
             walletAddress = WalletAddress("abc"),
             itemName = "newItemName",
             assetAmount = Balance(BigInteger.TWO),
-            createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+            createdAt = TestData.TIMESTAMP + 1.seconds
         )
 
         verify("null is returned when adding item to non-existent multi-payment template") {

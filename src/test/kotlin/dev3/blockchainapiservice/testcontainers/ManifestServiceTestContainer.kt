@@ -2,8 +2,8 @@ package dev3.blockchainapiservice.testcontainers
 
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.LogMessageWaitStrategy
-import java.time.Duration
-import java.time.temporal.ChronoUnit
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 class ManifestServiceTestContainer : GenericContainer<ManifestServiceTestContainer>(
     "ampnet/contracts-manifest-service:0.5.0"
@@ -18,7 +18,7 @@ class ManifestServiceTestContainer : GenericContainer<ManifestServiceTestContain
         waitStrategy = LogMessageWaitStrategy()
             .withRegEx("Example app listening at .*")
             .withTimes(1)
-            .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS))
+            .withStartupTimeout(60.seconds.toJavaDuration())
 
         addExposedPort(SERVICE_PORT)
         start()

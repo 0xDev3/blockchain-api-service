@@ -59,8 +59,8 @@ import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 import org.mockito.kotlin.verify as verifyMock
 
 class ContractImportServiceTest : TestBase() {
@@ -348,7 +348,7 @@ class ContractImportServiceTest : TestBase() {
                 .willReturn(id)
         }
 
-        val timestamp = TestData.TIMESTAMP + Duration.ofDays(1L)
+        val timestamp = TestData.TIMESTAMP + 1.days
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
@@ -463,8 +463,8 @@ class ContractImportServiceTest : TestBase() {
                 .willReturn(newDecoratorId, contractMetadataId, newlyImportedContractId)
         }
 
-        val newDecoratorTimestamp = TestData.TIMESTAMP + Duration.ofDays(1L)
-        val newlyImportedContractTimestamp = TestData.TIMESTAMP + Duration.ofDays(2L)
+        val newDecoratorTimestamp = TestData.TIMESTAMP + 1.days
+        val newlyImportedContractTimestamp = TestData.TIMESTAMP + 2.days
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
@@ -631,7 +631,7 @@ class ContractImportServiceTest : TestBase() {
                 .willReturn(contractMetadataId, newlyImportedContractId)
         }
 
-        val newlyImportedContractTimestamp = TestData.TIMESTAMP + Duration.ofDays(2L)
+        val newlyImportedContractTimestamp = TestData.TIMESTAMP + 2.days
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {

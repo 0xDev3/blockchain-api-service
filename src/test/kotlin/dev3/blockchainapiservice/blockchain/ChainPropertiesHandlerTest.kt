@@ -31,11 +31,10 @@ class ChainPropertiesHandlerTest : TestBase() {
     fun mustCorrectlyCreateChainPropertiesWithServicesWhenRpcUrlIsNull() {
         val chainPropertiesHandler = suppose("chain properties handler is created from application properties") {
             ChainPropertiesHandler(
-                ApplicationProperties()
-                    .apply {
-                        infuraId = ""
-                        chain = CHAINS
-                    }
+                ApplicationProperties().apply {
+                    infuraId = ""
+                    chain = CHAINS
+                }
             )
         }
 
@@ -66,11 +65,10 @@ class ChainPropertiesHandlerTest : TestBase() {
     fun mustCorrectlyCreateChainPropertiesWithServicesWhenCustomRpcUrlIsNotSpecified() {
         val chainPropertiesHandler = suppose("chain properties handler is created from application properties") {
             ChainPropertiesHandler(
-                ApplicationProperties()
-                    .apply {
-                        infuraId = ""
-                        chain = CHAINS
-                    }
+                ApplicationProperties().apply {
+                    infuraId = ""
+                    chain = CHAINS
+                }
             )
         }
 

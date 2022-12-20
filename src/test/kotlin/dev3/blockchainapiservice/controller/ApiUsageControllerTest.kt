@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.http.ResponseEntity
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.days
 
 class ApiUsageControllerTest : TestBase() {
 
@@ -43,7 +43,7 @@ class ApiUsageControllerTest : TestBase() {
             writeRequestUsage = RequestUsage(0, 0),
             readRequestUsage = RequestUsage(1, 1),
             startDate = TestData.TIMESTAMP,
-            endDate = TestData.TIMESTAMP + Duration.ofDays(30L)
+            endDate = TestData.TIMESTAMP + 30.days
         )
         private val RESPONSE = ResponseEntity.ok(
             ApiUsagePeriodResponse(
@@ -51,7 +51,7 @@ class ApiUsageControllerTest : TestBase() {
                 writeRequestUsage = RequestUsage(0, 0),
                 readRequestUsage = RequestUsage(1, 1),
                 startDate = TestData.TIMESTAMP.value,
-                endDate = (TestData.TIMESTAMP + Duration.ofDays(30L)).value
+                endDate = (TestData.TIMESTAMP + 30.days).value
             )
         )
     }
