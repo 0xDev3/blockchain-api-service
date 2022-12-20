@@ -3,12 +3,18 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCode
+import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeAlreadyUsed
+import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeDoesNotExist
 import dev3.blockchainapiservice.features.promo_codes.repository.JooqPromoCodeRepository
+import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeTable
+import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeUsageTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.PromoCodeRecord
+import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
+import org.jooq.impl.DSL
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -17,6 +23,7 @@ import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
 import java.time.Duration
+import java.util.UUID
 
 @JooqTest
 @Import(JooqPromoCodeRepository::class)
@@ -147,11 +154,109 @@ class JooqPromoCodeIntegTest : TestBase() {
             )
         }
 
+        val userId = UUID.randomUUID()
+
+        suppose("some user exists in the database") {
+            dslContext.executeInsert(
+                UserIdentifierRecord(
+                    id = userId,
+                    userIdentifier = "user-identifier",
+                    identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                    stripeClientId = null
+                )
+            )
+        }
+
         verify("some valid promo code is used") {
-            val result = repository.useCode(promoCode.code, TestData.TIMESTAMP - Duration.ofDays(1L))
+            val result = repository.useCode(
+                code = promoCode.code,
+                userId = userId,
+                currentTime = TestData.TIMESTAMP - Duration.ofDays(1L)
+            )
 
             assertThat(result).withMessage()
                 .isEqualTo(promoCode.copy(numOfUsages = 1L))
+        }
+
+        verify("promo code usage record is inserted") {
+            val result = dslContext.fetchExists(
+                PromoCodeUsageTable,
+                DSL.and(
+                    PromoCodeUsageTable.USER_ID.eq(userId),
+                    PromoCodeUsageTable.CODE.eq(promoCode.code)
+                )
+            )
+
+            assertThat(result).withMessage()
+                .isTrue()
+        }
+    }
+
+    @Test
+    fun mustNotUsePromoCodeTwice() {
+        val promoCode = PromoCode(
+            code = "test-code",
+            writeRequests = 1L,
+            readRequests = 2L,
+            numOfUsages = 0L,
+            validUntil = TestData.TIMESTAMP
+        )
+
+        suppose("some promo code exists") {
+            repository.storeCode(
+                code = promoCode.code,
+                writeRequests = promoCode.writeRequests,
+                readRequests = promoCode.readRequests,
+                validUntil = promoCode.validUntil
+            )
+        }
+
+        val userId = UUID.randomUUID()
+
+        suppose("some user exists in the database") {
+            dslContext.executeInsert(
+                UserIdentifierRecord(
+                    id = userId,
+                    userIdentifier = "user-identifier",
+                    identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                    stripeClientId = null
+                )
+            )
+        }
+
+        verify("some valid promo code is used") {
+            val result = repository.useCode(
+                code = promoCode.code,
+                userId = userId,
+                currentTime = TestData.TIMESTAMP - Duration.ofDays(1L)
+            )
+
+            assertThat(result).withMessage()
+                .isEqualTo(promoCode.copy(numOfUsages = 1L))
+        }
+
+        verify("already used promo code is not used again") {
+            val result = repository.useCode(
+                code = promoCode.code,
+                userId = userId,
+                currentTime = TestData.TIMESTAMP - Duration.ofDays(1L)
+            )
+
+            assertThat(result).withMessage()
+                .isEqualTo(PromoCodeAlreadyUsed)
+        }
+
+        verify("promo code usage record is inserted") {
+            val result = dslContext.fetchExists(
+                PromoCodeUsageTable,
+                DSL.and(
+                    PromoCodeUsageTable.USER_ID.eq(userId),
+                    PromoCodeUsageTable.CODE.eq(promoCode.code)
+                )
+            )
+
+            assertThat(result).withMessage()
+                .isTrue()
         }
     }
 
@@ -174,11 +279,41 @@ class JooqPromoCodeIntegTest : TestBase() {
             )
         }
 
+        val userId = UUID.randomUUID()
+
+        suppose("some user exists in the database") {
+            dslContext.executeInsert(
+                UserIdentifierRecord(
+                    id = userId,
+                    userIdentifier = "user-identifier",
+                    identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                    stripeClientId = null
+                )
+            )
+        }
+
         verify("some expired promo code is used") {
-            val result = repository.useCode(promoCode.code, TestData.TIMESTAMP + Duration.ofDays(1L))
+            val result = repository.useCode(
+                code = promoCode.code,
+                userId = userId,
+                currentTime = TestData.TIMESTAMP + Duration.ofDays(1L)
+            )
 
             assertThat(result).withMessage()
-                .isNull()
+                .isEqualTo(PromoCodeDoesNotExist)
+        }
+
+        verify("promo code usage record is not inserted") {
+            val result = dslContext.fetchExists(
+                PromoCodeUsageTable,
+                DSL.and(
+                    PromoCodeUsageTable.USER_ID.eq(userId),
+                    PromoCodeUsageTable.CODE.eq(promoCode.code)
+                )
+            )
+
+            assertThat(result).withMessage()
+                .isFalse()
         }
     }
 

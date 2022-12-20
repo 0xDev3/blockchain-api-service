@@ -31,6 +31,9 @@ enum class ErrorCode {
     @Description("The signed message has already been set for the requested resource and it cannot be overridden")
     SIGNED_MESSAGE_ALREADY_SET,
 
+    @Description("Access to the provided resource is not allowed for the current user")
+    ACCESS_FORBIDDEN,
+
     @Description("Provided authentication token has invalid format")
     BAD_AUTHENTICATION,
 
@@ -107,5 +110,8 @@ enum class ErrorCode {
     CUSTOMER_NOT_YET_CREATED,
 
     @Description("Indicates that customer has an already active subscription")
-    SUBSCRIPTION_ALREADY_ACTIVE
+    SUBSCRIPTION_ALREADY_ACTIVE,
+
+    @Description("Indicates that the user has already used the requested promo code before")
+    PROMO_CODE_ALREADY_USED
 }

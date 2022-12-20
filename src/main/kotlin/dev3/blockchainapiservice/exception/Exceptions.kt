@@ -91,6 +91,16 @@ class CannotAttachSignedMessageException(message: String) : ServiceException(
     }
 }
 
+class AccessForbiddenException(message: String) : ServiceException(
+    errorCode = ErrorCode.ACCESS_FORBIDDEN,
+    httpStatus = HttpStatus.FORBIDDEN,
+    message = message
+) {
+    companion object {
+        private const val serialVersionUID: Long = 6548344480966415539L
+    }
+}
+
 class BadAuthenticationException : ServiceException(
     errorCode = ErrorCode.BAD_AUTHENTICATION,
     httpStatus = HttpStatus.UNAUTHORIZED,
@@ -313,5 +323,15 @@ class WebhookException : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = 7893680094807460298L
+    }
+}
+
+class PromoCodeAlreadyUsedException(code: String) : ServiceException(
+    errorCode = ErrorCode.PROMO_CODE_ALREADY_USED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Promo code $code has already been claimed before"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -2863121442776829487L
     }
 }

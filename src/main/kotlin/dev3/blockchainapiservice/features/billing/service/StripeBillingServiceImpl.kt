@@ -124,6 +124,20 @@ class StripeBillingServiceImpl( // TODO test
             ?: throw CustomerCreationFailed(email)
     }
 
+    override fun hasActiveSubscription(userIdentifier: UserIdentifier): Boolean {
+        logger.info { "Checking if user has active subscription: $userIdentifier" }
+
+        return if (userIdentifier.stripeClientId == null) {
+            false
+        } else {
+            val params = SubscriptionListParams.builder()
+                .setStatus(SubscriptionListParams.Status.ACTIVE)
+                .setCustomer(userIdentifier.stripeClientId)
+                .build()
+            Subscription.list(params).data.isNotEmpty()
+        }
+    }
+
     override fun getSubscriptions(userIdentifier: UserIdentifier): List<SubscriptionResponse> {
         logger.debug { "Get subscriptions for user: $userIdentifier" }
 
@@ -160,14 +174,7 @@ class StripeBillingServiceImpl( // TODO test
             throw CustomerNotYetCreatedException()
         }
 
-        val getParams = SubscriptionListParams.builder()
-            .setStatus(SubscriptionListParams.Status.ACTIVE)
-            .setCustomer(userIdentifier.stripeClientId)
-            .build()
-
-        val activeSubscriptions = Subscription.list(getParams)
-
-        if (activeSubscriptions.data.isNotEmpty()) {
+        if (hasActiveSubscription(userIdentifier)) {
             throw SubscriptionAlreadyActiveException()
         }
 

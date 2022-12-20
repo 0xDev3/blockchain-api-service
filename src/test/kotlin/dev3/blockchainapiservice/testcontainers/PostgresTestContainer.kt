@@ -22,6 +22,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateItemT
 import dev3.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateTable
 import dev3.blockchainapiservice.generated.jooq.tables.ProjectTable
 import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeTable
+import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeUsageTable
 import dev3.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import org.jooq.DSLContext
 import org.testcontainers.containers.PostgreSQLContainer
@@ -50,14 +51,15 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
             deleteFrom(ApiUsagePeriodTable).execute()
             deleteFrom(ApiWriteCallTable).execute()
             deleteFrom(ApiReadCallTable).execute()
-            deleteFrom(ApiKeyTable).execute()
-            deleteFrom(ProjectTable).execute()
-            deleteFrom(UserIdentifierTable).execute()
             deleteFrom(FetchAccountBalanceCacheTable).execute()
             deleteFrom(FetchErc20AccountBalanceCacheTable).execute()
             deleteFrom(FetchTransactionInfoCacheTable).execute()
             deleteFrom(ContractDeploymentTransactionCacheTable).execute()
             deleteFrom(PromoCodeTable).execute()
+            deleteFrom(PromoCodeUsageTable).execute()
+            deleteFrom(ApiKeyTable).execute()
+            deleteFrom(ProjectTable).execute()
+            deleteFrom(UserIdentifierTable).execute()
             // TODO deleteFrom(SnapshotTable).execute()
             // TODO deleteFrom(MerkleTreeLeafNodeTable).execute()
             // TODO deleteFrom(MerkleTreeRootTable).execute()
