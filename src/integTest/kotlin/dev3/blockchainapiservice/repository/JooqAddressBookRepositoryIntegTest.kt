@@ -19,8 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 @JooqTest
 @Import(JooqAddressBookRepository::class)
@@ -126,7 +126,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
                 walletAddress = WalletAddress("b"),
                 phoneNumber = "phone-number-2",
                 email = "email-2",
-                createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L),
+                createdAt = TestData.TIMESTAMP + 1.seconds,
                 userId = OWNER_ID
             )
         )
@@ -200,7 +200,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             address = WalletAddress("cafe0babe1"),
             phoneNumber = "new-phone-number",
             email = "new-email",
-            createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L),
+            createdAt = TestData.TIMESTAMP + 1.seconds,
             userId = OWNER_ID
         )
 
@@ -223,7 +223,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         val nullUpdates = nonNullUpdates.copy(
             phoneNumber = null,
             email = null,
-            createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+            createdAt = TestData.TIMESTAMP + 1.seconds
         )
 
         val updatedNullAddressBookEntry = suppose("address book entry is updated in database with null values") {

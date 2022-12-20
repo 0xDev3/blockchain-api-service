@@ -20,8 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 @JooqTest
 @Import(JooqApiKeyRepository::class)
@@ -154,7 +154,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
                     id = UUID.randomUUID(),
                     projectId = PROJECT_ID,
                     apiKey = "api-key-2",
-                    createdAt = TestData.TIMESTAMP + Duration.ofSeconds(10L)
+                    createdAt = TestData.TIMESTAMP + 10.seconds
                 )
             ).execute()
         }

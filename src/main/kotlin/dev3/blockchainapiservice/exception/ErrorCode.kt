@@ -112,6 +112,9 @@ enum class ErrorCode {
     @Description("Indicates that customer has an already active subscription")
     SUBSCRIPTION_ALREADY_ACTIVE,
 
+    @Description("Indicates that the requested promo code has expired")
+    PROMO_CODE_EXPIRED,
+
     @Description("Indicates that the user has already used the requested promo code before")
     PROMO_CODE_ALREADY_USED
 }

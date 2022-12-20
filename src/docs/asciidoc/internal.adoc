@@ -47,3 +47,10 @@ include::src/docs/asciidoc/multi-payment-template/delete.adoc[]
 include::src/docs/asciidoc/multi-payment-template/add-item.adoc[]
 include::src/docs/asciidoc/multi-payment-template/update-item.adoc[]
 include::src/docs/asciidoc/multi-payment-template/delete-item.adoc[]
+
+== Promo Codes API
+All endpoints require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/promo-codes/fetch.adoc[]
+include::src/docs/asciidoc/promo-codes/generate.adoc[]
+include::src/docs/asciidoc/promo-codes/use.adoc[]

@@ -1,15 +1,17 @@
-package dev3.blockchainapiservice.features.promo_codes.service
+package dev3.blockchainapiservice.features.promocodes.service
 
 import dev3.blockchainapiservice.config.PromoCodeProperties
 import dev3.blockchainapiservice.exception.AccessForbiddenException
 import dev3.blockchainapiservice.exception.PromoCodeAlreadyUsedException
+import dev3.blockchainapiservice.exception.PromoCodeExpiredException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.exception.SubscriptionAlreadyActiveException
 import dev3.blockchainapiservice.features.billing.service.StripeBillingService
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCode
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeAlreadyUsed
-import dev3.blockchainapiservice.features.promo_codes.model.result.PromoCodeDoesNotExist
-import dev3.blockchainapiservice.features.promo_codes.repository.PromoCodeRepository
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCode
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeAlreadyUsed
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeDoesNotExist
+import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeExpired
+import dev3.blockchainapiservice.features.promocodes.repository.PromoCodeRepository
 import dev3.blockchainapiservice.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
@@ -19,8 +21,8 @@ import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.time.Duration
 import kotlin.math.absoluteValue
+import kotlin.time.Duration.Companion.days
 
 @Service
 class PromoCodeServiceImpl(
@@ -35,7 +37,7 @@ class PromoCodeServiceImpl(
     companion object : KLogging() {
         private const val PROMO_CODE_LENGTH = 6
         private val PROMO_CODE_CHARS = ('A'..'Z').toList() + ('0'..'9')
-        private val PROMO_PERIOD_DURATION = Duration.ofDays(30L)
+        private val PROMO_PERIOD_DURATION = 30.days
     }
 
     override fun generatePromoCode(
@@ -95,6 +97,7 @@ class PromoCodeServiceImpl(
 
         val promoCode = when (promoCodeResult) {
             is PromoCode -> promoCodeResult
+            is PromoCodeExpired -> throw PromoCodeExpiredException(code)
             is PromoCodeDoesNotExist -> throw ResourceNotFoundException("Expired or non-existent promo code: $code")
             is PromoCodeAlreadyUsed -> throw PromoCodeAlreadyUsedException(code)
         }

@@ -31,10 +31,10 @@ class ChainPropertiesHandlerTest : TestBase() {
     fun mustCorrectlyCreateChainPropertiesWithServicesWhenRpcUrlIsNull() {
         val chainPropertiesHandler = suppose("chain properties handler is created from application properties") {
             ChainPropertiesHandler(
-                ApplicationProperties(
-                    infuraId = "",
+                ApplicationProperties().apply {
+                    infuraId = ""
                     chain = CHAINS
-                )
+                }
             )
         }
 
@@ -47,7 +47,7 @@ class ChainPropertiesHandlerTest : TestBase() {
     @Test
     fun mustCorrectlyCreateChainPropertiesWithServicesWhenCustomRpcUrlIsSpecified() {
         val chainPropertiesHandler = suppose("chain properties handler is created from application properties") {
-            ChainPropertiesHandler(ApplicationProperties(infuraId = ""))
+            ChainPropertiesHandler(ApplicationProperties().apply { infuraId = "" })
         }
 
         verify("chain properties with services are correctly created") {
@@ -65,10 +65,10 @@ class ChainPropertiesHandlerTest : TestBase() {
     fun mustCorrectlyCreateChainPropertiesWithServicesWhenCustomRpcUrlIsNotSpecified() {
         val chainPropertiesHandler = suppose("chain properties handler is created from application properties") {
             ChainPropertiesHandler(
-                ApplicationProperties(
-                    infuraId = "",
+                ApplicationProperties().apply {
+                    infuraId = ""
                     chain = CHAINS
-                )
+                }
             )
         }
 
@@ -99,10 +99,11 @@ class ChainPropertiesHandlerTest : TestBase() {
 
     @Test
     fun mustReturnDefaultRpcIfInfuraIdIsMissing() {
-        val applicationProperties = ApplicationProperties(
-            infuraId = "",
-            chain = CHAINS
-        )
+        val applicationProperties = ApplicationProperties()
+            .apply {
+                infuraId = ""
+                chain = CHAINS
+            }
 
         val chainPropertiesHandler = suppose("chain properties handler is created from application properties") {
             ChainPropertiesHandler(applicationProperties)
@@ -117,10 +118,11 @@ class ChainPropertiesHandlerTest : TestBase() {
 
     @Test
     fun mustReturnDefaultRpcWhenChainDoesNotHaveInfuraRpcDefined() {
-        val applicationProperties = ApplicationProperties(
-            infuraId = "",
-            chain = CHAINS
-        )
+        val applicationProperties = ApplicationProperties()
+            .apply {
+                infuraId = ""
+                chain = CHAINS
+            }
 
         val chainPropertiesHandler = suppose("chain properties handler is created from application properties") {
             ChainPropertiesHandler(applicationProperties)
@@ -136,10 +138,11 @@ class ChainPropertiesHandlerTest : TestBase() {
     @Test
     fun mustReturnInfuraRpc() {
         val infuraId = "some-id"
-        val applicationProperties = ApplicationProperties(
-            infuraId = infuraId,
-            chain = CHAINS
-        )
+        val applicationProperties = ApplicationProperties()
+            .apply {
+                this.infuraId = infuraId
+                chain = CHAINS
+            }
 
         val chainPropertiesHandler = suppose("chain properties handler is created from application properties") {
             ChainPropertiesHandler(applicationProperties)

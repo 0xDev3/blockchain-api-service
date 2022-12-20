@@ -326,6 +326,16 @@ class WebhookException : ServiceException(
     }
 }
 
+class PromoCodeExpiredException(code: String) : ServiceException(
+    errorCode = ErrorCode.PROMO_CODE_EXPIRED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Promo code $code has expired"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -5645213305320430242L
+    }
+}
+
 class PromoCodeAlreadyUsedException(code: String) : ServiceException(
     errorCode = ErrorCode.PROMO_CODE_ALREADY_USED,
     httpStatus = HttpStatus.BAD_REQUEST,
