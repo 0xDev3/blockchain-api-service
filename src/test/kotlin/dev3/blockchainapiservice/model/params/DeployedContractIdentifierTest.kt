@@ -3,9 +3,7 @@ package dev3.blockchainapiservice.model.params
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.exception.InvalidRequestBodyException
 import dev3.blockchainapiservice.util.ContractAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.util.UUID
 
 class DeployedContractIdentifierTest : TestBase() {
@@ -33,7 +31,7 @@ class DeployedContractIdentifierTest : TestBase() {
         }
 
         verify("correct identifier is created") {
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(DeployedContractIdIdentifier(id))
         }
     }
@@ -53,7 +51,7 @@ class DeployedContractIdentifierTest : TestBase() {
         }
 
         verify("correct identifier is created") {
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(DeployedContractAliasIdentifier(alias))
         }
     }
@@ -73,7 +71,7 @@ class DeployedContractIdentifierTest : TestBase() {
         }
 
         verify("correct identifier is created") {
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(DeployedContractAddressIdentifier(contractAddress))
         }
     }
@@ -81,7 +79,7 @@ class DeployedContractIdentifierTest : TestBase() {
     @Test
     fun mustThrowInvalidRequestBodyExceptionWhenAllContractIdentifiersArePresent() {
         verify("InvalidRequestBodyException is thrown") {
-            assertThrows<InvalidRequestBodyException>(message) {
+            expectThrows<InvalidRequestBodyException> {
                 DeployedContractIdentifier(
                     RequestBody(
                         deployedContractId = UUID.randomUUID(),
@@ -96,7 +94,7 @@ class DeployedContractIdentifierTest : TestBase() {
     @Test
     fun mustThrowInvalidRequestBodyExceptionWhenNoContractIdentifiersArePresent() {
         verify("InvalidRequestBodyException is thrown") {
-            assertThrows<InvalidRequestBodyException>(message) {
+            expectThrows<InvalidRequestBodyException> {
                 DeployedContractIdentifier(
                     RequestBody(
                         deployedContractId = null,

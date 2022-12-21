@@ -5,7 +5,6 @@ import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigInteger
 
@@ -31,7 +30,7 @@ class EthereumFunctionEncoderServiceTest : TestBase() {
             "00000000000000000000000000000000000000000000003e8"
 
         verify("data is correctly encoded") {
-            assertThat(encodedData).withMessage()
+            expectThat(encodedData)
                 .isEqualTo(FunctionData(expectedData))
         }
     }
@@ -55,7 +54,7 @@ class EthereumFunctionEncoderServiceTest : TestBase() {
             "0000000000000000000000000000000000003e8"
 
         verify("data is correctly encoded") {
-            assertThat(encodedData).withMessage()
+            expectThat(encodedData)
                 .isEqualTo(FunctionData(expectedData))
         }
     }
@@ -69,7 +68,7 @@ class EthereumFunctionEncoderServiceTest : TestBase() {
         }
 
         verify("data is correctly encoded") {
-            assertThat(encodedData).withMessage()
+            expectThat(encodedData)
                 .isEqualTo(FunctionData(""))
         }
     }

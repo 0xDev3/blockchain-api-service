@@ -21,7 +21,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -171,24 +170,22 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         )
 
         verify("storing imported contract decorator returns correct result") {
-            assertThat(storedContractDecorator).withMessage()
+            expectThat(storedContractDecorator)
                 .isEqualTo(expectedDecorator)
         }
 
         verify("imported contract decorator was correctly stored into the database") {
-            assertThat(
+            expectThat(
                 repository.getByContractIdAndProjectId(contractId, PROJECT_ID_1)
                     ?.copy(artifact = expectedDecorator.artifact)
-            ).withMessage()
-                .isEqualTo(expectedDecorator)
-            assertThat(repository.getManifestJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+            ).isEqualTo(expectedDecorator)
+            expectThat(repository.getManifestJsonByContractIdAndProjectId(contractId, PROJECT_ID_1))
                 .isEqualTo(manifestJson)
-            assertThat(
+            expectThat(
                 repository.getArtifactJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)
                     ?.copy(linkReferences = null, deployedLinkReferences = null)
-            ).withMessage()
-                .isEqualTo(artifactJson)
-            assertThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+            ).isEqualTo(artifactJson)
+            expectThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, PROJECT_ID_1))
                 .isEqualTo(infoMarkdown)
         }
     }
@@ -246,19 +243,17 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         )
 
         verify("imported contract decorator was correctly updated in the database") {
-            assertThat(
+            expectThat(
                 repository.getByContractIdAndProjectId(contractId, PROJECT_ID_1)
                     ?.copy(artifact = expectedDecorator.artifact)
-            ).withMessage()
-                .isEqualTo(expectedDecorator)
-            assertThat(repository.getManifestJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+            ).isEqualTo(expectedDecorator)
+            expectThat(repository.getManifestJsonByContractIdAndProjectId(contractId, PROJECT_ID_1))
                 .isEqualTo(expectedManifest)
-            assertThat(
+            expectThat(
                 repository.getArtifactJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)
                     ?.copy(linkReferences = null, deployedLinkReferences = null)
-            ).withMessage()
-                .isEqualTo(artifactJson)
-            assertThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+            ).isEqualTo(artifactJson)
+            expectThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, PROJECT_ID_1))
                 .isEqualTo(infoMarkdown)
         }
     }
@@ -309,18 +304,18 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         )
 
         verify("storing imported contract decorator returns correct result") {
-            assertThat(storedContractDecorator).withMessage()
+            expectThat(storedContractDecorator)
                 .isEqualTo(expectedDecorator)
         }
 
         verify("imported contract decorator is not stored into the database") {
-            assertThat(repository.getByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+            expectThat(repository.getByContractIdAndProjectId(contractId, PROJECT_ID_1))
                 .isNull()
-            assertThat(repository.getManifestJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+            expectThat(repository.getManifestJsonByContractIdAndProjectId(contractId, PROJECT_ID_1))
                 .isNull()
-            assertThat(repository.getArtifactJsonByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+            expectThat(repository.getArtifactJsonByContractIdAndProjectId(contractId, PROJECT_ID_1))
                 .isNull()
-            assertThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, PROJECT_ID_1)).withMessage()
+            expectThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, PROJECT_ID_1))
                 .isNull()
         }
     }
@@ -331,13 +326,13 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         val projectId = UUID.randomUUID()
 
         verify("null is returned when fetching non-existent imported contract decorator by contract id") {
-            assertThat(repository.getByContractIdAndProjectId(contractId, projectId)).withMessage()
+            expectThat(repository.getByContractIdAndProjectId(contractId, projectId))
                 .isNull()
-            assertThat(repository.getManifestJsonByContractIdAndProjectId(contractId, projectId)).withMessage()
+            expectThat(repository.getManifestJsonByContractIdAndProjectId(contractId, projectId))
                 .isNull()
-            assertThat(repository.getArtifactJsonByContractIdAndProjectId(contractId, projectId)).withMessage()
+            expectThat(repository.getArtifactJsonByContractIdAndProjectId(contractId, projectId))
                 .isNull()
-            assertThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, projectId)).withMessage()
+            expectThat(repository.getInfoMarkdownByContractIdAndProjectId(contractId, projectId))
                 .isNull()
         }
     }
@@ -464,20 +459,19 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
                 contractImplements = OrList()
             )
 
-            assertThat(repository.getAll(PROJECT_ID_1, filters).fixEquals()).withMessage()
+            expectThat(repository.getAll(PROJECT_ID_1, filters).fixEquals())
                 .containsExactlyInAnyOrderElementsOf(project1DecoratorsWithMatchingTags.map { it.decorator })
-            assertThat(repository.getAllManifestJsonFiles(PROJECT_ID_1, filters)).withMessage()
+            expectThat(repository.getAllManifestJsonFiles(PROJECT_ID_1, filters))
                 .containsExactlyInAnyOrderElementsOf(
                     project1DecoratorsWithMatchingTags.map { testDataById[it.decorator.id]!!.manifest }
                 )
-            assertThat(
+            expectThat(
                 repository.getAllArtifactJsonFiles(PROJECT_ID_1, filters)
                     .map { it.copy(linkReferences = null, deployedLinkReferences = null) }
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    project1DecoratorsWithMatchingTags.map { testDataById[it.decorator.id]!!.artifact }
-                )
-            assertThat(repository.getAllInfoMarkdownFiles(PROJECT_ID_1, filters)).withMessage()
+            ).containsExactlyInAnyOrderElementsOf(
+                project1DecoratorsWithMatchingTags.map { testDataById[it.decorator.id]!!.artifact }
+            )
+            expectThat(repository.getAllInfoMarkdownFiles(PROJECT_ID_1, filters))
                 .containsExactlyInAnyOrderElementsOf(
                     project1DecoratorsWithMatchingTags.map { testDataById[it.decorator.id]!!.markdown }
                 )
@@ -491,20 +485,19 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
                     AndList(InterfaceId("trait-2"))
                 )
             )
-            assertThat(repository.getAll(PROJECT_ID_1, filters).fixEquals()).withMessage()
+            expectThat(repository.getAll(PROJECT_ID_1, filters).fixEquals())
                 .containsExactlyInAnyOrderElementsOf(project1DecoratorsWithMatchingTraits.map { it.decorator })
-            assertThat(repository.getAllManifestJsonFiles(PROJECT_ID_1, filters)).withMessage()
+            expectThat(repository.getAllManifestJsonFiles(PROJECT_ID_1, filters))
                 .containsExactlyInAnyOrderElementsOf(
                     project1DecoratorsWithMatchingTraits.map { testDataById[it.decorator.id]!!.manifest }
                 )
-            assertThat(
+            expectThat(
                 repository.getAllArtifactJsonFiles(PROJECT_ID_1, filters)
                     .map { it.copy(linkReferences = null, deployedLinkReferences = null) }
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    project1DecoratorsWithMatchingTraits.map { testDataById[it.decorator.id]!!.artifact }
-                )
-            assertThat(repository.getAllInfoMarkdownFiles(PROJECT_ID_1, filters)).withMessage()
+            ).containsExactlyInAnyOrderElementsOf(
+                project1DecoratorsWithMatchingTraits.map { testDataById[it.decorator.id]!!.artifact }
+            )
+            expectThat(repository.getAllInfoMarkdownFiles(PROJECT_ID_1, filters))
                 .containsExactlyInAnyOrderElementsOf(
                     project1DecoratorsWithMatchingTraits.map { testDataById[it.decorator.id]!!.markdown }
                 )
@@ -522,20 +515,19 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
                 )
             )
 
-            assertThat(repository.getAll(PROJECT_ID_2, filters).fixEquals()).withMessage()
+            expectThat(repository.getAll(PROJECT_ID_2, filters).fixEquals())
                 .containsExactlyInAnyOrderElementsOf(project2MatchingDecorators.map { it.decorator })
-            assertThat(repository.getAllManifestJsonFiles(PROJECT_ID_2, filters)).withMessage()
+            expectThat(repository.getAllManifestJsonFiles(PROJECT_ID_2, filters))
                 .containsExactlyInAnyOrderElementsOf(
                     project2MatchingDecorators.map { testDataById[it.decorator.id]!!.manifest }
                 )
-            assertThat(
+            expectThat(
                 repository.getAllArtifactJsonFiles(PROJECT_ID_2, filters)
                     .map { it.copy(linkReferences = null, deployedLinkReferences = null) }
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    project2MatchingDecorators.map { testDataById[it.decorator.id]!!.artifact }
-                )
-            assertThat(repository.getAllInfoMarkdownFiles(PROJECT_ID_2, filters)).withMessage()
+            ).containsExactlyInAnyOrderElementsOf(
+                project2MatchingDecorators.map { testDataById[it.decorator.id]!!.artifact }
+            )
+            expectThat(repository.getAllInfoMarkdownFiles(PROJECT_ID_2, filters))
                 .containsExactlyInAnyOrderElementsOf(
                     project2MatchingDecorators.map { testDataById[it.decorator.id]!!.markdown }
                 )

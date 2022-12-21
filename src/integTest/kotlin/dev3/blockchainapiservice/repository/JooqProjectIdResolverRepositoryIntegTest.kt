@@ -27,7 +27,6 @@ import dev3.blockchainapiservice.util.DurationSeconds
 import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -137,7 +136,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyReturnUserIdForProject() {
         verify("correct userId is returned") {
-            assertThat(repository.getUserId(IdType.PROJECT_ID, PROJECT_ID)).withMessage()
+            expectThat(repository.getUserId(IdType.PROJECT_ID, PROJECT_ID))
                 .isEqualTo(USER_ID)
         }
     }
@@ -167,7 +166,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         }
 
         verify("correct userId is returned") {
-            assertThat(repository.getUserId(IdType.ASSET_BALANCE_REQUEST_ID, id)).withMessage()
+            expectThat(repository.getUserId(IdType.ASSET_BALANCE_REQUEST_ID, id))
                 .isEqualTo(USER_ID)
         }
     }
@@ -203,7 +202,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         }
 
         verify("correct userId is returned") {
-            assertThat(repository.getUserId(IdType.ASSET_MULTI_SEND_REQUEST_ID, id)).withMessage()
+            expectThat(repository.getUserId(IdType.ASSET_MULTI_SEND_REQUEST_ID, id))
                 .isEqualTo(USER_ID)
         }
     }
@@ -233,7 +232,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         }
 
         verify("correct userId is returned") {
-            assertThat(repository.getUserId(IdType.ASSET_SEND_REQUEST_ID, id)).withMessage()
+            expectThat(repository.getUserId(IdType.ASSET_SEND_REQUEST_ID, id))
                 .isEqualTo(USER_ID)
         }
     }
@@ -262,7 +261,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         }
 
         verify("correct userId is returned") {
-            assertThat(repository.getUserId(IdType.AUTHORIZATION_REQUEST_ID, id)).withMessage()
+            expectThat(repository.getUserId(IdType.AUTHORIZATION_REQUEST_ID, id))
                 .isEqualTo(USER_ID)
         }
     }
@@ -313,7 +312,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         }
 
         verify("correct userId is returned") {
-            assertThat(repository.getUserId(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, id)).withMessage()
+            expectThat(repository.getUserId(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, id))
                 .isEqualTo(USER_ID)
         }
     }
@@ -345,7 +344,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         }
 
         verify("correct userId is returned") {
-            assertThat(repository.getUserId(IdType.FUNCTION_CALL_REQUEST_ID, id)).withMessage()
+            expectThat(repository.getUserId(IdType.FUNCTION_CALL_REQUEST_ID, id))
                 .isEqualTo(USER_ID)
         }
     }
@@ -376,7 +375,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         }
 
         verify("correct userId is returned") {
-            assertThat(repository.getUserId(IdType.ERC20_LOCK_REQUEST_ID, id)).withMessage()
+            expectThat(repository.getUserId(IdType.ERC20_LOCK_REQUEST_ID, id))
                 .isEqualTo(USER_ID)
         }
     }

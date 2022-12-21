@@ -12,10 +12,7 @@ import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.core.MethodParameter
 import org.springframework.web.context.request.NativeWebRequest
@@ -43,7 +40,7 @@ class ProjectApiKeyResolverTest : TestBase() {
             val method = Companion::class.java.methods.find { it.name == "supportedMethod" }!!
             val parameter = MethodParameter(method, 0)
 
-            assertThat(resolver.supportsParameter(parameter)).withMessage()
+            expectThat(resolver.supportsParameter(parameter))
                 .isTrue()
         }
     }
@@ -56,7 +53,7 @@ class ProjectApiKeyResolverTest : TestBase() {
             val method = Companion::class.java.methods.find { it.name == "unsupportedMethod1" }!!
             val parameter = MethodParameter(method, 0)
 
-            assertThat(resolver.supportsParameter(parameter)).withMessage()
+            expectThat(resolver.supportsParameter(parameter))
                 .isFalse()
         }
     }
@@ -69,7 +66,7 @@ class ProjectApiKeyResolverTest : TestBase() {
             val method = Companion::class.java.methods.find { it.name == "unsupportedMethod2" }!!
             val parameter = MethodParameter(method, 0)
 
-            assertThat(resolver.supportsParameter(parameter)).withMessage()
+            expectThat(resolver.supportsParameter(parameter))
                 .isFalse()
         }
     }
@@ -80,14 +77,14 @@ class ProjectApiKeyResolverTest : TestBase() {
         val httpServletRequest = mock<HttpServletRequest>()
 
         suppose("API key will be returned from header") {
-            given(httpServletRequest.getHeader(CustomHeaders.API_KEY_HEADER))
+            call(httpServletRequest.getHeader(CustomHeaders.API_KEY_HEADER))
                 .willReturn(apiKeyValue)
         }
 
         val nativeWebRequest = mock<NativeWebRequest>()
 
         suppose("HttpServletRequest will be returned") {
-            given(nativeWebRequest.getNativeRequest(HttpServletRequest::class.java))
+            call(nativeWebRequest.getNativeRequest(HttpServletRequest::class.java))
                 .willReturn(httpServletRequest)
         }
 
@@ -100,7 +97,7 @@ class ProjectApiKeyResolverTest : TestBase() {
         )
 
         suppose("API key is fetched from database") {
-            given(apiKeyRepository.getByValue(apiKeyValue))
+            call(apiKeyRepository.getByValue(apiKeyValue))
                 .willReturn(apiKey)
         }
 
@@ -116,14 +113,14 @@ class ProjectApiKeyResolverTest : TestBase() {
         )
 
         suppose("project is fetched from database") {
-            given(projectRepository.getById(apiKey.projectId))
+            call(projectRepository.getById(apiKey.projectId))
                 .willReturn(project)
         }
 
         val resolver = ProjectApiKeyResolver(apiKeyRepository, projectRepository)
 
         verify("API key is correctly returned") {
-            assertThat(resolver.resolveArgument(mock(), mock(), nativeWebRequest, mock())).withMessage()
+            expectThat(resolver.resolveArgument(mock(), mock(), nativeWebRequest, mock()))
                 .isEqualTo(project)
         }
     }
@@ -134,28 +131,28 @@ class ProjectApiKeyResolverTest : TestBase() {
         val httpServletRequest = mock<HttpServletRequest>()
 
         suppose("API key will be returned from header") {
-            given(httpServletRequest.getHeader(CustomHeaders.API_KEY_HEADER))
+            call(httpServletRequest.getHeader(CustomHeaders.API_KEY_HEADER))
                 .willReturn(apiKeyValue)
         }
 
         val nativeWebRequest = mock<NativeWebRequest>()
 
         suppose("HttpServletRequest will be returned") {
-            given(nativeWebRequest.getNativeRequest(HttpServletRequest::class.java))
+            call(nativeWebRequest.getNativeRequest(HttpServletRequest::class.java))
                 .willReturn(httpServletRequest)
         }
 
         val repository = mock<ApiKeyRepository>()
 
         suppose("API key is null") {
-            given(repository.getByValue(apiKeyValue))
+            call(repository.getByValue(apiKeyValue))
                 .willReturn(null)
         }
 
         val resolver = ProjectApiKeyResolver(repository, mock())
 
         verify("NonExistentApiKeyException is thrown") {
-            assertThrows<NonExistentApiKeyException>(message) {
+            expectThrows<NonExistentApiKeyException> {
                 resolver.resolveArgument(mock(), mock(), nativeWebRequest, mock())
             }
         }

@@ -16,7 +16,6 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -111,7 +110,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         verify("asset send request is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetSendRequest(
                         id = id,
@@ -139,7 +138,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent asset send request") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -234,7 +233,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         verify("asset send requests are correctly fetched by project") {
             val result = repository.getAllByProjectId(PROJECT_ID)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .containsExactlyInAnyOrderElementsOf(
                     projectRequests.map {
                         AssetSendRequest(
@@ -333,7 +332,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         verify("asset send requests are correctly fetched by sender") {
             val result = repository.getBySender(ASSET_SENDER_ADDRESS)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .containsExactlyInAnyOrderElementsOf(
                     senderRequests.map {
                         AssetSendRequest(
@@ -417,7 +416,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         verify("asset send requests are correctly fetched by recipient") {
             val result = repository.getByRecipient(ASSET_RECIPIENT_ADDRESS)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .containsExactlyInAnyOrderElementsOf(
                     recipientRequests.map {
                         AssetSendRequest(
@@ -485,14 +484,14 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         )
 
         verify("storing asset send request returns correct result") {
-            assertThat(storedAssetSendRequest).withMessage()
+            expectThat(storedAssetSendRequest)
                 .isEqualTo(expectedAssetSendRequest)
         }
 
         verify("asset send request was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(expectedAssetSendRequest)
         }
     }
@@ -522,14 +521,14 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, ASSET_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("txInfo was correctly set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetSendRequest(
                         id = id,
@@ -578,14 +577,14 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
 
         verify("setting txInfo will succeed") {
             val ignoredTokenSender = WalletAddress("f")
-            assertThat(repository.setTxInfo(id, TX_HASH, ignoredTokenSender)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, ignoredTokenSender))
                 .isTrue()
         }
 
         verify("txHash was correctly set while token sender was not updated") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetSendRequest(
                         id = id,
@@ -633,24 +632,24 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, ASSET_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("setting another txInfo will not succeed") {
-            assertThat(
+            expectThat(
                 repository.setTxInfo(
                     id,
                     TransactionHash("different-tx-hash"),
                     ASSET_SENDER_ADDRESS
                 )
-            ).withMessage().isFalse()
+            ).isFalse()
         }
 
         verify("first txHash remains in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetSendRequest(
                         id = id,

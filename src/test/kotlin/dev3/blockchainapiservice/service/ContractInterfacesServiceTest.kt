@@ -26,13 +26,9 @@ import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.InterfaceId
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class ContractInterfacesServiceTest : TestBase() {
 
@@ -140,7 +136,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
         suppose("some partially matching contract interfaces will be returned") {
-            given(
+            call(
                 contractInterfacesRepository.getAllWithPartiallyMatchingInterfaces(
                     abiFunctionSignatures = setOf("function(string)"),
                     abiEventSignatures = setOf("Event(string)")
@@ -169,7 +165,7 @@ class ContractInterfacesServiceTest : TestBase() {
         }
 
         suppose("some interfaces are in the contract interfaces repository") {
-            given(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
+            call(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
                 .willReturn(EMPTY_CONTRACT_INTERFACE)
         }
 
@@ -189,7 +185,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("correct interfaces are attached") {
-            assertThat(service.attachMatchingInterfacesToDecorator(decorator)).withMessage()
+            expectThat(service.attachMatchingInterfacesToDecorator(decorator))
                 .isEqualTo(
                     ContractDecorator(
                         id = decorator.id,
@@ -207,21 +203,21 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("some imported contract manifest will be returned") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(MANIFEST_JSON)
         }
 
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
         suppose("some partially matching contract interfaces will be returned") {
-            given(
+            call(
                 contractInterfacesRepository.getAllWithPartiallyMatchingInterfaces(
                     abiFunctionSignatures = setOf("function(string)"),
                     abiEventSignatures = setOf("Event(string)")
@@ -257,7 +253,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("correct interfaces are suggested") {
-            assertThat(service.getSuggestedInterfacesForImportedSmartContract(ID)).withMessage()
+            expectThat(service.getSuggestedInterfacesForImportedSmartContract(ID))
                 .isEqualTo(
                     listOf(
                         InterfaceManifestJsonWithId(
@@ -278,7 +274,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("null will be returned for contract deployment request") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(null)
         }
 
@@ -290,7 +286,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getSuggestedInterfacesForImportedSmartContract(ID)
             }
         }
@@ -301,7 +297,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some non-imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(imported = false))
         }
 
@@ -313,7 +309,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getSuggestedInterfacesForImportedSmartContract(ID)
             }
         }
@@ -324,14 +320,14 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("null will be returned for imported contract manifest") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(null)
         }
 
@@ -343,7 +339,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getSuggestedInterfacesForImportedSmartContract(ID)
             }
         }
@@ -354,26 +350,26 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("some imported contract manifest will be returned") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(MANIFEST_JSON)
         }
 
         suppose("some imported contract artifact will be returned") {
-            given(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(ARTIFACT_JSON)
         }
 
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
         suppose("some interfaces are in the contract interfaces repository") {
-            given(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
+            call(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
                 .willReturn(EMPTY_CONTRACT_INTERFACE)
         }
 
@@ -394,20 +390,24 @@ class ContractInterfacesServiceTest : TestBase() {
         }
 
         verify("interface is correctly added") {
-            verifyMock(importedContractDecoratorRepository)
-                .updateInterfaces(
+            expectInteractions(importedContractDecoratorRepository) {
+                once.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID)
+                once.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID)
+                once.updateInterfaces(
                     contractId = CONTRACT_ID,
                     projectId = PROJECT_ID,
                     interfaces = newInterfaces.map { InterfaceId(it) }.toList(),
                     manifest = MANIFEST_JSON.copy(implements = newInterfaces)
                 )
+            }
 
-            verifyMock(contractMetadataRepository)
-                .updateInterfaces(
+            expectInteractions(contractMetadataRepository) {
+                once.updateInterfaces(
                     contractId = CONTRACT_ID,
                     projectId = PROJECT_ID,
                     interfaces = newInterfaces.map { InterfaceId(it) }.toList()
                 )
+            }
         }
     }
 
@@ -416,7 +416,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("null will be returned for contract deployment request") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(null)
         }
 
@@ -428,7 +428,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.addInterfacesToImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -439,7 +439,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some non-imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(imported = false))
         }
 
@@ -451,7 +451,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.addInterfacesToImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -462,7 +462,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some non-owned contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = UUID.randomUUID()))
         }
 
@@ -474,7 +474,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.addInterfacesToImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -485,14 +485,14 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("null will be returned for imported contract manifest") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(null)
         }
 
@@ -504,7 +504,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.addInterfacesToImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -515,19 +515,19 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("some imported contract manifest will be returned") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(MANIFEST_JSON)
         }
 
         suppose("some imported contract artifact will be returned") {
-            given(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(ARTIFACT_JSON)
         }
 
@@ -539,7 +539,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ContractInterfaceNotFoundException is thrown") {
-            assertThrows<ContractInterfaceNotFoundException>(message) {
+            expectThrows<ContractInterfaceNotFoundException> {
                 service.addInterfacesToImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -550,26 +550,26 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("some imported contract manifest will be returned") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(MANIFEST_JSON)
         }
 
         suppose("some imported contract artifact will be returned") {
-            given(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(ARTIFACT_JSON)
         }
 
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
         suppose("some interfaces are in the contract interfaces repository") {
-            given(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
+            call(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
                 .willReturn(EMPTY_CONTRACT_INTERFACE)
         }
 
@@ -591,20 +591,24 @@ class ContractInterfacesServiceTest : TestBase() {
         }
 
         verify("interface is correctly removed") {
-            verifyMock(importedContractDecoratorRepository)
-                .updateInterfaces(
+            expectInteractions(importedContractDecoratorRepository) {
+                once.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID)
+                once.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID)
+                once.updateInterfaces(
                     contractId = CONTRACT_ID,
                     projectId = PROJECT_ID,
                     interfaces = emptyList(),
                     manifest = MANIFEST_JSON.copy(implements = emptySet())
                 )
+            }
 
-            verifyMock(contractMetadataRepository)
-                .updateInterfaces(
+            expectInteractions(contractMetadataRepository) {
+                once.updateInterfaces(
                     contractId = CONTRACT_ID,
                     projectId = PROJECT_ID,
                     interfaces = emptyList()
                 )
+            }
         }
     }
 
@@ -613,7 +617,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("null will be returned for contract deployment request") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(null)
         }
 
@@ -625,7 +629,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.removeInterfacesFromImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -636,7 +640,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some non-imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(imported = false))
         }
 
@@ -648,7 +652,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.removeInterfacesFromImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -659,7 +663,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some non-owned contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = UUID.randomUUID()))
         }
 
@@ -671,7 +675,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.removeInterfacesFromImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -682,14 +686,14 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("null will be returned for imported contract manifest") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(null)
         }
 
@@ -701,7 +705,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.removeInterfacesFromImportedContract(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -712,26 +716,26 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("some imported contract manifest will be returned") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(MANIFEST_JSON)
         }
 
         suppose("some imported contract artifact will be returned") {
-            given(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(ARTIFACT_JSON)
         }
 
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
         suppose("some interfaces are in the contract interfaces repository") {
-            given(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
+            call(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
                 .willReturn(EMPTY_CONTRACT_INTERFACE)
         }
 
@@ -751,20 +755,24 @@ class ContractInterfacesServiceTest : TestBase() {
         }
 
         verify("interfaces are correctly set") {
-            verifyMock(importedContractDecoratorRepository)
-                .updateInterfaces(
+            expectInteractions(importedContractDecoratorRepository) {
+                once.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID)
+                once.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID)
+                once.updateInterfaces(
                     contractId = CONTRACT_ID,
                     projectId = PROJECT_ID,
                     interfaces = newInterfaces,
                     manifest = MANIFEST_JSON.copy(implements = newInterfaces.map { it.value }.toSet())
                 )
+            }
 
-            verifyMock(contractMetadataRepository)
-                .updateInterfaces(
+            expectInteractions(contractMetadataRepository) {
+                once.updateInterfaces(
                     contractId = CONTRACT_ID,
                     projectId = PROJECT_ID,
                     interfaces = newInterfaces
                 )
+            }
         }
     }
 
@@ -773,7 +781,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("null will be returned for contract deployment request") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(null)
         }
 
@@ -785,7 +793,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.setImportedContractInterfaces(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -796,7 +804,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some non-imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(imported = false))
         }
 
@@ -808,7 +816,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.setImportedContractInterfaces(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -819,7 +827,7 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some non-owned contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = UUID.randomUUID()))
         }
 
@@ -831,7 +839,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.setImportedContractInterfaces(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -842,14 +850,14 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("null will be returned for imported contract manifest") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(null)
         }
 
@@ -861,7 +869,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.setImportedContractInterfaces(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }
@@ -872,19 +880,19 @@ class ContractInterfacesServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract deployment request will be returned") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
         }
 
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("some imported contract manifest will be returned") {
-            given(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(MANIFEST_JSON)
         }
 
         suppose("some imported contract artifact will be returned") {
-            given(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+            call(importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
                 .willReturn(ARTIFACT_JSON)
         }
 
@@ -896,7 +904,7 @@ class ContractInterfacesServiceTest : TestBase() {
         )
 
         verify("ContractInterfaceNotFoundException is thrown") {
-            assertThrows<ContractInterfaceNotFoundException>(message) {
+            expectThrows<ContractInterfaceNotFoundException> {
                 service.setImportedContractInterfaces(ID, PROJECT_ID, listOf(InterfaceId("new-interface")))
             }
         }

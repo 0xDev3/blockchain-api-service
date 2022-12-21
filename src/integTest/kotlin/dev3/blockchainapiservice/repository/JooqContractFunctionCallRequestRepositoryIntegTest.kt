@@ -22,7 +22,6 @@ import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -155,7 +154,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
         verify("contract function call request is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(record.toModel())
         }
     }
@@ -165,7 +164,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent contract function call request") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -207,7 +206,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("must correctly fetch project 1 contract function calls with matching contract ID and address") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_1,
                     filters = ContractFunctionCallRequestFilters(
@@ -215,14 +214,13 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         contractAddress = CONTRACT_ADDRESS
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    models(project1ContractsWithMatchingDeployedContractIdAndAddress)
-                )
+            ).containsExactlyInAnyOrderElementsOf(
+                models(project1ContractsWithMatchingDeployedContractIdAndAddress)
+            )
         }
 
         verify("must correctly fetch project 1 contract function calls with matching contract ID") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_1,
                     filters = ContractFunctionCallRequestFilters(
@@ -230,17 +228,16 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         contractAddress = null
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    models(
-                        project1ContractsWithMatchingDeployedContractIdAndAddress,
-                        project1ContractsWithNonMatchingContractAddress
-                    )
+            ).containsExactlyInAnyOrderElementsOf(
+                models(
+                    project1ContractsWithMatchingDeployedContractIdAndAddress,
+                    project1ContractsWithNonMatchingContractAddress
                 )
+            )
         }
 
         verify("must correctly fetch project 1 contract function calls with matching contract address") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_1,
                     filters = ContractFunctionCallRequestFilters(
@@ -248,17 +245,16 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         contractAddress = CONTRACT_ADDRESS
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    models(
-                        project1ContractsWithMatchingDeployedContractIdAndAddress,
-                        project1ContractsWithMissingDeployedContractId
-                    )
+            ).containsExactlyInAnyOrderElementsOf(
+                models(
+                    project1ContractsWithMatchingDeployedContractIdAndAddress,
+                    project1ContractsWithMissingDeployedContractId
                 )
+            )
         }
 
         verify("must correctly fetch all project 1 contract function calls") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_1,
                     filters = ContractFunctionCallRequestFilters(
@@ -266,18 +262,17 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         contractAddress = null
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    models(
-                        project1ContractsWithMatchingDeployedContractIdAndAddress,
-                        project1ContractsWithMissingDeployedContractId,
-                        project1ContractsWithNonMatchingContractAddress
-                    )
+            ).containsExactlyInAnyOrderElementsOf(
+                models(
+                    project1ContractsWithMatchingDeployedContractIdAndAddress,
+                    project1ContractsWithMissingDeployedContractId,
+                    project1ContractsWithNonMatchingContractAddress
                 )
+            )
         }
 
         verify("must correctly fetch project 2 contract function calls with matching contract ID and address") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_2,
                     filters = ContractFunctionCallRequestFilters(
@@ -285,14 +280,13 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         contractAddress = CONTRACT_ADDRESS
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    models(project2ContractsWithMatchingDeployedContractIdAndAddress)
-                )
+            ).containsExactlyInAnyOrderElementsOf(
+                models(project2ContractsWithMatchingDeployedContractIdAndAddress)
+            )
         }
 
         verify("must correctly fetch project 2 contract function calls with matching contract ID") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_2,
                     filters = ContractFunctionCallRequestFilters(
@@ -300,17 +294,16 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         contractAddress = null
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    models(
-                        project2ContractsWithMatchingDeployedContractIdAndAddress,
-                        project2ContractsWithNonMatchingContractAddress
-                    )
+            ).containsExactlyInAnyOrderElementsOf(
+                models(
+                    project2ContractsWithMatchingDeployedContractIdAndAddress,
+                    project2ContractsWithNonMatchingContractAddress
                 )
+            )
         }
 
         verify("must correctly fetch project 2 contract function calls with matching contract address") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_2,
                     filters = ContractFunctionCallRequestFilters(
@@ -318,17 +311,16 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         contractAddress = CONTRACT_ADDRESS
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    models(
-                        project2ContractsWithMatchingDeployedContractIdAndAddress,
-                        project2ContractsWithMissingDeployedContractId
-                    )
+            ).containsExactlyInAnyOrderElementsOf(
+                models(
+                    project2ContractsWithMatchingDeployedContractIdAndAddress,
+                    project2ContractsWithMissingDeployedContractId
                 )
+            )
         }
 
         verify("must correctly fetch all project 2 contract function calls") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_2,
                     filters = ContractFunctionCallRequestFilters(
@@ -336,14 +328,13 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                         contractAddress = null
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    models(
-                        project2ContractsWithMatchingDeployedContractIdAndAddress,
-                        project2ContractsWithMissingDeployedContractId,
-                        project2ContractsWithNonMatchingContractAddress
-                    )
+            ).containsExactlyInAnyOrderElementsOf(
+                models(
+                    project2ContractsWithMatchingDeployedContractIdAndAddress,
+                    project2ContractsWithMissingDeployedContractId,
+                    project2ContractsWithNonMatchingContractAddress
                 )
+            )
         }
     }
 
@@ -394,14 +385,14 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
         )
 
         verify("storing contract function call request returns correct result") {
-            assertThat(storedContractFunctionCallRequest).withMessage()
+            expectThat(storedContractFunctionCallRequest)
                 .isEqualTo(expectedContractFunctionCallRequest)
         }
 
         verify("contract function call request was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(expectedContractFunctionCallRequest)
         }
     }
@@ -433,14 +424,14 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, CALLER_ADDRESS)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, CALLER_ADDRESS))
                 .isTrue()
         }
 
         verify("txInfo is correctly set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = id,
@@ -493,14 +484,14 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
 
         verify("setting txInfo will succeed") {
             val ignoredCaller = WalletAddress("f")
-            assertThat(repository.setTxInfo(id, TX_HASH, ignoredCaller)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, ignoredCaller))
                 .isTrue()
         }
 
         verify("txHash was correctly set while contract function caller was not updated") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = id,
@@ -552,25 +543,24 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, CALLER_ADDRESS)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, CALLER_ADDRESS))
                 .isTrue()
         }
 
         verify("setting another txInfo will not succeed") {
-            assertThat(
+            expectThat(
                 repository.setTxInfo(
                     id = id,
                     txHash = TransactionHash("different-tx-hash"),
                     caller = CALLER_ADDRESS
                 )
-            ).withMessage()
-                .isFalse()
+            ).isFalse()
         }
 
         verify("first txHash remains in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = id,

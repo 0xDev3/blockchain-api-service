@@ -16,7 +16,6 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -122,7 +121,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         verify("asset multi-send request is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = id,
@@ -157,7 +156,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent asset multi-send request") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -273,7 +272,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         verify("asset multi-send requests are correctly fetched by project") {
             val result = repository.getAllByProjectId(PROJECT_ID)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .containsExactlyInAnyOrderElementsOf(
                     projectRequests.map {
                         AssetMultiSendRequest(
@@ -400,7 +399,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         verify("asset multi-send requests are correctly fetched by sender") {
             val result = repository.getBySender(ASSET_SENDER_ADDRESS)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .containsExactlyInAnyOrderElementsOf(
                     senderRequests.map {
                         AssetMultiSendRequest(
@@ -488,14 +487,14 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         )
 
         verify("storing asset multi-send request returns correct result") {
-            assertThat(storedAssetMultiSendRequest).withMessage()
+            expectThat(storedAssetMultiSendRequest)
                 .isEqualTo(expectedAssetMultiSendRequest)
         }
 
         verify("asset multi-send request was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(expectedAssetMultiSendRequest)
         }
     }
@@ -531,14 +530,14 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting approve txInfo will succeed") {
-            assertThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ASSET_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("approve txInfo was correctly set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = id,
@@ -600,14 +599,14 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
         verify("setting approve txInfo will succeed") {
             val ignoredTokenSender = WalletAddress("f")
-            assertThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ignoredTokenSender)).withMessage()
+            expectThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ignoredTokenSender))
                 .isTrue()
         }
 
         verify("approve txHash was correctly set while token sender was not updated") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = id,
@@ -668,24 +667,24 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting approve txInfo will succeed") {
-            assertThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ASSET_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("setting another approve txInfo will not succeed") {
-            assertThat(
+            expectThat(
                 repository.setApproveTxInfo(
                     id = id,
                     txHash = TransactionHash("different-tx-hash"),
                     caller = ASSET_SENDER_ADDRESS
                 )
-            ).withMessage().isFalse()
+            ).isFalse()
         }
 
         verify("first approve txHash remains in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = id,
@@ -746,19 +745,19 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting approve txInfo will not succeed") {
-            assertThat(
+            expectThat(
                 repository.setApproveTxInfo(
                     id = id,
                     txHash = APPROVE_TX_HASH,
                     caller = ASSET_SENDER_ADDRESS
                 )
-            ).withMessage().isFalse()
+            ).isFalse()
         }
 
         verify("approve tx hash is not set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = id,
@@ -819,19 +818,19 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting approve txInfo will succeed") {
-            assertThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ASSET_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("setting disperse txInfo will succeed") {
-            assertThat(repository.setDisperseTxInfo(id, DISPERSE_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setDisperseTxInfo(id, DISPERSE_TX_HASH, ASSET_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("disperse txInfo was correctly set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = id,
@@ -893,14 +892,14 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
         verify("setting disperse txInfo will succeed") {
             val ignoredTokenSender = WalletAddress("f")
-            assertThat(repository.setDisperseTxInfo(id, DISPERSE_TX_HASH, ignoredTokenSender)).withMessage()
+            expectThat(repository.setDisperseTxInfo(id, DISPERSE_TX_HASH, ignoredTokenSender))
                 .isTrue()
         }
 
         verify("disperse txHash was correctly set while token sender was not updated") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = id,
@@ -961,29 +960,29 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting approve txInfo will succeed") {
-            assertThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setApproveTxInfo(id, APPROVE_TX_HASH, ASSET_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("setting disperse txInfo will succeed") {
-            assertThat(repository.setDisperseTxInfo(id, DISPERSE_TX_HASH, ASSET_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setDisperseTxInfo(id, DISPERSE_TX_HASH, ASSET_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("setting another disperse txInfo will not succeed") {
-            assertThat(
+            expectThat(
                 repository.setDisperseTxInfo(
                     id = id,
                     txHash = TransactionHash("different-tx-hash"),
                     caller = ASSET_SENDER_ADDRESS
                 )
-            ).withMessage().isFalse()
+            ).isFalse()
         }
 
         verify("first disperse txHash remains in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = id,
@@ -1044,19 +1043,19 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting disperse txInfo will not succeed") {
-            assertThat(
+            expectThat(
                 repository.setDisperseTxInfo(
                     id = id,
                     txHash = DISPERSE_TX_HASH,
                     caller = ASSET_SENDER_ADDRESS
                 )
-            ).withMessage().isFalse()
+            ).isFalse()
         }
 
         verify("disperse tx hash is not set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = id,

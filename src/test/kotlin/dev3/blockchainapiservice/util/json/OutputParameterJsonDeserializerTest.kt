@@ -15,9 +15,7 @@ import dev3.blockchainapiservice.util.StaticBytesType
 import dev3.blockchainapiservice.util.StringType
 import dev3.blockchainapiservice.util.TupleType
 import dev3.blockchainapiservice.util.UintType
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class OutputParameterJsonDeserializerTest : TestBase() {
 
@@ -50,7 +48,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
         verify("must correctly parse base types") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         AddressType, BoolType, StringType, DynamicBytesType, UintType, UintType, UintType, UintType,
@@ -85,7 +83,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
         verify("must correctly parse dynamic array type") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf(DynamicArrayType(StringType)))
         }
     }
@@ -101,7 +99,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
         verify("must correctly parse sized array type") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf(StaticArrayType(BoolType, 2)))
         }
     }
@@ -117,7 +115,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
         verify("must correctly parse nested array type") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf(StaticArrayType(StaticArrayType(DynamicArrayType(UintType), 2), 3)))
         }
     }
@@ -138,7 +136,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
         verify("must correctly parse tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf(TupleType(StringType, UintType)))
         }
     }
@@ -173,7 +171,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
         verify("must correctly parse nested tuple") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         TupleType(
@@ -206,7 +204,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
         verify("must correctly parse tuple with array elements") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         TupleType(
@@ -234,7 +232,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
         verify("must correctly parse tuple array") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         DynamicArrayType(
@@ -279,7 +277,7 @@ class OutputParameterJsonDeserializerTest : TestBase() {
         verify("must correctly parse array of nested tuples with arrays") {
             val result = objectMapper.readValue(json, Result::class.java).args.map { it.deserializedType }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         StaticArrayType(
@@ -313,11 +311,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -331,11 +329,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -353,11 +351,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -376,11 +374,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -398,11 +396,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -421,11 +419,11 @@ class OutputParameterJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }

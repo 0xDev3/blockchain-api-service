@@ -27,12 +27,10 @@ import dev3.blockchainapiservice.util.InterfaceId
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
@@ -128,7 +126,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         verify("contract deployment request is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(record.toModel(metadata))
         }
     }
@@ -138,7 +136,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent contract deployment request by id") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -156,7 +154,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         verify("contract deployment request is correctly fetched by alias") {
             val result = repository.getByAliasAndProjectId(record.alias, record.projectId)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(record.toModel(metadata))
         }
     }
@@ -166,7 +164,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent contract deployment request by alias and project id") {
             val result = repository.getByAliasAndProjectId("non-existent-alias", UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -200,7 +198,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         verify("contract deployment request is correctly fetched by contract address and chain ID") {
             val result = repository.getByContractAddressAndChainId(CONTRACT_ADDRESS, olderRecord.chainId)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(olderRecord.toModel(metadata))
         }
     }
@@ -210,7 +208,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent contract deployment request by c. address and chain ID") {
             val result = repository.getByContractAddressAndChainId(ContractAddress("dead"), ChainId(1337L))
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -248,7 +246,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 projectId = olderRecord.projectId
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(olderRecord.toModel(metadata))
         }
     }
@@ -262,7 +260,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                 projectId = UUID.randomUUID()
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -411,7 +409,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("must correctly fetch project 1 contracts with matching contract ID") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_1,
                     filters = ContractDeploymentRequestFilters(
@@ -421,15 +419,14 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         deployedOnly = false
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    (project1ContractsWithMatchingCid + project1NonDeployedContractsWithMatchingCid)
-                        .map { it.toModel(metadataById[it.contractMetadataId]!!) }
-                )
+            ).containsExactlyInAnyOrderElementsOf(
+                (project1ContractsWithMatchingCid + project1NonDeployedContractsWithMatchingCid)
+                    .map { it.toModel(metadataById[it.contractMetadataId]!!) }
+            )
         }
 
         verify("must correctly fetch project 1 deployed contracts with matching contract ID") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_1,
                     filters = ContractDeploymentRequestFilters(
@@ -439,14 +436,13 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         deployedOnly = true
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    project1ContractsWithMatchingCid.map { it.toModel(metadataById[it.contractMetadataId]!!) }
-                )
+            ).containsExactlyInAnyOrderElementsOf(
+                project1ContractsWithMatchingCid.map { it.toModel(metadataById[it.contractMetadataId]!!) }
+            )
         }
 
         verify("must correctly fetch project 1 contracts with matching tags") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_1,
                     filters = ContractDeploymentRequestFilters(
@@ -459,14 +455,13 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         deployedOnly = false
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    project1ContractsWithMatchingTags.map { it.toModel(metadataById[it.contractMetadataId]!!) }
-                )
+            ).containsExactlyInAnyOrderElementsOf(
+                project1ContractsWithMatchingTags.map { it.toModel(metadataById[it.contractMetadataId]!!) }
+            )
         }
 
         verify("must correctly fetch project 1 contracts with matching traits") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_1,
                     filters = ContractDeploymentRequestFilters(
@@ -479,14 +474,13 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         deployedOnly = false
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    project1ContractsWithMatchingTraits.map { it.toModel(metadataById[it.contractMetadataId]!!) }
-                )
+            ).containsExactlyInAnyOrderElementsOf(
+                project1ContractsWithMatchingTraits.map { it.toModel(metadataById[it.contractMetadataId]!!) }
+            )
         }
 
         verify("must correctly fetch project 2 contracts which match given filters") {
-            assertThat(
+            expectThat(
                 repository.getAllByProjectId(
                     projectId = PROJECT_ID_2,
                     filters = ContractDeploymentRequestFilters(
@@ -509,10 +503,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
                         deployedOnly = true
                     )
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    project2MatchingContracts.map { it.toModel(metadataById[it.contractMetadataId]!!) }
-                )
+            ).containsExactlyInAnyOrderElementsOf(
+                project2MatchingContracts.map { it.toModel(metadataById[it.contractMetadataId]!!) }
+            )
         }
     }
 
@@ -583,19 +576,19 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         )
 
         verify("storing contract deployment request returns correct result") {
-            assertThat(storedContractDeploymentRequest).withMessage()
+            expectThat(storedContractDeploymentRequest)
                 .isEqualTo(expectedContractDeploymentRequest)
         }
 
         verify("contract deployment request was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(expectedContractDeploymentRequest)
         }
 
         verify("storing contract deployment request with conflicting alias throws AliasAlreadyInUseException") {
-            assertThrows<AliasAlreadyInUseException>(message) {
+            expectThrows<AliasAlreadyInUseException> {
                 repository.store(params.copy(id = UUID.randomUUID()), metadata.projectId)
             }
         }
@@ -613,7 +606,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("contract deployment request is correctly fetched by ID") {
-            assertThat(repository.getById(id)).withMessage()
+            expectThat(repository.getById(id))
                 .isEqualTo(record.toModel(metadata))
         }
 
@@ -622,9 +615,9 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("contract deployment request was successfully marked as deleted in the database") {
-            assertThat(deletionResult).withMessage()
+            expectThat(deletionResult)
                 .isTrue()
-            assertThat(repository.getById(id)).withMessage()
+            expectThat(repository.getById(id))
                 .isNull()
         }
     }
@@ -668,14 +661,14 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, DEPLOYER_ADDRESS)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, DEPLOYER_ADDRESS))
                 .isTrue()
         }
 
         verify("txInfo is correctly set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,
@@ -748,14 +741,14 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
         verify("setting txInfo will succeed") {
             val ignoredDeployer = WalletAddress("f")
-            assertThat(repository.setTxInfo(id, TX_HASH, ignoredDeployer)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, ignoredDeployer))
                 .isTrue()
         }
 
         verify("txHash was correctly set while contract deployer was not updated") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,
@@ -827,25 +820,24 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, DEPLOYER_ADDRESS)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, DEPLOYER_ADDRESS))
                 .isTrue()
         }
 
         verify("setting another txInfo will not succeed") {
-            assertThat(
+            expectThat(
                 repository.setTxInfo(
                     id = id,
                     txHash = TransactionHash("different-tx-hash"),
                     deployer = DEPLOYER_ADDRESS
                 )
-            ).withMessage()
-                .isFalse()
+            ).isFalse()
         }
 
         verify("first txHash remains in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,
@@ -917,14 +909,14 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting contract address will succeed") {
-            assertThat(repository.setContractAddress(id, CONTRACT_ADDRESS)).withMessage()
+            expectThat(repository.setContractAddress(id, CONTRACT_ADDRESS))
                 .isTrue()
         }
 
         verify("contract address is correctly set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,
@@ -996,19 +988,19 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting contract address will succeed") {
-            assertThat(repository.setContractAddress(id, CONTRACT_ADDRESS)).withMessage()
+            expectThat(repository.setContractAddress(id, CONTRACT_ADDRESS))
                 .isTrue()
         }
 
         verify("setting another contract address will not succeed") {
-            assertThat(repository.setContractAddress(id, ContractAddress("dead"))).withMessage()
+            expectThat(repository.setContractAddress(id, ContractAddress("dead")))
                 .isFalse()
         }
 
         verify("first contract address remains in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = id,

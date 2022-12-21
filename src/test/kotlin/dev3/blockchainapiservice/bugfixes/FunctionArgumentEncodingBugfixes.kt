@@ -4,7 +4,6 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.service.EthereumFunctionEncoderService
 import dev3.blockchainapiservice.util.FunctionArgument
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class FunctionArgumentEncodingBugfixes : TestBase() {
@@ -51,7 +50,7 @@ class FunctionArgumentEncodingBugfixes : TestBase() {
         verify("bug #1 must be fixed") {
             val encodedValue = encoder.encode("addRewards", listOf(deserializedArgument))
 
-            assertThat(encodedValue.value).withMessage()
+            expectThat(encodedValue.value)
                 .isEqualTo(
                     "0x8b5373f9" +
                         "0000000000000000000000000000000000000000000000000000000000000020" +

@@ -6,9 +6,7 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.SizedStaticArray
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.DynamicArray
@@ -672,7 +670,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                     }
                 }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     allValues.map { it.value }
                         .map {
@@ -707,9 +705,9 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 }
                 .map { Pair(it.componentType, it.value.map { bytes -> bytes.value }) }[0]
 
-            assertThat(componentType).withMessage()
+            expectThat(componentType)
                 .isEqualTo(DynamicBytes::class.java)
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEmpty()
         }
     }
@@ -735,9 +733,9 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 }
                 .map { Pair(it.componentType, it.value.map { utf8string -> utf8string.value }) }[0]
 
-            assertThat(componentType).withMessage()
+            expectThat(componentType)
                 .isEqualTo(Utf8String::class.java)
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf("a", "b"))
         }
     }
@@ -763,9 +761,9 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 }
                 .map { Pair(it.componentType, it.value.map { uint -> uint.value }) }[0]
 
-            assertThat(componentType).withMessage()
+            expectThat(componentType)
                 .isEqualTo(Uint::class.java)
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEmpty()
         }
     }
@@ -791,9 +789,9 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 }
                 .map { Pair(it.componentType, it.value.map { bool -> bool.value }) }[0]
 
-            assertThat(componentType).withMessage()
+            expectThat(componentType)
                 .isEqualTo(Bool::class.java)
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf(true, false))
         }
     }
@@ -844,9 +842,9 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 listOf(it.componentType, innerArray1.componentType, innerArray2.componentType)
             }
 
-            assertThat(componentTypes).withMessage()
+            expectThat(componentTypes)
                 .isEqualTo(listOf(SizedStaticArray::class.java, DynamicArray::class.java, Uint::class.java))
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         listOf(
@@ -893,7 +891,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                 .map { it.value as DynamicStruct }
                 .map { it.value.map { type -> type.value } }[0]
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf("test", BigInteger.ONE))
         }
     }
@@ -965,7 +963,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                     }
                 }[0]
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         "test",
@@ -1011,7 +1009,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                     }
                 }[0]
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         listOf("test", "another"),
@@ -1065,7 +1063,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                     it.value.map { tuple -> tuple.value.map { elem -> elem.value } }
                 }[0]
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         listOf("tuple1", BigInteger.ZERO),
@@ -1199,7 +1197,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
                     }
                 }[0]
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf( // tuple array
                         listOf( // tuple 1
@@ -1248,7 +1246,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for simple JSON") {
             val tree = objectMapper.readTree(simpleJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("string")
         }
 
@@ -1262,7 +1260,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for array JSON") {
             val tree = objectMapper.readTree(arrayJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("string[]")
         }
 
@@ -1276,7 +1274,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for array JSON") {
             val tree = objectMapper.readTree(emptyArrayJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("string[0]")
         }
 
@@ -1290,7 +1288,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for nested array JSON") {
             val tree = objectMapper.readTree(nestedArrayJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("string[1][1][]")
         }
 
@@ -1313,7 +1311,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for tuple JSON") {
             val tree = objectMapper.readTree(tupleJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("tuple(string,uint)")
         }
 
@@ -1358,7 +1356,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for tuple JSON") {
             val tree = objectMapper.readTree(nestedTupleJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("tuple(string,tuple(address,tuple(int),bool),uint)")
         }
 
@@ -1372,7 +1370,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for empty tuple array JSON") {
             val tree = objectMapper.readTree(emptyTupleArrayJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("tuple(*)[]")
         }
 
@@ -1386,7 +1384,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for nested empty tuple array JSON") {
             val tree = objectMapper.readTree(emptyNestedTupleArrayJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("tuple(*)[][0][]")
         }
 
@@ -1411,7 +1409,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for tuple array JSON") {
             val tree = objectMapper.readTree(tupleArrayJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("tuple(string,uint)[]")
         }
 
@@ -1440,7 +1438,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for nested tuple array JSON") {
             val tree = objectMapper.readTree(nestedTupleArrayJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("tuple(string,uint)[1][1][]")
         }
 
@@ -1493,7 +1491,7 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
         verify("correct type hierarchy is returned for tuple with arrays JSON") {
             val tree = objectMapper.readTree(nestedTupleWithArraysJson)
 
-            assertThat(deserializer.getTypeHierarchy(tree)).withMessage()
+            expectThat(deserializer.getTypeHierarchy(tree))
                 .isEqualTo("tuple(string[][1],tuple(address[],tuple(int),bool,tuple(*)[])[],uint)[]")
         }
     }
@@ -1509,11 +1507,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1531,11 +1529,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1553,11 +1551,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1576,11 +1574,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1599,11 +1597,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1623,11 +1621,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1646,11 +1644,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1669,11 +1667,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1692,11 +1690,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1715,11 +1713,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1738,11 +1736,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1761,11 +1759,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1784,11 +1782,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1807,11 +1805,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1830,11 +1828,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1857,11 +1855,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1884,11 +1882,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -1924,11 +1922,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }
@@ -2031,11 +2029,11 @@ class FunctionArgumentJsonDeserializerTest : TestBase() {
             """.trimMargin()
 
         verify("JsonMappingException is thrown") {
-            val ex = assertThrows<JsonMappingException>(message) {
+            val ex = expectThrows<JsonMappingException> {
                 objectMapper.readValue(json, Result::class.java)
             }
 
-            assertThat(ex.cause).withMessage()
+            expectThat(ex.cause)
                 .isInstanceOf(JsonParseException::class.java)
         }
     }

@@ -8,10 +8,7 @@ import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.core.MethodParameter
 import org.springframework.security.core.Authentication
@@ -40,7 +37,7 @@ class UserIdentifierResolverTest : TestBase() {
             val method = Companion::class.java.methods.find { it.name == "supportedMethod" }!!
             val parameter = MethodParameter(method, 0)
 
-            assertThat(resolver.supportsParameter(parameter)).withMessage()
+            expectThat(resolver.supportsParameter(parameter))
                 .isTrue()
         }
     }
@@ -53,7 +50,7 @@ class UserIdentifierResolverTest : TestBase() {
             val method = Companion::class.java.methods.find { it.name == "unsupportedMethod1" }!!
             val parameter = MethodParameter(method, 0)
 
-            assertThat(resolver.supportsParameter(parameter)).withMessage()
+            expectThat(resolver.supportsParameter(parameter))
                 .isFalse()
         }
     }
@@ -66,7 +63,7 @@ class UserIdentifierResolverTest : TestBase() {
             val method = Companion::class.java.methods.find { it.name == "unsupportedMethod2" }!!
             val parameter = MethodParameter(method, 0)
 
-            assertThat(resolver.supportsParameter(parameter)).withMessage()
+            expectThat(resolver.supportsParameter(parameter))
                 .isFalse()
         }
     }
@@ -77,14 +74,14 @@ class UserIdentifierResolverTest : TestBase() {
         val authentication = mock<Authentication>()
 
         suppose("authentication principal will some wallet address") {
-            given(authentication.principal)
+            call(authentication.principal)
                 .willReturn(walletAddress.rawValue)
         }
 
         val securityContext = mock<SecurityContext>()
 
         suppose("security context will return some authentication object") {
-            given(securityContext.authentication)
+            call(securityContext.authentication)
                 .willReturn(authentication)
             SecurityContextHolder.setContext(securityContext)
         }
@@ -97,14 +94,14 @@ class UserIdentifierResolverTest : TestBase() {
         )
 
         suppose("user wallet address is fetched from database") {
-            given(repository.getByWalletAddress(walletAddress))
+            call(repository.getByWalletAddress(walletAddress))
                 .willReturn(identifier)
         }
 
         val resolver = UserIdentifierResolver(mock(), repository)
 
         verify("user identifier is correctly returned") {
-            assertThat(resolver.resolveArgument(mock(), mock(), mock(), mock())).withMessage()
+            expectThat(resolver.resolveArgument(mock(), mock(), mock(), mock()))
                 .isEqualTo(identifier)
         }
     }
@@ -115,14 +112,14 @@ class UserIdentifierResolverTest : TestBase() {
         val authentication = mock<Authentication>()
 
         suppose("authentication principal will some wallet address") {
-            given(authentication.principal)
+            call(authentication.principal)
                 .willReturn(walletAddress.rawValue)
         }
 
         val securityContext = mock<SecurityContext>()
 
         suppose("security context will return some authentication object") {
-            given(securityContext.authentication)
+            call(securityContext.authentication)
                 .willReturn(authentication)
             SecurityContextHolder.setContext(securityContext)
         }
@@ -130,7 +127,7 @@ class UserIdentifierResolverTest : TestBase() {
         val repository = mock<UserIdentifierRepository>()
 
         suppose("user wallet address is not in database") {
-            given(repository.getByWalletAddress(walletAddress))
+            call(repository.getByWalletAddress(walletAddress))
                 .willReturn(null)
         }
 
@@ -138,7 +135,7 @@ class UserIdentifierResolverTest : TestBase() {
         val uuid = UUID.randomUUID()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(uuid)
         }
 
@@ -149,14 +146,14 @@ class UserIdentifierResolverTest : TestBase() {
         )
 
         suppose("user identifier will be stored in database") {
-            given(repository.store(identifier))
+            call(repository.store(identifier))
                 .willReturn(identifier)
         }
 
         val resolver = UserIdentifierResolver(uuidProvider, repository)
 
         verify("user identifier is correctly returned") {
-            assertThat(resolver.resolveArgument(mock(), mock(), mock(), mock())).withMessage()
+            expectThat(resolver.resolveArgument(mock(), mock(), mock(), mock()))
                 .isEqualTo(identifier)
         }
     }
@@ -166,14 +163,14 @@ class UserIdentifierResolverTest : TestBase() {
         val authentication = mock<Authentication>()
 
         suppose("authentication principal will return some non-string object") {
-            given(authentication.principal)
+            call(authentication.principal)
                 .willReturn(emptyList<Nothing>())
         }
 
         val securityContext = mock<SecurityContext>()
 
         suppose("security context will return some authentication object") {
-            given(securityContext.authentication)
+            call(securityContext.authentication)
                 .willReturn(authentication)
             SecurityContextHolder.setContext(securityContext)
         }
@@ -181,7 +178,7 @@ class UserIdentifierResolverTest : TestBase() {
         val resolver = UserIdentifierResolver(mock(), mock())
 
         verify("BadAuthenticationException is thrown") {
-            assertThrows<BadAuthenticationException>(message) {
+            expectThrows<BadAuthenticationException> {
                 resolver.resolveArgument(mock(), mock(), mock(), mock())
             }
         }
@@ -192,14 +189,14 @@ class UserIdentifierResolverTest : TestBase() {
         val authentication = mock<Authentication>()
 
         suppose("authentication principal is null") {
-            given(authentication.principal)
+            call(authentication.principal)
                 .willReturn(null)
         }
 
         val securityContext = mock<SecurityContext>()
 
         suppose("security context will return some authentication object") {
-            given(securityContext.authentication)
+            call(securityContext.authentication)
                 .willReturn(authentication)
             SecurityContextHolder.setContext(securityContext)
         }
@@ -207,7 +204,7 @@ class UserIdentifierResolverTest : TestBase() {
         val resolver = UserIdentifierResolver(mock(), mock())
 
         verify("BadAuthenticationException is thrown") {
-            assertThrows<BadAuthenticationException>(message) {
+            expectThrows<BadAuthenticationException> {
                 resolver.resolveArgument(mock(), mock(), mock(), mock())
             }
         }
@@ -218,7 +215,7 @@ class UserIdentifierResolverTest : TestBase() {
         val securityContext = mock<SecurityContext>()
 
         suppose("security context authentication is null") {
-            given(securityContext.authentication)
+            call(securityContext.authentication)
                 .willReturn(null)
             SecurityContextHolder.setContext(securityContext)
         }
@@ -226,7 +223,7 @@ class UserIdentifierResolverTest : TestBase() {
         val resolver = UserIdentifierResolver(mock(), mock())
 
         verify("BadAuthenticationException is thrown") {
-            assertThrows<BadAuthenticationException>(message) {
+            expectThrows<BadAuthenticationException> {
                 resolver.resolveArgument(mock(), mock(), mock(), mock())
             }
         }

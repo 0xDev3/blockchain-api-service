@@ -25,16 +25,11 @@ import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AssetSendRequestServiceTest : TestBase() {
 
@@ -70,14 +65,14 @@ class AssetSendRequestServiceTest : TestBase() {
         val uuid = UUID.randomUUID()
 
         suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(uuid)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -85,7 +80,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -130,7 +125,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("asset send request is stored in database") {
-            given(assetSendRequestRepository.store(storeParams))
+            call(assetSendRequestRepository.store(storeParams))
                 .willReturn(storedRequest)
         }
 
@@ -146,12 +141,12 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request is correctly created") {
-            assertThat(service.createAssetSendRequest(CREATE_PARAMS, PROJECT)).withMessage()
+            expectThat(service.createAssetSendRequest(CREATE_PARAMS, PROJECT))
                 .isEqualTo(WithFunctionDataOrEthValue(storedRequest, encodedData, null))
 
-            verifyMock(assetSendRequestRepository)
-                .store(storeParams)
-            verifyNoMoreInteractions(assetSendRequestRepository)
+            expectInteractions(assetSendRequestRepository) {
+                once.store(storeParams)
+            }
         }
     }
 
@@ -161,14 +156,14 @@ class AssetSendRequestServiceTest : TestBase() {
         val uuid = UUID.randomUUID()
 
         suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(uuid)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -205,7 +200,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("asset send request is stored in database") {
-            given(assetSendRequestRepository.store(storeParams))
+            call(assetSendRequestRepository.store(storeParams))
                 .willReturn(storedRequest)
         }
 
@@ -221,12 +216,12 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request is correctly created") {
-            assertThat(service.createAssetSendRequest(CREATE_PARAMS.copy(tokenAddress = null), PROJECT)).withMessage()
+            expectThat(service.createAssetSendRequest(CREATE_PARAMS.copy(tokenAddress = null), PROJECT))
                 .isEqualTo(WithFunctionDataOrEthValue(storedRequest, null, CREATE_PARAMS.assetAmount))
 
-            verifyMock(assetSendRequestRepository)
-                .store(storeParams)
-            verifyNoMoreInteractions(assetSendRequestRepository)
+            expectInteractions(assetSendRequestRepository) {
+                once.store(storeParams)
+            }
         }
     }
 
@@ -235,7 +230,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request does not exist in database") {
-            given(assetSendRequestRepository.getById(any()))
+            call(assetSendRequestRepository.getById(any()))
                 .willReturn(null)
         }
 
@@ -251,7 +246,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getAssetSendRequest(id = UUID.randomUUID())
             }
         }
@@ -280,7 +275,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -288,7 +283,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -312,7 +307,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with pending status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.PENDING,
@@ -347,7 +342,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -355,7 +350,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(sendRequest.chainId, null)
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(null)
         }
 
@@ -363,7 +358,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -387,7 +382,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with pending status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.PENDING,
@@ -422,7 +417,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -443,14 +438,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -474,7 +469,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with failed status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -509,7 +504,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -530,14 +525,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -561,7 +556,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with failed status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -596,7 +591,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -617,14 +612,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -648,7 +643,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with failed status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -683,7 +678,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -704,14 +699,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -735,7 +730,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with failed status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -770,7 +765,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -791,14 +786,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -822,7 +817,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with failed status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -857,7 +852,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -877,7 +872,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -893,7 +888,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with failed status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -928,7 +923,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -948,7 +943,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -964,7 +959,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with failed status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.FAILED,
@@ -999,7 +994,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -1020,14 +1015,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -1051,7 +1046,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with successful status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -1086,7 +1081,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -1107,14 +1102,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -1138,7 +1133,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with successful status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -1173,7 +1168,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -1193,7 +1188,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1209,7 +1204,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with successful status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -1244,7 +1239,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getById(id))
+            call(assetSendRequestRepository.getById(id))
                 .willReturn(sendRequest)
         }
 
@@ -1264,7 +1259,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
@@ -1280,7 +1275,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with successful status is returned") {
-            assertThat(service.getAssetSendRequest(id)).withMessage()
+            expectThat(service.getAssetSendRequest(id))
                 .isEqualTo(
                     sendRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -1315,7 +1310,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getAllByProjectId(PROJECT.id))
+            call(assetSendRequestRepository.getAllByProjectId(PROJECT.id))
                 .willReturn(listOf(sendRequest))
         }
 
@@ -1336,14 +1331,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -1367,8 +1362,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with successful status is returned") {
-            assertThat(service.getAssetSendRequestsByProjectId(PROJECT.id))
-                .withMessage()
+            expectThat(service.getAssetSendRequestsByProjectId(PROJECT.id))
                 .isEqualTo(
                     listOf(
                         sendRequest.withTransactionData(
@@ -1399,7 +1393,7 @@ class AssetSendRequestServiceTest : TestBase() {
         verify("empty list is returned") {
             val result = service.getAssetSendRequestsByProjectId(projectId)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEmpty()
         }
     }
@@ -1428,7 +1422,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getBySender(sender))
+            call(assetSendRequestRepository.getBySender(sender))
                 .willReturn(listOf(sendRequest))
         }
 
@@ -1449,14 +1443,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -1480,7 +1474,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with successful status is returned") {
-            assertThat(service.getAssetSendRequestsBySender(sender)).withMessage()
+            expectThat(service.getAssetSendRequestsBySender(sender))
                 .isEqualTo(
                     listOf(
                         sendRequest.withTransactionData(
@@ -1518,7 +1512,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request exists in database") {
-            given(assetSendRequestRepository.getByRecipient(recipient))
+            call(assetSendRequestRepository.getByRecipient(recipient))
                 .willReturn(listOf(sendRequest))
         }
 
@@ -1539,14 +1533,14 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "transfer",
                     arguments = listOf(
@@ -1570,8 +1564,7 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("asset send request with successful status is returned") {
-            assertThat(service.getAssetSendRequestsByRecipient(recipient))
-                .withMessage()
+            expectThat(service.getAssetSendRequestsByRecipient(recipient))
                 .isEqualTo(
                     listOf(
                         sendRequest.withTransactionData(
@@ -1592,7 +1585,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("txInfo will be successfully attached to the request") {
-            given(assetSendRequestRepository.setTxInfo(id, TX_HASH, caller))
+            call(assetSendRequestRepository.setTxInfo(id, TX_HASH, caller))
                 .willReturn(true)
         }
 
@@ -1610,9 +1603,9 @@ class AssetSendRequestServiceTest : TestBase() {
         verify("txInfo was successfully attached") {
             service.attachTxInfo(id, TX_HASH, caller)
 
-            verifyMock(assetSendRequestRepository)
-                .setTxInfo(id, TX_HASH, caller)
-            verifyNoMoreInteractions(assetSendRequestRepository)
+            expectInteractions(assetSendRequestRepository) {
+                once.setTxInfo(id, TX_HASH, caller)
+            }
         }
     }
 
@@ -1623,7 +1616,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching txInfo will fail") {
-            given(assetSendRequestRepository.setTxInfo(id, TX_HASH, caller))
+            call(assetSendRequestRepository.setTxInfo(id, TX_HASH, caller))
                 .willReturn(false)
         }
 
@@ -1639,31 +1632,33 @@ class AssetSendRequestServiceTest : TestBase() {
         )
 
         verify("CannotAttachTxInfoException is thrown") {
-            assertThrows<CannotAttachTxInfoException>(message) {
+            expectThrows<CannotAttachTxInfoException> {
                 service.attachTxInfo(id, TX_HASH, caller)
             }
 
-            verifyMock(assetSendRequestRepository)
-                .setTxInfo(id, TX_HASH, caller)
-            verifyNoMoreInteractions(assetSendRequestRepository)
+            expectInteractions(assetSendRequestRepository) {
+                once.setTxInfo(id, TX_HASH, caller)
+            }
         }
     }
 
     private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
-        given(projectRepository.getById(projectId))
-            .willReturn(
-                Project(
-                    id = projectId,
-                    ownerId = UUID.randomUUID(),
-                    issuerContractAddress = ContractAddress("dead"),
-                    baseRedirectUrl = BaseUrl(""),
-                    chainId = ChainId(0L),
-                    customRpcUrl = null,
-                    createdAt = TestData.TIMESTAMP
+        suppose("some project will be returned") {
+            call(projectRepository.getById(projectId))
+                .willReturn(
+                    Project(
+                        id = projectId,
+                        ownerId = UUID.randomUUID(),
+                        issuerContractAddress = ContractAddress("dead"),
+                        baseRedirectUrl = BaseUrl(""),
+                        chainId = ChainId(0L),
+                        customRpcUrl = null,
+                        createdAt = TestData.TIMESTAMP
+                    )
                 )
-            )
+        }
 
         return projectRepository
     }
