@@ -11,7 +11,6 @@ import dev3.blockchainapiservice.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.model.result.ApiUsagePeriod
 import dev3.blockchainapiservice.model.result.RequestUsage
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -132,7 +131,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                     )
                 }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         ApiUsageLimit( // new
@@ -168,7 +167,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         }
 
         verify("period has correct values") {
-            assertThat(usagePeriod).withMessage()
+            expectThat(usagePeriod)
                 .isEqualTo(
                     ApiUsagePeriod(
                         userId = USER_ID,
@@ -191,7 +190,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                 .where(ApiUsagePeriodTable.USER_ID.eq(USER_ID))
                 .fetchOne()
 
-            assertThat(record).withMessage()
+            expectThat(record)
                 .isEqualTo(
                     ApiUsagePeriodRecord(
                         id = record!!.id,
@@ -229,7 +228,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         }
 
         verify("period has correct values") {
-            assertThat(usagePeriod).withMessage()
+            expectThat(usagePeriod)
                 .isEqualTo(
                     ApiUsagePeriod(
                         userId = USER_ID,
@@ -254,7 +253,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
                 .limit(1)
                 .fetchOne()
 
-            assertThat(record).withMessage()
+            expectThat(record)
                 .isEqualTo(
                     ApiUsagePeriodRecord(
                         id = record!!.id,
@@ -300,7 +299,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         }
 
         verify("period has correct values") {
-            assertThat(usagePeriod).withMessage()
+            expectThat(usagePeriod)
                 .isEqualTo(
                     ApiUsagePeriod(
                         userId = USER_ID,
@@ -321,7 +320,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         verify("no new usage period is created") {
             val count = dslContext.fetchCount(ApiUsagePeriodTable, ApiUsagePeriodTable.USER_ID.eq(USER_ID))
 
-            assertThat(count).withMessage()
+            expectThat(count)
                 .isOne()
         }
     }
@@ -336,7 +335,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         verify("remaining rate limit is correctly fetched") {
             val remainingLimit = repository.remainingWriteLimit(USER_ID, TestData.TIMESTAMP)
 
-            assertThat(remainingLimit).withMessage()
+            expectThat(remainingLimit)
                 .isEqualTo(DEFAULT_PROPERTIES.freeTierWriteRequests - 2)
         }
     }
@@ -366,7 +365,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         verify("remaining rate limit is correctly fetched") {
             val remainingLimit = repository.remainingWriteLimit(USER_ID, TestData.TIMESTAMP - 1.days)
 
-            assertThat(remainingLimit).withMessage()
+            expectThat(remainingLimit)
                 .isEqualTo(DEFAULT_PROPERTIES.freeTierWriteRequests - 2)
         }
     }
@@ -381,7 +380,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         verify("remaining rate limit is correctly fetched") {
             val remainingLimit = repository.remainingReadLimit(USER_ID, TestData.TIMESTAMP)
 
-            assertThat(remainingLimit).withMessage()
+            expectThat(remainingLimit)
                 .isEqualTo(DEFAULT_PROPERTIES.freeTierReadRequests - 2)
         }
     }
@@ -411,7 +410,7 @@ class JooqApiRateLimitRepositoryIntegTest : TestBase() {
         verify("remaining rate limit is correctly fetched") {
             val remainingLimit = repository.remainingReadLimit(USER_ID, TestData.TIMESTAMP - 1.days)
 
-            assertThat(remainingLimit).withMessage()
+            expectThat(remainingLimit)
                 .isEqualTo(DEFAULT_PROPERTIES.freeTierReadRequests - 2)
         }
     }

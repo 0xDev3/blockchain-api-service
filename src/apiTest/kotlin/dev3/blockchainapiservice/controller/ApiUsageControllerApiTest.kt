@@ -17,7 +17,6 @@ import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -98,7 +97,7 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ApiUsagePeriodResponse(
                         userId = OWNER_ID,
@@ -144,7 +143,7 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ApiUsagePeriodResponse(
                         userId = OWNER_ID,

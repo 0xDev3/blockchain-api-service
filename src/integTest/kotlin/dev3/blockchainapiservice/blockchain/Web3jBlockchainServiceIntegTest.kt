@@ -47,12 +47,10 @@ import dev3.blockchainapiservice.util.UintType
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.DynamicArray
@@ -103,7 +101,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 slot = EthStorageSlot("0x0")
             )
 
-            assertThat(ContractAddress(slotValue)).withMessage()
+            expectThat(ContractAddress(slotValue))
                 .isEqualTo(proxyContractAddress)
         }
 
@@ -115,7 +113,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 slot = EthStorageSlot("0x123456")
             )
 
-            assertThat(ContractAddress(slotValue)).withMessage()
+            expectThat(ContractAddress(slotValue))
                 .isEqualTo(ZeroAddress.toContractAddress())
         }
     }
@@ -156,16 +154,16 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 walletAddress = accountBalance.wallet
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         blockNumber = fetchedAccountBalance.blockNumber,
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.blockNumber.value)
+            expectThat(fetchedAccountBalance.blockNumber.value)
                 .isPositive()
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -214,14 +212,14 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 blockParameter = blockNumberBeforeSendingBalance
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         blockNumber = blockNumberBeforeSendingBalance,
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -234,7 +232,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 blockParameter = blockNumberAfterSendingBalance
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         amount = Balance(value.toBigInteger().multiply(BigInteger.TWO)),
@@ -242,7 +240,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -276,16 +274,16 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 walletAddress = accountBalance.wallet
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         blockNumber = fetchedAccountBalance.blockNumber,
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.blockNumber.value)
+            expectThat(fetchedAccountBalance.blockNumber.value)
                 .isPositive()
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -327,14 +325,14 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 blockParameter = blockNumberBeforeSendingBalance
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         blockNumber = blockNumberBeforeSendingBalance,
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -348,7 +346,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 blockParameter = blockNumberAfterSendingBalance
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         amount = Balance.ZERO,
@@ -356,7 +354,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -366,7 +364,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("BlockchainReadException is thrown when reading ERC20 balance from invalid contract address") {
             val service = createService()
 
-            assertThrows<BlockchainReadException>(message) {
+            expectThrows<BlockchainReadException> {
                 service.fetchErc20AccountBalance(
                     chainSpec = TestData.CHAIN_ID.toSpec(),
                     contractAddress = ContractAddress(accounts[0].address),
@@ -414,10 +412,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 events = listOf(PredefinedEvents.ERC20_TRANSFER)
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     BlockchainTransactionInfo(
                         hash = txHash,
@@ -450,10 +448,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 )
             )
 
-            assertThat(transactionInfo.data).withMessage()
+            expectThat(transactionInfo.data)
                 .isEqualTo(expectedData)
 
-            assertThat(transactionInfo.blockConfirmations).withMessage()
+            expectThat(transactionInfo.blockConfirmations)
                 .isNotZero()
         }
     }
@@ -503,10 +501,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     BlockchainTransactionInfo(
                         hash = txHash,
@@ -530,10 +528,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 )
             )
 
-            assertThat(transactionInfo.data).withMessage()
+            expectThat(transactionInfo.data)
                 .isEqualTo(expectedData)
 
-            assertThat(transactionInfo.blockConfirmations).withMessage()
+            expectThat(transactionInfo.blockConfirmations)
                 .isNotZero()
         }
     }
@@ -564,10 +562,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     BlockchainTransactionInfo(
                         hash = txHash,
@@ -583,7 +581,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     )
                 )
 
-            assertThat(transactionInfo.blockConfirmations).withMessage()
+            expectThat(transactionInfo.blockConfirmations)
                 .isNotZero()
         }
     }
@@ -632,10 +630,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     BlockchainTransactionInfo(
                         hash = txHash,
@@ -651,7 +649,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                     )
                 )
 
-            assertThat(transactionInfo.blockConfirmations).withMessage()
+            expectThat(transactionInfo.blockConfirmations)
                 .isNotZero()
         }
     }
@@ -716,7 +714,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 )
             )!!
 
-            assertThat(transactionInfo.events).withMessage()
+            expectThat(transactionInfo.events)
                 .isEqualTo(
                     listOf(
                         EventInfo(
@@ -777,7 +775,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 events = emptyList()
             )!!
 
-            assertThat(transactionInfo.events).withMessage()
+            expectThat(transactionInfo.events)
                 .isEqualTo(
                     listOf(
                         EventInfo(
@@ -910,7 +908,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 )
             )!!
 
-            assertThat(transactionInfo.events).withMessage()
+            expectThat(transactionInfo.events)
                 .isEqualTo(
                     listOf(
                         EventInfo(
@@ -993,7 +991,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNull()
         }
     }
@@ -1030,7 +1028,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ReadonlyFunctionCallResult(
                         blockNumber = result.blockNumber,
@@ -1040,9 +1038,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                             .encodeConstructor(listOf(FunctionArgument(uintValue))).value
                     )
                 )
-            assertThat(result.blockNumber.value)
+            expectThat(result.blockNumber.value)
                 .isPositive()
-            assertThat(result.timestamp.value)
+            expectThat(result.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1059,7 +1057,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("BlockchainReadException is thrown when calling readonly function on invalid contract address") {
             val service = createService()
 
-            assertThrows<BlockchainReadException>(message) {
+            expectThrows<BlockchainReadException> {
                 service.callReadonlyFunction(
                     chainSpec = TestData.CHAIN_ID.toSpec(),
                     params = ExecuteReadonlyFunctionCallParams(
@@ -1125,10 +1123,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     FullContractDeploymentTransactionInfo(
                         hash = TransactionHash(deploymentTransaction.transactionHash),
@@ -1202,7 +1200,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 endBlock = endBlock1
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("9000"))),
                 PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("100"))),
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
@@ -1223,7 +1221,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 endBlock = endBlock2
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("5100"))),
                 PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("1000"))),
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
@@ -1293,7 +1291,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 endBlock = endBlock
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
                 PayoutAccountBalance(WalletAddress(accounts[4].address), Balance(BigInteger("400")))
             )
@@ -1352,7 +1350,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 endBlock = endBlock1
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("9000"))),
                 PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("100"))),
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
@@ -1373,7 +1371,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 endBlock = endBlock2
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("5100"))),
                 PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("1000"))),
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
@@ -1443,13 +1441,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("all payouts states are fetched") {
             // investor 1
-            assertThat(blockchainService.getPayoutsForInvestor(chainSpec, investor1NullParams))
-                .withMessage()
+            expectThat(blockchainService.getPayoutsForInvestor(chainSpec, investor1NullParams))
                 .containsExactlyInAnyOrderElementsOf(payoutsAndInvestments.forInvestor(investor1))
 
             // investor 2
-            assertThat(blockchainService.getPayoutsForInvestor(chainSpec, investor2NullParams))
-                .withMessage()
+            expectThat(blockchainService.getPayoutsForInvestor(chainSpec, investor2NullParams))
                 .containsExactlyInAnyOrderElementsOf(payoutsAndInvestments.forInvestor(investor2))
         }
     }
@@ -1465,7 +1461,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         val chainSpec = TestData.CHAIN_ID.toSpec()
 
         verify("exception is thrown") {
-            assertThrows<BlockchainReadException>(message) {
+            expectThrows<BlockchainReadException> {
                 blockchainService.getPayoutsForInvestor(chainSpec, nullParams)
             }
         }

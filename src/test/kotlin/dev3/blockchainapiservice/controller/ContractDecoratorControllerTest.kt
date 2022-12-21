@@ -24,10 +24,7 @@ import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.http.ResponseEntity
 import java.util.UUID
@@ -94,7 +91,7 @@ class ContractDecoratorControllerTest : TestBase() {
         )
 
         suppose("some contract decorators will be fetched with filters") {
-            given(repository.getAll(filters))
+            call(repository.getAll(filters))
                 .willReturn(listOf(result))
         }
 
@@ -109,7 +106,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDecoratorsResponse(
@@ -193,7 +190,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
 
         suppose("some contract decorators will be fetched with filters") {
-            given(repository.getAll(projectId, filters))
+            call(repository.getAll(projectId, filters))
                 .willReturn(listOf(result))
         }
 
@@ -208,7 +205,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDecoratorsResponse(
@@ -250,7 +247,7 @@ class ContractDecoratorControllerTest : TestBase() {
         )
 
         suppose("some contract manifest.json files will be fetched with filters") {
-            given(repository.getAllManifestJsonFiles(filters))
+            call(repository.getAllManifestJsonFiles(filters))
                 .willReturn(listOf(result))
         }
 
@@ -265,7 +262,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ManifestJsonsResponse(listOf(result))))
         }
     }
@@ -290,7 +287,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
 
         suppose("some contract manifest.json files will be fetched with filters") {
-            given(repository.getAllManifestJsonFiles(projectId, filters))
+            call(repository.getAllManifestJsonFiles(projectId, filters))
                 .willReturn(listOf(result))
         }
 
@@ -305,7 +302,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ManifestJsonsResponse(listOf(result))))
         }
     }
@@ -329,7 +326,7 @@ class ContractDecoratorControllerTest : TestBase() {
         )
 
         suppose("some contract artifact.json files will be fetched with filters") {
-            given(repository.getAllArtifactJsonFiles(filters))
+            call(repository.getAllArtifactJsonFiles(filters))
                 .willReturn(listOf(result))
         }
 
@@ -344,7 +341,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ArtifactJsonsResponse(listOf(result))))
         }
     }
@@ -369,7 +366,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
 
         suppose("some contract artifact.json files will be fetched with filters") {
-            given(repository.getAllArtifactJsonFiles(projectId, filters))
+            call(repository.getAllArtifactJsonFiles(projectId, filters))
                 .willReturn(listOf(result))
         }
 
@@ -384,7 +381,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ArtifactJsonsResponse(listOf(result))))
         }
     }
@@ -400,7 +397,7 @@ class ContractDecoratorControllerTest : TestBase() {
         )
 
         suppose("some contract info.md files will be fetched with filters") {
-            given(repository.getAllInfoMarkdownFiles(filters))
+            call(repository.getAllInfoMarkdownFiles(filters))
                 .willReturn(listOf(result))
         }
 
@@ -415,7 +412,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(InfoMarkdownsResponse(listOf(result))))
         }
     }
@@ -432,7 +429,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
 
         suppose("some contract info.md files will be fetched with filters") {
-            given(repository.getAllInfoMarkdownFiles(projectId, filters))
+            call(repository.getAllInfoMarkdownFiles(projectId, filters))
                 .willReturn(listOf(result))
         }
 
@@ -447,7 +444,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(InfoMarkdownsResponse(listOf(result))))
         }
     }
@@ -508,7 +505,7 @@ class ContractDecoratorControllerTest : TestBase() {
         )
 
         suppose("some contract decorator will be fetched") {
-            given(repository.getById(id))
+            call(repository.getById(id))
                 .willReturn(result)
         }
 
@@ -519,7 +516,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDecoratorResponse(
@@ -595,7 +592,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
 
         suppose("some contract decorator will be fetched") {
-            given(repository.getByContractIdAndProjectId(id, projectId))
+            call(repository.getByContractIdAndProjectId(id, projectId))
                 .willReturn(result)
         }
 
@@ -606,7 +603,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDecoratorResponse(
@@ -631,14 +628,14 @@ class ContractDecoratorControllerTest : TestBase() {
         val id = ContractId("example")
 
         suppose("null will be returned from the repository") {
-            given(repository.getById(id))
+            call(repository.getById(id))
                 .willReturn(null)
         }
 
         val controller = ContractDecoratorController(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 controller.getContractDecorator(id.value, null)
             }
         }
@@ -659,7 +656,7 @@ class ContractDecoratorControllerTest : TestBase() {
         )
 
         suppose("some contract manifest.json will be fetched") {
-            given(repository.getManifestJsonById(id))
+            call(repository.getManifestJsonById(id))
                 .willReturn(result)
         }
 
@@ -670,7 +667,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(result)
                 )
@@ -693,7 +690,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
 
         suppose("some contract manifest.json will be fetched") {
-            given(repository.getManifestJsonByContractIdAndProjectId(id, projectId))
+            call(repository.getManifestJsonByContractIdAndProjectId(id, projectId))
                 .willReturn(result)
         }
 
@@ -704,7 +701,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(result)
                 )
@@ -717,14 +714,14 @@ class ContractDecoratorControllerTest : TestBase() {
         val id = ContractId("example")
 
         suppose("null will be returned from the repository") {
-            given(repository.getManifestJsonById(id))
+            call(repository.getManifestJsonById(id))
                 .willReturn(null)
         }
 
         val controller = ContractDecoratorController(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 controller.getContractManifestJson(id.value, null)
             }
         }
@@ -745,7 +742,7 @@ class ContractDecoratorControllerTest : TestBase() {
         )
 
         suppose("some contract artifact.json will be fetched") {
-            given(repository.getArtifactJsonById(id))
+            call(repository.getArtifactJsonById(id))
                 .willReturn(result)
         }
 
@@ -756,7 +753,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(result)
                 )
@@ -779,7 +776,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
 
         suppose("some contract artifact.json will be fetched") {
-            given(repository.getArtifactJsonByContractIdAndProjectId(id, projectId))
+            call(repository.getArtifactJsonByContractIdAndProjectId(id, projectId))
                 .willReturn(result)
         }
 
@@ -790,7 +787,7 @@ class ContractDecoratorControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(result)
                 )
@@ -803,14 +800,14 @@ class ContractDecoratorControllerTest : TestBase() {
         val id = ContractId("example")
 
         suppose("null will be returned from the repository") {
-            given(repository.getArtifactJsonById(id))
+            call(repository.getArtifactJsonById(id))
                 .willReturn(null)
         }
 
         val controller = ContractDecoratorController(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 controller.getContractArtifactJson(id.value, null)
             }
         }
@@ -823,7 +820,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val result = "info-md"
 
         suppose("some contract info.md will be fetched") {
-            given(repository.getInfoMarkdownById(id))
+            call(repository.getInfoMarkdownById(id))
                 .willReturn(result)
         }
 
@@ -832,7 +829,7 @@ class ContractDecoratorControllerTest : TestBase() {
         verify("controller returns correct response") {
             val response = controller.getContractInfoMarkdown(id.value, null)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(result)
                 )
@@ -847,7 +844,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
 
         suppose("some contract info.md will be fetched") {
-            given(repository.getInfoMarkdownByContractIdAndProjectId(id, projectId))
+            call(repository.getInfoMarkdownByContractIdAndProjectId(id, projectId))
                 .willReturn(result)
         }
 
@@ -856,7 +853,7 @@ class ContractDecoratorControllerTest : TestBase() {
         verify("controller returns correct response") {
             val response = controller.getContractInfoMarkdown(id.value, projectId)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(result)
                 )
@@ -869,14 +866,14 @@ class ContractDecoratorControllerTest : TestBase() {
         val id = ContractId("example")
 
         suppose("null will be returned from the repository") {
-            given(repository.getInfoMarkdownById(id))
+            call(repository.getInfoMarkdownById(id))
                 .willReturn(null)
         }
 
         val controller = ContractDecoratorController(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 controller.getContractInfoMarkdown(id.value, null)
             }
         }
@@ -885,10 +882,12 @@ class ContractDecoratorControllerTest : TestBase() {
     private fun emptyRepository(filters: ContractDecoratorFilters): ContractDecoratorRepository {
         val repository = mock<ContractDecoratorRepository>()
 
-        given(repository.getAll(filters)).willReturn(emptyList())
-        given(repository.getAllManifestJsonFiles(filters)).willReturn(emptyList())
-        given(repository.getAllArtifactJsonFiles(filters)).willReturn(emptyList())
-        given(repository.getAllInfoMarkdownFiles(filters)).willReturn(emptyList())
+        suppose("contract decorator repository is empty") {
+            call(repository.getAll(filters)).willReturn(emptyList())
+            call(repository.getAllManifestJsonFiles(filters)).willReturn(emptyList())
+            call(repository.getAllArtifactJsonFiles(filters)).willReturn(emptyList())
+            call(repository.getAllInfoMarkdownFiles(filters)).willReturn(emptyList())
+        }
 
         return repository
     }

@@ -3,10 +3,7 @@ package dev3.blockchainapiservice.config.interceptors
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.repository.UserIdResolverRepository
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.web.servlet.HandlerMapping
 import java.util.UUID
@@ -26,14 +23,14 @@ class UserIdResolverTest : TestBase() {
         val userIdResolverRepository = mock<UserIdResolverRepository>()
 
         suppose("userId will be resolved in the repository") {
-            given(userIdResolverRepository.getUserId(idType, id))
+            call(userIdResolverRepository.getUserId(idType, id))
                 .willReturn(userId)
         }
 
         val request = mock<HttpServletRequest>()
 
         suppose("request will contain id") {
-            given(request.getAttribute(PATH_VARIABLES))
+            call(request.getAttribute(PATH_VARIABLES))
                 .willReturn(mapOf(idType.idVariableName to id.toString()))
         }
 
@@ -46,7 +43,7 @@ class UserIdResolverTest : TestBase() {
                 path = "/test-path/{${idType.idVariableName}}/rest"
             )
 
-            assertThat(resolvedUserId).withMessage()
+            expectThat(resolvedUserId)
                 .isEqualTo(userId)
         }
     }
@@ -59,19 +56,19 @@ class UserIdResolverTest : TestBase() {
         val userIdResolverRepository = mock<UserIdResolverRepository>()
 
         suppose("userId will be resolved in the repository") {
-            given(userIdResolverRepository.getUserId(idType, id))
+            call(userIdResolverRepository.getUserId(idType, id))
                 .willReturn(userId)
         }
 
         val request = mock<HttpServletRequest>()
 
         suppose("request will not contain id") {
-            given(request.getAttribute(PATH_VARIABLES))
+            call(request.getAttribute(PATH_VARIABLES))
                 .willReturn(emptyMap<String, String>())
         }
 
         verify("IllegalStateException is thrown") {
-            assertThrows<IllegalStateException>(message) {
+            expectThrows<IllegalStateException> {
                 UserIdResolver.resolve(
                     userIdResolverRepository = userIdResolverRepository,
                     interceptorName = "test",
@@ -89,7 +86,7 @@ class UserIdResolverTest : TestBase() {
         val request = mock<HttpServletRequest>()
 
         suppose("request will contain id") {
-            given(request.getAttribute(PATH_VARIABLES))
+            call(request.getAttribute(PATH_VARIABLES))
                 .willReturn(mapOf(idType.idVariableName to "invalid-id"))
         }
 
@@ -102,7 +99,7 @@ class UserIdResolverTest : TestBase() {
                 path = "/test-path/{${idType.idVariableName}}/rest"
             )
 
-            assertThat(resolvedUserId).withMessage()
+            expectThat(resolvedUserId)
                 .isNull()
         }
     }

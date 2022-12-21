@@ -22,12 +22,10 @@ import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.devtools.filewatch.ChangedFile
@@ -35,7 +33,6 @@ import org.springframework.boot.devtools.filewatch.ChangedFiles
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import java.nio.file.Paths
-import org.mockito.kotlin.verify as verifyMock
 
 @JooqTest
 @Import(JooqContractMetadataRepository::class)
@@ -215,7 +212,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
         suppose("mock contract interfaces will be returned") {
-            given(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
+            call(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
                 .willReturn(
                     InterfaceManifestJson(
                         name = null,
@@ -245,20 +242,19 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val otherNestedInterfaceId = InterfaceId("nested/other")
 
         verify("correct contract interfaces have been loaded") {
-            verifyMock(contractInterfacesRepository)
-                .store(exampleInterfaceId, EMPTY_CONTRACT_INTERFACE)
-            verifyMock(contractInterfacesRepository)
-                .store(exampleInterfaceId, "")
+            expectInteractions(contractInterfacesRepository) {
+                once.getById(InterfaceId("trait.another"))
+                twice.getById(InterfaceId("trait.example"))
 
-            verifyMock(contractInterfacesRepository)
-                .store(nestedInterfaceId, EMPTY_CONTRACT_INTERFACE)
-            verifyMock(contractInterfacesRepository)
-                .store(nestedInterfaceId, "")
+                once.store(exampleInterfaceId, EMPTY_CONTRACT_INTERFACE)
+                once.store(exampleInterfaceId, "")
 
-            verifyMock(contractInterfacesRepository)
-                .store(otherNestedInterfaceId, EMPTY_CONTRACT_INTERFACE)
-            verifyMock(contractInterfacesRepository)
-                .store(otherNestedInterfaceId, "")
+                once.store(nestedInterfaceId, EMPTY_CONTRACT_INTERFACE)
+                once.store(nestedInterfaceId, "")
+
+                once.store(otherNestedInterfaceId, EMPTY_CONTRACT_INTERFACE)
+                once.store(otherNestedInterfaceId, "")
+            }
         }
 
         val dummyContractId = ContractId("DummyContractSet/DummyContract")
@@ -271,7 +267,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         verify("correct contract decorators have been loaded") {
             val dummyDecorator = contractDecoratorRepository.getById(dummyContractId)!!
 
-            assertThat(dummyDecorator).withMessage()
+            expectThat(dummyDecorator)
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
@@ -290,7 +286,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
 
             val deeplyNestedDecorator = contractDecoratorRepository.getById(deeplyNestedContractId)!!
 
-            assertThat(deeplyNestedDecorator).withMessage()
+            expectThat(deeplyNestedDecorator)
                 .isEqualTo(
                     ContractDecorator(
                         id = deeplyNestedContractId,
@@ -307,14 +303,14 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     )
                 )
 
-            assertThat(contractDecoratorRepository.getById(contractWithoutArtifactId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(contractWithoutArtifactId))
                 .isNull()
-            assertThat(contractDecoratorRepository.getById(contractWithoutManifestId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(contractWithoutManifestId))
                 .isNull()
 
             val anotherDecorator = contractDecoratorRepository.getById(anotherContractId)!!
 
-            assertThat(anotherDecorator).withMessage()
+            expectThat(anotherDecorator)
                 .isEqualTo(
                     ContractDecorator(
                         id = anotherContractId,
@@ -331,23 +327,23 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     )
                 )
 
-            assertThat(contractDecoratorRepository.getById(ignoredContractId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(ignoredContractId))
                 .isNull()
         }
 
         verify("correct contract metadata exists in the database") {
-            assertThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID))
                 .isTrue()
-            assertThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID))
                 .isTrue()
-            assertThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID))
                 .isTrue()
 
-            assertThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID))
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID))
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID))
                 .isFalse()
         }
     }
@@ -358,7 +354,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val contractInterfacesRepository = mock<ContractInterfacesRepository>()
 
         suppose("mock contract interfaces will be returned") {
-            given(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
+            call(contractInterfacesRepository.getById(anyValueClass(InterfaceId(""))))
                 .willReturn(
                     InterfaceManifestJson(
                         name = null,
@@ -478,15 +474,24 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
             )
         }
 
-        verify("correct contract have been updated in database") {
-            verifyMock(contractInterfacesRepository)
-                .delete(InterfaceId("NonExistentInterface"))
+        verify("correct contracts have been updated in database") {
+            expectInteractions(contractInterfacesRepository) {
+                once.getById(InterfaceId("trait.another"))
+                4.times.getById(InterfaceId("trait.example"))
 
-            verifyMock(contractInterfacesRepository)
-                .delete(InterfaceId("AnotherNonExistentInterface"))
+                once.store(InterfaceId("nested.other"), EMPTY_CONTRACT_INTERFACE)
+                once.store(InterfaceId("nested.other"), "")
 
-            verifyMock(contractInterfacesRepository)
-                .delete(InterfaceId("AnotherNonExistentInterface/example"))
+                once.store(InterfaceId("nested"), EMPTY_CONTRACT_INTERFACE)
+                once.store(InterfaceId("nested"), "")
+
+                once.store(InterfaceId("example"), EMPTY_CONTRACT_INTERFACE)
+                once.store(InterfaceId("example"), "")
+
+                once.delete(InterfaceId("NonExistentInterface"))
+                once.delete(InterfaceId("AnotherNonExistentInterface"))
+                once.delete(InterfaceId("AnotherNonExistentInterface/example"))
+            }
         }
 
         val ignoredContractId = ContractId("AnotherContractSet/IgnoredContract")
@@ -494,7 +499,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         verify("correct contract decorators have been updated in database") {
             val dummyDecorator = contractDecoratorRepository.getById(dummyContractId)!!
 
-            assertThat(dummyDecorator).withMessage()
+            expectThat(dummyDecorator)
                 .isEqualTo(
                     ContractDecorator(
                         id = dummyContractId,
@@ -513,7 +518,7 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
 
             val deeplyNestedDecorator = contractDecoratorRepository.getById(deeplyNestedContractId)!!
 
-            assertThat(deeplyNestedDecorator).withMessage()
+            expectThat(deeplyNestedDecorator)
                 .isEqualTo(
                     ContractDecorator(
                         id = deeplyNestedContractId,
@@ -530,30 +535,30 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
                     )
                 )
 
-            assertThat(contractDecoratorRepository.getById(contractWithoutArtifactId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(contractWithoutArtifactId))
                 .isNull()
-            assertThat(contractDecoratorRepository.getById(contractWithoutManifestId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(contractWithoutManifestId))
                 .isEqualTo(withoutManifestDecorator)
 
-            assertThat(contractDecoratorRepository.getById(anotherContractId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(anotherContractId))
                 .isNull()
-            assertThat(contractDecoratorRepository.getById(ignoredContractId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(ignoredContractId))
                 .isNull()
         }
 
         verify("correct contract metadata exists in the database") {
-            assertThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID))
                 .isTrue()
-            assertThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID))
                 .isTrue()
-            assertThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID))
                 .isTrue()
 
-            assertThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID))
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID))
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID)).withMessage()
+            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID))
                 .isFalse()
         }
     }
@@ -584,38 +589,32 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         val missingFunctionOutputsContractId = ContractId("MissingValue/MissingFunctionOutputs")
 
         verify("no contract decorators have been loaded") {
-            assertThat(contractDecoratorRepository.getById(unparsableArtifactContractId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(unparsableArtifactContractId))
                 .isNull()
-            assertThat(contractDecoratorRepository.getById(unparsableManifestContractId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(unparsableManifestContractId))
                 .isNull()
-            assertThat(contractDecoratorRepository.getById(missingConstructorSignatureContractId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(missingConstructorSignatureContractId))
                 .isNull()
-            assertThat(contractDecoratorRepository.getById(missingEventNameContractId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(missingEventNameContractId))
                 .isNull()
-            assertThat(contractDecoratorRepository.getById(missingFunctionNameContractId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(missingFunctionNameContractId))
                 .isNull()
-            assertThat(contractDecoratorRepository.getById(missingFunctionOutputsContractId)).withMessage()
+            expectThat(contractDecoratorRepository.getById(missingFunctionOutputsContractId))
                 .isNull()
         }
 
         verify("correct contract metadata exists in the database") {
-            assertThat(contractMetadataRepository.exists(unparsableArtifactContractId, Constants.NIL_UUID))
-                .withMessage()
+            expectThat(contractMetadataRepository.exists(unparsableArtifactContractId, Constants.NIL_UUID))
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(unparsableManifestContractId, Constants.NIL_UUID))
-                .withMessage()
+            expectThat(contractMetadataRepository.exists(unparsableManifestContractId, Constants.NIL_UUID))
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(missingConstructorSignatureContractId, Constants.NIL_UUID))
-                .withMessage()
+            expectThat(contractMetadataRepository.exists(missingConstructorSignatureContractId, Constants.NIL_UUID))
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(missingEventNameContractId, Constants.NIL_UUID))
-                .withMessage()
+            expectThat(contractMetadataRepository.exists(missingEventNameContractId, Constants.NIL_UUID))
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(missingFunctionNameContractId, Constants.NIL_UUID))
-                .withMessage()
+            expectThat(contractMetadataRepository.exists(missingFunctionNameContractId, Constants.NIL_UUID))
                 .isFalse()
-            assertThat(contractMetadataRepository.exists(missingFunctionOutputsContractId, Constants.NIL_UUID))
-                .withMessage()
+            expectThat(contractMetadataRepository.exists(missingFunctionOutputsContractId, Constants.NIL_UUID))
                 .isFalse()
         }
     }

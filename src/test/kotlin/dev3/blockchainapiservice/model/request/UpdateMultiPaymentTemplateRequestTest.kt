@@ -4,7 +4,6 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.validation.ValidationConstants
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -44,11 +43,11 @@ class UpdateMultiPaymentTemplateRequestTest : TestBase() {
         verify("request with too long string is marked as invalid") {
             val violations = validator.validate(requestWithTooLongString).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("templateName")
         }
 
@@ -64,7 +63,7 @@ class UpdateMultiPaymentTemplateRequestTest : TestBase() {
         verify("request with valid length string is marked as valid") {
             val violations = validator.validate(requestWithValidLengthString).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -83,11 +82,11 @@ class UpdateMultiPaymentTemplateRequestTest : TestBase() {
         verify("request with invalid eth address is marked as invalid") {
             val violations = validator.validate(requestWithInvalidEthAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("tokenAddress")
         }
 
@@ -103,11 +102,11 @@ class UpdateMultiPaymentTemplateRequestTest : TestBase() {
         verify("request with too long eth address is marked as invalid") {
             val violations = validator.validate(requestWithTooLongEthAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("tokenAddress")
         }
 
@@ -123,11 +122,11 @@ class UpdateMultiPaymentTemplateRequestTest : TestBase() {
         verify("request with empty eth address is marked as invalid") {
             val violations = validator.validate(requestWithEmptyEthAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("tokenAddress")
         }
 
@@ -143,7 +142,7 @@ class UpdateMultiPaymentTemplateRequestTest : TestBase() {
         verify("request with valid eth address is marked as valid") {
             val violations = validator.validate(requestWithValidEthAddress).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }

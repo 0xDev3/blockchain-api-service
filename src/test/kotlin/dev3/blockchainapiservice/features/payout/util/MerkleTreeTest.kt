@@ -8,9 +8,7 @@ import dev3.blockchainapiservice.features.payout.util.MerkleTree.Companion.PathS
 import dev3.blockchainapiservice.features.payout.util.MerkleTree.Companion.RootNode
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import java.math.BigInteger
 
 class MerkleTreeTest : TestBase() {
@@ -20,7 +18,7 @@ class MerkleTreeTest : TestBase() {
     @Test
     fun mustThrowExceptionForEmptyNodeList() {
         verify("exception is thrown when building Merkle tree from empty list") {
-            assertThrows<IllegalArgumentException>(message) {
+            expectThrows<IllegalArgumentException> {
                 MerkleTree(emptyList(), HashFunction.IDENTITY)
             }
         }
@@ -29,7 +27,7 @@ class MerkleTreeTest : TestBase() {
     @Test
     fun mustThrowExceptionForLeafNodeHashCollision() {
         verify("exception is thrown when hash collision in leaf nodes occurs") {
-            assertThrows<IllegalArgumentException>(message) {
+            expectThrows<IllegalArgumentException> {
                 MerkleTree(
                     listOf(
                         PayoutAccountBalance(WalletAddress("0x1"), Balance(BigInteger("0"))),
@@ -44,7 +42,7 @@ class MerkleTreeTest : TestBase() {
     @Test
     fun mustThrowExceptionForLeafNodeAddressCollision() {
         verify("exception is thrown when address collision in leaf nodes occurs") {
-            assertThrows<IllegalArgumentException>(message) {
+            expectThrows<IllegalArgumentException> {
                 MerkleTree(
                     listOf(
                         PayoutAccountBalance(WalletAddress("0x1"), Balance(BigInteger("0"))),
@@ -67,7 +65,7 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct structure") {
-            assertThat(tree.root).withMessage().isEqualTo(
+            expectThat(tree.root).isEqualTo(
                 RootNode(
                     left = NilNode,
                     right = LeafNode(balance, MerkleHash(balance.abiEncode())),
@@ -78,25 +76,25 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct leaf nodes") {
-            assertThat(tree.leafNodesByHash).withMessage().hasSize(1)
-            assertThat(tree.leafNodesByHash).withMessage().containsEntry(
+            expectThat(tree.leafNodesByHash).hasSize(1)
+            expectThat(tree.leafNodesByHash).containsEntry(
                 MerkleHash(balance.abiEncode()), indexedLeafNode(balance, MerkleHash(balance.abiEncode()), 1)
             )
 
-            assertThat(tree.leafNodesByAddress).withMessage().hasSize(1)
-            assertThat(tree.leafNodesByAddress).withMessage().containsEntry(
+            expectThat(tree.leafNodesByAddress).hasSize(1)
+            expectThat(tree.leafNodesByAddress).containsEntry(
                 balance.address, indexedLeafNode(balance, MerkleHash(balance.abiEncode()), 1)
             )
         }
 
         verify("Merkle tree path is correct") {
-            assertThat(tree.pathTo(balance)).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balance)).isEqualTo(
                 listOf(NilNode.hash.l)
             )
         }
 
         verify("Merkle tree does not return a path for non-contained node") {
-            assertThat(tree.pathTo(nonContainedBalance)).withMessage().isNull()
+            expectThat(tree.pathTo(nonContainedBalance)).isNull()
         }
     }
 
@@ -115,7 +113,7 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct structure") {
-            assertThat(tree.root).withMessage().isEqualTo(
+            expectThat(tree.root).isEqualTo(
                 RootNode(
                     left = balances.leafNode(0),
                     right = balances.leafNode(1),
@@ -126,8 +124,8 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct leaf nodes") {
-            assertThat(tree.leafNodesByHash).withMessage().hasSize(2)
-            assertThat(tree.leafNodesByHash.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByHash).hasSize(2)
+            expectThat(tree.leafNodesByHash.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         MerkleHash(node.abiEncode()),
@@ -136,8 +134,8 @@ class MerkleTreeTest : TestBase() {
                 }
             )
 
-            assertThat(tree.leafNodesByAddress).withMessage().hasSize(2)
-            assertThat(tree.leafNodesByAddress.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByAddress).hasSize(2)
+            expectThat(tree.leafNodesByAddress.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         node.address,
@@ -148,16 +146,16 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree paths are correct") {
-            assertThat(tree.pathTo(balances[0])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[0])).isEqualTo(
                 listOf(hashes[1].r)
             )
-            assertThat(tree.pathTo(balances[1])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[1])).isEqualTo(
                 listOf(hashes[0].l)
             )
         }
 
         verify("Merkle tree does not return a path for non-contained node") {
-            assertThat(tree.pathTo(nonContainedBalance)).withMessage().isNull()
+            expectThat(tree.pathTo(nonContainedBalance)).isNull()
         }
     }
 
@@ -177,7 +175,7 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct structure") {
-            assertThat(tree.root).withMessage().isEqualTo(
+            expectThat(tree.root).isEqualTo(
                 RootNode(
                     left = MiddleNode(
                         left = NilNode, // node[nil] to index[0]
@@ -203,8 +201,8 @@ class MerkleTreeTest : TestBase() {
         )
 
         verify("Merkle tree has correct leaf nodes") {
-            assertThat(tree.leafNodesByHash).withMessage().hasSize(3)
-            assertThat(tree.leafNodesByHash.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByHash).hasSize(3)
+            expectThat(tree.leafNodesByHash.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         MerkleHash(node.abiEncode()),
@@ -213,8 +211,8 @@ class MerkleTreeTest : TestBase() {
                 }
             )
 
-            assertThat(tree.leafNodesByAddress).withMessage().hasSize(3)
-            assertThat(tree.leafNodesByAddress.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByAddress).hasSize(3)
+            expectThat(tree.leafNodesByAddress.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         node.address,
@@ -225,19 +223,19 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree paths are correct") {
-            assertThat(tree.pathTo(balances[0])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[0])).isEqualTo(
                 listOf(hashes[1].r, (NilNode.hash + hashes[2]).l)
             )
-            assertThat(tree.pathTo(balances[1])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[1])).isEqualTo(
                 listOf(hashes[0].l, (NilNode.hash + hashes[2]).l)
             )
-            assertThat(tree.pathTo(balances[2])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[2])).isEqualTo(
                 listOf(NilNode.hash.l, hashes[0..1].r)
             )
         }
 
         verify("Merkle tree does not return a path for non-contained node") {
-            assertThat(tree.pathTo(nonContainedBalance)).withMessage().isNull()
+            expectThat(tree.pathTo(nonContainedBalance)).isNull()
         }
     }
 
@@ -258,7 +256,7 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct structure") {
-            assertThat(tree.root).withMessage().isEqualTo(
+            expectThat(tree.root).isEqualTo(
                 RootNode(
                     left = MiddleNode(
                         left = balances.leafNode(0),
@@ -277,8 +275,8 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct leaf nodes") {
-            assertThat(tree.leafNodesByHash).withMessage().hasSize(4)
-            assertThat(tree.leafNodesByHash.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByHash).hasSize(4)
+            expectThat(tree.leafNodesByHash.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         MerkleHash(node.abiEncode()),
@@ -287,8 +285,8 @@ class MerkleTreeTest : TestBase() {
                 }
             )
 
-            assertThat(tree.leafNodesByAddress).withMessage().hasSize(4)
-            assertThat(tree.leafNodesByAddress.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByAddress).hasSize(4)
+            expectThat(tree.leafNodesByAddress.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         node.address,
@@ -299,22 +297,22 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree paths are correct") {
-            assertThat(tree.pathTo(balances[0])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[0])).isEqualTo(
                 listOf(hashes[1].r, hashes[2..3].r)
             )
-            assertThat(tree.pathTo(balances[1])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[1])).isEqualTo(
                 listOf(hashes[0].l, hashes[2..3].r)
             )
-            assertThat(tree.pathTo(balances[2])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[2])).isEqualTo(
                 listOf(hashes[3].r, hashes[0..1].l)
             )
-            assertThat(tree.pathTo(balances[3])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[3])).isEqualTo(
                 listOf(hashes[2].l, hashes[0..1].l)
             )
         }
 
         verify("Merkle tree does not return a path for non-contained node") {
-            assertThat(tree.pathTo(nonContainedBalance)).withMessage().isNull()
+            expectThat(tree.pathTo(nonContainedBalance)).isNull()
         }
     }
 
@@ -339,7 +337,7 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct structure") {
-            assertThat(tree.root).withMessage().isEqualTo(
+            expectThat(tree.root).isEqualTo(
                 RootNode(
                     left = MiddleNode(
                         left = MiddleNode(
@@ -374,8 +372,8 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct leaf nodes") {
-            assertThat(tree.leafNodesByHash).withMessage().hasSize(8)
-            assertThat(tree.leafNodesByHash.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByHash).hasSize(8)
+            expectThat(tree.leafNodesByHash.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         MerkleHash(node.abiEncode()),
@@ -384,8 +382,8 @@ class MerkleTreeTest : TestBase() {
                 }
             )
 
-            assertThat(tree.leafNodesByAddress).withMessage().hasSize(8)
-            assertThat(tree.leafNodesByAddress.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByAddress).hasSize(8)
+            expectThat(tree.leafNodesByAddress.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         node.address,
@@ -396,34 +394,34 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree paths are correct") {
-            assertThat(tree.pathTo(balances[0])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[0])).isEqualTo(
                 listOf(hashes[1].r, hashes[2..3].r, hashes[4..7].r)
             )
-            assertThat(tree.pathTo(balances[1])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[1])).isEqualTo(
                 listOf(hashes[0].l, hashes[2..3].r, hashes[4..7].r)
             )
-            assertThat(tree.pathTo(balances[2])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[2])).isEqualTo(
                 listOf(hashes[3].r, hashes[0..1].l, hashes[4..7].r)
             )
-            assertThat(tree.pathTo(balances[3])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[3])).isEqualTo(
                 listOf(hashes[2].l, hashes[0..1].l, hashes[4..7].r)
             )
-            assertThat(tree.pathTo(balances[4])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[4])).isEqualTo(
                 listOf(hashes[5].r, hashes[6..7].r, hashes[0..3].l)
             )
-            assertThat(tree.pathTo(balances[5])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[5])).isEqualTo(
                 listOf(hashes[4].l, hashes[6..7].r, hashes[0..3].l)
             )
-            assertThat(tree.pathTo(balances[6])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[6])).isEqualTo(
                 listOf(hashes[7].r, hashes[4..5].l, hashes[0..3].l)
             )
-            assertThat(tree.pathTo(balances[7])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[7])).isEqualTo(
                 listOf(hashes[6].l, hashes[4..5].l, hashes[0..3].l)
             )
         }
 
         verify("Merkle tree does not return a path for non-contained node") {
-            assertThat(tree.pathTo(nonContainedBalance)).withMessage().isNull()
+            expectThat(tree.pathTo(nonContainedBalance)).isNull()
         }
     }
 
@@ -452,7 +450,7 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct structure") {
-            assertThat(tree.root).withMessage().isEqualTo(
+            expectThat(tree.root).isEqualTo(
                 RootNode(
                     left = MiddleNode(
                         left = NilNode, // node[nil] to index[0..3]
@@ -523,8 +521,8 @@ class MerkleTreeTest : TestBase() {
         )
 
         verify("Merkle tree has correct leaf nodes") {
-            assertThat(tree.leafNodesByHash).withMessage().hasSize(12)
-            assertThat(tree.leafNodesByHash.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByHash).hasSize(12)
+            expectThat(tree.leafNodesByHash.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         MerkleHash(node.abiEncode()),
@@ -533,8 +531,8 @@ class MerkleTreeTest : TestBase() {
                 }
             )
 
-            assertThat(tree.leafNodesByAddress).withMessage().hasSize(12)
-            assertThat(tree.leafNodesByAddress.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByAddress).hasSize(12)
+            expectThat(tree.leafNodesByAddress.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         node.address,
@@ -545,46 +543,46 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree paths are correct") {
-            assertThat(tree.pathTo(balances[0])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[0])).isEqualTo(
                 listOf(hashes[1].r, hashes[2..3].r, hashes[4..7].r, (NilNode.hash + hashes[8..11]).l)
             )
-            assertThat(tree.pathTo(balances[1])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[1])).isEqualTo(
                 listOf(hashes[0].l, hashes[2..3].r, hashes[4..7].r, (NilNode.hash + hashes[8..11]).l)
             )
-            assertThat(tree.pathTo(balances[2])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[2])).isEqualTo(
                 listOf(hashes[3].r, hashes[0..1].l, hashes[4..7].r, (NilNode.hash + hashes[8..11]).l)
             )
-            assertThat(tree.pathTo(balances[3])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[3])).isEqualTo(
                 listOf(hashes[2].l, hashes[0..1].l, hashes[4..7].r, (NilNode.hash + hashes[8..11]).l)
             )
-            assertThat(tree.pathTo(balances[4])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[4])).isEqualTo(
                 listOf(hashes[5].r, hashes[6..7].r, hashes[0..3].l, (NilNode.hash + hashes[8..11]).l)
             )
-            assertThat(tree.pathTo(balances[5])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[5])).isEqualTo(
                 listOf(hashes[4].l, hashes[6..7].r, hashes[0..3].l, (NilNode.hash + hashes[8..11]).l)
             )
-            assertThat(tree.pathTo(balances[6])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[6])).isEqualTo(
                 listOf(hashes[7].r, hashes[4..5].l, hashes[0..3].l, (NilNode.hash + hashes[8..11]).l)
             )
-            assertThat(tree.pathTo(balances[7])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[7])).isEqualTo(
                 listOf(hashes[6].l, hashes[4..5].l, hashes[0..3].l, (NilNode.hash + hashes[8..11]).l)
             )
-            assertThat(tree.pathTo(balances[8])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[8])).isEqualTo(
                 listOf(hashes[9].r, hashes[10..11].r, NilNode.hash.l, hashes[0..7].r)
             )
-            assertThat(tree.pathTo(balances[9])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[9])).isEqualTo(
                 listOf(hashes[8].l, hashes[10..11].r, NilNode.hash.l, hashes[0..7].r)
             )
-            assertThat(tree.pathTo(balances[10])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[10])).isEqualTo(
                 listOf(hashes[11].r, hashes[8..9].l, NilNode.hash.l, hashes[0..7].r)
             )
-            assertThat(tree.pathTo(balances[11])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[11])).isEqualTo(
                 listOf(hashes[10].l, hashes[8..9].l, NilNode.hash.l, hashes[0..7].r)
             )
         }
 
         verify("Merkle tree does not return a path for non-contained node") {
-            assertThat(tree.pathTo(nonContainedBalance)).withMessage().isNull()
+            expectThat(tree.pathTo(nonContainedBalance)).isNull()
         }
     }
 
@@ -614,7 +612,7 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct structure") {
-            assertThat(tree.root).withMessage().isEqualTo(
+            expectThat(tree.root).isEqualTo(
                 RootNode(
                     left = MiddleNode(
                         left = MiddleNode(
@@ -694,8 +692,8 @@ class MerkleTreeTest : TestBase() {
         )
 
         verify("Merkle tree has correct leaf nodes") {
-            assertThat(tree.leafNodesByHash).withMessage().hasSize(13)
-            assertThat(tree.leafNodesByHash.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByHash).hasSize(13)
+            expectThat(tree.leafNodesByHash.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         MerkleHash(node.abiEncode()),
@@ -704,8 +702,8 @@ class MerkleTreeTest : TestBase() {
                 }
             )
 
-            assertThat(tree.leafNodesByAddress).withMessage().hasSize(13)
-            assertThat(tree.leafNodesByAddress.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByAddress).hasSize(13)
+            expectThat(tree.leafNodesByAddress.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         node.address,
@@ -716,7 +714,7 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree paths are correct") {
-            assertThat(tree.pathTo(balances[0])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[0])).isEqualTo(
                 listOf(
                     hashes[1].r,
                     hashes[2..3].r,
@@ -724,7 +722,7 @@ class MerkleTreeTest : TestBase() {
                     (NilNode.hash + NilNode.hash + hashes[12] + hashes[8..11]).l
                 )
             )
-            assertThat(tree.pathTo(balances[1])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[1])).isEqualTo(
                 listOf(
                     hashes[0].l,
                     hashes[2..3].r,
@@ -732,7 +730,7 @@ class MerkleTreeTest : TestBase() {
                     (NilNode.hash + NilNode.hash + hashes[12] + hashes[8..11]).l
                 )
             )
-            assertThat(tree.pathTo(balances[2])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[2])).isEqualTo(
                 listOf(
                     hashes[3].r,
                     hashes[0..1].l,
@@ -740,7 +738,7 @@ class MerkleTreeTest : TestBase() {
                     (NilNode.hash + NilNode.hash + hashes[12] + hashes[8..11]).l
                 )
             )
-            assertThat(tree.pathTo(balances[3])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[3])).isEqualTo(
                 listOf(
                     hashes[2].l,
                     hashes[0..1].l,
@@ -748,7 +746,7 @@ class MerkleTreeTest : TestBase() {
                     (NilNode.hash + NilNode.hash + hashes[12] + hashes[8..11]).l
                 )
             )
-            assertThat(tree.pathTo(balances[4])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[4])).isEqualTo(
                 listOf(
                     hashes[5].r,
                     hashes[6..7].r,
@@ -756,7 +754,7 @@ class MerkleTreeTest : TestBase() {
                     (NilNode.hash + NilNode.hash + hashes[12] + hashes[8..11]).l
                 )
             )
-            assertThat(tree.pathTo(balances[5])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[5])).isEqualTo(
                 listOf(
                     hashes[4].l,
                     hashes[6..7].r,
@@ -764,7 +762,7 @@ class MerkleTreeTest : TestBase() {
                     (NilNode.hash + NilNode.hash + hashes[12] + hashes[8..11]).l
                 )
             )
-            assertThat(tree.pathTo(balances[6])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[6])).isEqualTo(
                 listOf(
                     hashes[7].r,
                     hashes[4..5].l,
@@ -772,7 +770,7 @@ class MerkleTreeTest : TestBase() {
                     (NilNode.hash + NilNode.hash + hashes[12] + hashes[8..11]).l
                 )
             )
-            assertThat(tree.pathTo(balances[7])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[7])).isEqualTo(
                 listOf(
                     hashes[6].l,
                     hashes[4..5].l,
@@ -780,25 +778,25 @@ class MerkleTreeTest : TestBase() {
                     (NilNode.hash + NilNode.hash + hashes[12] + hashes[8..11]).l
                 )
             )
-            assertThat(tree.pathTo(balances[8])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[8])).isEqualTo(
                 listOf(hashes[9].r, hashes[10..11].r, (NilNode.hash + NilNode.hash + hashes[12]).l, hashes[0..7].r)
             )
-            assertThat(tree.pathTo(balances[9])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[9])).isEqualTo(
                 listOf(hashes[8].l, hashes[10..11].r, (NilNode.hash + NilNode.hash + hashes[12]).l, hashes[0..7].r)
             )
-            assertThat(tree.pathTo(balances[10])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[10])).isEqualTo(
                 listOf(hashes[11].r, hashes[8..9].l, (NilNode.hash + NilNode.hash + hashes[12]).l, hashes[0..7].r)
             )
-            assertThat(tree.pathTo(balances[11])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[11])).isEqualTo(
                 listOf(hashes[10].l, hashes[8..9].l, (NilNode.hash + NilNode.hash + hashes[12]).l, hashes[0..7].r)
             )
-            assertThat(tree.pathTo(balances[12])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[12])).isEqualTo(
                 listOf(NilNode.hash.l, NilNode.hash.l, hashes[8..11].r, hashes[0..7].r)
             )
         }
 
         verify("Merkle tree does not return a path for non-contained node") {
-            assertThat(tree.pathTo(nonContainedBalance)).withMessage().isNull()
+            expectThat(tree.pathTo(nonContainedBalance)).isNull()
         }
     }
 
@@ -813,7 +811,7 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct structure") {
-            assertThat(tree.root).withMessage().isEqualTo(
+            expectThat(tree.root).isEqualTo(
                 RootNode(
                     left = NilNode,
                     right = LeafNode(balance, HashFunction.KECCAK_256(balance.abiEncode())),
@@ -824,26 +822,26 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree has correct leaf nodes") {
-            assertThat(tree.leafNodesByHash).withMessage().hasSize(1)
-            assertThat(tree.leafNodesByHash).withMessage().containsEntry(
+            expectThat(tree.leafNodesByHash).hasSize(1)
+            expectThat(tree.leafNodesByHash).containsEntry(
                 HashFunction.KECCAK_256(balance.abiEncode()),
                 indexedLeafNode(balance, HashFunction.KECCAK_256(balance.abiEncode()), 1)
             )
 
-            assertThat(tree.leafNodesByAddress).withMessage().hasSize(1)
-            assertThat(tree.leafNodesByAddress).withMessage().containsEntry(
+            expectThat(tree.leafNodesByAddress).hasSize(1)
+            expectThat(tree.leafNodesByAddress).containsEntry(
                 balance.address, indexedLeafNode(balance, HashFunction.KECCAK_256(balance.abiEncode()), 1)
             )
         }
 
         verify("Merkle tree path is correct") {
-            assertThat(tree.pathTo(balance)).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balance)).isEqualTo(
                 listOf(NilNode.hash.l)
             )
         }
 
         verify("Merkle tree does not return a path for non-contained node") {
-            assertThat(tree.pathTo(nonContainedBalance)).withMessage().isNull()
+            expectThat(tree.pathTo(nonContainedBalance)).isNull()
         }
     }
 
@@ -864,7 +862,7 @@ class MerkleTreeTest : TestBase() {
 
         verify("Merkle tree has correct structure") {
             // ordering is according to keccak256 hashes
-            assertThat(tree.root).withMessage().isEqualTo(
+            expectThat(tree.root).isEqualTo(
                 RootNode(
                     left = MiddleNode(
                         left = balances.leafNode(2, HashFunction.KECCAK_256), // node[2] to index[0]
@@ -895,8 +893,8 @@ class MerkleTreeTest : TestBase() {
         )
 
         verify("Merkle tree has correct leaf nodes") {
-            assertThat(tree.leafNodesByHash).withMessage().hasSize(3)
-            assertThat(tree.leafNodesByHash.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByHash).hasSize(3)
+            expectThat(tree.leafNodesByHash.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         HashFunction.KECCAK_256(node.abiEncode()),
@@ -905,8 +903,8 @@ class MerkleTreeTest : TestBase() {
                 }
             )
 
-            assertThat(tree.leafNodesByAddress).withMessage().hasSize(3)
-            assertThat(tree.leafNodesByAddress.toList()).withMessage().containsExactlyInAnyOrderElementsOf(
+            expectThat(tree.leafNodesByAddress).hasSize(3)
+            expectThat(tree.leafNodesByAddress.toList()).containsExactlyInAnyOrderElementsOf(
                 balances.mapIndexed { index, node ->
                     Pair(
                         node.address,
@@ -917,19 +915,19 @@ class MerkleTreeTest : TestBase() {
         }
 
         verify("Merkle tree paths are correct") {
-            assertThat(tree.pathTo(balances[0])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[0])).isEqualTo(
                 listOf(hashes[2].l, HashFunction.KECCAK_256((NilNode.hash + hashes[1]).value).r)
             )
-            assertThat(tree.pathTo(balances[1])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[1])).isEqualTo(
                 listOf(NilNode.hash.l, HashFunction.KECCAK_256((hashes[2] + hashes[0]).value).l)
             )
-            assertThat(tree.pathTo(balances[2])).withMessage().isEqualTo(
+            expectThat(tree.pathTo(balances[2])).isEqualTo(
                 listOf(hashes[0].r, HashFunction.KECCAK_256((NilNode.hash + hashes[1]).value).r)
             )
         }
 
         verify("Merkle tree does not return a path for non-contained node") {
-            assertThat(tree.pathTo(nonContainedBalance)).withMessage().isNull()
+            expectThat(tree.pathTo(nonContainedBalance)).isNull()
         }
     }
 

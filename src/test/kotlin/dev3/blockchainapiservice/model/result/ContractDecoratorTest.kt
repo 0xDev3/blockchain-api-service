@@ -14,7 +14,6 @@ import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class ContractDecoratorTest : TestBase() {
@@ -211,7 +210,7 @@ class ContractDecoratorTest : TestBase() {
                 interfacesProvider = interfacesProvider
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractDecorator(
                         id = id,
@@ -403,7 +402,7 @@ class ContractDecoratorTest : TestBase() {
                 interfacesProvider = interfacesProvider
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ContractDecorator(
                         id = id,

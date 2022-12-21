@@ -23,10 +23,7 @@ import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import java.math.BigInteger
 import java.util.UUID
@@ -92,14 +89,14 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val repository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is returned from database") {
-            given(repository.getById(DEPLOYED_CONTRACT_ID.id))
+            call(repository.getById(DEPLOYED_CONTRACT_ID.id))
                 .willReturn(DEPLOYED_CONTRACT)
         }
 
         val service = DeployedContractIdentifierResolverServiceImpl(repository, mock())
 
         verify("contract contract ID and address are resolved") {
-            assertThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ID, PROJECT)).withMessage()
+            expectThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ID, PROJECT))
                 .isEqualTo(Pair(DEPLOYED_CONTRACT.id, DEPLOYED_CONTRACT.contractAddress))
         }
     }
@@ -109,14 +106,14 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val repository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is returned from database") {
-            given(repository.getById(DEPLOYED_CONTRACT_ID.id))
+            call(repository.getById(DEPLOYED_CONTRACT_ID.id))
                 .willReturn(DEPLOYED_CONTRACT.copy(contractAddress = null))
         }
 
         val ethCommonService = mock<EthCommonService>()
 
         suppose("deployed contract address will be fetched from blockchain") {
-            given(
+            call(
                 ethCommonService.fetchTransactionInfo(
                     txHash = TX_HASH,
                     chainId = DEPLOYED_CONTRACT.chainId,
@@ -129,7 +126,7 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val service = DeployedContractIdentifierResolverServiceImpl(repository, ethCommonService)
 
         verify("contract contract ID and address are resolved") {
-            assertThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ID, PROJECT)).withMessage()
+            expectThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ID, PROJECT))
                 .isEqualTo(Pair(DEPLOYED_CONTRACT.id, DEPLOYED_CONTRACT.contractAddress))
         }
     }
@@ -139,14 +136,14 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val repository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is returned from database without contract address") {
-            given(repository.getById(DEPLOYED_CONTRACT_ID.id))
+            call(repository.getById(DEPLOYED_CONTRACT_ID.id))
                 .willReturn(DEPLOYED_CONTRACT.copy(contractAddress = null))
         }
 
         val service = DeployedContractIdentifierResolverServiceImpl(repository, mock())
 
         verify("ContractNotYetDeployedException is thrown") {
-            assertThrows<ContractNotYetDeployedException>(message) {
+            expectThrows<ContractNotYetDeployedException> {
                 service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ID, PROJECT)
             }
         }
@@ -157,14 +154,14 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val repository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is not found from database") {
-            given(repository.getById(DEPLOYED_CONTRACT_ID.id))
+            call(repository.getById(DEPLOYED_CONTRACT_ID.id))
                 .willReturn(null)
         }
 
         val service = DeployedContractIdentifierResolverServiceImpl(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ID, PROJECT)
             }
         }
@@ -175,14 +172,14 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val repository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is returned from database") {
-            given(repository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS.alias, PROJECT.id))
+            call(repository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS.alias, PROJECT.id))
                 .willReturn(DEPLOYED_CONTRACT)
         }
 
         val service = DeployedContractIdentifierResolverServiceImpl(repository, mock())
 
         verify("contract contract ID and address are resolved") {
-            assertThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ALIAS, PROJECT)).withMessage()
+            expectThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ALIAS, PROJECT))
                 .isEqualTo(Pair(DEPLOYED_CONTRACT.id, DEPLOYED_CONTRACT.contractAddress))
         }
     }
@@ -192,14 +189,14 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val repository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is returned from database") {
-            given(repository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS.alias, PROJECT.id))
+            call(repository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS.alias, PROJECT.id))
                 .willReturn(DEPLOYED_CONTRACT.copy(contractAddress = null))
         }
 
         val ethCommonService = mock<EthCommonService>()
 
         suppose("deployed contract address will be fetched from blockchain") {
-            given(
+            call(
                 ethCommonService.fetchTransactionInfo(
                     txHash = TX_HASH,
                     chainId = DEPLOYED_CONTRACT.chainId,
@@ -212,7 +209,7 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val service = DeployedContractIdentifierResolverServiceImpl(repository, ethCommonService)
 
         verify("contract contract ID and address are resolved") {
-            assertThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ALIAS, PROJECT)).withMessage()
+            expectThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ALIAS, PROJECT))
                 .isEqualTo(Pair(DEPLOYED_CONTRACT.id, DEPLOYED_CONTRACT.contractAddress))
         }
     }
@@ -222,14 +219,14 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val repository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is returned from database without contract address") {
-            given(repository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS.alias, PROJECT.id))
+            call(repository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS.alias, PROJECT.id))
                 .willReturn(DEPLOYED_CONTRACT.copy(contractAddress = null))
         }
 
         val service = DeployedContractIdentifierResolverServiceImpl(repository, mock())
 
         verify("ContractNotYetDeployedException is thrown") {
-            assertThrows<ContractNotYetDeployedException>(message) {
+            expectThrows<ContractNotYetDeployedException> {
                 service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ALIAS, PROJECT)
             }
         }
@@ -240,14 +237,14 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val repository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is not found from database") {
-            given(repository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS.alias, PROJECT.id))
+            call(repository.getByAliasAndProjectId(DEPLOYED_CONTRACT_ALIAS.alias, PROJECT.id))
                 .willReturn(null)
         }
 
         val service = DeployedContractIdentifierResolverServiceImpl(repository, mock())
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ALIAS, PROJECT)
             }
         }
@@ -258,7 +255,7 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
         val service = DeployedContractIdentifierResolverServiceImpl(mock(), mock())
 
         verify("contract contract ID and address are resolved") {
-            assertThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ADDRESS, PROJECT)).withMessage()
+            expectThat(service.resolveContractIdAndAddress(DEPLOYED_CONTRACT_ADDRESS, PROJECT))
                 .isEqualTo(Pair(null, DEPLOYED_CONTRACT.contractAddress))
         }
     }

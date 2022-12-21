@@ -13,7 +13,6 @@ import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeUsageTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.PromoCodeRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.junit.jupiter.api.BeforeEach
@@ -30,7 +29,7 @@ import kotlin.time.Duration.Companion.days
 @Import(JooqPromoCodeRepository::class)
 @DirtiesContext
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class JooqPromoCodeIntegTest : TestBase() {
+class JooqPromoCodeRepositoryIntegTest : TestBase() {
 
     @Suppress("unused")
     private val postgresContainer = SharedTestContainers.postgresContainer
@@ -66,7 +65,7 @@ class JooqPromoCodeIntegTest : TestBase() {
         }
 
         verify("stored promo code is correctly returned") {
-            assertThat(storedCode).withMessage()
+            expectThat(storedCode)
                 .isEqualTo(promoCode)
         }
 
@@ -75,7 +74,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 .where(PromoCodeTable.CODE.eq(promoCode.code))
                 .fetchOne { it.toModel() }
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(promoCode)
         }
     }
@@ -131,7 +130,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 validUntil = TestData.TIMESTAMP + 15.days
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf(currentCode))
         }
     }
@@ -175,7 +174,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 currentTime = TestData.TIMESTAMP - 1.days
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(promoCode.copy(numOfUsages = 1L))
         }
 
@@ -188,7 +187,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isTrue()
         }
     }
@@ -232,7 +231,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 currentTime = TestData.TIMESTAMP - 1.days
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(promoCode.copy(numOfUsages = 1L))
         }
 
@@ -243,7 +242,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 currentTime = TestData.TIMESTAMP - 1.days
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(PromoCodeAlreadyUsed)
         }
 
@@ -256,7 +255,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isTrue()
         }
     }
@@ -300,7 +299,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 currentTime = TestData.TIMESTAMP + 1.days
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(PromoCodeExpired)
         }
 
@@ -313,7 +312,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isFalse()
         }
     }
@@ -340,7 +339,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 currentTime = TestData.TIMESTAMP + 1.days
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(PromoCodeDoesNotExist)
         }
 
@@ -353,7 +352,7 @@ class JooqPromoCodeIntegTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isFalse()
         }
     }

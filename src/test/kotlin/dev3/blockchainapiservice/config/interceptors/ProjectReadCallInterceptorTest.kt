@@ -10,13 +10,8 @@ import dev3.blockchainapiservice.exception.ErrorResponse
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
 import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.method.HandlerMethod
@@ -25,7 +20,6 @@ import java.io.PrintWriter
 import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import org.mockito.kotlin.verify as verifyMock
 
 class ProjectReadCallInterceptorTest : TestBase() {
 
@@ -63,11 +57,13 @@ class ProjectReadCallInterceptorTest : TestBase() {
             interceptor.preHandle(request, response, handler)
             interceptor.afterCompletion(request, response, handler, null)
 
-            verifyNoInteractions(apiRateLimitRepository)
-            verifyNoInteractions(userIdResolverRepository)
-            verifyNoInteractions(utcDateTimeProvider)
-            verifyNoInteractions(request)
-            verifyNoInteractions(response)
+            expectNoInteractions(
+                apiRateLimitRepository,
+                userIdResolverRepository,
+                utcDateTimeProvider,
+                request,
+                response
+            )
         }
     }
 
@@ -78,7 +74,7 @@ class ProjectReadCallInterceptorTest : TestBase() {
         val request = mock<HttpServletRequest>()
 
         suppose("request will contain id") {
-            given(request.getAttribute(PATH_VARIABLES))
+            call(request.getAttribute(PATH_VARIABLES))
                 .willReturn(mapOf(idType.idVariableName to projectId.toString()))
         }
 
@@ -86,28 +82,28 @@ class ProjectReadCallInterceptorTest : TestBase() {
         val userId = UUID.randomUUID()
 
         suppose("userId will be resolved in the repository") {
-            given(userIdResolverRepository.getUserId(idType, projectId))
+            call(userIdResolverRepository.getUserId(idType, projectId))
                 .willReturn(userId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
 
         suppose("remaining read API rate limit will not be zero") {
-            given(apiRateLimitRepository.remainingReadLimit(userId, TestData.TIMESTAMP))
+            call(apiRateLimitRepository.remainingReadLimit(userId, TestData.TIMESTAMP))
                 .willReturn(1)
         }
 
         val response = mock<HttpServletResponse>()
 
         suppose("response will have successful status") {
-            given(response.status)
+            call(response.status)
                 .willReturn(HttpStatus.OK.value())
         }
 
@@ -122,20 +118,19 @@ class ProjectReadCallInterceptorTest : TestBase() {
         verify("annotated method is correctly handled") {
             val handleResult = interceptor.preHandle(request, response, handler)
 
-            assertThat(handleResult).withMessage()
+            expectThat(handleResult)
                 .isTrue()
 
             interceptor.afterCompletion(request, response, handler, null)
 
-            verifyMock(apiRateLimitRepository)
-                .remainingReadLimit(userId, TestData.TIMESTAMP)
-            verifyMock(apiRateLimitRepository)
-                .addReadCall(userId, TestData.TIMESTAMP, "/test-path/{projectId}")
-            verifyNoMoreInteractions(apiRateLimitRepository)
+            expectInteractions(apiRateLimitRepository) {
+                once.remainingReadLimit(userId, TestData.TIMESTAMP)
+                once.addReadCall(userId, TestData.TIMESTAMP, "/test-path/{projectId}")
+            }
 
-            verifyMock(userIdResolverRepository, times(2))
-                .getUserId(idType, projectId)
-            verifyNoMoreInteractions(userIdResolverRepository)
+            expectInteractions(userIdResolverRepository) {
+                twice.getUserId(idType, projectId)
+            }
         }
     }
 
@@ -146,7 +141,7 @@ class ProjectReadCallInterceptorTest : TestBase() {
         val request = mock<HttpServletRequest>()
 
         suppose("request will contain id") {
-            given(request.getAttribute(PATH_VARIABLES))
+            call(request.getAttribute(PATH_VARIABLES))
                 .willReturn(mapOf(idType.idVariableName to projectId.toString()))
         }
 
@@ -154,35 +149,35 @@ class ProjectReadCallInterceptorTest : TestBase() {
         val userId = UUID.randomUUID()
 
         suppose("userId will be resolved in the repository") {
-            given(userIdResolverRepository.getUserId(idType, projectId))
+            call(userIdResolverRepository.getUserId(idType, projectId))
                 .willReturn(userId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
 
         suppose("remaining read API rate limit will be zero") {
-            given(apiRateLimitRepository.remainingReadLimit(userId, TestData.TIMESTAMP))
+            call(apiRateLimitRepository.remainingReadLimit(userId, TestData.TIMESTAMP))
                 .willReturn(0)
         }
 
         val response = mock<HttpServletResponse>()
 
         suppose("response will have bad request status") {
-            given(response.status)
+            call(response.status)
                 .willReturn(HttpStatus.BAD_REQUEST.value())
         }
 
         val writer = mock<PrintWriter>()
 
         suppose("response will return a writer") {
-            given(response.writer)
+            call(response.writer)
                 .willReturn(writer)
         }
 
@@ -197,29 +192,27 @@ class ProjectReadCallInterceptorTest : TestBase() {
         verify("annotated method is correctly handled") {
             val handleResult = interceptor.preHandle(request, response, handler)
 
-            assertThat(handleResult).withMessage()
+            expectThat(handleResult)
                 .isFalse()
 
             interceptor.afterCompletion(request, response, handler, null)
 
-            verifyMock(apiRateLimitRepository)
-                .remainingReadLimit(userId, TestData.TIMESTAMP)
-            verifyNoMoreInteractions(apiRateLimitRepository)
+            expectInteractions(apiRateLimitRepository) {
+                once.remainingReadLimit(userId, TestData.TIMESTAMP)
+            }
 
-            verifyMock(userIdResolverRepository, times(2))
-                .getUserId(idType, projectId)
-            verifyNoMoreInteractions(userIdResolverRepository)
+            expectInteractions(userIdResolverRepository) {
+                twice.getUserId(idType, projectId)
+            }
 
-            verifyMock(response)
-                .status = HttpStatus.PAYMENT_REQUIRED.value()
-            verifyMock(response)
-                .writer
-            verifyMock(response)
-                .status
-            verifyNoMoreInteractions(response)
+            expectInteractions(response) {
+                once.status = HttpStatus.PAYMENT_REQUIRED.value()
+                once.writer
+                once.status
+            }
 
-            verifyMock(writer)
-                .println(
+            expectInteractions(writer) {
+                once.println(
                     OBJECT_MAPPER.writeValueAsString(
                         ErrorResponse(
                             errorCode = ErrorCode.API_RATE_LIMIT_EXCEEDED,
@@ -227,7 +220,7 @@ class ProjectReadCallInterceptorTest : TestBase() {
                         )
                     )
                 )
-            verifyNoMoreInteractions(writer)
+            }
         }
     }
 }

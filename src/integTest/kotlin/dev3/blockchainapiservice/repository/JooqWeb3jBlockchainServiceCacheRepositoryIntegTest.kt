@@ -17,7 +17,6 @@ import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -99,14 +98,13 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
         }
 
         verify("fetchAccountBalance call is correctly cached") {
-            assertThat(
+            expectThat(
                 repository.getCachedFetchAccountBalance(
                     chainSpec = CHAIN_SPEC,
                     walletAddress = ACCOUNT_BALANCE.wallet,
                     blockNumber = ACCOUNT_BALANCE.blockNumber
                 )
-            ).withMessage()
-                .isEqualTo(ACCOUNT_BALANCE)
+            ).isEqualTo(ACCOUNT_BALANCE)
         }
     }
 
@@ -124,15 +122,14 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
         }
 
         verify("fetchErc20AccountBalance call is correctly cached") {
-            assertThat(
+            expectThat(
                 repository.getCachedFetchErc20AccountBalance(
                     chainSpec = CHAIN_SPEC,
                     contractAddress = CONTRACT_ADDRESS,
                     walletAddress = ACCOUNT_BALANCE.wallet,
                     blockNumber = ACCOUNT_BALANCE.blockNumber
                 )
-            ).withMessage()
-                .isEqualTo(ACCOUNT_BALANCE)
+            ).isEqualTo(ACCOUNT_BALANCE)
         }
     }
 
@@ -157,14 +154,13 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
         }
 
         verify("fetchTransactionInfo call is correctly cached") {
-            assertThat(
+            expectThat(
                 repository.getCachedFetchTransactionInfo(
                     chainSpec = CHAIN_SPEC,
                     txHash = TX_INFO.hash,
                     currentBlockNumber = BLOCK_NUMBER
                 )
-            ).withMessage()
-                .isEqualTo(Pair(TX_INFO, listOf(EventLog("data", listOf("topic")))))
+            ).isEqualTo(Pair(TX_INFO, listOf(EventLog("data", listOf("topic")))))
         }
     }
 
@@ -188,13 +184,12 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
         }
 
         verify("findContractDeploymentTransaction call is correctly cached") {
-            assertThat(
+            expectThat(
                 repository.getCachedContractDeploymentTransaction(
                     chainSpec = CHAIN_SPEC,
                     contractAddress = CONTRACT_ADDRESS
                 )
-            ).withMessage()
-                .isEqualTo(Pair(CONTRACT_DEPLOYMENT_TRANSACTION_INFO, listOf(EventLog("data", listOf("topic")))))
+            ).isEqualTo(Pair(CONTRACT_DEPLOYMENT_TRANSACTION_INFO, listOf(EventLog("data", listOf("topic")))))
         }
     }
 }

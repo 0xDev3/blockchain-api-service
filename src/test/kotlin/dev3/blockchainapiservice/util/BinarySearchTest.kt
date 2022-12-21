@@ -1,7 +1,6 @@
 package dev3.blockchainapiservice.util
 
 import dev3.blockchainapiservice.TestBase
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigInteger
 
@@ -34,7 +33,7 @@ class BinarySearchTest : TestBase() {
                 updateUpperBound = isUpper
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(target)
         }
     }
@@ -54,7 +53,7 @@ class BinarySearchTest : TestBase() {
                 updateUpperBound = isUpper
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(target)
         }
     }
@@ -74,7 +73,7 @@ class BinarySearchTest : TestBase() {
                 updateUpperBound = isUpper
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(target)
         }
     }
@@ -94,7 +93,7 @@ class BinarySearchTest : TestBase() {
                 updateUpperBound = isUpper
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(BigInteger("100"))
         }
     }

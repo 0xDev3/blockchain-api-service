@@ -14,11 +14,8 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -36,14 +33,14 @@ class ProjectServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(uuid)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(CREATED_AT)
         }
 
@@ -70,7 +67,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be stored into the database") {
-            given(projectRepository.store(project))
+            call(projectRepository.store(project))
                 .willReturn(project)
         }
 
@@ -83,7 +80,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("project is correctly stored into the database") {
-            assertThat(service.createProject(userIdentifier, params)).withMessage()
+            expectThat(service.createProject(userIdentifier, params))
                 .isEqualTo(project)
         }
     }
@@ -102,7 +99,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by ID") {
-            given(projectRepository.getById(project.id))
+            call(projectRepository.getById(project.id))
                 .willReturn(project)
         }
 
@@ -121,7 +118,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("project is fetched from database by ID") {
-            assertThat(service.getProjectById(userIdentifier, project.id)).withMessage()
+            expectThat(service.getProjectById(userIdentifier, project.id))
                 .isEqualTo(project)
         }
     }
@@ -131,7 +128,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("null will be returned for any project ID") {
-            given(projectRepository.getById(any()))
+            call(projectRepository.getById(any()))
                 .willReturn(null)
         }
 
@@ -150,7 +147,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getProjectById(userIdentifier, UUID.randomUUID())
             }
         }
@@ -170,7 +167,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by ID") {
-            given(projectRepository.getById(project.id))
+            call(projectRepository.getById(project.id))
                 .willReturn(project)
         }
 
@@ -189,7 +186,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getProjectById(userIdentifier, project.id)
             }
         }
@@ -209,7 +206,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by issuer address") {
-            given(projectRepository.getByIssuer(project.issuerContractAddress, project.chainId))
+            call(projectRepository.getByIssuer(project.issuerContractAddress, project.chainId))
                 .willReturn(project)
         }
 
@@ -228,8 +225,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("project is fetched from database by issuer address") {
-            assertThat(service.getProjectByIssuer(userIdentifier, project.issuerContractAddress, project.chainId))
-                .withMessage()
+            expectThat(service.getProjectByIssuer(userIdentifier, project.issuerContractAddress, project.chainId))
                 .isEqualTo(project)
         }
     }
@@ -241,7 +237,7 @@ class ProjectServiceTest : TestBase() {
         val chainId = ChainId(1337L)
 
         suppose("null will be returned for project issuer address") {
-            given(projectRepository.getByIssuer(issuerAddress, chainId))
+            call(projectRepository.getByIssuer(issuerAddress, chainId))
                 .willReturn(null)
         }
 
@@ -260,7 +256,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getProjectByIssuer(userIdentifier, issuerAddress, chainId)
             }
         }
@@ -280,7 +276,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by issuer address") {
-            given(projectRepository.getByIssuer(project.issuerContractAddress, project.chainId))
+            call(projectRepository.getByIssuer(project.issuerContractAddress, project.chainId))
                 .willReturn(project)
         }
 
@@ -299,7 +295,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getProjectByIssuer(userIdentifier, project.issuerContractAddress, project.chainId)
             }
         }
@@ -335,7 +331,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned for user") {
-            given(projectRepository.getAllByOwnerId(userIdentifier.id))
+            call(projectRepository.getAllByOwnerId(userIdentifier.id))
                 .willReturn(projects)
         }
 
@@ -348,7 +344,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("project is fetched from database by issuer address") {
-            assertThat(service.getAllProjectsForUser(userIdentifier)).withMessage()
+            expectThat(service.getAllProjectsForUser(userIdentifier))
                 .isEqualTo(projects)
         }
     }
@@ -367,7 +363,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by ID") {
-            given(projectRepository.getById(project.id))
+            call(projectRepository.getById(project.id))
                 .willReturn(project)
         }
 
@@ -395,7 +391,7 @@ class ProjectServiceTest : TestBase() {
         val apiKeyRepository = mock<ApiKeyRepository>()
 
         suppose("some API keys will be returned by project ID") {
-            given(apiKeyRepository.getAllByProjectId(project.id))
+            call(apiKeyRepository.getAllByProjectId(project.id))
                 .willReturn(apiKeys)
         }
 
@@ -408,7 +404,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("project is fetched from database by ID") {
-            assertThat(service.getProjectApiKeys(userIdentifier, project.id)).withMessage()
+            expectThat(service.getProjectApiKeys(userIdentifier, project.id))
                 .isEqualTo(apiKeys)
         }
     }
@@ -427,7 +423,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by ID") {
-            given(projectRepository.getById(project.id))
+            call(projectRepository.getById(project.id))
                 .willReturn(project)
         }
 
@@ -446,7 +442,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getProjectApiKeys(userIdentifier, project.id)
             }
         }
@@ -466,14 +462,14 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by ID") {
-            given(projectRepository.getById(project.id))
+            call(projectRepository.getById(project.id))
                 .willReturn(project)
         }
 
         val randomProvider = mock<RandomProvider>()
 
         suppose("some random bytes will be returned") {
-            given(randomProvider.getBytes(API_KEY_BYTES))
+            call(randomProvider.getBytes(API_KEY_BYTES))
                 .willReturn(ByteArray(API_KEY_BYTES))
         }
 
@@ -481,14 +477,14 @@ class ProjectServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(uuid)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(CREATED_AT)
         }
 
@@ -501,7 +497,7 @@ class ProjectServiceTest : TestBase() {
         val apiKeyRepository = mock<ApiKeyRepository>()
 
         suppose("API key will be stored into the database") {
-            given(apiKeyRepository.store(apiKey))
+            call(apiKeyRepository.store(apiKey))
                 .willReturn(apiKey)
         }
 
@@ -520,7 +516,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("API key is correctly stored into the database") {
-            assertThat(service.createApiKey(userIdentifier, project.id)).withMessage()
+            expectThat(service.createApiKey(userIdentifier, project.id))
                 .isEqualTo(apiKey)
         }
     }
@@ -539,7 +535,7 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("project will be returned by ID") {
-            given(projectRepository.getById(project.id))
+            call(projectRepository.getById(project.id))
                 .willReturn(project)
         }
 
@@ -558,7 +554,7 @@ class ProjectServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.createApiKey(userIdentifier, project.id)
             }
         }

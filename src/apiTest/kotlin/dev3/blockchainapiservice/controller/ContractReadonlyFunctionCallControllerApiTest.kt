@@ -23,7 +23,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -187,7 +186,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ReadonlyFunctionCallResponse(
                         deployedContractId = DEPLOYED_CONTRACT.id,
@@ -200,7 +199,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.timestamp)
+            expectThat(response.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -266,7 +265,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ReadonlyFunctionCallResponse(
                         deployedContractId = DEPLOYED_CONTRACT.id,
@@ -279,7 +278,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.timestamp)
+            expectThat(response.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -338,7 +337,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ReadonlyFunctionCallResponse(
                         deployedContractId = null,
@@ -351,7 +350,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.timestamp)
+            expectThat(response.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }

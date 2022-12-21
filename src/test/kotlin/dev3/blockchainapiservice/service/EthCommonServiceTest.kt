@@ -16,10 +16,7 @@ import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import java.math.BigInteger
 import java.util.UUID
@@ -41,14 +38,14 @@ class EthCommonServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(uuid)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -71,7 +68,7 @@ class EthCommonServiceTest : TestBase() {
         verify("correct result is returned") {
             val result = service.createDatabaseParams(Factory, params, project)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(OutParams(uuid, params, project, TestData.TIMESTAMP))
         }
     }
@@ -88,7 +85,7 @@ class EthCommonServiceTest : TestBase() {
         verify("correct result is returned") {
             val output = service.fetchResource(input, "message")
 
-            assertThat(output).withMessage()
+            expectThat(output)
                 .isEqualTo(input)
         }
     }
@@ -102,7 +99,7 @@ class EthCommonServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.fetchResource(null, "message")
             }
         }
@@ -131,7 +128,7 @@ class EthCommonServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("some transaction info is fetched from blockchain") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, txHash, emptyList()))
+            call(blockchainService.fetchTransactionInfo(chainSpec, txHash, emptyList()))
                 .willReturn(transactionInfo)
         }
 
@@ -149,7 +146,7 @@ class EthCommonServiceTest : TestBase() {
                 events = emptyList()
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(transactionInfo)
         }
     }
@@ -170,7 +167,7 @@ class EthCommonServiceTest : TestBase() {
                 events = emptyList()
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }

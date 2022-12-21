@@ -8,7 +8,6 @@ import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -68,7 +67,7 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
                 .where(ContractMetadataTable.ID.eq(id))
                 .fetchOne()
 
-            assertThat(record).withMessage()
+            expectThat(record)
                 .isEqualTo(
                     ContractMetadataRecord(
                         id = id,
@@ -132,7 +131,7 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
                 .where(ContractMetadataTable.ID.eq(id))
                 .fetchOne()
 
-            assertThat(record).withMessage()
+            expectThat(record)
                 .isEqualTo(
                     ContractMetadataRecord(
                         id = id,
@@ -151,7 +150,7 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
                 .where(ContractMetadataTable.ID.eq(otherId))
                 .fetchOne()
 
-            assertThat(record).withMessage()
+            expectThat(record)
                 .isNull()
         }
     }
@@ -191,7 +190,7 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
                 .where(ContractMetadataTable.ID.eq(id))
                 .fetchOne()
 
-            assertThat(record).withMessage()
+            expectThat(record)
                 .isEqualTo(
                     ContractMetadataRecord(
                         id = id,
@@ -231,12 +230,12 @@ class JooqContractMetadataRepositoryIntegTest : TestBase() {
         }
 
         verify("contract metadata exists in the database") {
-            assertThat(repository.exists(contractId, projectId)).withMessage()
+            expectThat(repository.exists(contractId, projectId))
                 .isTrue()
         }
 
         verify("no other contract metadata exists in the database") {
-            assertThat(repository.exists(ContractId("non-existent"), projectId)).withMessage()
+            expectThat(repository.exists(ContractId("non-existent"), projectId))
                 .isFalse()
         }
     }

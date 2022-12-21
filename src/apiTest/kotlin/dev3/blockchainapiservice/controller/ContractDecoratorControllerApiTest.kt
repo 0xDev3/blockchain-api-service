@@ -25,7 +25,6 @@ import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -176,7 +175,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDecoratorsResponse(
                         listOf(
@@ -218,7 +217,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ManifestJsonsResponse(listOf(MANIFEST_JSON)))
         }
     }
@@ -244,14 +243,13 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(
+            expectThat(
                 response.copy(
                     artifacts = response.artifacts.map {
                         it.copy(linkReferences = null, deployedLinkReferences = null)
                     }
                 )
-            ).withMessage()
-                .isEqualTo(ArtifactJsonsResponse(listOf(ARTIFACT_JSON)))
+            ).isEqualTo(ArtifactJsonsResponse(listOf(ARTIFACT_JSON)))
         }
     }
 
@@ -276,7 +274,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(InfoMarkdownsResponse(listOf(INFO_MD)))
         }
     }
@@ -298,7 +296,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDecoratorResponse(
                         id = CONTRACT_DECORATOR.id.value,
@@ -346,7 +344,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(MANIFEST_JSON)
         }
     }
@@ -382,7 +380,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response.copy(linkReferences = null, deployedLinkReferences = null)).withMessage()
+            expectThat(response.copy(linkReferences = null, deployedLinkReferences = null))
                 .isEqualTo(ARTIFACT_JSON)
         }
     }
@@ -418,7 +416,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(INFO_MD)
         }
     }
