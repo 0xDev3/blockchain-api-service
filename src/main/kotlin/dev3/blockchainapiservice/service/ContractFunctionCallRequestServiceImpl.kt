@@ -27,7 +27,7 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "LongParameterList")
 class ContractFunctionCallRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val contractFunctionCallRequestRepository: ContractFunctionCallRequestRepository,
