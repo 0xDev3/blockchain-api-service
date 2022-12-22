@@ -260,7 +260,7 @@ jooq {
                             ForcedType().apply {
                                 userType = "dev3.blockchainapiservice.util.FunctionData"
                                 converter = "dev3.blockchainapiservice.util.FunctionDataConverter"
-                                includeExpression = "tx_data"
+                                includeExpression = "tx_data|function_data"
                                 includeTypes = "BYTEA"
                             },
                             ForcedType().apply {
