@@ -8,7 +8,6 @@ import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.JsonNodeConverter
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.JSON
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
@@ -53,11 +52,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with too long string is marked as invalid") {
             val violations = validator.validate(requestWithTooLongString).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("redirectUrl")
         }
 
@@ -76,7 +75,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with valid length string is marked as valid") {
             val violations = validator.validate(requestWithValidLengthString).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -98,11 +97,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with invalid eth address is marked as invalid") {
             val violations = validator.validate(requestWithInvalidEthAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("tokenAddress")
         }
 
@@ -121,11 +120,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with too long eth address is marked as invalid") {
             val violations = validator.validate(requestWithTooLongEthAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("tokenAddress")
         }
 
@@ -144,11 +143,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with empty eth address is marked as invalid") {
             val violations = validator.validate(requestWithEmptyEthAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("tokenAddress")
         }
 
@@ -167,7 +166,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with valid eth address is marked as valid") {
             val violations = validator.validate(requestWithValidEthAddress).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -189,11 +188,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with negative uint256 is marked as invalid") {
             val violations = validator.validate(requestWithNegativeUint256).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be within range [0, 2^256]")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("blockNumber")
         }
 
@@ -212,11 +211,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with too big uint256 is marked as invalid") {
             val violations = validator.validate(requestWithTooBigUint256).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be within range [0, 2^256]")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("blockNumber")
         }
 
@@ -235,7 +234,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with valid uint256 is marked as valid") {
             val violations = validator.validate(requestWithValidUint256).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -257,11 +256,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with invalid eth address is marked as invalid") {
             val violations = validator.validate(requestWithInvalidEthAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("walletAddress")
         }
 
@@ -280,11 +279,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with too long eth address is marked as invalid") {
             val violations = validator.validate(requestWithTooLongEthAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("walletAddress")
         }
 
@@ -303,11 +302,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with empty eth address is marked as invalid") {
             val violations = validator.validate(requestWithEmptyEthAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("walletAddress")
         }
 
@@ -326,7 +325,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with valid eth address is marked as valid") {
             val violations = validator.validate(requestWithValidEthAddress).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -349,11 +348,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with too long JSON is marked as invalid") {
             val violations = validator.validate(requestWithTooLongJson).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid JSON of at most $REQUEST_BODY_MAX_JSON_CHARS characters")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("arbitraryData")
         }
 
@@ -372,7 +371,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with valid JSON string is marked as valid") {
             val violations = validator.validate(requestWithValidLengthJson).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -397,11 +396,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with too long string is marked as invalid") {
             val violations = validator.validate(requestWithTooLongString).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("screenConfig.beforeActionMessage")
         }
 
@@ -423,7 +422,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with valid length string is marked as valid") {
             val violations = validator.validate(requestWithValidLengthString).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -448,11 +447,11 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with too long string is marked as invalid") {
             val violations = validator.validate(requestWithTooLongString).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("screenConfig.afterActionMessage")
         }
 
@@ -474,7 +473,7 @@ class CreateAssetBalanceRequestTest : TestBase() {
         verify("request with valid length string is marked as valid") {
             val violations = validator.validate(requestWithValidLengthString).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }

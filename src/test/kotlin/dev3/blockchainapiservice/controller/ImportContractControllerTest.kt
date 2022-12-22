@@ -37,14 +37,11 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithTransactionData
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class ImportContractControllerTest : TestBase() {
 
@@ -69,7 +66,7 @@ class ImportContractControllerTest : TestBase() {
         val importService = mock<ContractImportService>()
 
         suppose("some smart contract import will be previewed") {
-            given(importService.previewImport(contractAddress, chainSpec))
+            call(importService.previewImport(contractAddress, chainSpec))
                 .willReturn(result)
         }
 
@@ -84,7 +81,7 @@ class ImportContractControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ImportPreviewResponse(result)))
         }
     }
@@ -154,19 +151,19 @@ class ImportContractControllerTest : TestBase() {
         )
 
         suppose("some smart contract is not already imported") {
-            given(importService.importExistingContract(params, project))
+            call(importService.importExistingContract(params, project))
                 .willReturn(null)
         }
 
         suppose("some smart contract will be imported") {
-            given(importService.importContract(params, project))
+            call(importService.importContract(params, project))
                 .willReturn(result.value.id)
         }
 
         val deploymentService = mock<ContractDeploymentRequestService>()
 
         suppose("imported contract will be deployed") {
-            given(deploymentService.getContractDeploymentRequest(result.value.id))
+            call(deploymentService.getContractDeploymentRequest(result.value.id))
                 .willReturn(result)
         }
 
@@ -189,7 +186,7 @@ class ImportContractControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDeploymentRequestResponse(
@@ -246,7 +243,7 @@ class ImportContractControllerTest : TestBase() {
         val contractInterfacesService = mock<ContractInterfacesService>()
 
         suppose("some interfaces are suggested") {
-            given(contractInterfacesService.getSuggestedInterfacesForImportedSmartContract(id))
+            call(contractInterfacesService.getSuggestedInterfacesForImportedSmartContract(id))
                 .willReturn(listOf(result))
         }
 
@@ -257,7 +254,7 @@ class ImportContractControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractInterfaceManifestsResponse(
@@ -326,7 +323,7 @@ class ImportContractControllerTest : TestBase() {
         val deploymentService = mock<ContractDeploymentRequestService>()
 
         suppose("imported contract will be returned") {
-            given(deploymentService.getContractDeploymentRequest(result.value.id))
+            call(deploymentService.getContractDeploymentRequest(result.value.id))
                 .willReturn(result)
         }
 
@@ -342,7 +339,7 @@ class ImportContractControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDeploymentRequestResponse(
@@ -384,8 +381,9 @@ class ImportContractControllerTest : TestBase() {
         }
 
         verify("some interfaces are added") {
-            verifyMock(contractInterfacesService)
-                .addInterfacesToImportedContract(result.value.id, result.value.projectId, newInterfaces)
+            expectInteractions(contractInterfacesService) {
+                once.addInterfacesToImportedContract(result.value.id, result.value.projectId, newInterfaces)
+            }
         }
     }
 
@@ -445,7 +443,7 @@ class ImportContractControllerTest : TestBase() {
         val deploymentService = mock<ContractDeploymentRequestService>()
 
         suppose("imported contract will be returned") {
-            given(deploymentService.getContractDeploymentRequest(result.value.id))
+            call(deploymentService.getContractDeploymentRequest(result.value.id))
                 .willReturn(result)
         }
 
@@ -461,7 +459,7 @@ class ImportContractControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDeploymentRequestResponse(
@@ -503,8 +501,9 @@ class ImportContractControllerTest : TestBase() {
         }
 
         verify("some interfaces are removed") {
-            verifyMock(contractInterfacesService)
-                .removeInterfacesFromImportedContract(result.value.id, result.value.projectId, interfacesToRemove)
+            expectInteractions(contractInterfacesService) {
+                once.removeInterfacesFromImportedContract(result.value.id, result.value.projectId, interfacesToRemove)
+            }
         }
     }
 
@@ -564,7 +563,7 @@ class ImportContractControllerTest : TestBase() {
         val deploymentService = mock<ContractDeploymentRequestService>()
 
         suppose("imported contract will be returned") {
-            given(deploymentService.getContractDeploymentRequest(result.value.id))
+            call(deploymentService.getContractDeploymentRequest(result.value.id))
                 .willReturn(result)
         }
 
@@ -580,7 +579,7 @@ class ImportContractControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDeploymentRequestResponse(
@@ -622,8 +621,9 @@ class ImportContractControllerTest : TestBase() {
         }
 
         verify("some interfaces are set") {
-            verifyMock(contractInterfacesService)
-                .setImportedContractInterfaces(result.value.id, result.value.projectId, interfacesToSet)
+            expectInteractions(contractInterfacesService) {
+                once.setImportedContractInterfaces(result.value.id, result.value.projectId, interfacesToSet)
+            }
         }
     }
 }

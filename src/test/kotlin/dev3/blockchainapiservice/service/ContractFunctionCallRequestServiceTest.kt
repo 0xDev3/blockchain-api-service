@@ -7,6 +7,7 @@ import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
@@ -33,16 +34,11 @@ import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionData
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.JSON
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class ContractFunctionCallRequestServiceTest : TestBase() {
 
@@ -151,18 +147,18 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyCreateFunctionCallRequest() {
+    fun mustCorrectlyCreateFunctionCallRequestWhenContractAddressIsNotBlacklisted() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(ID)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -170,7 +166,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val createParams = DEPLOYED_CONTRACT_ID_CREATE_PARAMS
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = createParams.functionName,
                     arguments = createParams.functionParams
@@ -182,15 +178,22 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is returned from database") {
-            given(contractDeploymentRequestRepository.getById(DEPLOYED_CONTRACT_ID))
+            call(contractDeploymentRequestRepository.getById(DEPLOYED_CONTRACT_ID))
                 .willReturn(DEPLOYED_CONTRACT)
         }
 
         val contractFunctionCallRequestRepository = mock<ContractFunctionCallRequestRepository>()
 
         suppose("contract function call request is stored in database") {
-            given(contractFunctionCallRequestRepository.store(STORE_PARAMS))
+            call(contractFunctionCallRequestRepository.store(STORE_PARAMS))
                 .willReturn(STORED_REQUEST)
+        }
+
+        val blacklistedAddressRepository = mock<BlacklistedAddressRepository>()
+
+        suppose("contract address is not blacklisted") {
+            call(blacklistedAddressRepository.exists(CONTRACT_ADDRESS))
+                .willReturn(false)
         }
 
         val service = ContractFunctionCallRequestServiceImpl(
@@ -200,6 +203,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = blacklistedAddressRepository,
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
@@ -210,12 +214,91 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request is correctly created") {
-            assertThat(service.createContractFunctionCallRequest(createParams, PROJECT)).withMessage()
+            expectThat(service.createContractFunctionCallRequest(createParams, PROJECT))
                 .isEqualTo(WithFunctionData(STORED_REQUEST, ENCODED_FUNCTION_DATA))
 
-            verifyMock(contractFunctionCallRequestRepository)
-                .store(STORE_PARAMS)
-            verifyNoMoreInteractions(contractFunctionCallRequestRepository)
+            expectInteractions(contractFunctionCallRequestRepository) {
+                once.store(STORE_PARAMS)
+            }
+        }
+    }
+
+    @Test
+    fun mustCorrectlyCreateFunctionCallRequestWhenContractAddressIsBlacklisted() {
+        val uuidProvider = mock<UuidProvider>()
+
+        suppose("some UUID will be generated") {
+            call(uuidProvider.getUuid())
+                .willReturn(ID)
+        }
+
+        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
+
+        suppose("some timestamp will be returned") {
+            call(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(TestData.TIMESTAMP)
+        }
+
+        val functionEncoderService = mock<FunctionEncoderService>()
+        val createParams = DEPLOYED_CONTRACT_ID_CREATE_PARAMS
+
+        suppose("function will be encoded") {
+            call(
+                functionEncoderService.encode(
+                    functionName = createParams.functionName,
+                    arguments = createParams.functionParams
+                )
+            )
+                .willReturn(ENCODED_FUNCTION_DATA)
+        }
+
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("deployed contract is returned from database") {
+            call(contractDeploymentRequestRepository.getById(DEPLOYED_CONTRACT_ID))
+                .willReturn(DEPLOYED_CONTRACT)
+        }
+
+        val storeParams = STORE_PARAMS.copy(redirectUrl = STORE_PARAMS.redirectUrl + "/caution")
+        val storedRequest = STORED_REQUEST.copy(redirectUrl = STORED_REQUEST.redirectUrl + "/caution")
+        val contractFunctionCallRequestRepository = mock<ContractFunctionCallRequestRepository>()
+
+        suppose("contract function call request is stored in database") {
+            call(contractFunctionCallRequestRepository.store(storeParams))
+                .willReturn(storedRequest)
+        }
+
+        val blacklistedAddressRepository = mock<BlacklistedAddressRepository>()
+
+        suppose("contract address is not blacklisted") {
+            call(blacklistedAddressRepository.exists(CONTRACT_ADDRESS))
+                .willReturn(true)
+        }
+
+        val service = ContractFunctionCallRequestServiceImpl(
+            functionEncoderService = functionEncoderService,
+            contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
+            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = blacklistedAddressRepository,
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = uuidProvider,
+                utcDateTimeProvider = utcDateTimeProvider,
+                blockchainService = mock()
+            ),
+            projectRepository = mock(),
+            objectMapper = JsonConfig().objectMapper()
+        )
+
+        verify("contract function call request is correctly created") {
+            expectThat(service.createContractFunctionCallRequest(createParams, PROJECT))
+                .isEqualTo(WithFunctionData(storedRequest, ENCODED_FUNCTION_DATA))
+
+            expectInteractions(contractFunctionCallRequestRepository) {
+                once.store(storeParams)
+            }
         }
     }
 
@@ -224,7 +307,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val contractFunctionCallRequestRepository = mock<ContractFunctionCallRequestRepository>()
 
         suppose("contract function call request is not found in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(null)
         }
 
@@ -235,6 +318,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -245,7 +329,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getContractFunctionCallRequest(ID)
             }
         }
@@ -257,14 +341,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST.copy(txHash = null)
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -280,6 +364,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -290,7 +375,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with pending status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.PENDING,
@@ -307,21 +392,21 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(null)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -337,6 +422,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -347,7 +433,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with pending status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.PENDING,
@@ -364,7 +450,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
@@ -372,14 +458,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(success = false)
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -395,6 +481,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -405,7 +492,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with failed status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.FAILED,
@@ -422,7 +509,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
@@ -430,14 +517,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(hash = TransactionHash("other-tx-hash"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -453,6 +540,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -463,7 +551,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with failed status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.FAILED,
@@ -480,7 +568,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
@@ -488,14 +576,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(from = WalletAddress("dead"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -511,6 +599,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -521,7 +610,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with failed status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.FAILED,
@@ -538,7 +627,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
@@ -546,14 +635,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(to = ContractAddress("dead"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -569,6 +658,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -579,7 +669,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with failed status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.FAILED,
@@ -596,7 +686,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
@@ -604,14 +694,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(data = FunctionData("dead"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -627,6 +717,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -637,7 +728,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with failed status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.FAILED,
@@ -654,7 +745,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
@@ -662,14 +753,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(value = Balance(BigInteger.valueOf(123456L)))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -685,6 +776,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -695,7 +787,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with failed status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.FAILED,
@@ -712,7 +804,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST.copy(callerAddress = null)
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
@@ -720,14 +812,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(from = WalletAddress("dead"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -743,6 +835,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -753,7 +846,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with successful status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.SUCCESS,
@@ -770,7 +863,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getById(ID))
+            call(contractFunctionCallRequestRepository.getById(ID))
                 .willReturn(request)
         }
 
@@ -778,14 +871,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -801,6 +894,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -811,7 +905,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with successful status is returned") {
-            assertThat(service.getContractFunctionCallRequest(ID)).withMessage()
+            expectThat(service.getContractFunctionCallRequest(ID))
                 .isEqualTo(
                     request.withTransactionAndFunctionData(
                         status = Status.SUCCESS,
@@ -833,14 +927,14 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val request = STORED_REQUEST.copy(txHash = null)
 
         suppose("contract function call request exists in the database") {
-            given(contractFunctionCallRequestRepository.getAllByProjectId(PROJECT.id, filters))
+            call(contractFunctionCallRequestRepository.getAllByProjectId(PROJECT.id, filters))
                 .willReturn(listOf(request))
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = request.functionName,
                     arguments = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.functionParams
@@ -856,6 +950,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -866,7 +961,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("contract function call request with pending status is returned") {
-            assertThat(service.getContractFunctionCallRequestsByProjectIdAndFilters(PROJECT.id, filters)).withMessage()
+            expectThat(service.getContractFunctionCallRequestsByProjectIdAndFilters(PROJECT.id, filters))
                 .isEqualTo(
                     listOf(
                         request.withTransactionAndFunctionData(
@@ -894,6 +989,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -904,7 +1000,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("empty list is returned") {
-            assertThat(service.getContractFunctionCallRequestsByProjectIdAndFilters(PROJECT.id, filters)).withMessage()
+            expectThat(service.getContractFunctionCallRequestsByProjectIdAndFilters(PROJECT.id, filters))
                 .isEmpty()
         }
     }
@@ -915,7 +1011,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("txInfo will be successfully attached to the request") {
-            given(contractFunctionCallRequestRepository.setTxInfo(ID, TX_HASH, caller))
+            call(contractFunctionCallRequestRepository.setTxInfo(ID, TX_HASH, caller))
                 .willReturn(true)
         }
 
@@ -926,6 +1022,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -938,9 +1035,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         verify("txInfo was successfully attached") {
             service.attachTxInfo(ID, TX_HASH, caller)
 
-            verifyMock(contractFunctionCallRequestRepository)
-                .setTxInfo(ID, TX_HASH, caller)
-            verifyNoMoreInteractions(contractFunctionCallRequestRepository)
+            expectInteractions(contractFunctionCallRequestRepository) {
+                once.setTxInfo(ID, TX_HASH, caller)
+            }
         }
     }
 
@@ -950,7 +1047,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching txInfo will fail") {
-            given(contractFunctionCallRequestRepository.setTxInfo(ID, TX_HASH, caller))
+            call(contractFunctionCallRequestRepository.setTxInfo(ID, TX_HASH, caller))
                 .willReturn(false)
         }
 
@@ -961,6 +1058,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -971,31 +1069,33 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         )
 
         verify("CannotAttachTxInfoException is thrown") {
-            assertThrows<CannotAttachTxInfoException>(message) {
+            expectThrows<CannotAttachTxInfoException> {
                 service.attachTxInfo(ID, TX_HASH, caller)
             }
 
-            verifyMock(contractFunctionCallRequestRepository)
-                .setTxInfo(ID, TX_HASH, caller)
-            verifyNoMoreInteractions(contractFunctionCallRequestRepository)
+            expectInteractions(contractFunctionCallRequestRepository) {
+                once.setTxInfo(ID, TX_HASH, caller)
+            }
         }
     }
 
     private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
-        given(projectRepository.getById(projectId))
-            .willReturn(
-                Project(
-                    id = projectId,
-                    ownerId = UUID.randomUUID(),
-                    issuerContractAddress = ContractAddress("dead"),
-                    baseRedirectUrl = BaseUrl(""),
-                    chainId = ChainId(0L),
-                    customRpcUrl = null,
-                    createdAt = TestData.TIMESTAMP
+        suppose("some project will be returned") {
+            call(projectRepository.getById(projectId))
+                .willReturn(
+                    Project(
+                        id = projectId,
+                        ownerId = UUID.randomUUID(),
+                        issuerContractAddress = ContractAddress("dead"),
+                        baseRedirectUrl = BaseUrl(""),
+                        chainId = ChainId(0L),
+                        customRpcUrl = null,
+                        createdAt = TestData.TIMESTAMP
+                    )
                 )
-            )
+        }
 
         return projectRepository
     }

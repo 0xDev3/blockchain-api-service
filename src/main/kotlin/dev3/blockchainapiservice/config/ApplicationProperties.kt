@@ -96,7 +96,7 @@ data class StripeProperties(
 )
 
 @ConstructorBinding
-@ConfigurationProperties(prefix = "blockchain-api-service.promo-code")
-data class PromoCodeProperties(
-    val allowedWallets: Set<WalletAddress> = emptySet()
+@ConfigurationProperties(prefix = "blockchain-api-service.admin")
+data class AdminProperties(
+    val wallets: Set<WalletAddress> = emptySet()
 )

@@ -55,7 +55,6 @@ import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -391,7 +390,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contractAddress.rawValue}-${chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ImportPreviewResponse(
                         manifest = response.manifest,
@@ -458,7 +457,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 projectId = Constants.NIL_UUID
             )
 
-            assertThat(importedContractDecorator).withMessage()
+            expectThat(importedContractDecorator)
                 .isEqualTo(null)
         }
     }
@@ -569,7 +568,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(importResponse).withMessage()
+            expectThat(importResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = importResponse.id,
@@ -606,14 +605,14 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(importResponse.createdAt)
+            expectThat(importResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(importResponse.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = importResponse.id,
@@ -644,7 +643,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -701,7 +700,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val constructorParams = listOf(TypeAndValue(type = "address", value = ownerAddress.rawValue))
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
@@ -742,14 +741,14 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
@@ -780,7 +779,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -839,7 +838,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
@@ -880,14 +879,14 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
@@ -918,7 +917,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -928,7 +927,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 projectId = PROJECT_ID
             )!!
 
-            assertThat(importedContractDecorator).withMessage()
+            expectThat(importedContractDecorator)
                 .isEqualTo(
                     CONTRACT_DECORATOR.copy(
                         id = importedContractId,
@@ -1040,7 +1039,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${proxy.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
@@ -1081,14 +1080,14 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
@@ -1119,7 +1118,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -1129,7 +1128,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 projectId = PROJECT_ID
             )!!
 
-            assertThat(importedContractDecorator).withMessage()
+            expectThat(importedContractDecorator)
                 .isEqualTo(
                     CONTRACT_DECORATOR.copy(
                         id = importedContractId,
@@ -1362,7 +1361,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct interface manifests are returned") {
-            assertThat(suggestedInterfacesResponse).withMessage()
+            expectThat(suggestedInterfacesResponse)
                 .isEqualTo(
                     ContractInterfaceManifestsResponse(
                         listOf(
@@ -1452,7 +1451,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(interfacesResponse).withMessage()
+            expectThat(interfacesResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = interfacesResponse.id,
@@ -1726,7 +1725,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(interfacesResponse).withMessage()
+            expectThat(interfacesResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = interfacesResponse.id,
@@ -1848,7 +1847,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(interfacesResponse).withMessage()
+            expectThat(interfacesResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = interfacesResponse.id,

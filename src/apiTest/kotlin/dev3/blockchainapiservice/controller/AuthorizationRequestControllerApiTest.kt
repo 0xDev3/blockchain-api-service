@@ -21,7 +21,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -120,7 +119,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AuthorizationRequestResponse(
                         id = response.id,
@@ -139,14 +138,14 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("authorization request is correctly stored in database") {
             val storedRequest = authorizationRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AuthorizationRequest(
                         id = response.id,
@@ -166,7 +165,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -204,7 +203,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AuthorizationRequestResponse(
                         id = response.id,
@@ -223,14 +222,14 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("authorization request is correctly stored in database") {
             val storedRequest = authorizationRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AuthorizationRequest(
                         id = response.id,
@@ -250,7 +249,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -346,7 +345,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AuthorizationRequestResponse(
                         id = id,
@@ -365,7 +364,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -430,7 +429,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AuthorizationRequestsResponse(
                         listOf(
@@ -453,7 +452,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -517,9 +516,9 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
         verify("signed message is correctly attached to authorization request") {
             val storedRequest = authorizationRequestRepository.getById(id)
 
-            assertThat(storedRequest?.actualWalletAddress)
+            expectThat(storedRequest?.actualWalletAddress)
                 .isEqualTo(walletAddress)
-            assertThat(storedRequest?.signedMessage)
+            expectThat(storedRequest?.signedMessage)
                 .isEqualTo(signedMessage)
         }
     }
@@ -572,9 +571,9 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
         verify("signed message is not changed in database") {
             val storedRequest = authorizationRequestRepository.getById(id)
 
-            assertThat(storedRequest?.actualWalletAddress)
+            expectThat(storedRequest?.actualWalletAddress)
                 .isEqualTo(walletAddress)
-            assertThat(storedRequest?.signedMessage)
+            expectThat(storedRequest?.signedMessage)
                 .isEqualTo(signedMessage)
         }
     }

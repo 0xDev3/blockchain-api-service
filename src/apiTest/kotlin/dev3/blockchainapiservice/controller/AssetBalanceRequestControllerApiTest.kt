@@ -28,7 +28,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -138,7 +137,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetBalanceRequestResponse(
                         id = response.id,
@@ -162,14 +161,14 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset balance request is correctly stored in database") {
             val storedRequest = assetBalanceRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetBalanceRequest(
                         id = response.id,
@@ -190,7 +189,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -233,7 +232,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetBalanceRequestResponse(
                         id = response.id,
@@ -257,14 +256,14 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset balance request is correctly stored in database") {
             val storedRequest = assetBalanceRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetBalanceRequest(
                         id = response.id,
@@ -285,7 +284,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -324,7 +323,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetBalanceRequestResponse(
                         id = response.id,
@@ -348,14 +347,14 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset balance request is correctly stored in database") {
             val storedRequest = assetBalanceRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetBalanceRequest(
                         id = response.id,
@@ -376,7 +375,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -417,7 +416,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetBalanceRequestResponse(
                         id = response.id,
@@ -441,14 +440,14 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset balance request is correctly stored in database") {
             val storedRequest = assetBalanceRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetBalanceRequest(
                         id = response.id,
@@ -469,7 +468,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -658,7 +657,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetBalanceRequestResponse(
                         id = id,
@@ -687,7 +686,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -773,7 +772,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetBalanceRequestResponse(
                         id = id,
@@ -802,7 +801,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -883,7 +882,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetBalanceRequestResponse(
                         id = id,
@@ -912,7 +911,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -995,7 +994,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetBalanceRequestResponse(
                         id = id,
@@ -1024,7 +1023,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1108,7 +1107,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetBalanceRequestsResponse(
                         listOf(
@@ -1141,7 +1140,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1227,7 +1226,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetBalanceRequestsResponse(
                         listOf(
@@ -1260,7 +1259,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1325,9 +1324,9 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         verify("signed message is correctly attached to asset balance request") {
             val storedRequest = assetBalanceRequestRepository.getById(id)
 
-            assertThat(storedRequest?.actualWalletAddress)
+            expectThat(storedRequest?.actualWalletAddress)
                 .isEqualTo(walletAddress)
-            assertThat(storedRequest?.signedMessage)
+            expectThat(storedRequest?.signedMessage)
                 .isEqualTo(signedMessage)
         }
     }
@@ -1381,9 +1380,9 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         verify("signed message is not changed in database") {
             val storedRequest = assetBalanceRequestRepository.getById(id)
 
-            assertThat(storedRequest?.actualWalletAddress)
+            expectThat(storedRequest?.actualWalletAddress)
                 .isEqualTo(walletAddress)
-            assertThat(storedRequest?.signedMessage)
+            expectThat(storedRequest?.signedMessage)
                 .isEqualTo(signedMessage)
         }
     }

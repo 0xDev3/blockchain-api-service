@@ -11,7 +11,6 @@ import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -39,9 +38,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         verify("correct contract decorator is returned") {
-            assertThat(storedDecorator).withMessage()
+            expectThat(storedDecorator)
                 .isEqualTo(decorator)
-            assertThat(repository.getById(decorator.id)).withMessage()
+            expectThat(repository.getById(decorator.id))
                 .isEqualTo(decorator)
         }
     }
@@ -65,9 +64,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         verify("correct contract manifest.json is returned") {
-            assertThat(storedManifest).withMessage()
+            expectThat(storedManifest)
                 .isEqualTo(manifestJson)
-            assertThat(repository.getManifestJsonById(id)).withMessage()
+            expectThat(repository.getManifestJsonById(id))
                 .isEqualTo(manifestJson)
         }
     }
@@ -91,9 +90,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         verify("correct contract artifact.json is returned") {
-            assertThat(storedArtifact).withMessage()
+            expectThat(storedArtifact)
                 .isEqualTo(artifactJson)
-            assertThat(repository.getArtifactJsonById(id)).withMessage()
+            expectThat(repository.getArtifactJsonById(id))
                 .isEqualTo(artifactJson)
         }
     }
@@ -109,9 +108,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         verify("correct contract info.md is returned") {
-            assertThat(storedInfoMd).withMessage()
+            expectThat(storedInfoMd)
                 .isEqualTo(infoMd)
-            assertThat(repository.getInfoMarkdownById(id)).withMessage()
+            expectThat(repository.getInfoMarkdownById(id))
                 .isEqualTo(infoMd)
         }
     }
@@ -138,7 +137,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         verify("correct contract decorator is returned") {
-            assertThat(repository.getById(decorator.id)).withMessage()
+            expectThat(repository.getById(decorator.id))
                 .isEqualTo(decorator)
         }
 
@@ -157,7 +156,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         verify("correct contract manifest.json is returned") {
-            assertThat(repository.getManifestJsonById(decorator.id)).withMessage()
+            expectThat(repository.getManifestJsonById(decorator.id))
                 .isEqualTo(manifestJson)
         }
 
@@ -176,7 +175,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         verify("correct contract artifact.json is returned") {
-            assertThat(repository.getArtifactJsonById(decorator.id)).withMessage()
+            expectThat(repository.getArtifactJsonById(decorator.id))
                 .isEqualTo(artifactJson)
         }
 
@@ -187,7 +186,7 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         verify("correct contract info.md is returned") {
-            assertThat(repository.getInfoMarkdownById(decorator.id)).withMessage()
+            expectThat(repository.getInfoMarkdownById(decorator.id))
                 .isEqualTo(infoMd)
         }
 
@@ -196,13 +195,13 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         }
 
         verify("null is returned") {
-            assertThat(repository.getById(decorator.id)).withMessage()
+            expectThat(repository.getById(decorator.id))
                 .isNull()
-            assertThat(repository.getManifestJsonById(decorator.id)).withMessage()
+            expectThat(repository.getManifestJsonById(decorator.id))
                 .isNull()
-            assertThat(repository.getArtifactJsonById(decorator.id)).withMessage()
+            expectThat(repository.getArtifactJsonById(decorator.id))
                 .isNull()
-            assertThat(repository.getInfoMarkdownById(decorator.id)).withMessage()
+            expectThat(repository.getInfoMarkdownById(decorator.id))
                 .isNull()
         }
     }
@@ -239,9 +238,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         )
 
         verify("correct contract decorators are returned") {
-            assertThat(repository.getAll(filters)).withMessage()
+            expectThat(repository.getAll(filters))
                 .containsExactlyInAnyOrderElementsOf(matching)
-            assertThat(repository.getAll(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+            expectThat(repository.getAll(ContractDecoratorFilters(OrList(), OrList())))
                 .containsExactlyInAnyOrderElementsOf(all)
         }
     }
@@ -282,9 +281,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         )
 
         verify("correct contract decorators are returned") {
-            assertThat(repository.getAll(filters)).withMessage()
+            expectThat(repository.getAll(filters))
                 .containsExactlyInAnyOrderElementsOf(matching)
-            assertThat(repository.getAll(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+            expectThat(repository.getAll(ContractDecoratorFilters(OrList(), OrList())))
                 .containsExactlyInAnyOrderElementsOf(all)
         }
     }
@@ -326,9 +325,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         )
 
         verify("correct contract manifest.json files are returned") {
-            assertThat(repository.getAllManifestJsonFiles(filters)).withMessage()
+            expectThat(repository.getAllManifestJsonFiles(filters))
                 .containsExactlyInAnyOrderElementsOf(matching.map { it.second })
-            assertThat(repository.getAllManifestJsonFiles(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+            expectThat(repository.getAllManifestJsonFiles(ContractDecoratorFilters(OrList(), OrList())))
                 .containsExactlyInAnyOrderElementsOf(all.map { it.second })
         }
     }
@@ -372,9 +371,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         )
 
         verify("correct contract manifest.json files are returned") {
-            assertThat(repository.getAllManifestJsonFiles(filters)).withMessage()
+            expectThat(repository.getAllManifestJsonFiles(filters))
                 .containsExactlyInAnyOrderElementsOf(matching.map { it.second })
-            assertThat(repository.getAllManifestJsonFiles(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+            expectThat(repository.getAllManifestJsonFiles(ContractDecoratorFilters(OrList(), OrList())))
                 .containsExactlyInAnyOrderElementsOf(all.map { it.second })
         }
     }
@@ -416,9 +415,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         )
 
         verify("correct contract artifact.json files are returned") {
-            assertThat(repository.getAllArtifactJsonFiles(filters)).withMessage()
+            expectThat(repository.getAllArtifactJsonFiles(filters))
                 .containsExactlyInAnyOrderElementsOf(matching.map { it.second })
-            assertThat(repository.getAllArtifactJsonFiles(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+            expectThat(repository.getAllArtifactJsonFiles(ContractDecoratorFilters(OrList(), OrList())))
                 .containsExactlyInAnyOrderElementsOf(all.map { it.second })
         }
     }
@@ -462,9 +461,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         )
 
         verify("correct contract artifact.json files are returned") {
-            assertThat(repository.getAllArtifactJsonFiles(filters)).withMessage()
+            expectThat(repository.getAllArtifactJsonFiles(filters))
                 .containsExactlyInAnyOrderElementsOf(matching.map { it.second })
-            assertThat(repository.getAllArtifactJsonFiles(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+            expectThat(repository.getAllArtifactJsonFiles(ContractDecoratorFilters(OrList(), OrList())))
                 .containsExactlyInAnyOrderElementsOf(all.map { it.second })
         }
     }
@@ -506,9 +505,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         )
 
         verify("correct contract info.md files are returned") {
-            assertThat(repository.getAllInfoMarkdownFiles(filters)).withMessage()
+            expectThat(repository.getAllInfoMarkdownFiles(filters))
                 .containsExactlyInAnyOrderElementsOf(matching.map { it.second })
-            assertThat(repository.getAllInfoMarkdownFiles(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+            expectThat(repository.getAllInfoMarkdownFiles(ContractDecoratorFilters(OrList(), OrList())))
                 .containsExactlyInAnyOrderElementsOf(all.map { it.second })
         }
     }
@@ -552,9 +551,9 @@ class InMemoryContractDecoratorRepositoryTest : TestBase() {
         )
 
         verify("correct contract info.md files are returned") {
-            assertThat(repository.getAllInfoMarkdownFiles(filters)).withMessage()
+            expectThat(repository.getAllInfoMarkdownFiles(filters))
                 .containsExactlyInAnyOrderElementsOf(matching.map { it.second })
-            assertThat(repository.getAllInfoMarkdownFiles(ContractDecoratorFilters(OrList(), OrList()))).withMessage()
+            expectThat(repository.getAllInfoMarkdownFiles(ContractDecoratorFilters(OrList(), OrList())))
                 .containsExactlyInAnyOrderElementsOf(all.map { it.second })
         }
     }

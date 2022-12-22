@@ -38,16 +38,11 @@ import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class ContractDeploymentRequestServiceTest : TestBase() {
 
@@ -156,35 +151,35 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("some contract decorator will be returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(ID)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("constructor will be encoded") {
-            given(functionEncoderService.encodeConstructor(arguments = CREATE_PARAMS.constructorParams))
+            call(functionEncoderService.encodeConstructor(arguments = CREATE_PARAMS.constructorParams))
                 .willReturn(ENCODED_CONSTRUCTOR)
         }
 
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request is stored in database") {
-            given(contractDeploymentRequestRepository.store(STORE_PARAMS, Constants.NIL_UUID))
+            call(contractDeploymentRequestRepository.store(STORE_PARAMS, Constants.NIL_UUID))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -204,12 +199,12 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request is correctly created") {
-            assertThat(service.createContractDeploymentRequest(CREATE_PARAMS, PROJECT)).withMessage()
+            expectThat(service.createContractDeploymentRequest(CREATE_PARAMS, PROJECT))
                 .isEqualTo(STORED_REQUEST)
 
-            verifyMock(contractDeploymentRequestRepository)
-                .store(STORE_PARAMS, Constants.NIL_UUID)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.store(STORE_PARAMS, Constants.NIL_UUID)
+            }
         }
     }
 
@@ -218,7 +213,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("null will be returned when fetching contract decorator") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(null)
         }
 
@@ -238,7 +233,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.createContractDeploymentRequest(CREATE_PARAMS, PROJECT)
             }
         }
@@ -249,7 +244,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("some contract decorator will be returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -269,7 +264,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.createContractDeploymentRequest(CREATE_PARAMS, PROJECT)
             }
         }
@@ -280,7 +275,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -302,11 +297,10 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         verify("contract deployment request is successfully marked as deleted") {
             service.markContractDeploymentRequestAsDeleted(ID, STORED_REQUEST.projectId)
 
-            verifyMock(contractDeploymentRequestRepository)
-                .getById(ID)
-            verifyMock(contractDeploymentRequestRepository)
-                .markAsDeleted(ID)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.getById(ID)
+                once.markAsDeleted(ID)
+            }
         }
     }
 
@@ -315,7 +309,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -335,13 +329,13 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request is successfully marked as deleted") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.markContractDeploymentRequestAsDeleted(ID, UUID.randomUUID())
             }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .getById(ID)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.getById(ID)
+            }
         }
     }
 
@@ -350,7 +344,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(null)
         }
 
@@ -370,13 +364,13 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request is successfully marked as deleted") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.markContractDeploymentRequestAsDeleted(ID, STORED_REQUEST.projectId)
             }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .getById(ID)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.getById(ID)
+            }
         }
     }
 
@@ -385,9 +379,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request does not exist in database") {
-            given(contractDeploymentRequestRepository.getById(any()))
+            call(contractDeploymentRequestRepository.getById(any()))
                 .willReturn(null)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(any(), any()))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(any(), any()))
                 .willReturn(null)
         }
 
@@ -407,13 +401,13 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown when fetching by id") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getContractDeploymentRequest(id = UUID.randomUUID())
             }
         }
 
         verify("ResourceNotFoundException is thrown when fetching by alias and project id") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getContractDeploymentRequestByProjectIdAndAlias(
                     projectId = UUID.randomUUID(),
                     alias = "random-alias"
@@ -431,16 +425,16 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(request)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(request)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -460,7 +454,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with pending status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     request.withTransactionData(
                         status = Status.PENDING,
@@ -470,8 +464,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and projectId with pending status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     request.withTransactionData(
                         status = Status.PENDING,
@@ -486,23 +479,23 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(null)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -522,7 +515,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with pending status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.PENDING,
@@ -532,8 +525,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and projectId with pending status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.PENDING,
@@ -548,9 +540,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -558,14 +550,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(success = false)
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -585,7 +577,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with failed status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -595,8 +587,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and projectId with failed status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -611,9 +602,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -621,14 +612,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(hash = TransactionHash("wrong"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -648,7 +639,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with failed status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -658,8 +649,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and projectId with failed status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -674,9 +664,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -684,14 +674,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(from = WalletAddress("1337"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -711,7 +701,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with failed status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -721,8 +711,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and projectId with failed status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -737,9 +726,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -747,14 +736,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(deployedContractAddress = null)
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -774,7 +763,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with failed status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -784,8 +773,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and projectId with failed status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -800,9 +788,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -810,14 +798,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(deployedContractAddress = ContractAddress("1337"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -837,7 +825,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with failed status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -847,8 +835,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and projectId with failed status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -863,9 +850,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -873,14 +860,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(data = FunctionData("wrong"))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -900,7 +887,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with failed status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -910,8 +897,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and projectId with failed status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -926,9 +912,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -936,14 +922,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val transactionInfo = TRANSACTION_INFO.copy(value = Balance(BigInteger("123456789")))
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -963,7 +949,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request with failed status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -973,8 +959,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request with failed status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.FAILED,
@@ -990,23 +975,23 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val request = STORED_REQUEST.copy(deployerAddress = null)
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(request)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(request)
         }
 
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -1026,7 +1011,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with successful status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     request.withTransactionData(
                         status = Status.SUCCESS,
@@ -1036,8 +1021,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and contractId with successful status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, CREATE_PARAMS.alias))
                 .isEqualTo(
                     request.withTransactionData(
                         status = Status.SUCCESS,
@@ -1052,23 +1036,23 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
-            given(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
+            call(contractDeploymentRequestRepository.getByAliasAndProjectId(CREATE_PARAMS.alias, PROJECT.id))
                 .willReturn(STORED_REQUEST)
         }
 
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -1088,7 +1072,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request by id with successful status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.SUCCESS,
@@ -1098,8 +1082,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
 
         verify("contract deployment request by alias and projectId with successful status is returned") {
-            assertThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, STORED_REQUEST.alias))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestByProjectIdAndAlias(PROJECT.id, STORED_REQUEST.alias))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.SUCCESS,
@@ -1114,26 +1097,26 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getById(ID))
+            call(contractDeploymentRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST.copy(contractAddress = null))
         }
 
         suppose("setting contract address will succeed") {
-            given(contractDeploymentRequestRepository.setContractAddress(ID, CONTRACT_ADDRESS))
+            call(contractDeploymentRequestRepository.setContractAddress(ID, CONTRACT_ADDRESS))
                 .willReturn(true)
         }
 
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -1153,7 +1136,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request with successful status is returned") {
-            assertThat(service.getContractDeploymentRequest(ID)).withMessage()
+            expectThat(service.getContractDeploymentRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withTransactionData(
                         status = Status.SUCCESS,
@@ -1161,11 +1144,10 @@ class ContractDeploymentRequestServiceTest : TestBase() {
                     )
                 )
 
-            verifyMock(contractDeploymentRequestRepository)
-                .getById(ID)
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(ID, CONTRACT_ADDRESS)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.getById(ID)
+                once.setContractAddress(ID, CONTRACT_ADDRESS)
+            }
         }
     }
 
@@ -1182,7 +1164,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val pendingRequest = STORED_REQUEST.copy(contractAddress = null, txHash = TransactionHash("other-tx-hash"))
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getAllByProjectId(PROJECT.id, filters))
+            call(contractDeploymentRequestRepository.getAllByProjectId(PROJECT.id, filters))
                 .willReturn(
                     listOf(
                         STORED_REQUEST,
@@ -1194,14 +1176,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -1221,8 +1203,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request with successful status is returned") {
-            assertThat(service.getContractDeploymentRequestsByProjectIdAndFilters(PROJECT.id, filters))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestsByProjectIdAndFilters(PROJECT.id, filters))
                 .isEqualTo(
                     listOf(
                         STORED_REQUEST.withTransactionData(
@@ -1249,7 +1230,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         suppose("contract deployment request exists in database") {
-            given(contractDeploymentRequestRepository.getAllByProjectId(PROJECT.id, filters))
+            call(contractDeploymentRequestRepository.getAllByProjectId(PROJECT.id, filters))
                 .willReturn(
                     listOf(
                         STORED_REQUEST,
@@ -1261,14 +1242,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
+            call(blockchainService.fetchTransactionInfo(CHAIN_SPEC, TX_HASH, EVENTS))
                 .willReturn(TRANSACTION_INFO)
         }
 
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
@@ -1288,8 +1269,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("contract deployment request with successful status is returned") {
-            assertThat(service.getContractDeploymentRequestsByProjectIdAndFilters(PROJECT.id, filters))
-                .withMessage()
+            expectThat(service.getContractDeploymentRequestsByProjectIdAndFilters(PROJECT.id, filters))
                 .isEqualTo(
                     listOf(
                         STORED_REQUEST.withTransactionData(
@@ -1328,7 +1308,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         verify("empty list is returned") {
             val result = service.getContractDeploymentRequestsByProjectIdAndFilters(PROJECT.id, filters)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEmpty()
         }
     }
@@ -1339,7 +1319,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val deployer = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("txInfo will be successfully attached to the request") {
-            given(contractDeploymentRequestRepository.setTxInfo(ID, TX_HASH, deployer))
+            call(contractDeploymentRequestRepository.setTxInfo(ID, TX_HASH, deployer))
                 .willReturn(true)
         }
 
@@ -1361,9 +1341,9 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         verify("txInfo was successfully attached") {
             service.attachTxInfo(ID, TX_HASH, deployer)
 
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(ID, TX_HASH, deployer)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.setTxInfo(ID, TX_HASH, deployer)
+            }
         }
     }
 
@@ -1373,7 +1353,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val deployer = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching txInfo will fail") {
-            given(contractDeploymentRequestRepository.setTxInfo(ID, TX_HASH, deployer))
+            call(contractDeploymentRequestRepository.setTxInfo(ID, TX_HASH, deployer))
                 .willReturn(false)
         }
 
@@ -1393,31 +1373,33 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         )
 
         verify("CannotAttachTxInfoException is thrown") {
-            assertThrows<CannotAttachTxInfoException>(message) {
+            expectThrows<CannotAttachTxInfoException> {
                 service.attachTxInfo(ID, TX_HASH, deployer)
             }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(ID, TX_HASH, deployer)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.setTxInfo(ID, TX_HASH, deployer)
+            }
         }
     }
 
     private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
-        given(projectRepository.getById(projectId))
-            .willReturn(
-                Project(
-                    id = projectId,
-                    ownerId = UUID.randomUUID(),
-                    issuerContractAddress = ContractAddress("dead"),
-                    baseRedirectUrl = BaseUrl(""),
-                    chainId = ChainId(0L),
-                    customRpcUrl = null,
-                    createdAt = TestData.TIMESTAMP
+        suppose("some project will be returned") {
+            call(projectRepository.getById(projectId))
+                .willReturn(
+                    Project(
+                        id = projectId,
+                        ownerId = UUID.randomUUID(),
+                        issuerContractAddress = ContractAddress("dead"),
+                        baseRedirectUrl = BaseUrl(""),
+                        chainId = ChainId(0L),
+                        customRpcUrl = null,
+                        createdAt = TestData.TIMESTAMP
+                    )
                 )
-            )
+        }
 
         return projectRepository
     }
@@ -1425,8 +1407,10 @@ class ContractDeploymentRequestServiceTest : TestBase() {
     private fun contractMetadataRepositoryMock(exists: Boolean): ContractMetadataRepository {
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
-        given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
-            .willReturn(exists)
+        suppose("some metadata will be returned") {
+            call(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
+                .willReturn(exists)
+        }
 
         return contractMetadataRepository
     }

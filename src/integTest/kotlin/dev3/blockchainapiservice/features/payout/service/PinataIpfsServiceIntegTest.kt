@@ -20,12 +20,10 @@ import dev3.blockchainapiservice.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.wiremock.WireMock
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
@@ -95,7 +93,7 @@ class PinataIpfsServiceIntegTest : TestBase() {
         verify("correct IPFS hash is returned for JSON upload") {
             val result = service.pinJsonToIpfs(objectMapper.readTree(requestJson))
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(ipfsHash)
         }
     }
@@ -127,7 +125,7 @@ class PinataIpfsServiceIntegTest : TestBase() {
         }
 
         verify("exception is thrown when IPFS hash is missing in response") {
-            assertThrows<IpfsUploadFailedException>(message) {
+            expectThrows<IpfsUploadFailedException> {
                 service.pinJsonToIpfs(objectMapper.readTree(requestJson))
             }
         }
@@ -153,7 +151,7 @@ class PinataIpfsServiceIntegTest : TestBase() {
         }
 
         verify("exception is thrown when non 2xx response is returned") {
-            assertThrows<IpfsUploadFailedException>(message) {
+            expectThrows<IpfsUploadFailedException> {
                 service.pinJsonToIpfs(objectMapper.readTree(requestJson))
             }
         }

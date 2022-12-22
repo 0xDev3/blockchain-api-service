@@ -5,7 +5,6 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.features.payout.util.MerkleHash
 import dev3.blockchainapiservice.features.payout.util.MerkleTree.Companion.PathSegment
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class PathSegmentJsonSerializerTest : TestBase() {
@@ -21,7 +20,7 @@ class PathSegmentJsonSerializerTest : TestBase() {
         }
 
         verify("path segment is correctly serialized") {
-            assertThat(serializedPathSegment).withMessage().isEqualTo(
+            expectThat(serializedPathSegment).isEqualTo(
                 objectMapper.readTree(
                     """
                     {

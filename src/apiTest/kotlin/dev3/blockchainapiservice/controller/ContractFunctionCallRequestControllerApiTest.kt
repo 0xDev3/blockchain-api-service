@@ -45,7 +45,6 @@ import dev3.blockchainapiservice.util.InterfaceId
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -326,7 +325,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = response.id,
@@ -360,14 +359,14 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract function call request is correctly stored in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = response.id,
@@ -390,7 +389,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -449,7 +448,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = response.id,
@@ -483,14 +482,14 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract function call request is correctly stored in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = response.id,
@@ -513,7 +512,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -567,7 +566,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = response.id,
@@ -601,14 +600,14 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract function call request is correctly stored in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = response.id,
@@ -631,7 +630,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -692,7 +691,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = response.id,
@@ -726,14 +725,14 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract function call request is correctly stored in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = response.id,
@@ -756,7 +755,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1123,7 +1122,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = createResponse.id,
@@ -1158,11 +1157,11 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.functionCallTx.blockConfirmations)
+            expectThat(fetchResponse.functionCallTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.functionCallTx.timestamp)
+            expectThat(fetchResponse.functionCallTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1275,7 +1274,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = createResponse.id,
@@ -1310,11 +1309,11 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.functionCallTx.blockConfirmations)
+            expectThat(fetchResponse.functionCallTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.functionCallTx.timestamp)
+            expectThat(fetchResponse.functionCallTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1433,7 +1432,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractFunctionCallRequestsResponse(
                         listOf(
@@ -1472,11 +1471,11 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].functionCallTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].functionCallTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].functionCallTx.timestamp)
+            expectThat(fetchResponse.requests[0].functionCallTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1586,7 +1585,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractFunctionCallRequestsResponse(
                         listOf(
@@ -1625,11 +1624,11 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].functionCallTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].functionCallTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].functionCallTx.timestamp)
+            expectThat(fetchResponse.requests[0].functionCallTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1684,7 +1683,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("transaction info is correctly attached to contract deployment request") {
             val storedRequest = contractFunctionCallRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }
@@ -1741,7 +1740,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("transaction info is not changed in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }

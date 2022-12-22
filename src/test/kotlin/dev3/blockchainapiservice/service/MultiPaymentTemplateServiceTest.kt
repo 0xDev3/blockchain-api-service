@@ -16,16 +16,11 @@ import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
-import org.mockito.kotlin.verify as verifyMock
 
 class MultiPaymentTemplateServiceTest : TestBase() {
 
@@ -79,21 +74,21 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(TEMPLATE_ID, ITEM.id)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(ITEM.createdAt, TEMPLATE.createdAt)
         }
 
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template will be stored into the database") {
-            given(multiPaymentTemplateRepository.store(TEMPLATE))
+            call(multiPaymentTemplateRepository.store(TEMPLATE))
                 .willReturn(TEMPLATE)
         }
 
@@ -104,12 +99,12 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("multi-payment template is stored into the database") {
-            assertThat(service.createMultiPaymentTemplate(CREATE_REQUEST, USER_IDENTIFIER)).withMessage()
+            expectThat(service.createMultiPaymentTemplate(CREATE_REQUEST, USER_IDENTIFIER))
                 .isEqualTo(TEMPLATE)
 
-            verifyMock(multiPaymentTemplateRepository)
-                .store(TEMPLATE)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.store(TEMPLATE)
+            }
         }
     }
 
@@ -119,14 +114,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val updatedAt = TestData.TIMESTAMP + 10.seconds
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(updatedAt)
         }
 
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
@@ -138,7 +133,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         suppose("multi-payment template will be updated in the database") {
-            given(multiPaymentTemplateRepository.update(updatedTemplate))
+            call(multiPaymentTemplateRepository.update(updatedTemplate))
                 .willReturn(updatedTemplate)
         }
 
@@ -149,14 +144,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("multi-payment template is updated in the database") {
-            assertThat(service.updateMultiPaymentTemplate(TEMPLATE_ID, UPDATE_REQUEST, USER_IDENTIFIER)).withMessage()
+            expectThat(service.updateMultiPaymentTemplate(TEMPLATE_ID, UPDATE_REQUEST, USER_IDENTIFIER))
                 .isEqualTo(updatedTemplate)
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyMock(multiPaymentTemplateRepository)
-                .update(updatedTemplate)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+                once.update(updatedTemplate)
+            }
         }
     }
 
@@ -165,7 +159,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("non-owned multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
         }
 
@@ -176,13 +170,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.updateMultiPaymentTemplate(TEMPLATE_ID, UPDATE_REQUEST, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+            }
         }
     }
 
@@ -191,7 +185,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
@@ -202,7 +196,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         suppose("null will be returned when updating multi-payment template") {
-            given(multiPaymentTemplateRepository.update(updatedTemplate))
+            call(multiPaymentTemplateRepository.update(updatedTemplate))
                 .willReturn(null)
         }
 
@@ -213,15 +207,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.updateMultiPaymentTemplate(TEMPLATE_ID, UPDATE_REQUEST, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyMock(multiPaymentTemplateRepository)
-                .update(updatedTemplate)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+                once.update(updatedTemplate)
+            }
         }
     }
 
@@ -230,7 +223,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
@@ -245,11 +238,10 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         }
 
         verify("multi-payment template was deleted from the database") {
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyMock(multiPaymentTemplateRepository)
-                .delete(TEMPLATE_ID)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+                once.delete(TEMPLATE_ID)
+            }
         }
     }
 
@@ -258,7 +250,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("non-owned multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
         }
 
@@ -269,13 +261,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.deleteMultiPaymentTemplateById(TEMPLATE_ID, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+            }
         }
     }
 
@@ -284,7 +276,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("null is returned when fetching multi-payment template by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(null)
         }
 
@@ -295,13 +287,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.deleteMultiPaymentTemplateById(TEMPLATE_ID, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+            }
         }
     }
 
@@ -310,7 +302,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
@@ -321,12 +313,12 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("multi-payment template is updated in the database") {
-            assertThat(service.getMultiPaymentTemplateById(TEMPLATE_ID)).withMessage()
+            expectThat(service.getMultiPaymentTemplateById(TEMPLATE_ID))
                 .isEqualTo(TEMPLATE)
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+            }
         }
     }
 
@@ -335,7 +327,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("null is returned when fetching multi-payment template by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(null)
         }
 
@@ -346,13 +338,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getMultiPaymentTemplateById(TEMPLATE_ID)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+            }
         }
     }
 
@@ -361,7 +353,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment templates are fetched by wallet address") {
-            given(multiPaymentTemplateRepository.getAllByWalletAddress(USER_IDENTIFIER.walletAddress))
+            call(multiPaymentTemplateRepository.getAllByWalletAddress(USER_IDENTIFIER.walletAddress))
                 .willReturn(listOf(TEMPLATE.withoutItems()))
         }
 
@@ -372,12 +364,12 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("multi-payment template is updated in the database") {
-            assertThat(service.getAllMultiPaymentTemplatesByWalletAddress(USER_IDENTIFIER.walletAddress)).withMessage()
+            expectThat(service.getAllMultiPaymentTemplatesByWalletAddress(USER_IDENTIFIER.walletAddress))
                 .isEqualTo(listOf(TEMPLATE.withoutItems()))
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getAllByWalletAddress(USER_IDENTIFIER.walletAddress)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getAllByWalletAddress(USER_IDENTIFIER.walletAddress)
+            }
         }
     }
 
@@ -387,7 +379,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val newItemId = UUID.randomUUID()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(newItemId)
         }
 
@@ -395,14 +387,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val newItemTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(newItemTimestamp)
         }
 
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
@@ -420,7 +412,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         suppose("item will be added to multi-payment template in the database") {
-            given(multiPaymentTemplateRepository.addItem(newItem, newItemTimestamp))
+            call(multiPaymentTemplateRepository.addItem(newItem, newItemTimestamp))
                 .willReturn(updatedTemplate)
         }
 
@@ -431,14 +423,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("item is added to multi-payment template the database") {
-            assertThat(service.addItemToMultiPaymentTemplate(TEMPLATE_ID, ITEM_REQUEST, USER_IDENTIFIER)).withMessage()
+            expectThat(service.addItemToMultiPaymentTemplate(TEMPLATE_ID, ITEM_REQUEST, USER_IDENTIFIER))
                 .isEqualTo(updatedTemplate)
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyMock(multiPaymentTemplateRepository)
-                .addItem(newItem, newItemTimestamp)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+                once.addItem(newItem, newItemTimestamp)
+            }
         }
     }
 
@@ -447,7 +438,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("non-owned multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
         }
 
@@ -458,13 +449,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.addItemToMultiPaymentTemplate(TEMPLATE_ID, ITEM_REQUEST, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+            }
         }
     }
 
@@ -474,7 +465,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val newItemId = UUID.randomUUID()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(newItemId)
         }
 
@@ -482,14 +473,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val newItemTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(newItemTimestamp)
         }
 
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
@@ -503,7 +494,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         suppose("null will be returned when adding item to multi-payment template in the database") {
-            given(multiPaymentTemplateRepository.addItem(newItem, newItemTimestamp))
+            call(multiPaymentTemplateRepository.addItem(newItem, newItemTimestamp))
                 .willReturn(null)
         }
 
@@ -514,15 +505,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.addItemToMultiPaymentTemplate(TEMPLATE_ID, ITEM_REQUEST, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyMock(multiPaymentTemplateRepository)
-                .addItem(newItem, newItemTimestamp)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+                once.addItem(newItem, newItemTimestamp)
+            }
         }
     }
 
@@ -532,14 +522,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val updateTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(updateTimestamp)
         }
 
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
@@ -557,7 +547,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         suppose("item will be updated for multi-payment template in the database") {
-            given(multiPaymentTemplateRepository.updateItem(updatedItem, updateTimestamp))
+            call(multiPaymentTemplateRepository.updateItem(updatedItem, updateTimestamp))
                 .willReturn(updatedTemplate)
         }
 
@@ -574,15 +564,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("item is updated for multi-payment template the database") {
-            assertThat(service.updateMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, updateItemRequest, USER_IDENTIFIER))
-                .withMessage()
+            expectThat(service.updateMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, updateItemRequest, USER_IDENTIFIER))
                 .isEqualTo(updatedTemplate)
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyMock(multiPaymentTemplateRepository)
-                .updateItem(updatedItem, updateTimestamp)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+                once.updateItem(updatedItem, updateTimestamp)
+            }
         }
     }
 
@@ -591,7 +579,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("non-owned multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
         }
 
@@ -602,13 +590,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.updateMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, ITEM_REQUEST, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+            }
         }
     }
 
@@ -618,14 +606,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val updateTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(updateTimestamp)
         }
 
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
@@ -639,7 +627,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         suppose("null will be returned when updating multi-payment template item in the database") {
-            given(multiPaymentTemplateRepository.updateItem(updatedItem, updateTimestamp))
+            call(multiPaymentTemplateRepository.updateItem(updatedItem, updateTimestamp))
                 .willReturn(null)
         }
 
@@ -656,15 +644,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.updateMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, updateItemRequest, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyMock(multiPaymentTemplateRepository)
-                .updateItem(updatedItem, updateTimestamp)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+                once.updateItem(updatedItem, updateTimestamp)
+            }
         }
     }
 
@@ -674,19 +661,19 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val updateTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(updateTimestamp)
         }
 
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
         suppose("multi-payment template item will be deleted from the database") {
-            given(multiPaymentTemplateRepository.deleteItem(TEMPLATE_ID, ITEM.id, updateTimestamp))
+            call(multiPaymentTemplateRepository.deleteItem(TEMPLATE_ID, ITEM.id, updateTimestamp))
                 .willReturn(TEMPLATE.copy(items = WithItems(emptyList())))
         }
 
@@ -697,14 +684,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("multi-payment template item was deleted from the database") {
-            assertThat(service.deleteMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, USER_IDENTIFIER)).withMessage()
+            expectThat(service.deleteMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, USER_IDENTIFIER))
                 .isEqualTo(TEMPLATE.copy(items = WithItems(emptyList())))
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyMock(multiPaymentTemplateRepository)
-                .deleteItem(TEMPLATE_ID, ITEM.id, updateTimestamp)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+                once.deleteItem(TEMPLATE_ID, ITEM.id, updateTimestamp)
+            }
         }
     }
 
@@ -713,7 +699,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("non-owned multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
         }
 
@@ -724,13 +710,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.deleteMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+            }
         }
     }
 
@@ -740,19 +726,19 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val updateTimestamp = TestData.TIMESTAMP + 1.seconds
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(updateTimestamp)
         }
 
         val multiPaymentTemplateRepository = mock<MultiPaymentTemplateRepository>()
 
         suppose("multi-payment template is fetched by id") {
-            given(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
+            call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
         suppose("null will be returned when deleting multi-payment template item from the database") {
-            given(multiPaymentTemplateRepository.deleteItem(TEMPLATE_ID, ITEM.id, updateTimestamp))
+            call(multiPaymentTemplateRepository.deleteItem(TEMPLATE_ID, ITEM.id, updateTimestamp))
                 .willReturn(null)
         }
 
@@ -763,15 +749,14 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.deleteMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, USER_IDENTIFIER)
             }
 
-            verifyMock(multiPaymentTemplateRepository)
-                .getById(TEMPLATE_ID)
-            verifyMock(multiPaymentTemplateRepository)
-                .deleteItem(TEMPLATE_ID, ITEM.id, updateTimestamp)
-            verifyNoMoreInteractions(multiPaymentTemplateRepository)
+            expectInteractions(multiPaymentTemplateRepository) {
+                once.getById(TEMPLATE_ID)
+                once.deleteItem(TEMPLATE_ID, ITEM.id, updateTimestamp)
+            }
         }
     }
 }
