@@ -7,6 +7,7 @@ import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
@@ -146,7 +147,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
     }
 
     @Test
-    fun mustCorrectlyCreateFunctionCallRequest() {
+    fun mustCorrectlyCreateFunctionCallRequestWhenContractAddressIsNotBlacklisted() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
@@ -188,6 +189,13 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
                 .willReturn(STORED_REQUEST)
         }
 
+        val blacklistedAddressRepository = mock<BlacklistedAddressRepository>()
+
+        suppose("contract address is not blacklisted") {
+            call(blacklistedAddressRepository.exists(CONTRACT_ADDRESS))
+                .willReturn(false)
+        }
+
         val service = ContractFunctionCallRequestServiceImpl(
             functionEncoderService = functionEncoderService,
             contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
@@ -195,6 +203,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = blacklistedAddressRepository,
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = uuidProvider,
                 utcDateTimeProvider = utcDateTimeProvider,
@@ -215,6 +224,85 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
     }
 
     @Test
+    fun mustCorrectlyCreateFunctionCallRequestWhenContractAddressIsBlacklisted() {
+        val uuidProvider = mock<UuidProvider>()
+
+        suppose("some UUID will be generated") {
+            call(uuidProvider.getUuid())
+                .willReturn(ID)
+        }
+
+        val utcDateTimeProvider = mock<UtcDateTimeProvider>()
+
+        suppose("some timestamp will be returned") {
+            call(utcDateTimeProvider.getUtcDateTime())
+                .willReturn(TestData.TIMESTAMP)
+        }
+
+        val functionEncoderService = mock<FunctionEncoderService>()
+        val createParams = DEPLOYED_CONTRACT_ID_CREATE_PARAMS
+
+        suppose("function will be encoded") {
+            call(
+                functionEncoderService.encode(
+                    functionName = createParams.functionName,
+                    arguments = createParams.functionParams
+                )
+            )
+                .willReturn(ENCODED_FUNCTION_DATA)
+        }
+
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("deployed contract is returned from database") {
+            call(contractDeploymentRequestRepository.getById(DEPLOYED_CONTRACT_ID))
+                .willReturn(DEPLOYED_CONTRACT)
+        }
+
+        val storeParams = STORE_PARAMS.copy(redirectUrl = STORE_PARAMS.redirectUrl + "/caution")
+        val storedRequest = STORED_REQUEST.copy(redirectUrl = STORED_REQUEST.redirectUrl + "/caution")
+        val contractFunctionCallRequestRepository = mock<ContractFunctionCallRequestRepository>()
+
+        suppose("contract function call request is stored in database") {
+            call(contractFunctionCallRequestRepository.store(storeParams))
+                .willReturn(storedRequest)
+        }
+
+        val blacklistedAddressRepository = mock<BlacklistedAddressRepository>()
+
+        suppose("contract address is not blacklisted") {
+            call(blacklistedAddressRepository.exists(CONTRACT_ADDRESS))
+                .willReturn(true)
+        }
+
+        val service = ContractFunctionCallRequestServiceImpl(
+            functionEncoderService = functionEncoderService,
+            contractFunctionCallRequestRepository = contractFunctionCallRequestRepository,
+            deployedContractIdentifierResolverService = service(contractDeploymentRequestRepository),
+            contractDeploymentRequestRepository = mock(),
+            contractDecoratorRepository = mock(),
+            importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = blacklistedAddressRepository,
+            ethCommonService = EthCommonServiceImpl(
+                uuidProvider = uuidProvider,
+                utcDateTimeProvider = utcDateTimeProvider,
+                blockchainService = mock()
+            ),
+            projectRepository = mock(),
+            objectMapper = JsonConfig().objectMapper()
+        )
+
+        verify("contract function call request is correctly created") {
+            expectThat(service.createContractFunctionCallRequest(createParams, PROJECT))
+                .isEqualTo(WithFunctionData(storedRequest, ENCODED_FUNCTION_DATA))
+
+            expectInteractions(contractFunctionCallRequestRepository) {
+                once.store(storeParams)
+            }
+        }
+    }
+
+    @Test
     fun mustThrowResourceNotFoundExceptionForNonExistentContractFunctionCallRequest() {
         val contractFunctionCallRequestRepository = mock<ContractFunctionCallRequestRepository>()
 
@@ -230,6 +318,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -275,6 +364,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -332,6 +422,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -390,6 +481,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -448,6 +540,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -506,6 +599,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -564,6 +658,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -622,6 +717,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -680,6 +776,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -738,6 +835,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -796,6 +894,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -851,6 +950,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -889,6 +989,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -921,6 +1022,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),
@@ -956,6 +1058,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             contractDeploymentRequestRepository = mock(),
             contractDecoratorRepository = mock(),
             importedContractDecoratorRepository = mock(),
+            blacklistedAddressRepository = mock(),
             ethCommonService = EthCommonServiceImpl(
                 uuidProvider = mock(),
                 utcDateTimeProvider = mock(),

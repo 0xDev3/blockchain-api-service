@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
 import dev3.blockchainapiservice.model.params.PreStoreContractFunctionCallRequestParams
@@ -34,6 +35,7 @@ class ContractFunctionCallRequestServiceImpl(
     private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,
     private val contractDecoratorRepository: ContractDecoratorRepository,
     private val importedContractDecoratorRepository: ImportedContractDecoratorRepository,
+    private val blacklistedAddressRepository: BlacklistedAddressRepository,
     private val ethCommonService: EthCommonService,
     private val projectRepository: ProjectRepository,
     private val objectMapper: ObjectMapper
@@ -61,7 +63,7 @@ class ContractFunctionCallRequestServiceImpl(
                 contractAddress = contractAddress
             ),
             project = project
-        )
+        ).addCautionIfNeeded()
 
         val contractFunctionCallRequest = contractFunctionCallRequestRepository.store(databaseParams)
 
@@ -102,6 +104,9 @@ class ContractFunctionCallRequestServiceImpl(
             )
         }
     }
+
+    private fun StoreContractFunctionCallRequestParams.addCautionIfNeeded() =
+        if (blacklistedAddressRepository.exists(contractAddress)) copy(redirectUrl = "$redirectUrl/caution") else this
 
     private fun ContractFunctionCallRequest.appendTransactionData(
         project: Project
