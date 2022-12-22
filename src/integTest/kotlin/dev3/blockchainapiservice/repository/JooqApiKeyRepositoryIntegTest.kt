@@ -11,7 +11,6 @@ import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -88,7 +87,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         verify("API key is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ApiKey(
                         id = id,
@@ -118,7 +117,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         verify("API key is correctly fetched by ID") {
             val result = repository.getByValue(API_KEY)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ApiKey(
                         id = id,
@@ -135,7 +134,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent API key") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -162,7 +161,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         verify("API keys are correctly fetched by project ID") {
             val result = repository.getAllByProjectId(PROJECT_ID)
 
-            assertThat(result.map { it.apiKey }).withMessage()
+            expectThat(result.map { it.apiKey })
                 .isEqualTo(
                     listOf("api-key-1", "api-key-2")
                 )
@@ -183,9 +182,9 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         }
 
         verify("must correctly determine that API key exists") {
-            assertThat(repository.exists(API_KEY)).withMessage()
+            expectThat(repository.exists(API_KEY))
                 .isTrue()
-            assertThat(repository.exists("unknown-api-key")).withMessage()
+            expectThat(repository.exists("unknown-api-key"))
                 .isFalse()
         }
     }
@@ -205,14 +204,14 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         }
 
         verify("storing API key returns correct result") {
-            assertThat(storedApiKey).withMessage()
+            expectThat(storedApiKey)
                 .isEqualTo(apiKey)
         }
 
         verify("API key was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(apiKey)
         }
     }

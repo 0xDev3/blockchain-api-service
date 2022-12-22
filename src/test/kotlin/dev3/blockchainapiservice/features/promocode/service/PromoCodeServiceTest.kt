@@ -1,8 +1,8 @@
-package dev3.blockchainapiservice.features.promo_code.service
+package dev3.blockchainapiservice.features.promocode.service
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.config.PromoCodeProperties
+import dev3.blockchainapiservice.config.AdminProperties
 import dev3.blockchainapiservice.exception.AccessForbiddenException
 import dev3.blockchainapiservice.exception.PromoCodeAlreadyUsedException
 import dev3.blockchainapiservice.exception.PromoCodeExpiredException
@@ -21,16 +21,10 @@ import dev3.blockchainapiservice.repository.ApiRateLimitRepository
 import dev3.blockchainapiservice.service.RandomProvider
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoInteractions
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.util.UUID
 import kotlin.time.Duration.Companion.days
-import org.mockito.kotlin.verify as verifyMock
 
 class PromoCodeServiceTest : TestBase() {
 
@@ -51,21 +45,21 @@ class PromoCodeServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyGeneratePromoCodeWhenUserIsAllowedToGeneratePromoCode() {
-        val promoCodeProperties = suppose("user is allowed to generate promo code") {
-            PromoCodeProperties(allowedWallets = setOf(USER_IDENTIFIER.walletAddress))
+        val adminProperties = suppose("user is allowed to generate promo code") {
+            AdminProperties(wallets = setOf(USER_IDENTIFIER.walletAddress))
         }
 
         val randomProvider = mock<RandomProvider>()
 
         suppose("some promo code will be generated") {
-            given(randomProvider.getBytes(6))
+            call(randomProvider.getBytes(6))
                 .willReturn(ByteArray(6) { it.toByte() })
         }
 
         val promoCodeRepository = mock<PromoCodeRepository>()
 
         suppose("promo code will be stored into the database") {
-            given(
+            call(
                 promoCodeRepository.storeCode(
                     code = PROMO_CODE.code,
                     writeRequests = PROMO_CODE.writeRequests,
@@ -82,7 +76,7 @@ class PromoCodeServiceTest : TestBase() {
             apiRateLimitRepository = mock(),
             randomProvider = randomProvider,
             utcDateTimeProvider = mock(),
-            promoCodeProperties = promoCodeProperties
+            adminProperties = adminProperties
         )
 
         verify("promo code is correctly generated and stored") {
@@ -94,15 +88,15 @@ class PromoCodeServiceTest : TestBase() {
                 validUntil = TestData.TIMESTAMP
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(PROMO_CODE)
         }
     }
 
     @Test
     fun mustThrowAccessForbiddenExceptionWhenUserIsNotAllowedToGeneratePromoCode() {
-        val promoCodeProperties = suppose("user is not allowed to generate promo code") {
-            PromoCodeProperties()
+        val adminProperties = suppose("user is not allowed to generate promo code") {
+            AdminProperties()
         }
 
         val service = PromoCodeServiceImpl(
@@ -111,11 +105,11 @@ class PromoCodeServiceTest : TestBase() {
             apiRateLimitRepository = mock(),
             randomProvider = mock(),
             utcDateTimeProvider = mock(),
-            promoCodeProperties = promoCodeProperties
+            adminProperties = adminProperties
         )
 
         verify("AccessForbiddenException is thrown") {
-            assertThrows<AccessForbiddenException>(message) {
+            expectThrows<AccessForbiddenException> {
                 service.generatePromoCode(
                     userIdentifier = USER_IDENTIFIER,
                     prefix = "DEV3-",
@@ -129,14 +123,14 @@ class PromoCodeServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchPromoCodesWhenUserIsAllowedToFetchPromoCodes() {
-        val promoCodeProperties = suppose("user is allowed to generate promo code") {
-            PromoCodeProperties(allowedWallets = setOf(USER_IDENTIFIER.walletAddress))
+        val adminProperties = suppose("user is allowed to generate promo code") {
+            AdminProperties(wallets = setOf(USER_IDENTIFIER.walletAddress))
         }
 
         val promoCodeRepository = mock<PromoCodeRepository>()
 
         suppose("some promo codes will be returned") {
-            given(promoCodeRepository.getCodes(TestData.TIMESTAMP, TestData.TIMESTAMP + 1.days))
+            call(promoCodeRepository.getCodes(TestData.TIMESTAMP, TestData.TIMESTAMP + 1.days))
                 .willReturn(listOf(PROMO_CODE))
         }
 
@@ -146,7 +140,7 @@ class PromoCodeServiceTest : TestBase() {
             apiRateLimitRepository = mock(),
             randomProvider = mock(),
             utcDateTimeProvider = mock(),
-            promoCodeProperties = promoCodeProperties
+            adminProperties = adminProperties
         )
 
         verify("promo codes are correctly fetched") {
@@ -156,15 +150,15 @@ class PromoCodeServiceTest : TestBase() {
                 validUntil = TestData.TIMESTAMP + 1.days
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf(PROMO_CODE))
         }
     }
 
     @Test
     fun mustThrowAccessForbiddenExceptionWhenUserIsNotAllowedToFetchPromoCodes() {
-        val promoCodeProperties = suppose("user is not allowed to generate promo code") {
-            PromoCodeProperties()
+        val adminProperties = suppose("user is not allowed to generate promo code") {
+            AdminProperties()
         }
 
         val service = PromoCodeServiceImpl(
@@ -173,11 +167,11 @@ class PromoCodeServiceTest : TestBase() {
             apiRateLimitRepository = mock(),
             randomProvider = mock(),
             utcDateTimeProvider = mock(),
-            promoCodeProperties = promoCodeProperties
+            adminProperties = adminProperties
         )
 
         verify("AccessForbiddenException is thrown") {
-            assertThrows<AccessForbiddenException>(message) {
+            expectThrows<AccessForbiddenException> {
                 service.getPromoCodes(
                     userIdentifier = USER_IDENTIFIER,
                     validFrom = TestData.TIMESTAMP,
@@ -192,21 +186,21 @@ class PromoCodeServiceTest : TestBase() {
         val billingService = mock<StripeBillingService>()
 
         suppose("user does not have an active subscription") {
-            given(billingService.hasActiveSubscription(USER_IDENTIFIER))
+            call(billingService.hasActiveSubscription(USER_IDENTIFIER))
                 .willReturn(false)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
         val promoCodeRepository = mock<PromoCodeRepository>()
 
         suppose("some promo code is used") {
-            given(
+            call(
                 promoCodeRepository.useCode(
                     code = PROMO_CODE.code,
                     userId = USER_IDENTIFIER.id,
@@ -223,14 +217,14 @@ class PromoCodeServiceTest : TestBase() {
             apiRateLimitRepository = apiRateLimitRepository,
             randomProvider = mock(),
             utcDateTimeProvider = utcDateTimeProvider,
-            promoCodeProperties = PromoCodeProperties()
+            adminProperties = AdminProperties()
         )
 
         verify("promo code is used and api rate limit is added to the user") {
             service.usePromoCode(USER_IDENTIFIER, PROMO_CODE.code)
 
-            verifyMock(apiRateLimitRepository)
-                .createNewFutureUsageLimits(
+            expectInteractions(apiRateLimitRepository) {
+                once.createNewFutureUsageLimits(
                     userId = USER_IDENTIFIER.id,
                     currentTime = TestData.TIMESTAMP,
                     limits = listOf(
@@ -243,7 +237,7 @@ class PromoCodeServiceTest : TestBase() {
                         )
                     )
                 )
-            verifyNoMoreInteractions(apiRateLimitRepository)
+            }
         }
     }
 
@@ -252,7 +246,7 @@ class PromoCodeServiceTest : TestBase() {
         val billingService = mock<StripeBillingService>()
 
         suppose("user has an active subscription") {
-            given(billingService.hasActiveSubscription(USER_IDENTIFIER))
+            call(billingService.hasActiveSubscription(USER_IDENTIFIER))
                 .willReturn(true)
         }
 
@@ -263,15 +257,15 @@ class PromoCodeServiceTest : TestBase() {
             apiRateLimitRepository = apiRateLimitRepository,
             randomProvider = mock(),
             utcDateTimeProvider = mock(),
-            promoCodeProperties = PromoCodeProperties()
+            adminProperties = AdminProperties()
         )
 
         verify("SubscriptionAlreadyActiveException is thrown") {
-            assertThrows<SubscriptionAlreadyActiveException>(message) {
+            expectThrows<SubscriptionAlreadyActiveException> {
                 service.usePromoCode(USER_IDENTIFIER, PROMO_CODE.code)
             }
 
-            verifyNoInteractions(apiRateLimitRepository)
+            expectNoInteractions(apiRateLimitRepository)
         }
     }
 
@@ -280,21 +274,21 @@ class PromoCodeServiceTest : TestBase() {
         val billingService = mock<StripeBillingService>()
 
         suppose("user does not have an active subscription") {
-            given(billingService.hasActiveSubscription(USER_IDENTIFIER))
+            call(billingService.hasActiveSubscription(USER_IDENTIFIER))
                 .willReturn(false)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
         val promoCodeRepository = mock<PromoCodeRepository>()
 
         suppose("some promo code has expired") {
-            given(
+            call(
                 promoCodeRepository.useCode(
                     code = PROMO_CODE.code,
                     userId = USER_IDENTIFIER.id,
@@ -311,15 +305,15 @@ class PromoCodeServiceTest : TestBase() {
             apiRateLimitRepository = apiRateLimitRepository,
             randomProvider = mock(),
             utcDateTimeProvider = utcDateTimeProvider,
-            promoCodeProperties = PromoCodeProperties()
+            adminProperties = AdminProperties()
         )
 
         verify("PromoCodeExpiredException is thrown") {
-            assertThrows<PromoCodeExpiredException>(message) {
+            expectThrows<PromoCodeExpiredException> {
                 service.usePromoCode(USER_IDENTIFIER, PROMO_CODE.code)
             }
 
-            verifyNoInteractions(apiRateLimitRepository)
+            expectNoInteractions(apiRateLimitRepository)
         }
     }
 
@@ -328,21 +322,21 @@ class PromoCodeServiceTest : TestBase() {
         val billingService = mock<StripeBillingService>()
 
         suppose("user does not have an active subscription") {
-            given(billingService.hasActiveSubscription(USER_IDENTIFIER))
+            call(billingService.hasActiveSubscription(USER_IDENTIFIER))
                 .willReturn(false)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
         val promoCodeRepository = mock<PromoCodeRepository>()
 
         suppose("some promo code does not exist") {
-            given(
+            call(
                 promoCodeRepository.useCode(
                     code = PROMO_CODE.code,
                     userId = USER_IDENTIFIER.id,
@@ -359,15 +353,15 @@ class PromoCodeServiceTest : TestBase() {
             apiRateLimitRepository = apiRateLimitRepository,
             randomProvider = mock(),
             utcDateTimeProvider = utcDateTimeProvider,
-            promoCodeProperties = PromoCodeProperties()
+            adminProperties = AdminProperties()
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.usePromoCode(USER_IDENTIFIER, PROMO_CODE.code)
             }
 
-            verifyNoInteractions(apiRateLimitRepository)
+            expectNoInteractions(apiRateLimitRepository)
         }
     }
 
@@ -376,21 +370,21 @@ class PromoCodeServiceTest : TestBase() {
         val billingService = mock<StripeBillingService>()
 
         suppose("user does not have an active subscription") {
-            given(billingService.hasActiveSubscription(USER_IDENTIFIER))
+            call(billingService.hasActiveSubscription(USER_IDENTIFIER))
                 .willReturn(false)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
         val promoCodeRepository = mock<PromoCodeRepository>()
 
         suppose("some promo code was already used") {
-            given(
+            call(
                 promoCodeRepository.useCode(
                     code = PROMO_CODE.code,
                     userId = USER_IDENTIFIER.id,
@@ -407,15 +401,15 @@ class PromoCodeServiceTest : TestBase() {
             apiRateLimitRepository = apiRateLimitRepository,
             randomProvider = mock(),
             utcDateTimeProvider = utcDateTimeProvider,
-            promoCodeProperties = PromoCodeProperties()
+            adminProperties = AdminProperties()
         )
 
         verify("PromoCodeAlreadyUsedException is thrown") {
-            assertThrows<PromoCodeAlreadyUsedException>(message) {
+            expectThrows<PromoCodeAlreadyUsedException> {
                 service.usePromoCode(USER_IDENTIFIER, PROMO_CODE.code)
             }
 
-            verifyNoInteractions(apiRateLimitRepository)
+            expectNoInteractions(apiRateLimitRepository)
         }
     }
 }

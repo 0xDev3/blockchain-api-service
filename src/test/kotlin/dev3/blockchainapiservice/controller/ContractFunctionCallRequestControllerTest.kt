@@ -26,15 +26,11 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionData
 import dev3.blockchainapiservice.util.WithTransactionAndFunctionData
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class ContractFunctionCallRequestControllerTest : TestBase() {
 
@@ -88,7 +84,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
         val service = mock<ContractFunctionCallRequestService>()
 
         suppose("contract function call request will be created") {
-            given(service.createContractFunctionCallRequest(params, project))
+            call(service.createContractFunctionCallRequest(params, project))
                 .willReturn(result)
         }
 
@@ -112,7 +108,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractFunctionCallRequestResponse(
@@ -187,7 +183,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
         )
 
         suppose("some contract function call request will be fetched") {
-            given(service.getContractFunctionCallRequest(id))
+            call(service.getContractFunctionCallRequest(id))
                 .willReturn(result)
         }
 
@@ -198,7 +194,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractFunctionCallRequestResponse(
@@ -278,7 +274,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
         )
 
         suppose("some contract function call requests will be fetched by project ID and filters") {
-            given(service.getContractFunctionCallRequestsByProjectIdAndFilters(projectId, filters))
+            call(service.getContractFunctionCallRequestsByProjectIdAndFilters(projectId, filters))
                 .willReturn(listOf(result))
         }
 
@@ -293,7 +289,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractFunctionCallRequestsResponse(
@@ -348,10 +344,9 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
         }
 
         verify("transaction info is correctly attached") {
-            verifyMock(service)
-                .attachTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
-
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.attachTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
+            }
         }
     }
 }

@@ -19,15 +19,11 @@ import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class MultiPaymentTemplateControllerTest : TestBase() {
 
@@ -77,7 +73,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         val service = mock<MultiPaymentTemplateService>()
 
         suppose("multi-payment template will be created") {
-            given(service.createMultiPaymentTemplate(request, USER_IDENTIFIER))
+            call(service.createMultiPaymentTemplate(request, USER_IDENTIFIER))
                 .willReturn(TEMPLATE)
         }
 
@@ -89,7 +85,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(MultiPaymentTemplateWithItemsResponse(TEMPLATE)))
         }
     }
@@ -106,7 +102,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         val service = mock<MultiPaymentTemplateService>()
 
         suppose("multi-payment template will be updated") {
-            given(service.updateMultiPaymentTemplate(TEMPLATE_ID, request, USER_IDENTIFIER))
+            call(service.updateMultiPaymentTemplate(TEMPLATE_ID, request, USER_IDENTIFIER))
                 .willReturn(TEMPLATE)
         }
 
@@ -118,7 +114,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(MultiPaymentTemplateWithItemsResponse(TEMPLATE)))
         }
     }
@@ -131,9 +127,9 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         verify("controller returns correct response") {
             controller.deleteMultiPaymentTemplate(TEMPLATE_ID, USER_IDENTIFIER)
 
-            verifyMock(service)
-                .deleteMultiPaymentTemplateById(TEMPLATE_ID, USER_IDENTIFIER)
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.deleteMultiPaymentTemplateById(TEMPLATE_ID, USER_IDENTIFIER)
+            }
         }
     }
 
@@ -142,7 +138,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         val service = mock<MultiPaymentTemplateService>()
 
         suppose("multi-payment template will be fetched") {
-            given(service.getMultiPaymentTemplateById(TEMPLATE_ID))
+            call(service.getMultiPaymentTemplateById(TEMPLATE_ID))
                 .willReturn(TEMPLATE)
         }
 
@@ -153,7 +149,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(MultiPaymentTemplateWithItemsResponse(TEMPLATE)))
         }
     }
@@ -163,7 +159,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         val service = mock<MultiPaymentTemplateService>()
 
         suppose("multi-payment template will be fetched") {
-            given(service.getAllMultiPaymentTemplatesByWalletAddress(USER_IDENTIFIER.walletAddress))
+            call(service.getAllMultiPaymentTemplatesByWalletAddress(USER_IDENTIFIER.walletAddress))
                 .willReturn(listOf(TEMPLATE.withoutItems()))
         }
 
@@ -174,7 +170,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         MultiPaymentTemplatesResponse(
@@ -198,7 +194,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         val service = mock<MultiPaymentTemplateService>()
 
         suppose("multi-payment template item will be created") {
-            given(service.addItemToMultiPaymentTemplate(TEMPLATE_ID, request, USER_IDENTIFIER))
+            call(service.addItemToMultiPaymentTemplate(TEMPLATE_ID, request, USER_IDENTIFIER))
                 .willReturn(TEMPLATE)
         }
 
@@ -210,7 +206,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(MultiPaymentTemplateWithItemsResponse(TEMPLATE)))
         }
     }
@@ -226,7 +222,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         val service = mock<MultiPaymentTemplateService>()
 
         suppose("multi-payment template item will be updated") {
-            given(service.updateMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, request, USER_IDENTIFIER))
+            call(service.updateMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, request, USER_IDENTIFIER))
                 .willReturn(TEMPLATE)
         }
 
@@ -238,7 +234,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(MultiPaymentTemplateWithItemsResponse(TEMPLATE)))
         }
     }
@@ -248,7 +244,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
         val service = mock<MultiPaymentTemplateService>()
 
         suppose("multi-payment template item will be deleted") {
-            given(service.deleteMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, USER_IDENTIFIER))
+            call(service.deleteMultiPaymentTemplateItem(TEMPLATE_ID, ITEM.id, USER_IDENTIFIER))
                 .willReturn(TEMPLATE)
         }
 
@@ -259,7 +255,7 @@ class MultiPaymentTemplateControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(MultiPaymentTemplateWithItemsResponse(TEMPLATE)))
         }
     }

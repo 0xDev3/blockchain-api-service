@@ -6,7 +6,6 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRec
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -60,7 +59,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("user identifier is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
@@ -76,7 +75,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent user identifier") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -99,7 +98,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("user identifier is correctly fetched by identifier") {
             val result = repository.getByUserIdentifier(USER_WALLET_ADDRESS.rawValue, IDENTIFIER_TYPE)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
@@ -115,7 +114,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent user identifier") {
             val result = repository.getByUserIdentifier("???", IDENTIFIER_TYPE)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -139,7 +138,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("user identifier is correctly fetched by identifier") {
             val result = repository.getByWalletAddress(walletAddress)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
@@ -155,7 +154,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent user identifier") {
             val result = repository.getByWalletAddress(WalletAddress("dead"))
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -174,14 +173,14 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         }
 
         verify("storing user identifier returns correct result") {
-            assertThat(storedUserIdentifier).withMessage()
+            expectThat(storedUserIdentifier)
                 .isEqualTo(userIdentifier)
         }
 
         verify("user identifier was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(userIdentifier)
         }
     }
@@ -205,7 +204,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("user identifier is correctly fetched by Stripe client ID") {
             val result = repository.getByStripeClientId(clientId)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
@@ -221,7 +220,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent Stripe client ID") {
             val result = repository.getByStripeClientId("non-existent")
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -246,12 +245,12 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         }
 
         verify("stripe client id was stored in database") {
-            assertThat(updateStatus).withMessage()
+            expectThat(updateStatus)
                 .isTrue()
 
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(userIdentifier.copy(stripeClientId = stripeClientId))
         }
     }

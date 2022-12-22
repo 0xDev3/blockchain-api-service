@@ -19,14 +19,10 @@ import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithStatus
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AuthorizationRequestControllerTest : TestBase() {
 
@@ -68,7 +64,7 @@ class AuthorizationRequestControllerTest : TestBase() {
         val service = mock<AuthorizationRequestService>()
 
         suppose("authorization request will be created") {
-            given(service.createAuthorizationRequest(params, project))
+            call(service.createAuthorizationRequest(params, project))
                 .willReturn(result)
         }
 
@@ -88,7 +84,7 @@ class AuthorizationRequestControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AuthorizationRequestResponse(
@@ -133,7 +129,7 @@ class AuthorizationRequestControllerTest : TestBase() {
         )
 
         suppose("some authorization request will be fetched") {
-            given(service.getAuthorizationRequest(id))
+            call(service.getAuthorizationRequest(id))
                 .willReturn(result)
         }
 
@@ -144,7 +140,7 @@ class AuthorizationRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AuthorizationRequestResponse(
@@ -191,7 +187,7 @@ class AuthorizationRequestControllerTest : TestBase() {
             )
 
         suppose("some authorization requests will be fetched by project ID") {
-            given(service.getAuthorizationRequestsByProjectId(projectId))
+            call(service.getAuthorizationRequestsByProjectId(projectId))
                 .willReturn(listOf(result))
         }
 
@@ -202,7 +198,7 @@ class AuthorizationRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AuthorizationRequestsResponse(
@@ -242,10 +238,9 @@ class AuthorizationRequestControllerTest : TestBase() {
         }
 
         verify("signed message is correctly attached") {
-            verifyMock(service)
-                .attachWalletAddressAndSignedMessage(id, walletAddress, signedMessage)
-
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.attachWalletAddressAndSignedMessage(id, walletAddress, signedMessage)
+            }
         }
     }
 }

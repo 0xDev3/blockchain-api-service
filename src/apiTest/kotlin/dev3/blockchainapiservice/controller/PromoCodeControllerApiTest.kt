@@ -16,7 +16,6 @@ import dev3.blockchainapiservice.security.WithMockUser
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -92,7 +91,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     PromoCodesResponse(
                         listOf(
@@ -148,7 +147,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     PromoCodesResponse(
                         listOf(
@@ -199,7 +198,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     PromoCodeResponse(
                         code = response.code,
@@ -210,9 +209,9 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.code).withMessage()
+            expectThat(response.code)
                 .startsWith("DEV3-")
-            assertThat(response.validUntil - 30.days.toJavaDuration()).withMessage()
+            expectThat(response.validUntil - 30.days.toJavaDuration())
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -222,7 +221,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                 validUntil = MAX_TIME
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         PromoCode(
@@ -234,7 +233,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                         )
                     )
                 )
-            assertThat(result[0].validUntil.value).withMessage()
+            expectThat(result[0].validUntil.value)
                 .isCloseTo(response.validUntil, WITHIN_TIME_TOLERANCE)
         }
     }
@@ -264,7 +263,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     PromoCodeResponse(
                         code = response.code,
@@ -275,9 +274,9 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.code).withMessage()
+            expectThat(response.code)
                 .startsWith("TEST-")
-            assertThat(response.validUntil - 3.days.toJavaDuration()).withMessage()
+            expectThat(response.validUntil - 3.days.toJavaDuration())
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -287,7 +286,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                 validUntil = MAX_TIME
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         PromoCode(
@@ -299,7 +298,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                         )
                     )
                 )
-            assertThat(result[0].validUntil.value).withMessage()
+            expectThat(result[0].validUntil.value)
                 .isCloseTo(response.validUntil, WITHIN_TIME_TOLERANCE)
         }
     }
@@ -344,7 +343,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
         }
 
         verify("number of promo code usages was incremented to 1") {
-            assertThat(
+            expectThat(
                 promoCodeRepository.getCodes(
                     validFrom = MIN_TIME,
                     validUntil = MAX_TIME
@@ -359,7 +358,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                 currentTime = UtcDateTime(OffsetDateTime.now())
             )
 
-            assertThat(currentPeriod).withMessage()
+            expectThat(currentPeriod)
                 .isEqualTo(
                     ApiUsagePeriod(
                         userId = USER_ID,
@@ -369,9 +368,9 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                         endDate = currentPeriod.endDate
                     )
                 )
-            assertThat(currentPeriod.startDate.value).withMessage()
+            expectThat(currentPeriod.startDate.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(currentPeriod.endDate.value - 30.days.toJavaDuration()).withMessage()
+            expectThat(currentPeriod.endDate.value - 30.days.toJavaDuration())
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }

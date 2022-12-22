@@ -52,16 +52,11 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.Tuple
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
 import kotlin.time.Duration.Companion.days
-import org.mockito.kotlin.verify as verifyMock
 
 class ContractImportServiceTest : TestBase() {
 
@@ -336,7 +331,7 @@ class ContractImportServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some non-imported contract will be returned from contract deployment request repository") {
-            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+            call(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
                 .willReturn(NON_IMPORTED_CONTRACT)
         }
 
@@ -344,7 +339,7 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(id)
         }
 
@@ -352,7 +347,7 @@ class ContractImportServiceTest : TestBase() {
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(timestamp)
         }
 
@@ -376,7 +371,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         suppose("request will be correctly copied") {
-            given(contractDeploymentRequestRepository.store(storeParams, Constants.NIL_UUID))
+            call(contractDeploymentRequestRepository.store(storeParams, Constants.NIL_UUID))
                 .willReturn(NON_IMPORTED_CONTRACT.copy(id = id))
         }
 
@@ -395,21 +390,18 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is correctly imported") {
-            assertThat(service.importExistingContract(PARAMS, OTHER_PROJECT)).withMessage()
+            expectThat(service.importExistingContract(PARAMS, OTHER_PROJECT))
                 .isEqualTo(id)
 
-            verifyMock(contractDeploymentRequestRepository)
-                .getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID)
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID)
+                once.store(
                     params = storeParams,
                     metadataProjectId = Constants.NIL_UUID
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(id, NON_IMPORTED_CONTRACT.contractAddress!!)
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(id, NON_IMPORTED_CONTRACT.txHash!!, NON_IMPORTED_CONTRACT.deployerAddress!!)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+                once.setContractAddress(id, NON_IMPORTED_CONTRACT.contractAddress!!)
+                once.setTxInfo(id, NON_IMPORTED_CONTRACT.txHash!!, NON_IMPORTED_CONTRACT.deployerAddress!!)
+            }
         }
     }
 
@@ -418,21 +410,21 @@ class ContractImportServiceTest : TestBase() {
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("already imported contract manifest json, artifact json and info markdown will be returned") {
-            given(
+            call(
                 importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(
                     contractId = IMPORTED_CONTRACT.contractId,
                     projectId = PROJECT.id
                 )
             )
                 .willReturn(MANIFEST_JSON)
-            given(
+            call(
                 importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(
                     contractId = IMPORTED_CONTRACT.contractId,
                     projectId = PROJECT.id
                 )
             )
                 .willReturn(ARTIFACT_JSON)
-            given(
+            call(
                 importedContractDecoratorRepository.getInfoMarkdownByContractIdAndProjectId(
                     contractId = IMPORTED_CONTRACT.contractId,
                     projectId = PROJECT.id
@@ -444,7 +436,7 @@ class ContractImportServiceTest : TestBase() {
         val newContractId = ContractId("imported-${CONTRACT_ADDRESS.rawValue}-${CHAIN_ID.value}")
 
         suppose("contract decorator is not imported to other project") {
-            given(
+            call(
                 importedContractDecoratorRepository.getByContractIdAndProjectId(
                     contractId = newContractId,
                     projectId = OTHER_PROJECT.id
@@ -459,7 +451,7 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(newDecoratorId, contractMetadataId, newlyImportedContractId)
         }
 
@@ -468,7 +460,7 @@ class ContractImportServiceTest : TestBase() {
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(newDecoratorTimestamp, newlyImportedContractTimestamp)
         }
 
@@ -481,7 +473,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         suppose("contract decorator is stored for other project") {
-            given(
+            call(
                 importedContractDecoratorRepository.store(
                     id = newDecoratorId,
                     projectId = OTHER_PROJECT.id,
@@ -517,12 +509,12 @@ class ContractImportServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract will be returned from contract deployment request repository") {
-            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+            call(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
                 .willReturn(IMPORTED_CONTRACT)
         }
 
         suppose("request will be correctly copied") {
-            given(contractDeploymentRequestRepository.store(storeParams, OTHER_PROJECT.id))
+            call(contractDeploymentRequestRepository.store(storeParams, OTHER_PROJECT.id))
                 .willReturn(IMPORTED_CONTRACT.copy(id = newlyImportedContractId))
         }
 
@@ -543,11 +535,11 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is correctly imported") {
-            assertThat(service.importExistingContract(PARAMS, OTHER_PROJECT)).withMessage()
+            expectThat(service.importExistingContract(PARAMS, OTHER_PROJECT))
                 .isEqualTo(newlyImportedContractId)
 
-            verifyMock(contractMetadataRepository)
-                .createOrUpdate(
+            expectInteractions(contractMetadataRepository) {
+                once.createOrUpdate(
                     ContractMetadata(
                         id = contractMetadataId,
                         name = newDecorator.name,
@@ -558,20 +550,17 @@ class ContractImportServiceTest : TestBase() {
                         projectId = OTHER_PROJECT.id
                     )
                 )
-            verifyNoMoreInteractions(contractMetadataRepository)
+            }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID)
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID)
+                once.store(
                     params = storeParams,
                     metadataProjectId = OTHER_PROJECT.id
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(newlyImportedContractId, IMPORTED_CONTRACT.contractAddress!!)
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(newlyImportedContractId, IMPORTED_CONTRACT.txHash!!, IMPORTED_CONTRACT.deployerAddress!!)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+                once.setContractAddress(newlyImportedContractId, IMPORTED_CONTRACT.contractAddress!!)
+                once.setTxInfo(newlyImportedContractId, IMPORTED_CONTRACT.txHash!!, IMPORTED_CONTRACT.deployerAddress!!)
+            }
         }
     }
 
@@ -580,21 +569,21 @@ class ContractImportServiceTest : TestBase() {
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("already imported contract manifest json, artifact json and info markdown will be returned") {
-            given(
+            call(
                 importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(
                     contractId = IMPORTED_CONTRACT.contractId,
                     projectId = PROJECT.id
                 )
             )
                 .willReturn(MANIFEST_JSON)
-            given(
+            call(
                 importedContractDecoratorRepository.getArtifactJsonByContractIdAndProjectId(
                     contractId = IMPORTED_CONTRACT.contractId,
                     projectId = PROJECT.id
                 )
             )
                 .willReturn(ARTIFACT_JSON)
-            given(
+            call(
                 importedContractDecoratorRepository.getInfoMarkdownByContractIdAndProjectId(
                     contractId = IMPORTED_CONTRACT.contractId,
                     projectId = PROJECT.id
@@ -613,7 +602,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         suppose("contract decorator is imported to same project") {
-            given(
+            call(
                 importedContractDecoratorRepository.getByContractIdAndProjectId(
                     contractId = newContractId,
                     projectId = PROJECT.id
@@ -627,7 +616,7 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(contractMetadataId, newlyImportedContractId)
         }
 
@@ -635,7 +624,7 @@ class ContractImportServiceTest : TestBase() {
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(newlyImportedContractTimestamp)
         }
 
@@ -661,12 +650,12 @@ class ContractImportServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract will be returned from contract deployment request repository") {
-            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+            call(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
                 .willReturn(IMPORTED_CONTRACT)
         }
 
         suppose("request will be correctly copied") {
-            given(contractDeploymentRequestRepository.store(storeParams, PROJECT.id))
+            call(contractDeploymentRequestRepository.store(storeParams, PROJECT.id))
                 .willReturn(IMPORTED_CONTRACT.copy(id = newlyImportedContractId))
         }
 
@@ -687,11 +676,11 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is correctly imported") {
-            assertThat(service.importExistingContract(PARAMS, PROJECT)).withMessage()
+            expectThat(service.importExistingContract(PARAMS, PROJECT))
                 .isEqualTo(newlyImportedContractId)
 
-            verifyMock(contractMetadataRepository)
-                .createOrUpdate(
+            expectInteractions(contractMetadataRepository) {
+                once.createOrUpdate(
                     ContractMetadata(
                         id = contractMetadataId,
                         name = decorator.name,
@@ -702,20 +691,17 @@ class ContractImportServiceTest : TestBase() {
                         projectId = PROJECT.id
                     )
                 )
-            verifyNoMoreInteractions(contractMetadataRepository)
+            }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID)
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID)
+                once.store(
                     params = storeParams,
                     metadataProjectId = PROJECT.id
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(newlyImportedContractId, IMPORTED_CONTRACT.contractAddress!!)
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(newlyImportedContractId, IMPORTED_CONTRACT.txHash!!, IMPORTED_CONTRACT.deployerAddress!!)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+                once.setContractAddress(newlyImportedContractId, IMPORTED_CONTRACT.contractAddress!!)
+                once.setTxInfo(newlyImportedContractId, IMPORTED_CONTRACT.txHash!!, IMPORTED_CONTRACT.deployerAddress!!)
+            }
         }
     }
 
@@ -724,7 +710,7 @@ class ContractImportServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request repository will return null") {
-            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+            call(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
                 .willReturn(null)
         }
 
@@ -743,7 +729,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("null is returned when importing non-existent contract") {
-            assertThat(service.importExistingContract(PARAMS, PROJECT)).withMessage()
+            expectThat(service.importExistingContract(PARAMS, PROJECT))
                 .isNull()
         }
     }
@@ -753,14 +739,14 @@ class ContractImportServiceTest : TestBase() {
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator will be returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
         suppose("contract metadata exists") {
-            given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
+            call(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
                 .willReturn(true)
         }
 
@@ -768,7 +754,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
@@ -776,14 +762,14 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(id)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -804,11 +790,11 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is successfully imported") {
-            assertThat(service.importContract(PARAMS, PROJECT)).withMessage()
+            expectThat(service.importContract(PARAMS, PROJECT))
                 .isEqualTo(id)
 
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.store(
                     params = StoreContractDeploymentRequestParams(
                         id = id,
                         alias = PARAMS.alias,
@@ -829,11 +815,9 @@ class ContractImportServiceTest : TestBase() {
                     ),
                     metadataProjectId = Constants.NIL_UUID
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(id, PARAMS.contractAddress)
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(id, CONTRACT_DEPLOYMENT_TRANSACTION_INFO.hash, CONTRACT_DEPLOYMENT_TRANSACTION_INFO.from)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+                once.setContractAddress(id, PARAMS.contractAddress)
+                once.setTxInfo(id, CONTRACT_DEPLOYMENT_TRANSACTION_INFO.hash, CONTRACT_DEPLOYMENT_TRANSACTION_INFO.from)
+            }
         }
     }
 
@@ -842,7 +826,7 @@ class ContractImportServiceTest : TestBase() {
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("null will be returned for contract decorator") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(null)
         }
 
@@ -861,7 +845,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.importContract(PARAMS, PROJECT)
             }
         }
@@ -872,14 +856,14 @@ class ContractImportServiceTest : TestBase() {
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator will be returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
         suppose("contract metadata does not exist") {
-            given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
+            call(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
                 .willReturn(false)
         }
 
@@ -898,7 +882,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.importContract(PARAMS, PROJECT)
             }
         }
@@ -909,14 +893,14 @@ class ContractImportServiceTest : TestBase() {
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator will be returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
         suppose("contract metadata exists") {
-            given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
+            call(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
                 .willReturn(true)
         }
 
@@ -924,7 +908,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will not be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(null)
         }
 
@@ -943,7 +927,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("ContractNotFoundException is thrown") {
-            assertThrows<ContractNotFoundException>(message) {
+            expectThrows<ContractNotFoundException> {
                 service.importContract(PARAMS, PROJECT)
             }
         }
@@ -954,14 +938,14 @@ class ContractImportServiceTest : TestBase() {
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator will be returned") {
-            given(contractDecoratorRepository.getById(CONTRACT_ID))
+            call(contractDecoratorRepository.getById(CONTRACT_ID))
                 .willReturn(CONTRACT_DECORATOR)
         }
 
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
         suppose("contract metadata exists") {
-            given(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
+            call(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
                 .willReturn(true)
         }
 
@@ -969,7 +953,7 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.copy(data = FunctionData("ffff")))
         }
 
@@ -988,7 +972,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("ContractDecoratorBinaryMismatchException is thrown") {
-            assertThrows<ContractDecoratorBinaryMismatchException>(message) {
+            expectThrows<ContractDecoratorBinaryMismatchException> {
                 service.importContract(PARAMS, PROJECT)
             }
         }
@@ -1000,14 +984,14 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
         val contractDecompilerService = mock<ContractDecompilerService>()
 
         suppose("contract will be decompiled") {
-            given(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+            call(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = MANIFEST_JSON,
@@ -1021,7 +1005,7 @@ class ContractImportServiceTest : TestBase() {
         val contractId = ContractId("imported-${PARAMS.contractAddress.rawValue}-${PROJECT.chainId.value}")
 
         suppose("imported contract decorator does not exist in the database") {
-            given(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
+            call(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
                 .willReturn(null)
         }
 
@@ -1033,7 +1017,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         suppose("imported contract decorator will be stored into the database") {
-            given(
+            call(
                 importedContractDecoratorRepository.store(
                     id = contractDecoratorId,
                     projectId = PROJECT.id,
@@ -1053,14 +1037,14 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(contractDecoratorId, contractMetadataId, deployedContractId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -1082,11 +1066,11 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is successfully imported") {
-            assertThat(service.importContract(PARAMS.copy(contractId = null), PROJECT)).withMessage()
+            expectThat(service.importContract(PARAMS.copy(contractId = null), PROJECT))
                 .isEqualTo(deployedContractId)
 
-            verifyMock(contractMetadataRepository)
-                .createOrUpdate(
+            expectInteractions(contractMetadataRepository) {
+                once.createOrUpdate(
                     ContractMetadata(
                         id = contractMetadataId,
                         name = contractDecorator.name,
@@ -1097,10 +1081,10 @@ class ContractImportServiceTest : TestBase() {
                         projectId = PROJECT.id
                     )
                 )
-            verifyNoMoreInteractions(contractMetadataRepository)
+            }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.store(
                     params = StoreContractDeploymentRequestParams(
                         id = deployedContractId,
                         alias = PARAMS.alias,
@@ -1121,15 +1105,13 @@ class ContractImportServiceTest : TestBase() {
                     ),
                     metadataProjectId = PROJECT.id
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(deployedContractId, PARAMS.contractAddress)
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(
+                once.setContractAddress(deployedContractId, PARAMS.contractAddress)
+                once.setTxInfo(
                     id = deployedContractId,
                     txHash = CONTRACT_DEPLOYMENT_TRANSACTION_INFO.hash,
                     deployer = CONTRACT_DEPLOYMENT_TRANSACTION_INFO.from
                 )
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            }
         }
     }
 
@@ -1139,14 +1121,14 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_BINARY_INFO)
         }
 
         val contractDecompilerService = mock<ContractDecompilerService>()
 
         suppose("contract will be decompiled") {
-            given(contractDecompilerService.decompile(CONTRACT_BINARY_INFO.binary))
+            call(contractDecompilerService.decompile(CONTRACT_BINARY_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = MANIFEST_JSON,
@@ -1160,7 +1142,7 @@ class ContractImportServiceTest : TestBase() {
         val contractId = ContractId("imported-${PARAMS.contractAddress.rawValue}-${PROJECT.chainId.value}")
 
         suppose("imported contract decorator does not exist in the database") {
-            given(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
+            call(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
                 .willReturn(null)
         }
 
@@ -1172,7 +1154,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         suppose("imported contract decorator will be stored into the database") {
-            given(
+            call(
                 importedContractDecoratorRepository.store(
                     id = contractDecoratorId,
                     projectId = PROJECT.id,
@@ -1192,14 +1174,14 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(contractDecoratorId, contractMetadataId, deployedContractId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -1221,11 +1203,11 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is successfully imported") {
-            assertThat(service.importContract(PARAMS.copy(contractId = null), PROJECT)).withMessage()
+            expectThat(service.importContract(PARAMS.copy(contractId = null), PROJECT))
                 .isEqualTo(deployedContractId)
 
-            verifyMock(contractMetadataRepository)
-                .createOrUpdate(
+            expectInteractions(contractMetadataRepository) {
+                once.createOrUpdate(
                     ContractMetadata(
                         id = contractMetadataId,
                         name = contractDecorator.name,
@@ -1236,10 +1218,10 @@ class ContractImportServiceTest : TestBase() {
                         projectId = PROJECT.id
                     )
                 )
-            verifyNoMoreInteractions(contractMetadataRepository)
+            }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.store(
                     params = StoreContractDeploymentRequestParams(
                         id = deployedContractId,
                         alias = PARAMS.alias,
@@ -1260,9 +1242,8 @@ class ContractImportServiceTest : TestBase() {
                     ),
                     metadataProjectId = PROJECT.id
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(deployedContractId, PARAMS.contractAddress)
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+                once.setContractAddress(deployedContractId, PARAMS.contractAddress)
+            }
         }
     }
 
@@ -1272,14 +1253,14 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(PROJECT.chainId, PROJECT.customRpcUrl)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, PARAMS.contractAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
         val contractDecompilerService = mock<ContractDecompilerService>()
 
         suppose("contract will be decompiled") {
-            given(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+            call(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = MANIFEST_JSON,
@@ -1294,7 +1275,7 @@ class ContractImportServiceTest : TestBase() {
         val contractDecorator = CONTRACT_DECORATOR.copy(id = contractId)
 
         suppose("imported contract decorator exists in the database") {
-            given(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
+            call(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
                 .willReturn(contractDecorator)
         }
 
@@ -1303,14 +1284,14 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(contractMetadataId, deployedContractId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -1332,11 +1313,11 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is successfully imported") {
-            assertThat(service.importContract(PARAMS.copy(contractId = null), PROJECT)).withMessage()
+            expectThat(service.importContract(PARAMS.copy(contractId = null), PROJECT))
                 .isEqualTo(deployedContractId)
 
-            verifyMock(contractMetadataRepository)
-                .createOrUpdate(
+            expectInteractions(contractMetadataRepository) {
+                once.createOrUpdate(
                     ContractMetadata(
                         id = contractMetadataId,
                         name = contractDecorator.name,
@@ -1347,10 +1328,10 @@ class ContractImportServiceTest : TestBase() {
                         projectId = PROJECT.id
                     )
                 )
-            verifyNoMoreInteractions(contractMetadataRepository)
+            }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.store(
                     params = StoreContractDeploymentRequestParams(
                         id = deployedContractId,
                         alias = PARAMS.alias,
@@ -1371,15 +1352,13 @@ class ContractImportServiceTest : TestBase() {
                     ),
                     metadataProjectId = PROJECT.id
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(deployedContractId, PARAMS.contractAddress)
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(
+                once.setContractAddress(deployedContractId, PARAMS.contractAddress)
+                once.setTxInfo(
                     id = deployedContractId,
                     txHash = CONTRACT_DEPLOYMENT_TRANSACTION_INFO.hash,
                     deployer = CONTRACT_DEPLOYMENT_TRANSACTION_INFO.from
                 )
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            }
         }
     }
 
@@ -1391,23 +1370,23 @@ class ContractImportServiceTest : TestBase() {
         val params = PARAMS.copy(contractAddress = proxyAddress)
 
         suppose("proxy contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress, EVENTS))
                 .willReturn(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
         suppose("proxy contract slots will be empty") {
-            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_IMPLEMENTATION_SLOT))
+            call(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_IMPLEMENTATION_SLOT))
                 .willReturn(ZeroAddress.rawValue)
-            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, OPENZEPPELIN_SLOT))
+            call(blockchainService.readStorageSlot(chainSpec, params.contractAddress, OPENZEPPELIN_SLOT))
                 .willReturn(ZeroAddress.rawValue)
-            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_BEACON_SLOT))
+            call(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_BEACON_SLOT))
                 .willReturn(ZeroAddress.rawValue)
         }
 
         val contractDecompilerService = mock<ContractDecompilerService>()
 
         suppose("proxy contract will be decompiled") {
-            given(contractDecompilerService.decompile(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+            call(contractDecompilerService.decompile(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = PROXY_MANIFEST_JSON,
@@ -1421,7 +1400,7 @@ class ContractImportServiceTest : TestBase() {
         val encodedData = FunctionData("001122")
 
         suppose("proxy implementation function call will be encoded") {
-            given(functionEncoderService.encode("implementation", emptyList()))
+            call(functionEncoderService.encode("implementation", emptyList()))
                 .willReturn(encodedData)
         }
 
@@ -1435,7 +1414,7 @@ class ContractImportServiceTest : TestBase() {
         val implementationAddress = ContractAddress("fde333bca111")
 
         suppose("implementation contract address will be returned") {
-            given(blockchainService.callReadonlyFunction(chainSpec, readOnlyParams))
+            call(blockchainService.callReadonlyFunction(chainSpec, readOnlyParams))
                 .willReturn(
                     ReadonlyFunctionCallResult(
                         BlockNumber(BigInteger.ZERO),
@@ -1447,12 +1426,12 @@ class ContractImportServiceTest : TestBase() {
         }
 
         suppose("implementation contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
         suppose("implementation contract will be decompiled") {
-            given(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+            call(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = MANIFEST_JSON,
@@ -1466,7 +1445,7 @@ class ContractImportServiceTest : TestBase() {
         val contractId = ContractId("imported-${params.contractAddress.rawValue}-${PROJECT.chainId.value}")
 
         suppose("imported contract decorator does not exist in the database") {
-            given(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
+            call(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
                 .willReturn(null)
         }
 
@@ -1478,7 +1457,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         suppose("imported contract decorator will be stored into the database") {
-            given(
+            call(
                 importedContractDecoratorRepository.store(
                     id = contractDecoratorId,
                     projectId = PROJECT.id,
@@ -1498,14 +1477,14 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(contractDecoratorId, contractMetadataId, deployedContractId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -1527,11 +1506,11 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is successfully imported") {
-            assertThat(service.importContract(params.copy(contractId = null), PROJECT)).withMessage()
+            expectThat(service.importContract(params.copy(contractId = null), PROJECT))
                 .isEqualTo(deployedContractId)
 
-            verifyMock(contractMetadataRepository)
-                .createOrUpdate(
+            expectInteractions(contractMetadataRepository) {
+                once.createOrUpdate(
                     ContractMetadata(
                         id = contractMetadataId,
                         name = contractDecorator.name,
@@ -1542,10 +1521,10 @@ class ContractImportServiceTest : TestBase() {
                         projectId = PROJECT.id
                     )
                 )
-            verifyNoMoreInteractions(contractMetadataRepository)
+            }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.store(
                     params = StoreContractDeploymentRequestParams(
                         id = deployedContractId,
                         alias = params.alias,
@@ -1566,15 +1545,13 @@ class ContractImportServiceTest : TestBase() {
                     ),
                     metadataProjectId = PROJECT.id
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(deployedContractId, params.contractAddress)
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(
+                once.setContractAddress(deployedContractId, params.contractAddress)
+                once.setTxInfo(
                     id = deployedContractId,
                     txHash = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.hash,
                     deployer = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.from
                 )
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            }
         }
     }
 
@@ -1586,26 +1563,26 @@ class ContractImportServiceTest : TestBase() {
         val params = PARAMS.copy(contractAddress = proxyAddress)
 
         suppose("proxy contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress, EVENTS))
                 .willReturn(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
         val implementationAddress = ContractAddress("fde333bca111")
 
         suppose("proxy implementation slot will return proxy contract address") {
-            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_IMPLEMENTATION_SLOT))
+            call(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_IMPLEMENTATION_SLOT))
                 .willReturn(implementationAddress.rawValue)
         }
 
         suppose("proxy beacon contract slot will be empty") {
-            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_BEACON_SLOT))
+            call(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_BEACON_SLOT))
                 .willReturn(ZeroAddress.rawValue)
         }
 
         val contractDecompilerService = mock<ContractDecompilerService>()
 
         suppose("proxy contract will be decompiled") {
-            given(contractDecompilerService.decompile(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+            call(contractDecompilerService.decompile(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = PROXY_MANIFEST_JSON,
@@ -1616,12 +1593,12 @@ class ContractImportServiceTest : TestBase() {
         }
 
         suppose("implementation contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
         suppose("implementation contract will be decompiled") {
-            given(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+            call(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = MANIFEST_JSON,
@@ -1635,7 +1612,7 @@ class ContractImportServiceTest : TestBase() {
         val contractId = ContractId("imported-${params.contractAddress.rawValue}-${PROJECT.chainId.value}")
 
         suppose("imported contract decorator does not exist in the database") {
-            given(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
+            call(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
                 .willReturn(null)
         }
 
@@ -1647,7 +1624,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         suppose("imported contract decorator will be stored into the database") {
-            given(
+            call(
                 importedContractDecoratorRepository.store(
                     id = contractDecoratorId,
                     projectId = PROJECT.id,
@@ -1667,14 +1644,14 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(contractDecoratorId, contractMetadataId, deployedContractId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -1696,11 +1673,11 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is successfully imported") {
-            assertThat(service.importContract(params.copy(contractId = null), PROJECT)).withMessage()
+            expectThat(service.importContract(params.copy(contractId = null), PROJECT))
                 .isEqualTo(deployedContractId)
 
-            verifyMock(contractMetadataRepository)
-                .createOrUpdate(
+            expectInteractions(contractMetadataRepository) {
+                once.createOrUpdate(
                     ContractMetadata(
                         id = contractMetadataId,
                         name = contractDecorator.name,
@@ -1711,10 +1688,10 @@ class ContractImportServiceTest : TestBase() {
                         projectId = PROJECT.id
                     )
                 )
-            verifyNoMoreInteractions(contractMetadataRepository)
+            }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.store(
                     params = StoreContractDeploymentRequestParams(
                         id = deployedContractId,
                         alias = params.alias,
@@ -1735,15 +1712,13 @@ class ContractImportServiceTest : TestBase() {
                     ),
                     metadataProjectId = PROJECT.id
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(deployedContractId, params.contractAddress)
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(
+                once.setContractAddress(deployedContractId, params.contractAddress)
+                once.setTxInfo(
                     id = deployedContractId,
                     txHash = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.hash,
                     deployer = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.from
                 )
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            }
         }
     }
 
@@ -1755,28 +1730,28 @@ class ContractImportServiceTest : TestBase() {
         val params = PARAMS.copy(contractAddress = proxyAddress)
 
         suppose("proxy contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, params.contractAddress, EVENTS))
                 .willReturn(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
         suppose("proxy implementation slots will be empty") {
-            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_IMPLEMENTATION_SLOT))
+            call(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_IMPLEMENTATION_SLOT))
                 .willReturn(ZeroAddress.rawValue)
-            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, OPENZEPPELIN_SLOT))
+            call(blockchainService.readStorageSlot(chainSpec, params.contractAddress, OPENZEPPELIN_SLOT))
                 .willReturn(ZeroAddress.rawValue)
         }
 
         val beaconAddress = ContractAddress("bbb111ccc222")
 
         suppose("proxy beacon contract slot will return beacon contract address") {
-            given(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_BEACON_SLOT))
+            call(blockchainService.readStorageSlot(chainSpec, params.contractAddress, PROXY_BEACON_SLOT))
                 .willReturn(beaconAddress.rawValue)
         }
 
         val contractDecompilerService = mock<ContractDecompilerService>()
 
         suppose("proxy contract will be decompiled") {
-            given(contractDecompilerService.decompile(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+            call(contractDecompilerService.decompile(PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = PROXY_MANIFEST_JSON,
@@ -1790,7 +1765,7 @@ class ContractImportServiceTest : TestBase() {
         val encodedData = FunctionData("001122")
 
         suppose("proxy implementation function call will be encoded") {
-            given(functionEncoderService.encode("implementation", emptyList()))
+            call(functionEncoderService.encode("implementation", emptyList()))
                 .willReturn(encodedData)
         }
 
@@ -1804,7 +1779,7 @@ class ContractImportServiceTest : TestBase() {
         val implementationAddress = ContractAddress("fde333bca111")
 
         suppose("implementation contract address will be returned") {
-            given(blockchainService.callReadonlyFunction(chainSpec, readOnlyParams))
+            call(blockchainService.callReadonlyFunction(chainSpec, readOnlyParams))
                 .willReturn(
                     ReadonlyFunctionCallResult(
                         BlockNumber(BigInteger.ZERO),
@@ -1816,12 +1791,12 @@ class ContractImportServiceTest : TestBase() {
         }
 
         suppose("implementation contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, implementationAddress, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
         suppose("implementation contract will be decompiled") {
-            given(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+            call(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = MANIFEST_JSON,
@@ -1835,7 +1810,7 @@ class ContractImportServiceTest : TestBase() {
         val contractId = ContractId("imported-${params.contractAddress.rawValue}-${PROJECT.chainId.value}")
 
         suppose("imported contract decorator does not exist in the database") {
-            given(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
+            call(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, PROJECT.id))
                 .willReturn(null)
         }
 
@@ -1847,7 +1822,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         suppose("imported contract decorator will be stored into the database") {
-            given(
+            call(
                 importedContractDecoratorRepository.store(
                     id = contractDecoratorId,
                     projectId = PROJECT.id,
@@ -1867,14 +1842,14 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(contractDecoratorId, contractMetadataId, deployedContractId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -1896,11 +1871,11 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract is successfully imported") {
-            assertThat(service.importContract(params.copy(contractId = null), PROJECT)).withMessage()
+            expectThat(service.importContract(params.copy(contractId = null), PROJECT))
                 .isEqualTo(deployedContractId)
 
-            verifyMock(contractMetadataRepository)
-                .createOrUpdate(
+            expectInteractions(contractMetadataRepository) {
+                once.createOrUpdate(
                     ContractMetadata(
                         id = contractMetadataId,
                         name = contractDecorator.name,
@@ -1911,10 +1886,10 @@ class ContractImportServiceTest : TestBase() {
                         projectId = PROJECT.id
                     )
                 )
-            verifyNoMoreInteractions(contractMetadataRepository)
+            }
 
-            verifyMock(contractDeploymentRequestRepository)
-                .store(
+            expectInteractions(contractDeploymentRequestRepository) {
+                once.store(
                     params = StoreContractDeploymentRequestParams(
                         id = deployedContractId,
                         alias = params.alias,
@@ -1935,15 +1910,13 @@ class ContractImportServiceTest : TestBase() {
                     ),
                     metadataProjectId = PROJECT.id
                 )
-            verifyMock(contractDeploymentRequestRepository)
-                .setContractAddress(deployedContractId, params.contractAddress)
-            verifyMock(contractDeploymentRequestRepository)
-                .setTxInfo(
+                once.setContractAddress(deployedContractId, params.contractAddress)
+                once.setTxInfo(
                     id = deployedContractId,
                     txHash = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.hash,
                     deployer = PROXY_CONTRACT_DEPLOYMENT_TRANSACTION_INFO.from
                 )
-            verifyNoMoreInteractions(contractDeploymentRequestRepository)
+            }
         }
     }
 
@@ -1979,7 +1952,7 @@ class ContractImportServiceTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         TypeAndValue("uint", BigInteger.ONE),
@@ -2036,7 +2009,7 @@ class ContractImportServiceTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         TypeAndValue("uint[]", listOf(BigInteger.ONE, BigInteger.TWO)),
@@ -2106,7 +2079,7 @@ class ContractImportServiceTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         TypeAndValue(
@@ -2192,7 +2165,7 @@ class ContractImportServiceTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         TypeAndValue(
@@ -2357,7 +2330,7 @@ class ContractImportServiceTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         TypeAndValue(
@@ -2466,7 +2439,7 @@ class ContractImportServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some imported contract will be returned from contract deployment request repository") {
-            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+            call(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
                 .willReturn(IMPORTED_CONTRACT)
         }
 
@@ -2482,7 +2455,7 @@ class ContractImportServiceTest : TestBase() {
         val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
 
         suppose("imported contract decorator is returned") {
-            given(
+            call(
                 importedContractDecoratorRepository.getByContractIdAndProjectId(
                     contractId = contractId,
                     projectId = IMPORTED_CONTRACT.projectId
@@ -2506,7 +2479,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract import is correctly previewed") {
-            assertThat(service.previewImport(CONTRACT_ADDRESS, ChainSpec(CHAIN_ID, null))).withMessage()
+            expectThat(service.previewImport(CONTRACT_ADDRESS, ChainSpec(CHAIN_ID, null)))
                 .isEqualTo(decorator)
         }
     }
@@ -2516,7 +2489,7 @@ class ContractImportServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("some non-imported contract will be returned from contract deployment request repository") {
-            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+            call(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
                 .willReturn(NON_IMPORTED_CONTRACT)
         }
 
@@ -2532,7 +2505,7 @@ class ContractImportServiceTest : TestBase() {
         val contractDecoratorRepository = mock<ContractDecoratorRepository>()
 
         suppose("contract decorator is returned") {
-            given(contractDecoratorRepository.getById(contractId))
+            call(contractDecoratorRepository.getById(contractId))
                 .willReturn(decorator)
         }
 
@@ -2551,7 +2524,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract import is correctly previewed") {
-            assertThat(service.previewImport(CONTRACT_ADDRESS, ChainSpec(CHAIN_ID, null))).withMessage()
+            expectThat(service.previewImport(CONTRACT_ADDRESS, ChainSpec(CHAIN_ID, null)))
                 .isEqualTo(decorator)
         }
     }
@@ -2561,7 +2534,7 @@ class ContractImportServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("null will be returned from contract deployment request repository") {
-            given(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
+            call(contractDeploymentRequestRepository.getByContractAddressAndChainId(CONTRACT_ADDRESS, CHAIN_ID))
                 .willReturn(null)
         }
 
@@ -2569,14 +2542,14 @@ class ContractImportServiceTest : TestBase() {
         val chainSpec = ChainSpec(CHAIN_ID, null)
 
         suppose("contract deployment transaction will be found on blockchain") {
-            given(blockchainService.findContractDeploymentTransaction(chainSpec, CONTRACT_ADDRESS, EVENTS))
+            call(blockchainService.findContractDeploymentTransaction(chainSpec, CONTRACT_ADDRESS, EVENTS))
                 .willReturn(CONTRACT_DEPLOYMENT_TRANSACTION_INFO)
         }
 
         val contractDecompilerService = mock<ContractDecompilerService>()
 
         suppose("contract will be decompiled") {
-            given(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
+            call(contractDecompilerService.decompile(CONTRACT_DEPLOYMENT_TRANSACTION_INFO.binary))
                 .willReturn(
                     DecompiledContractJson(
                         manifest = MANIFEST_JSON,
@@ -2590,7 +2563,7 @@ class ContractImportServiceTest : TestBase() {
         val contractId = ContractId("imported-${CONTRACT_ADDRESS.rawValue}-${CHAIN_ID.value}")
 
         suppose("imported contract decorator does not exist in the database") {
-            given(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, Constants.NIL_UUID))
+            call(importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, Constants.NIL_UUID))
                 .willReturn(null)
         }
 
@@ -2602,7 +2575,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         suppose("imported contract decorator will be previewed in the database") {
-            given(
+            call(
                 importedContractDecoratorRepository.store(
                     id = contractDecoratorId,
                     projectId = Constants.NIL_UUID,
@@ -2620,14 +2593,14 @@ class ContractImportServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(contractDecoratorId)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some UTC date-time will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -2646,7 +2619,7 @@ class ContractImportServiceTest : TestBase() {
         )
 
         verify("contract import is correctly previewed") {
-            assertThat(service.previewImport(CONTRACT_ADDRESS, chainSpec)).withMessage()
+            expectThat(service.previewImport(CONTRACT_ADDRESS, chainSpec))
                 .isEqualTo(contractDecorator)
         }
     }

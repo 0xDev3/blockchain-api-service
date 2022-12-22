@@ -28,7 +28,6 @@ import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -139,7 +138,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = response.id,
@@ -172,14 +171,14 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("ERC20 lock request is correctly stored in database") {
             val storedRequest = erc20LockRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     Erc20LockRequest(
                         id = response.id,
@@ -201,7 +200,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -247,7 +246,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = response.id,
@@ -280,14 +279,14 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("ERC20 lock request is correctly stored in database") {
             val storedRequest = erc20LockRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     Erc20LockRequest(
                         id = response.id,
@@ -309,7 +308,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -430,7 +429,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = createResponse.id,
@@ -463,11 +462,11 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.lockTx.blockConfirmations)
+            expectThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.lockTx.timestamp)
+            expectThat(fetchResponse.lockTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -551,7 +550,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = createResponse.id,
@@ -585,11 +584,11 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.lockTx.blockConfirmations)
+            expectThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.lockTx.timestamp)
+            expectThat(fetchResponse.lockTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -671,7 +670,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     Erc20LockRequestsResponse(
                         listOf(
@@ -710,11 +709,11 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].lockTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].lockTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].lockTx.timestamp)
+            expectThat(fetchResponse.requests[0].lockTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -798,7 +797,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     Erc20LockRequestsResponse(
                         listOf(
@@ -837,11 +836,11 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].lockTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].lockTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].lockTx.timestamp)
+            expectThat(fetchResponse.requests[0].lockTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -908,7 +907,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         verify("transaction info is correctly attached to ERC20 lock request") {
             val storedRequest = erc20LockRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }
@@ -964,7 +963,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         verify("transaction info is not changed in database") {
             val storedRequest = erc20LockRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }

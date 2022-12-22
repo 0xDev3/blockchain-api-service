@@ -1,6 +1,6 @@
 package dev3.blockchainapiservice.features.promocodes.service
 
-import dev3.blockchainapiservice.config.PromoCodeProperties
+import dev3.blockchainapiservice.config.AdminProperties
 import dev3.blockchainapiservice.exception.AccessForbiddenException
 import dev3.blockchainapiservice.exception.PromoCodeAlreadyUsedException
 import dev3.blockchainapiservice.exception.PromoCodeExpiredException
@@ -31,7 +31,7 @@ class PromoCodeServiceImpl(
     private val apiRateLimitRepository: ApiRateLimitRepository,
     private val randomProvider: RandomProvider,
     private val utcDateTimeProvider: UtcDateTimeProvider,
-    private val promoCodeProperties: PromoCodeProperties
+    private val adminProperties: AdminProperties
 ) : PromoCodeService {
 
     companion object : KLogging() {
@@ -118,7 +118,7 @@ class PromoCodeServiceImpl(
     }
 
     private fun UserIdentifier.checkIfAllowed(message: String) {
-        if (this is UserWalletAddressIdentifier && walletAddress !in promoCodeProperties.allowedWallets) {
+        if (this is UserWalletAddressIdentifier && walletAddress !in adminProperties.wallets) {
             throw AccessForbiddenException(message)
         }
     }

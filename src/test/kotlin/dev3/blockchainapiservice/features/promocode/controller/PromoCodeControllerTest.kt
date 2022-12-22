@@ -1,4 +1,4 @@
-package dev3.blockchainapiservice.features.promo_code.controller
+package dev3.blockchainapiservice.features.promocode.controller
 
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
@@ -13,17 +13,13 @@ import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
 import java.util.UUID
 import kotlin.time.Duration.Companion.days
 import kotlin.time.toJavaDuration
-import org.mockito.kotlin.verify as verifyMock
 
 class PromoCodeControllerTest : TestBase() {
 
@@ -54,7 +50,7 @@ class PromoCodeControllerTest : TestBase() {
         val to = TestData.TIMESTAMP + 1.days
 
         suppose("some promo codes will be returned") {
-            given(service.getPromoCodes(USER_IDENTIFIER, from, to))
+            call(service.getPromoCodes(USER_IDENTIFIER, from, to))
                 .willReturn(
                     result.promoCodes.map {
                         PromoCode(
@@ -75,7 +71,7 @@ class PromoCodeControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(result))
         }
     }
@@ -93,7 +89,7 @@ class PromoCodeControllerTest : TestBase() {
         val service = mock<PromoCodeService>()
 
         suppose("some promo code will be generated") {
-            given(
+            call(
                 service.generatePromoCode(
                     userIdentifier = USER_IDENTIFIER,
                     prefix = "DEV3-",
@@ -116,7 +112,7 @@ class PromoCodeControllerTest : TestBase() {
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -134,7 +130,7 @@ class PromoCodeControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(result))
         }
     }
@@ -147,9 +143,9 @@ class PromoCodeControllerTest : TestBase() {
         verify("promo code is correctly used") {
             controller.usePromoCode(USER_IDENTIFIER, "code")
 
-            verifyMock(service)
-                .usePromoCode(USER_IDENTIFIER, "code")
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.usePromoCode(USER_IDENTIFIER, "code")
+            }
         }
     }
 }

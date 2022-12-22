@@ -25,15 +25,11 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionData
 import dev3.blockchainapiservice.util.WithTransactionData
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class Erc20LockRequestControllerTest : TestBase() {
 
@@ -80,7 +76,7 @@ class Erc20LockRequestControllerTest : TestBase() {
         val service = mock<Erc20LockRequestService>()
 
         suppose("ERC20 lock request will be created") {
-            given(service.createErc20LockRequest(params, project))
+            call(service.createErc20LockRequest(params, project))
                 .willReturn(WithFunctionData(result, data))
         }
 
@@ -102,7 +98,7 @@ class Erc20LockRequestControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         Erc20LockRequestResponse(
@@ -174,7 +170,7 @@ class Erc20LockRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 lock request will be fetched") {
-            given(service.getErc20LockRequest(id))
+            call(service.getErc20LockRequest(id))
                 .willReturn(result)
         }
 
@@ -185,7 +181,7 @@ class Erc20LockRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         Erc20LockRequestResponse(
@@ -258,7 +254,7 @@ class Erc20LockRequestControllerTest : TestBase() {
         )
 
         suppose("some ERC20 lock requests will be fetched by project ID") {
-            given(service.getErc20LockRequestsByProjectId(projectId))
+            call(service.getErc20LockRequestsByProjectId(projectId))
                 .willReturn(listOf(result))
         }
 
@@ -269,7 +265,7 @@ class Erc20LockRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         Erc20LockRequestsResponse(
@@ -323,10 +319,9 @@ class Erc20LockRequestControllerTest : TestBase() {
         }
 
         verify("transaction info is correctly attached") {
-            verifyMock(service)
-                .attachTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
-
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.attachTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
+            }
         }
     }
 }

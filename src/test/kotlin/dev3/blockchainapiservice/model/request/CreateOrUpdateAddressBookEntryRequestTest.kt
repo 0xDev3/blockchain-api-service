@@ -2,7 +2,6 @@ package dev3.blockchainapiservice.model.request
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.validation.ValidationConstants
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -42,14 +41,14 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with too long alias is marked as invalid") {
             val violations = validator.validate(requestWithTooLongAlias).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo(
                     "value must be between 3 and 256 characters long and contain only" +
                         " letters, digits and characters '-', '_', '.', '/'",
                 )
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("alias")
         }
 
@@ -65,14 +64,14 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with too short alias is marked as invalid") {
             val violations = validator.validate(requestWithTooShortAlias).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo(
                     "value must be between 3 and 256 characters long and contain only" +
                         " letters, digits and characters '-', '_', '.', '/'",
                 )
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("alias")
         }
 
@@ -88,14 +87,14 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with invalid alias is marked as invalid") {
             val violations = validator.validate(requestWithInvalidAlias).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo(
                     "value must be between 3 and 256 characters long and contain only" +
                         " letters, digits and characters '-', '_', '.', '/'",
                 )
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("alias")
         }
 
@@ -111,7 +110,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with valid alias is marked as valid") {
             val violations = validator.validate(requestWithValidAlias).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -130,11 +129,11 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with invalid address is marked as invalid") {
             val violations = validator.validate(requestWithInvalidAddress).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("value must be a valid Ethereum address")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("address")
         }
 
@@ -150,7 +149,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with valid address is marked as valid") {
             val violations = validator.validate(requestWithValidLengthString).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -169,11 +168,11 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with too long string is marked as invalid") {
             val violations = validator.validate(requestWithTooLongString).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("phoneNumber")
         }
 
@@ -189,7 +188,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with valid length string is marked as valid") {
             val violations = validator.validate(requestWithValidLengthString).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }
@@ -208,11 +207,11 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with too long string is marked as invalid") {
             val violations = validator.validate(requestWithTooLongString).toList()
 
-            assertThat(violations.size).withMessage()
+            expectThat(violations.size)
                 .isOne()
-            assertThat(violations[0].message).withMessage()
+            expectThat(violations[0].message)
                 .isEqualTo("size must be between 0 and ${ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH}")
-            assertThat(violations[0].propertyPath.toString()).withMessage()
+            expectThat(violations[0].propertyPath.toString())
                 .isEqualTo("email")
         }
 
@@ -228,7 +227,7 @@ class CreateOrUpdateAddressBookEntryRequestTest : TestBase() {
         verify("request with valid length string is marked as valid") {
             val violations = validator.validate(requestWithValidLengthString).toList()
 
-            assertThat(violations).withMessage()
+            expectThat(violations)
                 .isEmpty()
         }
     }

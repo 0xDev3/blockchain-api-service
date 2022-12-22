@@ -8,9 +8,7 @@ import dev3.blockchainapiservice.config.ChainProperties
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.exception.UnsupportedChainIdException
 import dev3.blockchainapiservice.util.ChainId
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class ChainPropertiesHandlerTest : TestBase() {
 
@@ -40,7 +38,7 @@ class ChainPropertiesHandlerTest : TestBase() {
 
         verify("chain properties with services are correctly created") {
             val chainProperties = chainPropertiesHandler.getBlockchainProperties(CHAIN_ID.toSpec())
-            assertThat(chainProperties.web3j).withMessage().isNotNull()
+            expectThat(chainProperties.web3j).isNotNull()
         }
     }
 
@@ -57,7 +55,7 @@ class ChainPropertiesHandlerTest : TestBase() {
                     customRpcUrl = "http://localhost:1234/"
                 )
             )
-            assertThat(chainProperties.web3j).withMessage().isNotNull()
+            expectThat(chainProperties.web3j).isNotNull()
         }
     }
 
@@ -79,7 +77,7 @@ class ChainPropertiesHandlerTest : TestBase() {
                     customRpcUrl = null
                 )
             )
-            assertThat(chainProperties.web3j).withMessage().isNotNull()
+            expectThat(chainProperties.web3j).isNotNull()
         }
     }
 
@@ -90,10 +88,10 @@ class ChainPropertiesHandlerTest : TestBase() {
         }
 
         verify("InternalException is thrown") {
-            val exception = assertThrows<UnsupportedChainIdException>(message) {
+            val exception = expectThrows<UnsupportedChainIdException> {
                 chainPropertiesHandler.getBlockchainProperties(ChainId(-1).toSpec())
             }
-            assertThat(exception.errorCode).withMessage().isEqualTo(ErrorCode.UNSUPPORTED_CHAIN_ID)
+            expectThat(exception.errorCode).isEqualTo(ErrorCode.UNSUPPORTED_CHAIN_ID)
         }
     }
 
@@ -112,7 +110,7 @@ class ChainPropertiesHandlerTest : TestBase() {
         verify("correct RPC URL is returned") {
             val chainProperties = applicationProperties.chain[CHAIN_ID]!!
             val rpc = chainPropertiesHandler.getChainRpcUrl(chainProperties)
-            assertThat(rpc).withMessage().isEqualTo(chainProperties.rpcUrl)
+            expectThat(rpc).isEqualTo(chainProperties.rpcUrl)
         }
     }
 
@@ -131,7 +129,7 @@ class ChainPropertiesHandlerTest : TestBase() {
         verify("correct RPC URL is returned") {
             val chainProperties = applicationProperties.chain[CHAIN_ID]!!
             val rpc = chainPropertiesHandler.getChainRpcUrl(chainProperties)
-            assertThat(rpc).withMessage().isEqualTo(chainProperties.rpcUrl)
+            expectThat(rpc).isEqualTo(chainProperties.rpcUrl)
         }
     }
 
@@ -151,7 +149,7 @@ class ChainPropertiesHandlerTest : TestBase() {
         verify("correct Infura RPC URL is returned") {
             val chainProperties = applicationProperties.chain[CHAIN_ID]!!
             val rpc = chainPropertiesHandler.getChainRpcUrl(chainProperties)
-            assertThat(rpc).withMessage().isEqualTo(chainProperties.infuraUrl + infuraId)
+            expectThat(rpc).isEqualTo(chainProperties.infuraUrl + infuraId)
         }
     }
 

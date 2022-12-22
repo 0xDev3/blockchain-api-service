@@ -13,9 +13,7 @@ import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.http.ResponseEntity
 import java.util.UUID
@@ -61,14 +59,14 @@ class ApiUsageControllerTest : TestBase() {
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
 
         suppose("some api usage will be returned") {
-            given(apiRateLimitRepository.getCurrentApiUsagePeriod(USER_IDENTIFIER.id, TestData.TIMESTAMP))
+            call(apiRateLimitRepository.getCurrentApiUsagePeriod(USER_IDENTIFIER.id, TestData.TIMESTAMP))
                 .willReturn(API_USAGE_PERIOD)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -79,7 +77,7 @@ class ApiUsageControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(RESPONSE)
         }
     }
@@ -89,14 +87,14 @@ class ApiUsageControllerTest : TestBase() {
         val apiRateLimitRepository = mock<ApiRateLimitRepository>()
 
         suppose("some api usage will be returned") {
-            given(apiRateLimitRepository.getCurrentApiUsagePeriod(USER_IDENTIFIER.id, TestData.TIMESTAMP))
+            call(apiRateLimitRepository.getCurrentApiUsagePeriod(USER_IDENTIFIER.id, TestData.TIMESTAMP))
                 .willReturn(API_USAGE_PERIOD)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -107,7 +105,7 @@ class ApiUsageControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(RESPONSE)
         }
     }

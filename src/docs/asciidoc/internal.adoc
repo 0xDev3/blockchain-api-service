@@ -54,3 +54,10 @@ All endpoints require `Authorization: Bearer JWT` header.
 include::src/docs/asciidoc/promo-codes/fetch.adoc[]
 include::src/docs/asciidoc/promo-codes/generate.adoc[]
 include::src/docs/asciidoc/promo-codes/use.adoc[]
+
+== Blacklist API
+All endpoints require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/blacklist/fetch.adoc[]
+include::src/docs/asciidoc/blacklist/add.adoc[]
+include::src/docs/asciidoc/blacklist/remove.adoc[]
