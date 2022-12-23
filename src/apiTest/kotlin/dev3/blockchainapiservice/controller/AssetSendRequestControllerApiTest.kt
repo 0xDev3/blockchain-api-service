@@ -571,7 +571,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.MISSING_TOKEN_ADDRESS)
+            expectResponseErrorCode(response, ErrorCode.MISSING_TOKEN_ADDRESS)
         }
     }
 
@@ -609,7 +609,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TOKEN_ADDRESS_NOT_ALLOWED)
+            expectResponseErrorCode(response, ErrorCode.TOKEN_ADDRESS_NOT_ALLOWED)
         }
     }
 
@@ -646,7 +646,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
+            expectResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 
@@ -1105,7 +1105,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -1938,7 +1938,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
+            expectResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
         verify("transaction info is not changed in database") {

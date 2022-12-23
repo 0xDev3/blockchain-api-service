@@ -322,7 +322,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -358,7 +358,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -394,7 +394,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -430,7 +430,7 @@ class ContractDecoratorControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 }

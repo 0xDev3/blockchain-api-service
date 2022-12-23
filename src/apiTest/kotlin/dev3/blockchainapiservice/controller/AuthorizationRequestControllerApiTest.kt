@@ -281,7 +281,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
+            expectResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 
@@ -466,7 +466,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -565,7 +565,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.SIGNED_MESSAGE_ALREADY_SET)
+            expectResponseErrorCode(response, ErrorCode.SIGNED_MESSAGE_ALREADY_SET)
         }
 
         verify("signed message is not changed in database") {

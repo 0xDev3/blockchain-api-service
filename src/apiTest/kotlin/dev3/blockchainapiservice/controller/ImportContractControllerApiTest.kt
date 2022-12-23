@@ -1215,7 +1215,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -1250,7 +1250,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_NOT_FOUND)
         }
     }
 
@@ -1297,7 +1297,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_BINARY_MISMATCH)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_BINARY_MISMATCH)
         }
     }
 
@@ -1555,7 +1555,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
         }
     }
 
@@ -1624,7 +1624,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
         }
     }
 
@@ -1951,7 +1951,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
         }
     }
 
@@ -2020,7 +2020,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
         }
     }
 }
