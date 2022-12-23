@@ -5,6 +5,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
+import dev3.blockchainapiservice.generated.jooq.tables.ContractArbitraryCallRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.Erc20LockRequestTable
@@ -34,6 +35,7 @@ class JooqUserIdResolverRepository(private val dslContext: DSLContext) : UserIdR
             IdType.AUTHORIZATION_REQUEST_ID -> AuthorizationRequestTable.run { ID.select(id, PROJECT_ID) }
             IdType.CONTRACT_DEPLOYMENT_REQUEST_ID -> ContractDeploymentRequestTable.run { ID.select(id, PROJECT_ID) }
             IdType.FUNCTION_CALL_REQUEST_ID -> ContractFunctionCallRequestTable.run { ID.select(id, PROJECT_ID) }
+            IdType.ARBITRARY_CALL_REQUEST_ID -> ContractArbitraryCallRequestTable.run { ID.select(id, PROJECT_ID) }
             IdType.ERC20_LOCK_REQUEST_ID -> Erc20LockRequestTable.run { ID.select(id, PROJECT_ID) }
         }
 

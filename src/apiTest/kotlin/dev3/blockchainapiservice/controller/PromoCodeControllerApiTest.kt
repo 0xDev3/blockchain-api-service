@@ -174,7 +174,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isForbidden)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
+            expectResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
         }
     }
 
@@ -319,7 +319,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isForbidden)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
+            expectResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
         }
     }
 
@@ -385,7 +385,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -408,7 +408,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.PROMO_CODE_EXPIRED)
+            expectResponseErrorCode(response, ErrorCode.PROMO_CODE_EXPIRED)
         }
     }
 
@@ -438,7 +438,7 @@ class PromoCodeControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.PROMO_CODE_ALREADY_USED)
+            expectResponseErrorCode(response, ErrorCode.PROMO_CODE_ALREADY_USED)
         }
     }
 }

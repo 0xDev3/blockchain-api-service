@@ -626,7 +626,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                 afterActionMessage = screenAfterActionMessage
             ),
             callerAddress = callerAddress,
-            txHash = txHash,
+            txHash = txHash
         )
 
     private fun models(vararg records: List<ContractFunctionCallRequestRecord>): List<ContractFunctionCallRequest> =

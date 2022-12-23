@@ -57,7 +57,7 @@ class ControllerTestBase : TestBase() {
             .build()
     }
 
-    protected fun VerifyMessage.verifyResponseErrorCode(result: MvcResult, expectedErrorCode: ErrorCode) {
+    protected fun VerifyMessage.expectResponseErrorCode(result: MvcResult, expectedErrorCode: ErrorCode) {
         val response: ErrorResponse = objectMapper.readValue(result.response.contentAsString)
 
         expectThat(response.errorCode)
