@@ -8,6 +8,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.AssetBalanceReque
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetMultiSendRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetSendRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.AuthorizationRequestRecord
+import dev3.blockchainapiservice.generated.jooq.tables.records.ContractArbitraryCallRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractFunctionCallRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
@@ -24,6 +25,7 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.DurationSeconds
+import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
@@ -87,6 +89,7 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
         private const val DEPLOY_SCREEN_AFTER_ACTION_MESSAGE = "deploy-screen-after-action-message"
         private val CONTRACT_ADDRESS = ContractAddress("1337")
         private val DEPLOYER_ADDRESS = WalletAddress("123")
+        private val FUNCTION_DATA = FunctionData("00")
         private const val FUNCTION_NAME = "balanceOf"
         private val ETH_AMOUNT = Balance(BigInteger("10000"))
         private val CALLER_ADDRESS = WalletAddress("123")
@@ -345,6 +348,39 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
 
         verify("correct userId is returned") {
             expectThat(repository.getUserId(IdType.FUNCTION_CALL_REQUEST_ID, id))
+                .isEqualTo(USER_ID)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReturnUserIdForContractArbitraryCallRequest() {
+        val id = UUID.randomUUID()
+
+        suppose("some contract arbitrary call request exists in database") {
+            dslContext.executeInsert(
+                ContractArbitraryCallRequestRecord(
+                    id = id,
+                    deployedContractId = null,
+                    contractAddress = CONTRACT_ADDRESS,
+                    functionData = FUNCTION_DATA,
+                    functionName = FUNCTION_NAME,
+                    functionParams = TestData.EMPTY_JSON_ARRAY,
+                    ethAmount = ETH_AMOUNT,
+                    chainId = CHAIN_ID,
+                    redirectUrl = REDIRECT_URL,
+                    projectId = PROJECT_ID,
+                    createdAt = TestData.TIMESTAMP,
+                    arbitraryData = ARBITRARY_DATA,
+                    screenBeforeActionMessage = SCREEN_BEFORE_ACTION_MESSAGE,
+                    screenAfterActionMessage = SCREEN_AFTER_ACTION_MESSAGE,
+                    callerAddress = CALLER_ADDRESS,
+                    txHash = TX_HASH
+                )
+            )
+        }
+
+        verify("correct userId is returned") {
+            expectThat(repository.getUserId(IdType.ARBITRARY_CALL_REQUEST_ID, id))
                 .isEqualTo(USER_ID)
         }
     }

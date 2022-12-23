@@ -10,6 +10,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTabl
 import dev3.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.BlacklistedAddressTable
+import dev3.blockchainapiservice.generated.jooq.tables.ContractArbitraryCallRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractDeploymentTransactionCacheTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
@@ -43,6 +44,7 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
             deleteFrom(AssetSendRequestTable).execute()
             deleteFrom(AssetMultiSendRequestTable).execute()
             deleteFrom(ContractFunctionCallRequestTable).execute()
+            deleteFrom(ContractArbitraryCallRequestTable).execute()
             deleteFrom(ContractDeploymentRequestTable).execute()
             deleteFrom(ContractMetadataTable).execute()
             deleteFrom(Erc20LockRequestTable).execute()

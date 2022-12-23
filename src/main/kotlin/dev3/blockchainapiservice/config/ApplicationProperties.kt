@@ -76,7 +76,8 @@ data class MetaPixelProperties(
 @ConfigurationProperties(prefix = "blockchain-api-service.contract-manifest-service")
 data class ContractManifestServiceProperties(
     val baseUrl: String?,
-    val decompileContractPath: String = "/decompile-contract"
+    val decompileContractPath: String = "/decompile-contract",
+    val functionSignaturePath: String = "/function-signature/{signature}"
 )
 
 @ConstructorBinding
