@@ -125,7 +125,7 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.BAD_AUTHENTICATION)
+            expectResponseErrorCode(response, ErrorCode.BAD_AUTHENTICATION)
         }
     }
 
@@ -172,7 +172,7 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
+            expectResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 }

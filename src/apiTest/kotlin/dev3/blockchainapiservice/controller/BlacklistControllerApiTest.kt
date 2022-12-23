@@ -57,7 +57,7 @@ class BlacklistControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isForbidden)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
+            expectResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
         }
     }
 
@@ -91,7 +91,7 @@ class BlacklistControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isForbidden)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
+            expectResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
         }
     }
 
@@ -130,7 +130,7 @@ class BlacklistControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isForbidden)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
+            expectResponseErrorCode(response, ErrorCode.ACCESS_FORBIDDEN)
         }
     }
 }
