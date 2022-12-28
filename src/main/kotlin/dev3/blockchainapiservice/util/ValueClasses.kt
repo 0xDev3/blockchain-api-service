@@ -181,6 +181,8 @@ value class InterfaceId private constructor(val value: String) {
     companion object {
         operator fun invoke(value: String) = InterfaceId(value.replace('/', '.').lowercase())
     }
+
+    fun isImported() = value.contains("imported")
 }
 
 @JvmInline
