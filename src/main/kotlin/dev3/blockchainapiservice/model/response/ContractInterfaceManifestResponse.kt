@@ -19,8 +19,8 @@ data class ContractInterfaceManifestResponse(
         name = manifest.name,
         description = manifest.description,
         tags = manifest.tags.toList(),
-        eventDecorators = manifest.eventDecorators,
-        functionDecorators = manifest.functionDecorators
+        eventDecorators = manifest.matchingEventDecorators,
+        functionDecorators = manifest.matchingFunctionDecorators
     )
 
     constructor(id: InterfaceId, manifest: InterfaceManifestJson) : this(
