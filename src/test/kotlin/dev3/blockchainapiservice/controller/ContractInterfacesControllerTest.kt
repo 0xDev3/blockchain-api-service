@@ -26,8 +26,8 @@ class ContractInterfacesControllerTest : TestBase() {
             name = "name",
             description = "description",
             tags = emptySet(),
-            eventDecorators = emptyList(),
-            functionDecorators = emptyList()
+            matchingEventDecorators = emptyList(),
+            matchingFunctionDecorators = emptyList()
         )
 
         suppose("some contract interfaces will be fetched") {
@@ -52,8 +52,8 @@ class ContractInterfacesControllerTest : TestBase() {
                                     name = result.name,
                                     description = result.description,
                                     tags = result.tags.toList(),
-                                    eventDecorators = result.eventDecorators,
-                                    functionDecorators = result.functionDecorators
+                                    eventDecorators = result.matchingEventDecorators,
+                                    functionDecorators = result.matchingFunctionDecorators
                                 )
                             )
                         )

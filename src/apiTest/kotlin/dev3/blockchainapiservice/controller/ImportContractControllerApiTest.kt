@@ -21,11 +21,11 @@ import dev3.blockchainapiservice.model.json.TypeDecorator
 import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponseType
 import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.ImportPreviewResponse
+import dev3.blockchainapiservice.model.response.SuggestedContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractConstructor
 import dev3.blockchainapiservice.model.result.ContractDecorator
@@ -1357,16 +1357,18 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(response.response.contentAsString, ContractInterfaceManifestsResponse::class.java)
+            objectMapper.readValue(
+                response.response.contentAsString,
+                SuggestedContractInterfaceManifestsResponse::class.java
+            )
         }
 
         verify("correct interface manifests are returned") {
             expectThat(suggestedInterfacesResponse)
                 .isEqualTo(
-                    ContractInterfaceManifestsResponse(
-                        listOf(
-                            ContractInterfaceManifestResponse(interfaceId, CONTRACT_INTERFACE)
-                        )
+                    SuggestedContractInterfaceManifestsResponse(
+                        manifests = listOf(ContractInterfaceManifestResponse(interfaceId, CONTRACT_INTERFACE)),
+                        bestMatchingInterfaces = listOf(interfaceId.value)
                     )
                 )
         }

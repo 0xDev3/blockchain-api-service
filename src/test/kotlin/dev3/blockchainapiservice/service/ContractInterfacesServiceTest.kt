@@ -15,6 +15,7 @@ import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.model.result.MatchingContractInterfaces
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.repository.ContractMetadataRepository
@@ -129,6 +130,131 @@ class ContractInterfacesServiceTest : TestBase() {
             deployedLinkReferences = null
         )
         private val EMPTY_CONTRACT_INTERFACE = InterfaceManifestJson(null, null, emptySet(), emptyList(), emptyList())
+        private val MULTI_FUNCTION_MANIFEST_JSON = ManifestJson(
+            name = "name",
+            description = "description",
+            tags = emptySet(),
+            implements = setOf("already-implemented"),
+            eventDecorators = listOf(
+                EventDecorator(
+                    signature = "Event(string)",
+                    name = "name",
+                    description = "description",
+                    parameterDecorators = emptyList()
+                )
+            ),
+            constructorDecorators = emptyList(),
+            functionDecorators = listOf(
+                FunctionDecorator(
+                    signature = "function(string)",
+                    name = "name",
+                    description = "description",
+                    parameterDecorators = emptyList(),
+                    returnDecorators = emptyList(),
+                    emittableEvents = emptyList(),
+                    readOnly = false
+                ),
+                FunctionDecorator(
+                    signature = "another(address)",
+                    name = "another",
+                    description = "another description",
+                    parameterDecorators = emptyList(),
+                    returnDecorators = emptyList(),
+                    emittableEvents = emptyList(),
+                    readOnly = false
+                ),
+                FunctionDecorator(
+                    signature = "test(uint,int)",
+                    name = "test",
+                    description = "test fn description",
+                    parameterDecorators = emptyList(),
+                    returnDecorators = emptyList(),
+                    emittableEvents = emptyList(),
+                    readOnly = false
+                )
+            )
+        )
+        private val MULTI_FUNCTION_ARTIFACT_JSON = ArtifactJson(
+            contractName = "Name",
+            sourceName = "Name.sol",
+            abi = listOf(
+                AbiObject(
+                    anonymous = null,
+                    inputs = listOf(
+                        AbiInputOutput(
+                            components = null,
+                            internalType = "string",
+                            name = "arg0",
+                            type = "string",
+                            indexed = null
+                        )
+                    ),
+                    outputs = emptyList(),
+                    stateMutability = null,
+                    name = "Event",
+                    type = "event"
+                ),
+                AbiObject(
+                    anonymous = null,
+                    inputs = listOf(
+                        AbiInputOutput(
+                            components = null,
+                            internalType = "string",
+                            name = "arg0",
+                            type = "string",
+                            indexed = null
+                        )
+                    ),
+                    outputs = emptyList(),
+                    stateMutability = null,
+                    name = "function",
+                    type = "function"
+                ),
+                AbiObject(
+                    anonymous = null,
+                    inputs = listOf(
+                        AbiInputOutput(
+                            components = null,
+                            internalType = "address",
+                            name = "arg0",
+                            type = "address",
+                            indexed = null
+                        )
+                    ),
+                    outputs = emptyList(),
+                    stateMutability = null,
+                    name = "another",
+                    type = "function"
+                ),
+                AbiObject(
+                    anonymous = null,
+                    inputs = listOf(
+                        AbiInputOutput(
+                            components = null,
+                            internalType = "uint",
+                            name = "arg0",
+                            type = "uint",
+                            indexed = null
+                        ),
+                        AbiInputOutput(
+                            components = null,
+                            internalType = "int",
+                            name = "arg0",
+                            type = "int",
+                            indexed = null
+                        )
+                    ),
+                    outputs = emptyList(),
+                    stateMutability = null,
+                    name = "test",
+                    type = "function"
+                )
+            ),
+            bytecode = "",
+            deployedBytecode = "",
+            linkReferences = null,
+            deployedLinkReferences = null
+        )
     }
 
     @Test
@@ -149,16 +275,16 @@ class ContractInterfacesServiceTest : TestBase() {
                             name = "Already Implemented",
                             description = "Already Implemented",
                             tags = emptySet(),
-                            eventDecorators = MANIFEST_JSON.eventDecorators,
-                            functionDecorators = emptyList()
+                            matchingEventDecorators = MANIFEST_JSON.eventDecorators,
+                            matchingFunctionDecorators = emptyList()
                         ),
                         InterfaceManifestJsonWithId(
                             id = InterfaceId("not-yet-implemented"),
                             name = "Not Yet Implemented",
                             description = "Not Yet Implemented",
                             tags = emptySet(),
-                            eventDecorators = emptyList(),
-                            functionDecorators = MANIFEST_JSON.functionDecorators
+                            matchingEventDecorators = emptyList(),
+                            matchingFunctionDecorators = MANIFEST_JSON.functionDecorators
                         )
                     )
                 )
@@ -230,16 +356,16 @@ class ContractInterfacesServiceTest : TestBase() {
                             name = "Already Implemented",
                             description = "Already Implemented",
                             tags = emptySet(),
-                            eventDecorators = MANIFEST_JSON.eventDecorators,
-                            functionDecorators = emptyList()
+                            matchingEventDecorators = MANIFEST_JSON.eventDecorators,
+                            matchingFunctionDecorators = emptyList()
                         ),
                         InterfaceManifestJsonWithId(
                             id = InterfaceId("not-yet-implemented"),
                             name = "Not Yet Implemented",
                             description = "Not Yet Implemented",
                             tags = emptySet(),
-                            eventDecorators = emptyList(),
-                            functionDecorators = MANIFEST_JSON.functionDecorators
+                            matchingEventDecorators = emptyList(),
+                            matchingFunctionDecorators = MANIFEST_JSON.functionDecorators
                         )
                     )
                 )
@@ -255,14 +381,154 @@ class ContractInterfacesServiceTest : TestBase() {
         verify("correct interfaces are suggested") {
             expectThat(service.getSuggestedInterfacesForImportedSmartContract(ID))
                 .isEqualTo(
+                    MatchingContractInterfaces(
+                        listOf(
+                            InterfaceManifestJsonWithId(
+                                id = InterfaceId("not-yet-implemented"),
+                                name = "Not Yet Implemented",
+                                description = "Not Yet Implemented",
+                                tags = emptySet(),
+                                matchingEventDecorators = emptyList(),
+                                matchingFunctionDecorators = MANIFEST_JSON.functionDecorators
+                            )
+                        ),
+                        listOf(InterfaceId("not-yet-implemented"))
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlySuggestInterfacesByPriorityForImportedContract() {
+        val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
+
+        suppose("some imported contract deployment request will be returned") {
+            call(contractDeploymentRequestRepository.getById(ID))
+                .willReturn(CONTRACT_DEPLOYMENT_REQUEST)
+        }
+
+        val importedContractDecoratorRepository = mock<ImportedContractDecoratorRepository>()
+
+        suppose("some imported contract manifest will be returned") {
+            call(importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(CONTRACT_ID, PROJECT_ID))
+                .willReturn(MULTI_FUNCTION_MANIFEST_JSON)
+        }
+
+        val contractInterfacesRepository = mock<ContractInterfacesRepository>()
+
+        suppose("some partially matching contract interfaces will be returned") {
+            call(
+                contractInterfacesRepository.getAllWithPartiallyMatchingInterfaces(
+                    abiFunctionSignatures = setOf("function(string)", "another(address)", "test(uint,int)"),
+                    abiEventSignatures = setOf("Event(string)")
+                )
+            )
+                .willReturn(
                     listOf(
                         InterfaceManifestJsonWithId(
-                            id = InterfaceId("not-yet-implemented"),
-                            name = "Not Yet Implemented",
-                            description = "Not Yet Implemented",
+                            id = InterfaceId("already-implemented"),
+                            name = "Already Implemented",
+                            description = "Already Implemented",
                             tags = emptySet(),
-                            eventDecorators = emptyList(),
-                            functionDecorators = MANIFEST_JSON.functionDecorators
+                            matchingEventDecorators = MULTI_FUNCTION_MANIFEST_JSON.eventDecorators,
+                            matchingFunctionDecorators = emptyList()
+                        ),
+                        InterfaceManifestJsonWithId(
+                            id = InterfaceId("best-matching"),
+                            name = "Best matching",
+                            description = "Best matching",
+                            tags = emptySet(),
+                            matchingEventDecorators = MULTI_FUNCTION_MANIFEST_JSON.eventDecorators,
+                            matchingFunctionDecorators = MULTI_FUNCTION_MANIFEST_JSON.functionDecorators.filterNot {
+                                it.name == "test"
+                            }
+                        ),
+                        InterfaceManifestJsonWithId(
+                            id = InterfaceId("second-best-matching-with-overlap"),
+                            name = "Second-best matching with overlap",
+                            description = "Second-best matching with overlap",
+                            tags = emptySet(),
+                            matchingEventDecorators = emptyList(),
+                            matchingFunctionDecorators = MULTI_FUNCTION_MANIFEST_JSON.functionDecorators.filterNot {
+                                it.name == "another"
+                            }
+                        ),
+                        InterfaceManifestJsonWithId(
+                            id = InterfaceId("empty"),
+                            name = "Empty",
+                            description = "Empty",
+                            tags = emptySet(),
+                            matchingEventDecorators = emptyList(),
+                            matchingFunctionDecorators = emptyList()
+                        ),
+                        InterfaceManifestJsonWithId(
+                            id = InterfaceId("least-matching"),
+                            name = "Least matching",
+                            description = "Least matching",
+                            tags = emptySet(),
+                            matchingEventDecorators = emptyList(),
+                            matchingFunctionDecorators = MULTI_FUNCTION_MANIFEST_JSON.functionDecorators.filter {
+                                it.name == "test"
+                            }
+                        )
+                    )
+                )
+        }
+
+        val service = ContractInterfacesServiceImpl(
+            contractDeploymentRequestRepository = contractDeploymentRequestRepository,
+            importedContractDecoratorRepository = importedContractDecoratorRepository,
+            contractInterfacesRepository = contractInterfacesRepository,
+            contractMetadataRepository = mock()
+        )
+
+        verify("correct interfaces are suggested") {
+            expectThat(service.getSuggestedInterfacesForImportedSmartContract(ID))
+                .isEqualTo(
+                    MatchingContractInterfaces(
+                        listOf(
+                            InterfaceManifestJsonWithId(
+                                id = InterfaceId("best-matching"),
+                                name = "Best matching",
+                                description = "Best matching",
+                                tags = emptySet(),
+                                matchingEventDecorators = MULTI_FUNCTION_MANIFEST_JSON.eventDecorators,
+                                matchingFunctionDecorators = MULTI_FUNCTION_MANIFEST_JSON.functionDecorators.filterNot {
+                                    it.name == "test"
+                                }
+                            ),
+                            InterfaceManifestJsonWithId(
+                                id = InterfaceId("second-best-matching-with-overlap"),
+                                name = "Second-best matching with overlap",
+                                description = "Second-best matching with overlap",
+                                tags = emptySet(),
+                                matchingEventDecorators = emptyList(),
+                                matchingFunctionDecorators = MULTI_FUNCTION_MANIFEST_JSON.functionDecorators.filterNot {
+                                    it.name == "another"
+                                }
+                            ),
+                            InterfaceManifestJsonWithId(
+                                id = InterfaceId("least-matching"),
+                                name = "Least matching",
+                                description = "Least matching",
+                                tags = emptySet(),
+                                matchingEventDecorators = emptyList(),
+                                matchingFunctionDecorators = MULTI_FUNCTION_MANIFEST_JSON.functionDecorators.filter {
+                                    it.name == "test"
+                                }
+                            ),
+                            InterfaceManifestJsonWithId(
+                                id = InterfaceId("empty"),
+                                name = "Empty",
+                                description = "Empty",
+                                tags = emptySet(),
+                                matchingEventDecorators = emptyList(),
+                                matchingFunctionDecorators = emptyList()
+                            )
+                        ),
+                        listOf(
+                            InterfaceId("best-matching"),
+                            InterfaceId("least-matching")
                         )
                     )
                 )

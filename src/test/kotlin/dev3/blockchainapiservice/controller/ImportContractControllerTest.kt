@@ -13,11 +13,12 @@ import dev3.blockchainapiservice.model.request.ImportContractRequest
 import dev3.blockchainapiservice.model.request.ImportedContractInterfacesRequest
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.ImportPreviewResponse
+import dev3.blockchainapiservice.model.response.SuggestedContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.model.result.MatchingContractInterfaces
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.service.ContractDeploymentRequestService
 import dev3.blockchainapiservice.service.ContractImportService
@@ -236,15 +237,20 @@ class ImportContractControllerTest : TestBase() {
             name = "name",
             description = "description",
             tags = emptySet(),
-            eventDecorators = emptyList(),
-            functionDecorators = emptyList()
+            matchingEventDecorators = emptyList(),
+            matchingFunctionDecorators = emptyList()
         )
 
         val contractInterfacesService = mock<ContractInterfacesService>()
 
         suppose("some interfaces are suggested") {
             call(contractInterfacesService.getSuggestedInterfacesForImportedSmartContract(id))
-                .willReturn(listOf(result))
+                .willReturn(
+                    MatchingContractInterfaces(
+                        manifests = listOf(result),
+                        bestMatchingInterfaces = listOf(result.id)
+                    )
+                )
         }
 
         val controller = ImportContractController(mock(), mock(), contractInterfacesService)
@@ -257,10 +263,9 @@ class ImportContractControllerTest : TestBase() {
             expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
-                        ContractInterfaceManifestsResponse(
-                            listOf(
-                                ContractInterfaceManifestResponse(result)
-                            )
+                        SuggestedContractInterfaceManifestsResponse(
+                            manifests = listOf(ContractInterfaceManifestResponse(result)),
+                            bestMatchingInterfaces = listOf(result.id.value)
                         )
                     )
                 )

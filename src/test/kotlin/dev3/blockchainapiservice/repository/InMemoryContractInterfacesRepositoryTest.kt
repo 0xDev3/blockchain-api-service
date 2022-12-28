@@ -134,16 +134,16 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
                             name = interfaceManifest1.name,
                             description = interfaceManifest1.description,
                             tags = interfaceManifest1.tags,
-                            eventDecorators = interfaceManifest1.eventDecorators,
-                            functionDecorators = interfaceManifest1.functionDecorators
+                            matchingEventDecorators = interfaceManifest1.eventDecorators,
+                            matchingFunctionDecorators = interfaceManifest1.functionDecorators
                         ),
                         InterfaceManifestJsonWithId(
                             id = id2,
                             name = interfaceManifest2.name,
                             description = interfaceManifest2.description,
                             tags = interfaceManifest2.tags,
-                            eventDecorators = interfaceManifest2.eventDecorators,
-                            functionDecorators = interfaceManifest2.functionDecorators
+                            matchingEventDecorators = interfaceManifest2.eventDecorators,
+                            matchingFunctionDecorators = interfaceManifest2.functionDecorators
                         )
                     )
                 )
@@ -239,8 +239,8 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
                         name = "name-1",
                         description = "description-1",
                         tags = interfaceManifest1.tags,
-                        eventDecorators = interfaceManifest1.eventDecorators,
-                        functionDecorators = interfaceManifest1.functionDecorators
+                        matchingEventDecorators = interfaceManifest1.eventDecorators,
+                        matchingFunctionDecorators = interfaceManifest1.functionDecorators
                     )
                 )
             )
@@ -295,8 +295,8 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
                         name = "name-1",
                         description = "description-1",
                         tags = interfaceManifest1.tags,
-                        eventDecorators = interfaceManifest1.eventDecorators,
-                        functionDecorators = interfaceManifest1.functionDecorators
+                        matchingEventDecorators = interfaceManifest1.eventDecorators,
+                        matchingFunctionDecorators = interfaceManifest1.functionDecorators
                     )
                 )
             )
