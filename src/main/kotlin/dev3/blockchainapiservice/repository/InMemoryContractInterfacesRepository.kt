@@ -58,8 +58,8 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
                     name = it.value.name,
                     description = it.value.description,
                     tags = it.value.tags,
-                    eventDecorators = it.value.eventDecorators,
-                    functionDecorators = it.value.functionDecorators
+                    matchingEventDecorators = it.value.eventDecorators,
+                    matchingFunctionDecorators = it.value.functionDecorators
                 )
             }
     }
@@ -87,8 +87,8 @@ class InMemoryContractInterfacesRepository : ContractInterfacesRepository {
                     name = interfaceDecorator.name,
                     description = interfaceDecorator.description,
                     tags = interfaceDecorator.tags,
-                    eventDecorators = matchingEvents,
-                    functionDecorators = matchingFunctions
+                    matchingEventDecorators = matchingEvents,
+                    matchingFunctionDecorators = matchingFunctions
                 )
             }
         }

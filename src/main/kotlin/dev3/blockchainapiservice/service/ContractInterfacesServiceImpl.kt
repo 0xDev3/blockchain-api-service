@@ -2,7 +2,9 @@ package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.result.ContractDecorator
+import dev3.blockchainapiservice.model.result.MatchingContractInterfaces
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.repository.ContractMetadataRepository
@@ -20,7 +22,9 @@ class ContractInterfacesServiceImpl(
     private val contractMetadataRepository: ContractMetadataRepository
 ) : ContractInterfacesService {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private data class WithNumOfMatches(val manifest: InterfaceManifestJsonWithId, val numMatches: Int)
+    }
 
     override fun attachMatchingInterfacesToDecorator(contractDecorator: ContractDecorator): ContractDecorator {
         val matchingInterfaces = contractInterfacesRepository.getAllWithPartiallyMatchingInterfaces(
@@ -28,7 +32,7 @@ class ContractInterfacesServiceImpl(
             abiEventSignatures = contractDecorator.events.map { it.signature }.toSet()
         )
             .filterNot { contractDecorator.implements.contains(it.id) }
-            .filter { it.functionDecorators.isNotEmpty() }
+            .filter { it.matchingFunctionDecorators.isNotEmpty() }
             .map { it.id.value }
             .toSet()
 
@@ -45,7 +49,7 @@ class ContractInterfacesServiceImpl(
         )
     }
 
-    override fun getSuggestedInterfacesForImportedSmartContract(id: UUID): List<InterfaceManifestJsonWithId> {
+    override fun getSuggestedInterfacesForImportedSmartContract(id: UUID): MatchingContractInterfaces {
         logger.debug { "Fetching suggested interface for contract with id: $id" }
 
         val contractDeploymentRequest = contractDeploymentRequestRepository.getById(id)?.takeIf { it.imported }
@@ -59,10 +63,17 @@ class ContractInterfacesServiceImpl(
                 " and project ID: ${contractDeploymentRequest.projectId}"
         )
 
+        val functionSignatures = importedManifest.functionDecorators.map { it.signature }.toSet()
+
         return contractInterfacesRepository.getAllWithPartiallyMatchingInterfaces(
-            abiFunctionSignatures = importedManifest.functionDecorators.map { it.signature }.toSet(),
+            abiFunctionSignatures = functionSignatures,
             abiEventSignatures = importedManifest.eventDecorators.map { it.signature }.toSet()
-        ).filterNot { importedManifest.implements.contains(it.id.value) }
+        )
+            .map { WithNumOfMatches(it, it.matchingFunctionDecorators.size + it.matchingEventDecorators.size) }
+            .findBestMatchingInterfaces(
+                manifest = importedManifest,
+                functionSignatures = functionSignatures
+            )
     }
 
     override fun addInterfacesToImportedContract(
@@ -154,4 +165,40 @@ class ContractInterfacesServiceImpl(
             interfaces = newInterfacesList
         )
     }
+
+    private fun List<WithNumOfMatches>.findBestMatchingInterfaces(
+        manifest: ManifestJson,
+        functionSignatures: Set<String>
+    ): MatchingContractInterfaces {
+        val (imported, nonImported) = partition { it.manifest.id.isImported() }
+
+        val sortedNonImported = nonImported.sortedByDescending { it.numMatches }
+        val sortedImported = imported.sortedByDescending { it.numMatches }
+
+        val interfacesByPriority = (sortedNonImported + sortedImported)
+            .filterNot { manifest.implements.contains(it.manifest.id.value) }
+
+        val allMatchingInterfaces = interfacesByPriority.map { it.manifest }
+        val bestMatchingInterfacesSet = interfacesByPriority.filter { it.numMatches > 0 }
+            .takeWithoutOverlaps(functionSignatures)
+
+        return MatchingContractInterfaces(
+            manifests = allMatchingInterfaces,
+            bestMatchingInterfaces = bestMatchingInterfacesSet
+        )
+    }
+
+    private fun List<WithNumOfMatches>.takeWithoutOverlaps(functionSignatures: Set<String>): List<InterfaceId> =
+        if (isEmpty()) {
+            emptyList()
+        } else {
+            val firstElem = first()
+            val firstElemSignatures = firstElem.manifest.matchingFunctionDecorators.map { it.signature }.toSet()
+
+            val matchingFirstElement = firstElem.takeIf { functionSignatures.containsAll(firstElemSignatures) }
+            val newFunctionSignatures = matchingFirstElement?.let { functionSignatures - firstElemSignatures }
+                ?: functionSignatures
+
+            listOfNotNull(matchingFirstElement?.manifest?.id) + drop(1).takeWithoutOverlaps(newFunctionSignatures)
+        }
 }

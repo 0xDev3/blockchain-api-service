@@ -10,9 +10,8 @@ import dev3.blockchainapiservice.model.params.ImportContractParams
 import dev3.blockchainapiservice.model.request.ImportContractRequest
 import dev3.blockchainapiservice.model.request.ImportedContractInterfacesRequest
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.ImportPreviewResponse
+import dev3.blockchainapiservice.model.response.SuggestedContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.service.ContractDeploymentRequestService
 import dev3.blockchainapiservice.service.ContractImportService
@@ -77,13 +76,9 @@ class ImportContractController(
     @ApiReadLimitedMapping(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, "/v1/import-smart-contract/{id}/suggested-interfaces")
     fun getSuggestedInterfacesForImportedSmartContract(
         @PathVariable("id") id: UUID
-    ): ResponseEntity<ContractInterfaceManifestsResponse> {
-        val manifests = contractInterfacesService.getSuggestedInterfacesForImportedSmartContract(id)
-        return ResponseEntity.ok(
-            ContractInterfaceManifestsResponse(
-                manifests.map { ContractInterfaceManifestResponse(it) }
-            )
-        )
+    ): ResponseEntity<SuggestedContractInterfaceManifestsResponse> {
+        val matchingInterfaces = contractInterfacesService.getSuggestedInterfacesForImportedSmartContract(id)
+        return ResponseEntity.ok(SuggestedContractInterfaceManifestsResponse(matchingInterfaces))
     }
 
     @ApiWriteLimitedMapping(

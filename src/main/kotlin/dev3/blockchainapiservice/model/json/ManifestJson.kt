@@ -39,8 +39,8 @@ data class InterfaceManifestJsonWithId(
     val description: String?,
     @JsonDeserialize(`as` = LinkedHashSet::class)
     val tags: Set<String>,
-    val eventDecorators: List<EventDecorator>,
-    val functionDecorators: List<FunctionDecorator>
+    val matchingEventDecorators: List<EventDecorator>,
+    val matchingFunctionDecorators: List<FunctionDecorator>
 )
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
