@@ -20,6 +20,8 @@ class ChainPropertiesHandlerTest : TestBase() {
                 rpcUrl = "rpc-url",
                 infuraUrl = "/infura/",
                 startBlockNumber = null,
+                chainExplorerApiUrl = null,
+                chainExplorerApiKey = null,
                 minBlockConfirmationsForCaching = null
             )
         )
