@@ -45,6 +45,8 @@ data class ChainProperties(
     val infuraUrl: String?,
     val startBlockNumber: BigInteger?,
     val minBlockConfirmationsForCaching: BigInteger?,
+    val chainExplorerApiUrl: String?,
+    val chainExplorerApiKey: String?,
     val latestBlockCacheDuration: Duration = 5.seconds.toJavaDuration()
 )
 

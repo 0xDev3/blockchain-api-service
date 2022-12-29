@@ -1474,6 +1474,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 rpcUrl = "http://localhost:${hardhatContainer.mappedPort}",
                 infuraUrl = null,
                 startBlockNumber = null,
+                chainExplorerApiUrl = null,
+                chainExplorerApiKey = null,
                 minBlockConfirmationsForCaching = null
             )
         )

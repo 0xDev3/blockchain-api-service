@@ -378,6 +378,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
@@ -523,6 +524,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
@@ -664,6 +666,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
@@ -717,6 +720,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
@@ -778,6 +782,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
@@ -833,6 +838,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
@@ -870,6 +876,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = contractMetadataRepository,
@@ -915,6 +922,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = contractMetadataRepository,
@@ -960,6 +968,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = contractMetadataRepository,
@@ -1054,6 +1063,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = contractDecompilerService,
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
@@ -1191,6 +1201,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = contractDecompilerService,
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
@@ -1301,6 +1312,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = contractDecompilerService,
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
@@ -1494,6 +1506,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = contractDecompilerService,
+            abiProviderService = mock(),
             functionEncoderService = functionEncoderService,
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
@@ -1661,6 +1674,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = contractDecompilerService,
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
@@ -1859,6 +1873,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = contractDecompilerService,
+            abiProviderService = mock(),
             functionEncoderService = functionEncoderService,
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = contractMetadataRepository,
@@ -1925,6 +1940,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
@@ -1969,6 +1985,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
@@ -2045,6 +2062,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
@@ -2101,6 +2119,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
@@ -2217,6 +2236,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = mock(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = mock(),
             contractMetadataRepository = mock(),
@@ -2467,6 +2487,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
@@ -2512,6 +2533,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = mock(),
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
@@ -2607,6 +2629,7 @@ class ContractImportServiceTest : TestBase() {
         val service = ContractImportServiceImpl(
             abiDecoderService = EthereumAbiDecoderService(),
             contractDecompilerService = contractDecompilerService,
+            abiProviderService = mock(),
             functionEncoderService = mock(),
             contractDeploymentRequestRepository = contractDeploymentRequestRepository,
             contractMetadataRepository = mock(),
