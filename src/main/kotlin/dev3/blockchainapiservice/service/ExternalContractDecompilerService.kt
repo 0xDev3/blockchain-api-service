@@ -17,7 +17,7 @@ class ExternalContractDecompilerService(
 ) : ContractDecompilerService {
 
     companion object {
-        data class Request(val bytecode: String)
+        private data class Request(val bytecode: String)
     }
 
     override fun decompile(contractBinary: ContractBinaryData): DecompiledContractJson =

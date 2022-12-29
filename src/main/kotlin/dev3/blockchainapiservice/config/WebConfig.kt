@@ -39,6 +39,12 @@ class WebConfig(
             "application property blockchain-api-service.contract-manifest-service.base-url is not set"
     }
 
+    @Bean("basicJsonRestTemplate")
+    fun basicJsonRestTemplate(): RestTemplate =
+        RestTemplateBuilder()
+            .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .build()
+
     @Bean("externalContractDecompilerServiceRestTemplate")
     fun externalContractDecompilerServiceRestTemplate(
         contractManifestServiceProperties: ContractManifestServiceProperties
