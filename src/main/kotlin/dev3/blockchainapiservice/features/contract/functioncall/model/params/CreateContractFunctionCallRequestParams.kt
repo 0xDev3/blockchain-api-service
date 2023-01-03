@@ -1,8 +1,9 @@
-package dev3.blockchainapiservice.model.params
+package dev3.blockchainapiservice.features.contract.functioncall.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.features.contract.functioncall.model.request.CreateContractFunctionCallRequest
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.request.CreateContractFunctionCallRequest
+import dev3.blockchainapiservice.model.params.DeployedContractIdentifier
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.WalletAddress

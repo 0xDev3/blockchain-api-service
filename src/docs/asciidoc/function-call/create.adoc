@@ -40,6 +40,6 @@ include::{snippets}/ContractFunctionCallRequestControllerApiTest/mustCorrectlyCr
 Schemas:
 
 .Request Schema
-include::{snippets}/dev3.blockchainapiservice.model.request.CreateContractFunctionCallRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.contract.functioncall.model.request.CreateContractFunctionCallRequest.adoc[]
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.ContractFunctionCallRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.contract.functioncall.model.response.ContractFunctionCallRequestResponse.adoc[]

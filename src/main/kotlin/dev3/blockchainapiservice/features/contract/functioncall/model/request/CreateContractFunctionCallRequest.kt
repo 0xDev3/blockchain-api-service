@@ -1,4 +1,4 @@
-package dev3.blockchainapiservice.model.request
+package dev3.blockchainapiservice.features.contract.functioncall.model.request
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode

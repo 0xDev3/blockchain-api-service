@@ -28,4 +28,4 @@ include::{snippets}/ContractFunctionCallRequestControllerApiTest/mustCorrectlyFe
 include::{snippets}/ContractFunctionCallRequestControllerApiTest/mustCorrectlyFetchContractFunctionCallRequestsByProjectIdAndFilters/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.ContractFunctionCallRequestsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.contract.functioncall.model.response.ContractFunctionCallRequestsResponse.adoc[]

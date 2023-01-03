@@ -1,10 +1,11 @@
-package dev3.blockchainapiservice.model.result
+package dev3.blockchainapiservice.features.contract.functioncall.model.result
 
 import com.fasterxml.jackson.databind.JsonNode
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
