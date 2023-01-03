@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.Erc20LockRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.Erc20LockRequestRecord
 import dev3.blockchainapiservice.model.ScreenConfig
@@ -12,7 +14,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.coalesce
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20LockRequestRepository {
@@ -41,14 +42,14 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
         return record.toModel()
     }
 
-    override fun getById(id: UUID): Erc20LockRequest? {
+    override fun getById(id: Erc20LockRequestId): Erc20LockRequest? {
         logger.debug { "Get ERC20 lock request by id: $id" }
         return dslContext.selectFrom(Erc20LockRequestTable)
             .where(Erc20LockRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
-    override fun getAllByProjectId(projectId: UUID): List<Erc20LockRequest> {
+    override fun getAllByProjectId(projectId: ProjectId): List<Erc20LockRequest> {
         logger.debug { "Get ERC20 lock requests filtered by projectId: $projectId" }
         return dslContext.selectFrom(Erc20LockRequestTable)
             .where(Erc20LockRequestTable.PROJECT_ID.eq(projectId))
@@ -56,7 +57,7 @@ class JooqErc20LockRequestRepository(private val dslContext: DSLContext) : Erc20
             .fetch { it.toModel() }
     }
 
-    override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
+    override fun setTxInfo(id: Erc20LockRequestId, txHash: TransactionHash, caller: WalletAddress): Boolean {
         logger.info { "Set txInfo for ERC20 lock request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(Erc20LockRequestTable)
             .set(Erc20LockRequestTable.TX_HASH, txHash)

@@ -6,6 +6,12 @@ import dev3.blockchainapiservice.blockchain.ExampleContract
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
@@ -59,8 +65,8 @@ import java.util.UUID
 class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val PROJECT = Project(
             id = PROJECT_ID,
             ownerId = OWNER_ID,
@@ -73,7 +79,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         private const val API_KEY = "api-key"
         private val CONTRACT_DECORATOR_ID = ContractId("examples.exampleContract")
         private val DEPLOYED_CONTRACT = StoreContractDeploymentRequestParams(
-            id = UUID.randomUUID(),
+            id = ContractDeploymentRequestId(UUID.randomUUID()),
             alias = "contract-alias",
             contractData = ContractBinaryData("00"),
             contractId = CONTRACT_DECORATOR_ID,
@@ -230,13 +236,13 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ContractMetadataRecord(
-                id = UUID.randomUUID(),
+                id = ContractMetadataId(UUID.randomUUID()),
                 name = CONTRACT_DECORATOR.name,
                 description = CONTRACT_DECORATOR.description,
                 contractId = CONTRACT_DECORATOR.id,
                 contractTags = CONTRACT_DECORATOR.tags.map { it.value }.toTypedArray(),
                 contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray(),
-                projectId = Constants.NIL_UUID
+                projectId = Constants.NIL_PROJECT_ID
             )
         )
 
@@ -263,7 +269,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 apiKey = API_KEY,
                 createdAt = TestData.TIMESTAMP
@@ -279,7 +285,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         val contractAddress = ContractAddress("cafebabe")
         val storedContract = suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -302,7 +308,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id}",
+                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id.value}",
                                 "function_name": "$functionName",
                                 "function_params": $paramsJson,
                                 "eth_amount": "${ethAmount.rawValue}",
@@ -337,7 +343,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         functionCallData = response.functionCallData,
                         ethAmount = ethAmount.rawValue,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-function-call/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-function-call/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = response.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -376,7 +383,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         functionParams = objectMapper.readTree(paramsJson),
                         ethAmount = ethAmount,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-function-call/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-function-call/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -402,7 +410,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         val contractAddress = ContractAddress("cafebabe")
         val storedContract = suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -460,7 +468,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         functionCallData = response.functionCallData,
                         ethAmount = ethAmount.rawValue,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-function-call/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-function-call/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = response.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -499,7 +508,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         functionParams = objectMapper.readTree(paramsJson),
                         ethAmount = ethAmount,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-function-call/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-function-call/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -578,7 +588,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         functionCallData = response.functionCallData,
                         ethAmount = ethAmount.rawValue,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-function-call/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-function-call/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = response.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -617,7 +628,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         functionParams = objectMapper.readTree(paramsJson),
                         ethAmount = ethAmount,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-function-call/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-function-call/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -644,7 +656,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         val contractAddress = ContractAddress("cafebabe")
         val storedContract = suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -667,7 +679,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id}",
+                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id.value}",
                                 "function_name": "$functionName",
                                 "function_params": $paramsJson,
                                 "eth_amount": "${ethAmount.rawValue}",
@@ -703,7 +715,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         functionCallData = response.functionCallData,
                         ethAmount = ethAmount.rawValue,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         projectId = PROJECT_ID,
                         createdAt = response.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -742,7 +754,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         functionParams = objectMapper.readTree(paramsJson),
                         ethAmount = ethAmount,
                         chainId = PROJECT.chainId,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -766,7 +778,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress("cafebabe")
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID)
             contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
         }
 
@@ -778,7 +790,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id}",
+                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id.value}",
                                 "deployed_contract_alias": "${DEPLOYED_CONTRACT.alias}",
                                 "contract_address": "${contractAddress.rawValue}",
                                 "function_name": "setOwner",
@@ -808,7 +820,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val callerAddress = WalletAddress("b")
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID)
         }
 
         verify("400 is returned when creating contract function call request") {
@@ -916,7 +928,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val callerAddress = WalletAddress("b")
 
         suppose("some non-deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID)
         }
 
         verify("400 is returned when creating contract function call request") {
@@ -927,7 +939,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id}",
+                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id.value}",
                                 "function_name": "setOwner",
                                 "function_params": [],
                                 "eth_amount": "0",
@@ -955,7 +967,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val callerAddress = WalletAddress("b")
 
         suppose("some non-deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID)
         }
 
         verify("400 is returned when creating contract function call request") {
@@ -1048,7 +1060,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val ethAmount = Balance.ZERO
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -1110,7 +1122,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch contract function call request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/function-call/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/function-call/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1135,7 +1147,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         ethAmount = ethAmount.rawValue,
                         chainId = PROJECT.chainId.value,
                         redirectUrl = PROJECT.baseRedirectUrl.value +
-                            "/request-function-call/${createResponse.id}/action",
+                            "/request-function-call/${createResponse.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = fetchResponse.createdAt,
                         arbitraryData = createResponse.arbitraryData,
@@ -1199,7 +1211,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     projectId = projectId,
                     chainId = chainId
                 ),
-                metadataProjectId = Constants.NIL_UUID
+                metadataProjectId = Constants.NIL_PROJECT_ID
             ).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
@@ -1262,7 +1274,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch contract function call request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/function-call/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/function-call/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1287,7 +1299,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                         ethAmount = ethAmount.rawValue,
                         chainId = chainId.value,
                         redirectUrl = PROJECT.baseRedirectUrl.value +
-                            "/request-function-call/${createResponse.id}/action",
+                            "/request-function-call/${createResponse.id.value}/action",
                         projectId = projectId,
                         createdAt = fetchResponse.createdAt,
                         arbitraryData = createResponse.arbitraryData,
@@ -1355,7 +1367,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val ethAmount = Balance.ZERO
 
         val storedContract = suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -1378,7 +1390,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "deployed_contract_id": "${storedContract.id}",
+                                "deployed_contract_id": "${storedContract.id.value}",
                                 "function_name": "$functionName",
                                 "function_params": $paramsJson,
                                 "eth_amount": "${ethAmount.rawValue}",
@@ -1418,7 +1430,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val fetchResponse = suppose("request to fetch contract function call requests by project ID is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get(
-                    "/v1/function-call/by-project/${createResponse.projectId}?deployedContractId=${storedContract.id}" +
+                    "/v1/function-call/by-project/${createResponse.projectId.value}" +
+                        "?deployedContractId=${storedContract.id.value}" +
                         "&contractAddress=${contractAddress.rawValue}"
                 )
             )
@@ -1447,7 +1460,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                                 ethAmount = ethAmount.rawValue,
                                 chainId = PROJECT.chainId.value,
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-function-call/${createResponse.id}/action",
+                                    "/request-function-call/${createResponse.id.value}/action",
                                 projectId = PROJECT_ID,
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 arbitraryData = createResponse.arbitraryData,
@@ -1508,7 +1521,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         val storedContract = suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -1531,7 +1544,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "deployed_contract_id": "${storedContract.id}",
+                                "deployed_contract_id": "${storedContract.id.value}",
                                 "function_name": "$functionName",
                                 "function_params": $paramsJson,
                                 "eth_amount": "${ethAmount.rawValue}",
@@ -1571,7 +1584,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val fetchResponse = suppose("request to fetch contract function call requests by project ID is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get(
-                    "/v1/function-call/by-project/${createResponse.projectId}?deployedContractId=${storedContract.id}" +
+                    "/v1/function-call/by-project/${createResponse.projectId.value}" +
+                        "?deployedContractId=${storedContract.id.value}" +
                         "&contractAddress=${contractAddress.rawValue}"
                 )
             )
@@ -1600,7 +1614,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                                 ethAmount = ethAmount.rawValue,
                                 chainId = chainId.value,
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-function-call/${createResponse.id}/action",
+                                    "/request-function-call/${createResponse.id.value}/action",
                                 projectId = projectId,
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 arbitraryData = createResponse.arbitraryData,
@@ -1635,7 +1649,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyAttachTransactionInfo() {
-        val id = UUID.randomUUID()
+        val id = ContractFunctionCallRequestId(UUID.randomUUID())
         val callerAddress = WalletAddress("c")
 
         suppose("some contract function call request without transaction info exists in database") {
@@ -1648,7 +1662,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     functionParams = TestData.EMPTY_JSON_ARRAY,
                     ethAmount = Balance(BigInteger.TEN),
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,
@@ -1665,7 +1679,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach transaction info to contract deployment request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/function-call/$id")
+                MockMvcRequestBuilders.put("/v1/function-call/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1690,7 +1704,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustReturn400BadRequestWhenTransactionInfoIsNotAttached() {
-        val id = UUID.randomUUID()
+        val id = ContractFunctionCallRequestId(UUID.randomUUID())
         val txHash = TransactionHash("0x1")
         val callerAddress = WalletAddress("c")
 
@@ -1704,7 +1718,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     functionParams = TestData.EMPTY_JSON_ARRAY,
                     ethAmount = Balance(BigInteger.TEN),
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,
@@ -1720,7 +1734,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned when attaching transaction info") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/function-call/$id")
+                MockMvcRequestBuilders.put("/v1/function-call/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1745,8 +1759,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    private fun insertProjectWithCustomRpcUrl(): Triple<UUID, ChainId, String> {
-        val projectId = UUID.randomUUID()
+    private fun insertProjectWithCustomRpcUrl(): Triple<ProjectId, ChainId, String> {
+        val projectId = ProjectId(UUID.randomUUID())
         val chainId = ChainId(1337L)
 
         dslContext.executeInsert(
@@ -1765,7 +1779,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = projectId,
                 apiKey = apiKey,
                 createdAt = TestData.TIMESTAMP

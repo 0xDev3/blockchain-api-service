@@ -7,10 +7,10 @@ import com.facebook.ads.sdk.serverside.Event
 import com.facebook.ads.sdk.serverside.EventRequest
 import com.facebook.ads.sdk.serverside.UserData
 import dev3.blockchainapiservice.config.MetaPixelProperties
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.result.UserIdentifier
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class AnalyticsServiceImpl(
@@ -25,7 +25,7 @@ class AnalyticsServiceImpl(
 
     override fun postApiKeyCreatedEvent(
         userIdentifier: UserIdentifier,
-        projectId: UUID,
+        projectId: ProjectId,
         origin: String?,
         userAgent: String?,
         remoteAddr: String?
@@ -61,7 +61,7 @@ class AnalyticsServiceImpl(
                 CustomData().customProperties(
                     hashMapOf(
                         "wallet" to userIdentifier.userIdentifier,
-                        "projectId" to projectId.toString()
+                        "projectId" to projectId.value.toString()
                     )
                 )
             )

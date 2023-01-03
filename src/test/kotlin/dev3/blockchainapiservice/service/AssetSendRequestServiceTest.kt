@@ -6,6 +6,9 @@ import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateAssetSendRequestParams
 import dev3.blockchainapiservice.model.params.StoreAssetSendRequestParams
@@ -26,7 +29,6 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import java.math.BigInteger
 import java.util.UUID
@@ -35,8 +37,8 @@ class AssetSendRequestServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -62,11 +64,11 @@ class AssetSendRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyCreateAssetSendRequestForSomeToken() {
         val uuidProvider = mock<UuidProvider>()
-        val uuid = UUID.randomUUID()
+        val uuid = AssetSendRequestId(UUID.randomUUID())
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(uuid)
+            call(uuidProvider.getRawUuid())
+                .willReturn(uuid.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -99,7 +101,7 @@ class AssetSendRequestServiceTest : TestBase() {
             id = uuid,
             projectId = PROJECT.id,
             chainId = PROJECT.chainId,
-            redirectUrl = redirectUrl.replace("\${id}", uuid.toString()),
+            redirectUrl = redirectUrl.replace("\${id}", uuid.value.toString()),
             tokenAddress = CREATE_PARAMS.tokenAddress,
             assetAmount = CREATE_PARAMS.assetAmount,
             assetSenderAddress = CREATE_PARAMS.assetSenderAddress,
@@ -153,11 +155,11 @@ class AssetSendRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyCreateAssetSendRequestForNativeAsset() {
         val uuidProvider = mock<UuidProvider>()
-        val uuid = UUID.randomUUID()
+        val uuid = AssetSendRequestId(UUID.randomUUID())
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(uuid)
+            call(uuidProvider.getRawUuid())
+                .willReturn(uuid.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -174,7 +176,7 @@ class AssetSendRequestServiceTest : TestBase() {
             id = uuid,
             projectId = PROJECT.id,
             chainId = PROJECT.chainId,
-            redirectUrl = redirectUrl.replace("\${id}", uuid.toString()),
+            redirectUrl = redirectUrl.replace("\${id}", uuid.value.toString()),
             tokenAddress = null,
             assetAmount = CREATE_PARAMS.assetAmount,
             assetSenderAddress = CREATE_PARAMS.assetSenderAddress,
@@ -230,7 +232,7 @@ class AssetSendRequestServiceTest : TestBase() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
 
         suppose("asset send request does not exist in database") {
-            call(assetSendRequestRepository.getById(any()))
+            call(assetSendRequestRepository.getById(anyValueClass(AssetSendRequestId(UUID.randomUUID()))))
                 .willReturn(null)
         }
 
@@ -247,14 +249,14 @@ class AssetSendRequestServiceTest : TestBase() {
 
         verify("ResourceNotFoundException is thrown") {
             expectThrows<ResourceNotFoundException> {
-                service.getAssetSendRequest(id = UUID.randomUUID())
+                service.getAssetSendRequest(id = AssetSendRequestId(UUID.randomUUID()))
             }
         }
     }
 
     @Test
     fun mustReturnAssetSendRequestWithPendingStatusWhenAssetSendRequestHasNullTxHash() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -321,7 +323,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithPendingStatusWhenTransactionIsNotYetMined() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -396,7 +398,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithFailedStatusWhenTransactionIsNotSuccessful() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -483,7 +485,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithFailedStatusWhenTransactionHasWrongToAddress() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -570,7 +572,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithFailedStatusWhenTransactionHasWrongTxHash() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -657,7 +659,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithFailedStatusWhenTransactionHasWrongFromAddress() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -744,7 +746,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithFailedStatusWhenTransactionHasWrongData() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -831,7 +833,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithFailedStatusWhenTransactionHasWrongRecipientAddressForNativeToken() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -902,7 +904,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithFailedStatusWhenTransactionHasWrongValueForNativeToken() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -973,7 +975,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithSuccessfulStatusWhenFromAddressIsNull() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -1060,7 +1062,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithSuccessfulStatusWhenFromAddressIsSpecified() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -1147,7 +1149,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithSuccessfulStatusWhenFromAddressIsNullForNativeToken() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -1218,7 +1220,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetSendRequestWithSuccessfulStatusWhenFromAddressIsSpecifiedForNativeToken() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -1289,7 +1291,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnListOfAssetSendRequestsByProjectId() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sendRequest = AssetSendRequest(
             id = id,
             projectId = PROJECT.id,
@@ -1378,7 +1380,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnEmptyListOfAssetSendRequestsForNonExistentProject() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val service = AssetSendRequestServiceImpl(
             functionEncoderService = mock(),
             assetSendRequestRepository = mock(),
@@ -1400,7 +1402,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnListOfAssetSendRequestsBySenderAddress() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sender = WalletAddress("b")
         val sendRequest = AssetSendRequest(
             id = id,
@@ -1490,7 +1492,7 @@ class AssetSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnListOfAssetSendRequestsByRecipientAddress() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val recipient = WalletAddress("c")
         val sendRequest = AssetSendRequest(
             id = id,
@@ -1581,7 +1583,7 @@ class AssetSendRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyAttachTxInfo() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("txInfo will be successfully attached to the request") {
@@ -1612,7 +1614,7 @@ class AssetSendRequestServiceTest : TestBase() {
     @Test
     fun mustThrowCannotAttachTxInfoExceptionWhenAttachingTxInfoFails() {
         val assetSendRequestRepository = mock<AssetSendRequestRepository>()
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching txInfo will fail") {
@@ -1642,7 +1644,7 @@ class AssetSendRequestServiceTest : TestBase() {
         }
     }
 
-    private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
+    private fun projectRepositoryMock(projectId: ProjectId): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("some project will be returned") {
@@ -1650,7 +1652,7 @@ class AssetSendRequestServiceTest : TestBase() {
                 .willReturn(
                     Project(
                         id = projectId,
-                        ownerId = UUID.randomUUID(),
+                        ownerId = UserId(UUID.randomUUID()),
                         issuerContractAddress = ContractAddress("dead"),
                         baseRedirectUrl = BaseUrl(""),
                         chainId = ChainId(0L),

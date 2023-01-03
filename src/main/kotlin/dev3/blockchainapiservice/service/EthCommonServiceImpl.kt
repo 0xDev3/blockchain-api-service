@@ -22,8 +22,12 @@ class EthCommonServiceImpl(
     companion object : KLogging()
 
     override fun <P, R> createDatabaseParams(factory: ParamsFactory<P, R>, params: P, project: Project): R {
-        // TODO use API key quota here in the future (out of MVP scope)
-        return factory.fromCreateParams(uuidProvider.getUuid(), params, project, utcDateTimeProvider.getUtcDateTime())
+        return factory.fromCreateParams(
+            id = uuidProvider.getRawUuid(),
+            params = params,
+            project = project,
+            createdAt = utcDateTimeProvider.getUtcDateTime()
+        )
     }
 
     override fun <R> fetchResource(resource: R?, message: String): R {

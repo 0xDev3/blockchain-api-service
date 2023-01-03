@@ -1,15 +1,15 @@
 package dev3.blockchainapiservice.model.response
 
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
 import dev3.blockchainapiservice.model.result.MultiPaymentTemplate
 import dev3.blockchainapiservice.model.result.NoItems
 import dev3.blockchainapiservice.util.AssetType
 import java.time.OffsetDateTime
-import java.util.UUID
 
 data class MultiPaymentTemplatesResponse(val templates: List<MultiPaymentTemplateWithoutItemsResponse>)
 
 data class MultiPaymentTemplateWithoutItemsResponse(
-    val id: UUID,
+    val id: MultiPaymentTemplateId,
     val templateName: String,
     val assetType: AssetType,
     val tokenAddress: String?,

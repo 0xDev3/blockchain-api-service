@@ -6,6 +6,10 @@ import dev3.blockchainapiservice.blockchain.SimpleERC20
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
@@ -44,8 +48,8 @@ import java.util.UUID
 class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val PROJECT = Project(
             id = PROJECT_ID,
             ownerId = OWNER_ID,
@@ -93,7 +97,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 apiKey = API_KEY,
                 createdAt = TestData.TIMESTAMP
@@ -144,7 +148,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         projectId = PROJECT_ID,
                         status = Status.PENDING,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-balance/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-balance/${response.id.value}/action",
                         tokenAddress = tokenAddress.rawValue,
                         assetType = AssetType.TOKEN,
                         blockNumber = blockNumber.value,
@@ -155,7 +159,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             afterActionMessage = "after-action-message"
                         ),
                         balance = null,
-                        messageToSign = "Verification message ID to sign: ${response.id}",
+                        messageToSign = "Verification message ID to sign: ${response.id.value}",
                         signedMessage = null,
                         createdAt = response.createdAt
                     )
@@ -174,7 +178,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-balance/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-balance/${response.id.value}/action",
                         tokenAddress = tokenAddress,
                         blockNumber = blockNumber,
                         requestedWalletAddress = walletAddress,
@@ -239,7 +243,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         projectId = PROJECT_ID,
                         status = Status.PENDING,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         tokenAddress = tokenAddress.rawValue,
                         assetType = AssetType.TOKEN,
                         blockNumber = blockNumber.value,
@@ -250,7 +254,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             afterActionMessage = "after-action-message"
                         ),
                         balance = null,
-                        messageToSign = "Verification message ID to sign: ${response.id}",
+                        messageToSign = "Verification message ID to sign: ${response.id.value}",
                         signedMessage = null,
                         createdAt = response.createdAt
                     )
@@ -269,7 +273,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         tokenAddress = tokenAddress,
                         blockNumber = blockNumber,
                         requestedWalletAddress = walletAddress,
@@ -330,7 +334,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         projectId = PROJECT_ID,
                         status = Status.PENDING,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-balance/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-balance/${response.id.value}/action",
                         tokenAddress = null,
                         assetType = AssetType.NATIVE,
                         blockNumber = blockNumber.value,
@@ -341,7 +345,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             afterActionMessage = "after-action-message"
                         ),
                         balance = null,
-                        messageToSign = "Verification message ID to sign: ${response.id}",
+                        messageToSign = "Verification message ID to sign: ${response.id.value}",
                         signedMessage = null,
                         createdAt = response.createdAt
                     )
@@ -360,7 +364,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-balance/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-balance/${response.id.value}/action",
                         tokenAddress = null,
                         blockNumber = blockNumber,
                         requestedWalletAddress = walletAddress,
@@ -423,7 +427,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         projectId = PROJECT_ID,
                         status = Status.PENDING,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         tokenAddress = null,
                         assetType = AssetType.NATIVE,
                         blockNumber = blockNumber.value,
@@ -434,7 +438,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             afterActionMessage = "after-action-message"
                         ),
                         balance = null,
-                        messageToSign = "Verification message ID to sign: ${response.id}",
+                        messageToSign = "Verification message ID to sign: ${response.id.value}",
                         signedMessage = null,
                         createdAt = response.createdAt
                     )
@@ -453,7 +457,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         tokenAddress = null,
                         blockNumber = blockNumber,
                         requestedWalletAddress = walletAddress,
@@ -627,12 +631,12 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, AssetBalanceRequestResponse::class.java)
         }
 
-        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+        val id = AssetBalanceRequestId(UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73"))
 
         suppose("ID from pre-signed message is used in database") {
             dslContext.update(AssetBalanceRequestTable)
                 .set(AssetBalanceRequestTable.ID, id)
-                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/${id.value}")
                 .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
@@ -648,7 +652,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset balance request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/balance/$id")
+                MockMvcRequestBuilders.get("/v1/balance/${id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -664,7 +668,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         projectId = PROJECT_ID,
                         status = Status.SUCCESS,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = "https://example.com/$id",
+                        redirectUrl = "https://example.com/${id.value}",
                         tokenAddress = tokenAddress.rawValue,
                         assetType = AssetType.TOKEN,
                         blockNumber = blockNumber.value,
@@ -680,7 +684,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             timestamp = fetchResponse.balance!!.timestamp,
                             amount = assetBalance.rawValue
                         ),
-                        messageToSign = "Verification message ID to sign: $id",
+                        messageToSign = "Verification message ID to sign: ${id.value}",
                         signedMessage = signedMessage.value,
                         createdAt = fetchResponse.createdAt
                     )
@@ -744,12 +748,12 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, AssetBalanceRequestResponse::class.java)
         }
 
-        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+        val id = AssetBalanceRequestId(UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73"))
 
         suppose("ID from pre-signed message is used in database") {
             dslContext.update(AssetBalanceRequestTable)
                 .set(AssetBalanceRequestTable.ID, id)
-                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/${id.value}")
                 .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
@@ -764,7 +768,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch asset balance request is made") {
-            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/balance/$id"))
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/balance/${id.value}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -779,7 +783,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         projectId = projectId,
                         status = Status.SUCCESS,
                         chainId = chainId.value,
-                        redirectUrl = "https://example.com/$id",
+                        redirectUrl = "https://example.com/${id.value}",
                         tokenAddress = tokenAddress.rawValue,
                         assetType = AssetType.TOKEN,
                         blockNumber = blockNumber.value,
@@ -795,7 +799,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             timestamp = fetchResponse.balance!!.timestamp,
                             amount = assetBalance.rawValue
                         ),
-                        messageToSign = "Verification message ID to sign: $id",
+                        messageToSign = "Verification message ID to sign: ${id.value}",
                         signedMessage = signedMessage.value,
                         createdAt = fetchResponse.createdAt
                     )
@@ -852,12 +856,12 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, AssetBalanceRequestResponse::class.java)
         }
 
-        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+        val id = AssetBalanceRequestId(UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73"))
 
         suppose("ID from pre-signed message is used in database") {
             dslContext.update(AssetBalanceRequestTable)
                 .set(AssetBalanceRequestTable.ID, id)
-                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/${id.value}")
                 .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
@@ -873,7 +877,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset balance request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/balance/$id")
+                MockMvcRequestBuilders.get("/v1/balance/${id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -889,7 +893,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         projectId = PROJECT_ID,
                         status = Status.SUCCESS,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = "https://example.com/$id",
+                        redirectUrl = "https://example.com/${id.value}",
                         tokenAddress = null,
                         assetType = AssetType.NATIVE,
                         blockNumber = blockNumber.value,
@@ -905,7 +909,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             timestamp = fetchResponse.balance!!.timestamp,
                             amount = amount.rawValue
                         ),
-                        messageToSign = "Verification message ID to sign: $id",
+                        messageToSign = "Verification message ID to sign: ${id.value}",
                         signedMessage = signedMessage.value,
                         createdAt = fetchResponse.createdAt
                     )
@@ -966,12 +970,12 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, AssetBalanceRequestResponse::class.java)
         }
 
-        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+        val id = AssetBalanceRequestId(UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73"))
 
         suppose("ID from pre-signed message is used in database") {
             dslContext.update(AssetBalanceRequestTable)
                 .set(AssetBalanceRequestTable.ID, id)
-                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/${id.value}")
                 .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
@@ -986,7 +990,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch asset balance request is made") {
-            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/balance/$id"))
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/balance/${id.value}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -1001,7 +1005,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                         projectId = projectId,
                         status = Status.SUCCESS,
                         chainId = chainId.value,
-                        redirectUrl = "https://example.com/$id",
+                        redirectUrl = "https://example.com/${id.value}",
                         tokenAddress = null,
                         assetType = AssetType.NATIVE,
                         blockNumber = blockNumber.value,
@@ -1017,7 +1021,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                             timestamp = fetchResponse.balance!!.timestamp,
                             amount = amount.rawValue
                         ),
-                        messageToSign = "Verification message ID to sign: $id",
+                        messageToSign = "Verification message ID to sign: ${id.value}",
                         signedMessage = signedMessage.value,
                         createdAt = fetchResponse.createdAt
                     )
@@ -1077,12 +1081,12 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, AssetBalanceRequestResponse::class.java)
         }
 
-        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+        val id = AssetBalanceRequestId(UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73"))
 
         suppose("ID from pre-signed message is used in database") {
             dslContext.update(AssetBalanceRequestTable)
                 .set(AssetBalanceRequestTable.ID, id)
-                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/${id.value}")
                 .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
@@ -1098,7 +1102,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset balance requests by project ID is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/balance/by-project/$PROJECT_ID")
+                MockMvcRequestBuilders.get("/v1/balance/by-project/${PROJECT_ID.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1116,7 +1120,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                                 projectId = PROJECT_ID,
                                 status = Status.SUCCESS,
                                 chainId = PROJECT.chainId.value,
-                                redirectUrl = "https://example.com/$id",
+                                redirectUrl = "https://example.com/${id.value}",
                                 tokenAddress = tokenAddress.rawValue,
                                 assetType = AssetType.TOKEN,
                                 blockNumber = blockNumber.value,
@@ -1132,7 +1136,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                                     timestamp = fetchResponse.requests[0].balance!!.timestamp,
                                     amount = assetBalance.rawValue
                                 ),
-                                messageToSign = "Verification message ID to sign: $id",
+                                messageToSign = "Verification message ID to sign: ${id.value}",
                                 signedMessage = signedMessage.value,
                                 createdAt = fetchResponse.requests[0].createdAt
                             )
@@ -1198,12 +1202,12 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, AssetBalanceRequestResponse::class.java)
         }
 
-        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+        val id = AssetBalanceRequestId(UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73"))
 
         suppose("ID from pre-signed message is used in database") {
             dslContext.update(AssetBalanceRequestTable)
                 .set(AssetBalanceRequestTable.ID, id)
-                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .set(AssetBalanceRequestTable.REDIRECT_URL, "https://example.com/${id.value}")
                 .where(AssetBalanceRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
@@ -1218,7 +1222,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch asset balance requests by project ID is made") {
-            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/balance/by-project/$projectId"))
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/balance/by-project/${projectId.value}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -1235,7 +1239,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                                 projectId = projectId,
                                 status = Status.SUCCESS,
                                 chainId = chainId.value,
-                                redirectUrl = "https://example.com/$id",
+                                redirectUrl = "https://example.com/${id.value}",
                                 tokenAddress = tokenAddress.rawValue,
                                 assetType = AssetType.TOKEN,
                                 blockNumber = blockNumber.value,
@@ -1251,7 +1255,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                                     timestamp = fetchResponse.requests[0].balance!!.timestamp,
                                     amount = assetBalance.rawValue
                                 ),
-                                messageToSign = "Verification message ID to sign: $id",
+                                messageToSign = "Verification message ID to sign: ${id.value}",
                                 signedMessage = signedMessage.value,
                                 createdAt = fetchResponse.requests[0].createdAt
                             )
@@ -1279,7 +1283,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyAttachSignedMessage() {
-        val id = UUID.randomUUID()
+        val id = AssetBalanceRequestId(UUID.randomUUID())
 
         suppose("some asset balance request without signed message exists in database") {
             assetBalanceRequestRepository.store(
@@ -1287,7 +1291,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     tokenAddress = ContractAddress("a"),
                     blockNumber = BlockNumber(BigInteger.TEN),
                     requestedWalletAddress = WalletAddress("b"),
@@ -1306,7 +1310,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach signed message to asset balance request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/balance/$id")
+                MockMvcRequestBuilders.put("/v1/balance/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1333,7 +1337,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustReturn400BadRequestWhenSignedMessageIsNotAttached() {
-        val id = UUID.randomUUID()
+        val id = AssetBalanceRequestId(UUID.randomUUID())
         val walletAddress = WalletAddress("c")
         val signedMessage = SignedMessage("signed-message")
 
@@ -1343,7 +1347,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     tokenAddress = ContractAddress("a"),
                     blockNumber = BlockNumber(BigInteger.TEN),
                     requestedWalletAddress = WalletAddress("b"),
@@ -1360,7 +1364,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned when attaching signed message") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/balance/$id")
+                MockMvcRequestBuilders.put("/v1/balance/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1387,8 +1391,8 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    private fun insertProjectWithCustomRpcUrl(): Triple<UUID, ChainId, String> {
-        val projectId = UUID.randomUUID()
+    private fun insertProjectWithCustomRpcUrl(): Triple<ProjectId, ChainId, String> {
+        val projectId = ProjectId(UUID.randomUUID())
         val chainId = ChainId(1337L)
 
         dslContext.executeInsert(
@@ -1407,7 +1411,7 @@ class AssetBalanceRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = projectId,
                 apiKey = apiKey,
                 createdAt = TestData.TIMESTAMP

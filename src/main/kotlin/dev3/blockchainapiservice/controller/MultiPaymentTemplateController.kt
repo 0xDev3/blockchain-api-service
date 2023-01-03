@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
 import dev3.blockchainapiservice.model.request.CreateMultiPaymentTemplateRequest
 import dev3.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.model.request.UpdateMultiPaymentTemplateRequest
@@ -20,7 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.validation.Valid
 
 @Validated
@@ -44,7 +45,7 @@ class MultiPaymentTemplateController(private val multiPaymentTemplateService: Mu
 
     @PatchMapping("/v1/multi-payment-template/{id}")
     fun updateMultiPaymentTemplate(
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: MultiPaymentTemplateId,
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @Valid @RequestBody requestBody: UpdateMultiPaymentTemplateRequest
     ): ResponseEntity<MultiPaymentTemplateWithItemsResponse> {
@@ -61,7 +62,7 @@ class MultiPaymentTemplateController(private val multiPaymentTemplateService: Mu
 
     @DeleteMapping("/v1/multi-payment-template/{id}")
     fun deleteMultiPaymentTemplate(
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: MultiPaymentTemplateId,
         @UserIdentifierBinding userIdentifier: UserIdentifier
     ) {
         multiPaymentTemplateService.deleteMultiPaymentTemplateById(
@@ -72,7 +73,7 @@ class MultiPaymentTemplateController(private val multiPaymentTemplateService: Mu
 
     @GetMapping("/v1/multi-payment-template/{id}")
     fun getMultiPaymentTemplateById(
-        @PathVariable("id") id: UUID
+        @PathVariable("id") id: MultiPaymentTemplateId
     ): ResponseEntity<MultiPaymentTemplateWithItemsResponse> {
         return ResponseEntity.ok(
             MultiPaymentTemplateWithItemsResponse(
@@ -95,7 +96,7 @@ class MultiPaymentTemplateController(private val multiPaymentTemplateService: Mu
 
     @PostMapping("/v1/multi-payment-template/{templateId}/items")
     fun addItemToMultiPaymentTemplate(
-        @PathVariable("templateId") templateId: UUID,
+        @PathVariable("templateId") templateId: MultiPaymentTemplateId,
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @Valid @RequestBody requestBody: MultiPaymentTemplateItemRequest
     ): ResponseEntity<MultiPaymentTemplateWithItemsResponse> {
@@ -112,8 +113,8 @@ class MultiPaymentTemplateController(private val multiPaymentTemplateService: Mu
 
     @PatchMapping("/v1/multi-payment-template/{templateId}/items/{itemId}")
     fun updateMultiPaymentTemplateItem(
-        @PathVariable("templateId") templateId: UUID,
-        @PathVariable("itemId") itemId: UUID,
+        @PathVariable("templateId") templateId: MultiPaymentTemplateId,
+        @PathVariable("itemId") itemId: MultiPaymentTemplateItemId,
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @Valid @RequestBody requestBody: MultiPaymentTemplateItemRequest
     ): ResponseEntity<MultiPaymentTemplateWithItemsResponse> {
@@ -131,8 +132,8 @@ class MultiPaymentTemplateController(private val multiPaymentTemplateService: Mu
 
     @DeleteMapping("/v1/multi-payment-template/{templateId}/items/{itemId}")
     fun deleteMultiPaymentTemplateItem(
-        @PathVariable("templateId") templateId: UUID,
-        @PathVariable("itemId") itemId: UUID,
+        @PathVariable("templateId") templateId: MultiPaymentTemplateId,
+        @PathVariable("itemId") itemId: MultiPaymentTemplateItemId,
         @UserIdentifierBinding userIdentifier: UserIdentifier
     ): ResponseEntity<MultiPaymentTemplateWithItemsResponse> {
         return ResponseEntity.ok(

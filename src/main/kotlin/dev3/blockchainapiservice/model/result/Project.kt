@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.model.result
 
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
@@ -7,8 +9,8 @@ import dev3.blockchainapiservice.util.UtcDateTime
 import java.util.UUID
 
 data class Project(
-    val id: UUID,
-    val ownerId: UUID,
+    val id: ProjectId,
+    val ownerId: UserId,
     val issuerContractAddress: ContractAddress,
     val baseRedirectUrl: BaseUrl,
     val chainId: ChainId,

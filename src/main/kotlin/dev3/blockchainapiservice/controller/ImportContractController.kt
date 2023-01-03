@@ -6,6 +6,7 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMa
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.model.params.ImportContractParams
 import dev3.blockchainapiservice.model.request.ImportContractRequest
 import dev3.blockchainapiservice.model.request.ImportedContractInterfacesRequest
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.validation.Valid
 
 @Validated
@@ -75,7 +75,7 @@ class ImportContractController(
 
     @ApiReadLimitedMapping(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, "/v1/import-smart-contract/{id}/suggested-interfaces")
     fun getSuggestedInterfacesForImportedSmartContract(
-        @PathVariable("id") id: UUID
+        @PathVariable("id") id: ContractDeploymentRequestId
     ): ResponseEntity<SuggestedContractInterfaceManifestsResponse> {
         val matchingInterfaces = contractInterfacesService.getSuggestedInterfacesForImportedSmartContract(id)
         return ResponseEntity.ok(SuggestedContractInterfaceManifestsResponse(matchingInterfaces))
@@ -88,7 +88,7 @@ class ImportContractController(
     )
     fun addInterfacesToImportedSmartContract(
         @ApiKeyBinding project: Project,
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: ContractDeploymentRequestId,
         @Valid @RequestBody requestBody: ImportedContractInterfacesRequest
     ): ResponseEntity<ContractDeploymentRequestResponse> {
         contractInterfacesService.addInterfacesToImportedContract(
@@ -109,7 +109,7 @@ class ImportContractController(
     )
     fun removeInterfacesFromImportedSmartContract(
         @ApiKeyBinding project: Project,
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: ContractDeploymentRequestId,
         @Valid @RequestBody requestBody: ImportedContractInterfacesRequest
     ): ResponseEntity<ContractDeploymentRequestResponse> {
         contractInterfacesService.removeInterfacesFromImportedContract(
@@ -130,7 +130,7 @@ class ImportContractController(
     )
     fun setInterfacesForImportedSmartContract(
         @ApiKeyBinding project: Project,
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: ContractDeploymentRequestId,
         @Valid @RequestBody requestBody: ImportedContractInterfacesRequest
     ): ResponseEntity<ContractDeploymentRequestResponse> {
         contractInterfacesService.setImportedContractInterfaces(

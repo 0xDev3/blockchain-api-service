@@ -4,6 +4,9 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.CannotAttachSignedMessageException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateAuthorizationRequestParams
 import dev3.blockchainapiservice.model.params.StoreAuthorizationRequestParams
@@ -25,8 +28,8 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -37,12 +40,12 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustSuccessfullyCreateAuthorizationRequest() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
-                .willReturn(uuid)
+            call(uuidProvider.getRawUuid())
+                .willReturn(uuid.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -64,7 +67,7 @@ class AuthorizationRequestServiceTest : TestBase() {
                 afterActionMessage = "after-action-message"
             )
         )
-        val fullRedirectUrl = redirectUrl.replace("\${id}", uuid.toString())
+        val fullRedirectUrl = redirectUrl.replace("\${id}", uuid.value.toString())
         val databaseParams = StoreAuthorizationRequestParams(
             id = uuid,
             projectId = PROJECT.id,
@@ -118,7 +121,7 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustThrowResourceNotFoundExceptionForNonExistentAuthorizationRequest() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is not in database") {
@@ -145,11 +148,11 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAuthorizationRequestWithPendingStatusWhenActualWalletAddressIsNull() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val authorizationRequest = AuthorizationRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
-            redirectUrl = "redirect-url/$uuid",
+            projectId = ProjectId(UUID.randomUUID()),
+            redirectUrl = "redirect-url/${uuid.value}",
             messageToSignOverride = "message-to-sign-override",
             storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
@@ -210,11 +213,11 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAuthorizationRequestWithPendingStatusWhenSignedMessageIsNull() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val authorizationRequest = AuthorizationRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
-            redirectUrl = "redirect-url/$uuid",
+            projectId = ProjectId(UUID.randomUUID()),
+            redirectUrl = "redirect-url/${uuid.value}",
             messageToSignOverride = "message-to-sign-override",
             storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
@@ -276,11 +279,11 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAuthorizationRequestWithFailedStatusWhenRequestedAndActualWalletAddressesDontMatch() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val authorizationRequest = AuthorizationRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
-            redirectUrl = "redirect-url/$uuid",
+            projectId = ProjectId(UUID.randomUUID()),
+            redirectUrl = "redirect-url/${uuid.value}",
             messageToSignOverride = "message-to-sign-override",
             storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
@@ -342,11 +345,11 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAuthorizationRequestWithFailedStatusWhenSignatureDoesntMatch() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val authorizationRequest = AuthorizationRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
-            redirectUrl = "redirect-url/$uuid",
+            projectId = ProjectId(UUID.randomUUID()),
+            redirectUrl = "redirect-url/${uuid.value}",
             messageToSignOverride = "message-to-sign-override",
             storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
@@ -419,11 +422,11 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAuthorizationRequestWithSuccessfulStatusWhenRequestedWalletAddressIsNull() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val authorizationRequest = AuthorizationRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
-            redirectUrl = "redirect-url/$uuid",
+            projectId = ProjectId(UUID.randomUUID()),
+            redirectUrl = "redirect-url/${uuid.value}",
             messageToSignOverride = "message-to-sign-override",
             storeIndefinitely = true,
             requestedWalletAddress = null,
@@ -496,11 +499,11 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAuthorizationRequestWithSuccessfulStatusWhenRequestedWalletAddressIsSpecified() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val authorizationRequest = AuthorizationRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
-            redirectUrl = "redirect-url/$uuid",
+            projectId = ProjectId(UUID.randomUUID()),
+            redirectUrl = "redirect-url/${uuid.value}",
             messageToSignOverride = "message-to-sign-override",
             storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
@@ -573,11 +576,11 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAuthorizationRequestWithSuccessfulStatusAndDeleteItIfItsNotStoredIndefinitely() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val authorizationRequest = AuthorizationRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
-            redirectUrl = "redirect-url/$uuid",
+            projectId = ProjectId(UUID.randomUUID()),
+            redirectUrl = "redirect-url/${uuid.value}",
             messageToSignOverride = "message-to-sign-override",
             storeIndefinitely = false,
             requestedWalletAddress = WalletAddress("def"),
@@ -651,11 +654,11 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnListOfAuthorizationRequestsByProjectId() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val authorizationRequest = AuthorizationRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
-            redirectUrl = "redirect-url/$uuid",
+            projectId = ProjectId(UUID.randomUUID()),
+            redirectUrl = "redirect-url/${uuid.value}",
             messageToSignOverride = "message-to-sign-override",
             storeIndefinitely = true,
             requestedWalletAddress = WalletAddress("def"),
@@ -726,7 +729,7 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustAttachWalletAddressAndSignedMessage() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val walletAddress = WalletAddress("a")
         val signedMessage = SignedMessage("signed-message")
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
@@ -757,7 +760,7 @@ class AuthorizationRequestServiceTest : TestBase() {
 
     @Test
     fun mustThrowCannotAttachSignedMessageExceptionWhenAttachingWalletAddressAndSignedMessageFails() {
-        val uuid = UUID.randomUUID()
+        val uuid = AuthorizationRequestId(UUID.randomUUID())
         val walletAddress = WalletAddress("a")
         val signedMessage = SignedMessage("signed-message")
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()

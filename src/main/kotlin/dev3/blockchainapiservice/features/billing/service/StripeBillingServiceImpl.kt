@@ -27,6 +27,7 @@ import dev3.blockchainapiservice.features.billing.model.response.IntervalType
 import dev3.blockchainapiservice.features.billing.model.response.PayableSubscriptionResponse
 import dev3.blockchainapiservice.features.billing.model.response.SubscriptionPriceResponse
 import dev3.blockchainapiservice.features.billing.model.response.SubscriptionResponse
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
@@ -35,7 +36,6 @@ import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 import kotlin.time.Duration.Companion.days
 
 @Service
@@ -267,7 +267,7 @@ class StripeBillingServiceImpl( // TODO test
 
     private fun Subscription.isActive() = status == "active"
 
-    private fun Subscription.activateNewSubscription(userId: UUID) {
+    private fun Subscription.activateNewSubscription(userId: UserId) {
         val start = UtcDateTime.ofEpochSeconds(currentPeriodStart)
         val end = UtcDateTime.ofEpochSeconds(currentPeriodEnd)
         val data = this.items.data[0]

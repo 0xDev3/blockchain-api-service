@@ -4,6 +4,8 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.AliasAlreadyInUseException
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.result.AddressBookEntry
@@ -31,7 +33,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         private val ADDRESS = WalletAddress("a")
         private const val PHONE_NUMBER = "phone-number"
         private const val EMAIL = "email"
-        private val OWNER_ID = UUID.randomUUID()
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val OWNER_ADDRESS = WalletAddress("cafebabe")
     }
 
@@ -61,7 +63,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchAddressBookEntryById() {
         val record = AddressBookRecord(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = ALIAS,
             walletAddress = ADDRESS,
             phoneNumber = PHONE_NUMBER,
@@ -85,7 +87,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchAddressBookEntryByAliasAndUserId() {
         val record = AddressBookRecord(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = ALIAS,
             walletAddress = ADDRESS,
             phoneNumber = PHONE_NUMBER,
@@ -110,7 +112,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
     fun mustCorrectlyFetchAddressBookEntriesByWalletAddress() {
         val records = listOf(
             AddressBookRecord(
-                id = UUID.randomUUID(),
+                id = AddressBookId(UUID.randomUUID()),
                 alias = "alias-1",
                 walletAddress = WalletAddress("a"),
                 phoneNumber = "phone-number-1",
@@ -119,7 +121,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
                 userId = OWNER_ID
             ),
             AddressBookRecord(
-                id = UUID.randomUUID(),
+                id = AddressBookId(UUID.randomUUID()),
                 alias = "alias-2",
                 walletAddress = WalletAddress("b"),
                 phoneNumber = "phone-number-2",
@@ -144,7 +146,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyStoreAddressBookEntry() {
         val addressBookEntry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = ALIAS,
             address = ADDRESS,
             phoneNumber = PHONE_NUMBER,
@@ -171,7 +173,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
 
         verify("storing address book entry with conflicting alias throws AliasAlreadyInUseException") {
             expectThrows<AliasAlreadyInUseException> {
-                repository.store(addressBookEntry.copy(id = UUID.randomUUID()))
+                repository.store(addressBookEntry.copy(id = AddressBookId(UUID.randomUUID())))
             }
         }
     }
@@ -179,7 +181,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyUpdateAddressBookEntry() {
         val addressBookEntry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = ALIAS,
             address = ADDRESS,
             phoneNumber = PHONE_NUMBER,
@@ -241,7 +243,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         }
 
         val otherEntry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "other-alias",
             address = WalletAddress("c"),
             phoneNumber = "other-phone-number",

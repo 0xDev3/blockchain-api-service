@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetSendRequestRecord
 import dev3.blockchainapiservice.model.ScreenConfig
@@ -12,7 +14,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.coalesce
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqAssetSendRequestRepository(private val dslContext: DSLContext) : AssetSendRequestRepository {
@@ -40,14 +41,14 @@ class JooqAssetSendRequestRepository(private val dslContext: DSLContext) : Asset
         return record.toModel()
     }
 
-    override fun getById(id: UUID): AssetSendRequest? {
+    override fun getById(id: AssetSendRequestId): AssetSendRequest? {
         logger.debug { "Get asset send request by id: $id" }
         return dslContext.selectFrom(AssetSendRequestTable)
             .where(AssetSendRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
-    override fun getAllByProjectId(projectId: UUID): List<AssetSendRequest> {
+    override fun getAllByProjectId(projectId: ProjectId): List<AssetSendRequest> {
         logger.debug { "Get asset send requests filtered by projectId: $projectId" }
         return dslContext.selectFrom(AssetSendRequestTable)
             .where(AssetSendRequestTable.PROJECT_ID.eq(projectId))
@@ -71,7 +72,7 @@ class JooqAssetSendRequestRepository(private val dslContext: DSLContext) : Asset
             .fetch { it.toModel() }
     }
 
-    override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
+    override fun setTxInfo(id: AssetSendRequestId, txHash: TransactionHash, caller: WalletAddress): Boolean {
         logger.info { "Set txInfo for asset send request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(AssetSendRequestTable)
             .set(AssetSendRequestTable.TX_HASH, txHash)

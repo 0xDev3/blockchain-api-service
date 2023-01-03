@@ -3,6 +3,9 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.Erc20LockRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -46,8 +49,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         private const val LOCK_SCREEN_BEFORE_ACTION_MESSAGE = "lock-screen-before-action-message"
         private const val LOCK_SCREEN_AFTER_ACTION_MESSAGE = "lock-screen-after-action-message"
         private val TX_HASH = TransactionHash("tx-hash")
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
     }
 
     @Suppress("unused")
@@ -87,7 +90,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchErc20LockRequestById() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
 
         suppose("some ERC20 lock request exists in database") {
             dslContext.executeInsert(
@@ -140,7 +143,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentErc20LockRequestById() {
         verify("null is returned when fetching non-existent ERC20 lock request") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(Erc20LockRequestId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -149,7 +152,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchErc20LockRequestsByProject() {
-        val otherProjectId = UUID.randomUUID()
+        val otherProjectId = ProjectId(UUID.randomUUID())
 
         suppose("some other project is in database") {
             dslContext.executeInsert(
@@ -167,7 +170,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
 
         val projectRequests = listOf(
             Erc20LockRequestRecord(
-                id = UUID.randomUUID(),
+                id = Erc20LockRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -183,7 +186,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             Erc20LockRequestRecord(
-                id = UUID.randomUUID(),
+                id = Erc20LockRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -201,7 +204,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         )
         val otherRequests = listOf(
             Erc20LockRequestRecord(
-                id = UUID.randomUUID(),
+                id = Erc20LockRequestId(UUID.randomUUID()),
                 projectId = otherProjectId,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -217,7 +220,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             Erc20LockRequestRecord(
-                id = UUID.randomUUID(),
+                id = Erc20LockRequestId(UUID.randomUUID()),
                 projectId = otherProjectId,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -269,7 +272,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreErc20LockRequest() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val params = StoreErc20LockRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -326,7 +329,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetTxInfoForErc20LockRequestWithNullTxHash() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val params = StoreErc20LockRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -383,7 +386,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotUpdateTokenSenderAddressForErc20LockRequestWhenTokenSenderIsAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val params = StoreErc20LockRequestParams(
             id = id,
             chainId = CHAIN_ID,
@@ -441,7 +444,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetTxHashForErc20LockRequestWhenTxHashIsAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val params = StoreErc20LockRequestParams(
             id = id,
             projectId = PROJECT_ID,

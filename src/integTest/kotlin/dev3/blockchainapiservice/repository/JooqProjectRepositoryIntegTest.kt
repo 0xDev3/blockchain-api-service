@@ -4,6 +4,8 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.DuplicateIssuerContractAddressException
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.result.Project
@@ -28,7 +30,7 @@ import java.util.UUID
 class JooqProjectRepositoryIntegTest : TestBase() {
 
     companion object {
-        private val OWNER_ID = UUID.randomUUID()
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val ISSUER_CONTRACT_ADDRESS = ContractAddress("1550e4")
         private val BASE_REDIRECT_URL = BaseUrl("base-redirect-url")
         private val CHAIN_ID = ChainId(1337L)
@@ -60,7 +62,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchProjectById() {
-        val id = UUID.randomUUID()
+        val id = ProjectId(UUID.randomUUID())
 
         suppose("some project is stored in database") {
             dslContext.executeInsert(
@@ -97,7 +99,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentProjectById() {
         verify("null is returned when fetching non-existent project") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(ProjectId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -106,7 +108,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchProjectByIssuer() {
-        val id = UUID.randomUUID()
+        val id = ProjectId(UUID.randomUUID())
 
         suppose("some project is stored in database") {
             dslContext.executeInsert(
@@ -155,7 +157,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         suppose("some projects are stored in database") {
             dslContext.batchInsert(
                 ProjectRecord(
-                    id = UUID.randomUUID(),
+                    id = ProjectId(UUID.randomUUID()),
                     ownerId = OWNER_ID,
                     issuerContractAddress = ContractAddress("a1"),
                     baseRedirectUrl = BASE_REDIRECT_URL,
@@ -164,7 +166,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
                     createdAt = TestData.TIMESTAMP
                 ),
                 ProjectRecord(
-                    id = UUID.randomUUID(),
+                    id = ProjectId(UUID.randomUUID()),
                     ownerId = OWNER_ID,
                     issuerContractAddress = ContractAddress("a2"),
                     baseRedirectUrl = BASE_REDIRECT_URL,
@@ -187,7 +189,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreProject() {
-        val id = UUID.randomUUID()
+        val id = ProjectId(UUID.randomUUID())
         val project = Project(
             id = id,
             ownerId = OWNER_ID,
@@ -220,7 +222,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         suppose("project is stored in database") {
             repository.store(
                 Project(
-                    id = UUID.randomUUID(),
+                    id = ProjectId(UUID.randomUUID()),
                     ownerId = OWNER_ID,
                     issuerContractAddress = ISSUER_CONTRACT_ADDRESS,
                     baseRedirectUrl = BASE_REDIRECT_URL,
@@ -235,7 +237,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
             expectThrows<DuplicateIssuerContractAddressException> {
                 repository.store(
                     Project(
-                        id = UUID.randomUUID(),
+                        id = ProjectId(UUID.randomUUID()),
                         ownerId = OWNER_ID,
                         issuerContractAddress = ISSUER_CONTRACT_ADDRESS,
                         baseRedirectUrl = BASE_REDIRECT_URL,

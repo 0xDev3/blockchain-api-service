@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.ContractBinaryInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
@@ -18,7 +20,7 @@ import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 data class StoreContractDeploymentRequestParams(
-    val id: UUID,
+    val id: ContractDeploymentRequestId,
     val alias: String,
     val contractId: ContractId,
     val contractData: ContractBinaryData,
@@ -27,7 +29,7 @@ data class StoreContractDeploymentRequestParams(
     val initialEthAmount: Balance,
     val chainId: ChainId,
     val redirectUrl: String,
-    val projectId: UUID,
+    val projectId: ProjectId,
     val createdAt: UtcDateTime,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig,
@@ -45,7 +47,7 @@ data class StoreContractDeploymentRequestParams(
             project: Project,
             createdAt: UtcDateTime
         ) = StoreContractDeploymentRequestParams(
-            id = id,
+            id = ContractDeploymentRequestId(id),
             alias = params.createParams.alias,
             contractId = params.createParams.contractId,
             contractData = ContractBinaryData(
@@ -69,7 +71,7 @@ data class StoreContractDeploymentRequestParams(
 
         @Suppress("LongParameterList")
         fun fromImportedContract(
-            id: UUID,
+            id: ContractDeploymentRequestId,
             params: ImportContractParams,
             contractId: ContractId,
             contractDeploymentTransactionInfo: ContractDeploymentTransactionInfo,
@@ -89,7 +91,7 @@ data class StoreContractDeploymentRequestParams(
                     deployerAddress = contractDeploymentTransactionInfo.from,
                     initialEthAmount = contractDeploymentTransactionInfo.value,
                     chainId = project.chainId,
-                    redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
+                    redirectUrl = project.createRedirectUrl(params.redirectUrl, id.value, PATH),
                     projectId = project.id,
                     createdAt = createdAt,
                     arbitraryData = params.arbitraryData,
@@ -109,7 +111,7 @@ data class StoreContractDeploymentRequestParams(
                     deployerAddress = null,
                     initialEthAmount = Balance.ZERO,
                     chainId = project.chainId,
-                    redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
+                    redirectUrl = project.createRedirectUrl(params.redirectUrl, id.value, PATH),
                     projectId = project.id,
                     createdAt = createdAt,
                     arbitraryData = params.arbitraryData,
@@ -122,7 +124,7 @@ data class StoreContractDeploymentRequestParams(
 
         @Suppress("LongParameterList")
         fun fromContractDeploymentRequest(
-            id: UUID,
+            id: ContractDeploymentRequestId,
             importContractParams: ImportContractParams,
             contractDeploymentRequest: ContractDeploymentRequest,
             project: Project,
@@ -137,7 +139,7 @@ data class StoreContractDeploymentRequestParams(
             deployerAddress = contractDeploymentRequest.deployerAddress,
             initialEthAmount = contractDeploymentRequest.initialEthAmount,
             chainId = contractDeploymentRequest.chainId,
-            redirectUrl = project.createRedirectUrl(importContractParams.redirectUrl, id, PATH),
+            redirectUrl = project.createRedirectUrl(importContractParams.redirectUrl, id.value, PATH),
             projectId = project.id,
             createdAt = createdAt,
             arbitraryData = importContractParams.arbitraryData,

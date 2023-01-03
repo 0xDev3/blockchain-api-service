@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetMultiSendRequestRecord
 import dev3.blockchainapiservice.model.ScreenConfig
@@ -13,7 +15,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.coalesce
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqAssetMultiSendRequestRepository(private val dslContext: DSLContext) : AssetMultiSendRequestRepository {
@@ -47,14 +48,14 @@ class JooqAssetMultiSendRequestRepository(private val dslContext: DSLContext) : 
         return record.toModel()
     }
 
-    override fun getById(id: UUID): AssetMultiSendRequest? {
+    override fun getById(id: AssetMultiSendRequestId): AssetMultiSendRequest? {
         logger.debug { "Get asset multi-send request by id: $id" }
         return dslContext.selectFrom(AssetMultiSendRequestTable)
             .where(AssetMultiSendRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
-    override fun getAllByProjectId(projectId: UUID): List<AssetMultiSendRequest> {
+    override fun getAllByProjectId(projectId: ProjectId): List<AssetMultiSendRequest> {
         logger.debug { "Get asset multi-send requests filtered by projectId: $projectId" }
         return dslContext.selectFrom(AssetMultiSendRequestTable)
             .where(AssetMultiSendRequestTable.PROJECT_ID.eq(projectId))
@@ -70,7 +71,11 @@ class JooqAssetMultiSendRequestRepository(private val dslContext: DSLContext) : 
             .fetch { it.toModel() }
     }
 
-    override fun setApproveTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
+    override fun setApproveTxInfo(
+        id: AssetMultiSendRequestId,
+        txHash: TransactionHash,
+        caller: WalletAddress
+    ): Boolean {
         logger.info { "Set approve txInfo for asset multi-send request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(AssetMultiSendRequestTable)
             .set(AssetMultiSendRequestTable.APPROVE_TX_HASH, txHash)
@@ -88,7 +93,11 @@ class JooqAssetMultiSendRequestRepository(private val dslContext: DSLContext) : 
             .execute() > 0
     }
 
-    override fun setDisperseTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
+    override fun setDisperseTxInfo(
+        id: AssetMultiSendRequestId,
+        txHash: TransactionHash,
+        caller: WalletAddress
+    ): Boolean {
         logger.info { "Set disperse txInfo for asset multi-send request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(AssetMultiSendRequestTable)
             .set(AssetMultiSendRequestTable.DISPERSE_TX_HASH, txHash)

@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.model.response
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.util.FunctionArgumentSchema
@@ -13,10 +15,9 @@ import dev3.blockchainapiservice.util.annotation.SchemaIgnore
 import dev3.blockchainapiservice.util.annotation.SchemaName
 import java.math.BigInteger
 import java.time.OffsetDateTime
-import java.util.UUID
 
 data class ContractDeploymentRequestResponse(
-    val id: UUID,
+    val id: ContractDeploymentRequestId,
     val alias: String,
     val name: String?,
     val description: String?,
@@ -30,7 +31,7 @@ data class ContractDeploymentRequestResponse(
     val initialEthAmount: BigInteger,
     val chainId: Long,
     val redirectUrl: String,
-    val projectId: UUID,
+    val projectId: ProjectId,
     val createdAt: OffsetDateTime,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig?,

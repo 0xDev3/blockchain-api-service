@@ -4,6 +4,9 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ContractNotYetDeployedException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.DeployedContractAddressIdentifier
@@ -32,15 +35,15 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
             customRpcUrl = "custom-rpc-url",
             createdAt = TestData.TIMESTAMP
         )
-        private val DEPLOYED_CONTRACT_ID = DeployedContractIdIdentifier(UUID.randomUUID())
+        private val DEPLOYED_CONTRACT_ID = DeployedContractIdIdentifier(ContractDeploymentRequestId(UUID.randomUUID()))
         private val DEPLOYED_CONTRACT_ALIAS = DeployedContractAliasIdentifier("contract-alias")
         private val DEPLOYED_CONTRACT_ADDRESS = DeployedContractAddressIdentifier(ContractAddress("abc123"))
         private val DEPLOYER_ADDRESS = WalletAddress("a")

@@ -3,6 +3,9 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.request.CreateMultiPaymentTemplateRequest
 import dev3.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.model.request.UpdateMultiPaymentTemplateRequest
@@ -26,13 +29,13 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("cafebabe")
         )
-        private val TEMPLATE_ID = UUID.randomUUID()
+        private val TEMPLATE_ID = MultiPaymentTemplateId(UUID.randomUUID())
         private val ITEM = MultiPaymentTemplateItem(
-            id = UUID.randomUUID(),
+            id = MultiPaymentTemplateItemId(UUID.randomUUID()),
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("a"),
             itemName = "itemName",
@@ -74,8 +77,10 @@ class MultiPaymentTemplateServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
-                .willReturn(TEMPLATE_ID, ITEM.id)
+            call(uuidProvider.getUuid(MultiPaymentTemplateId))
+                .willReturn(TEMPLATE_ID)
+            call(uuidProvider.getUuid(MultiPaymentTemplateItemId))
+                .willReturn(ITEM.id)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -160,7 +165,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
         suppose("non-owned multi-payment template is fetched by id") {
             call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
-                .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
+                .willReturn(TEMPLATE.copy(userId = UserId(UUID.randomUUID())))
         }
 
         val service = MultiPaymentTemplateServiceImpl(
@@ -251,7 +256,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
         suppose("non-owned multi-payment template is fetched by id") {
             call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
-                .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
+                .willReturn(TEMPLATE.copy(userId = UserId(UUID.randomUUID())))
         }
 
         val service = MultiPaymentTemplateServiceImpl(
@@ -376,10 +381,10 @@ class MultiPaymentTemplateServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyAddItemToMultiPaymentTemplate() {
         val uuidProvider = mock<UuidProvider>()
-        val newItemId = UUID.randomUUID()
+        val newItemId = MultiPaymentTemplateItemId(UUID.randomUUID())
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
+            call(uuidProvider.getUuid(MultiPaymentTemplateItemId))
                 .willReturn(newItemId)
         }
 
@@ -439,7 +444,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
         suppose("non-owned multi-payment template is fetched by id") {
             call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
-                .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
+                .willReturn(TEMPLATE.copy(userId = UserId(UUID.randomUUID())))
         }
 
         val service = MultiPaymentTemplateServiceImpl(
@@ -462,10 +467,10 @@ class MultiPaymentTemplateServiceTest : TestBase() {
     @Test
     fun mustThrowResourceNotFoundExceptionWhenAddingMultiTemplateItemToNonExistentTemplate() {
         val uuidProvider = mock<UuidProvider>()
-        val newItemId = UUID.randomUUID()
+        val newItemId = MultiPaymentTemplateItemId(UUID.randomUUID())
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
+            call(uuidProvider.getUuid(MultiPaymentTemplateItemId))
                 .willReturn(newItemId)
         }
 
@@ -580,7 +585,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
         suppose("non-owned multi-payment template is fetched by id") {
             call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
-                .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
+                .willReturn(TEMPLATE.copy(userId = UserId(UUID.randomUUID())))
         }
 
         val service = MultiPaymentTemplateServiceImpl(
@@ -700,7 +705,7 @@ class MultiPaymentTemplateServiceTest : TestBase() {
 
         suppose("non-owned multi-payment template is fetched by id") {
             call(multiPaymentTemplateRepository.getById(TEMPLATE_ID))
-                .willReturn(TEMPLATE.copy(userId = UUID.randomUUID()))
+                .willReturn(TEMPLATE.copy(userId = UserId(UUID.randomUUID())))
         }
 
         val service = MultiPaymentTemplateServiceImpl(

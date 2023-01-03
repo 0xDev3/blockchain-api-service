@@ -3,6 +3,8 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachSignedMessageException
+import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
 import dev3.blockchainapiservice.model.params.StoreAssetBalanceRequestParams
 import dev3.blockchainapiservice.model.result.AssetBalanceRequest
@@ -17,7 +19,6 @@ import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class AssetBalanceRequestServiceImpl(
@@ -40,7 +41,7 @@ class AssetBalanceRequestServiceImpl(
         )
     }
 
-    override fun getAssetBalanceRequest(id: UUID): FullAssetBalanceRequest {
+    override fun getAssetBalanceRequest(id: AssetBalanceRequestId): FullAssetBalanceRequest {
         logger.debug { "Fetching asset balance request, id: $id" }
 
         val assetBalanceRequest = ethCommonService.fetchResource(
@@ -52,7 +53,7 @@ class AssetBalanceRequestServiceImpl(
         return assetBalanceRequest.appendBalanceData(project)
     }
 
-    override fun getAssetBalanceRequestsByProjectId(projectId: UUID): List<FullAssetBalanceRequest> {
+    override fun getAssetBalanceRequestsByProjectId(projectId: ProjectId): List<FullAssetBalanceRequest> {
         logger.debug { "Fetching asset balance requests for projectId: $projectId" }
         return projectRepository.getById(projectId)?.let {
             assetBalanceRequestRepository.getAllByProjectId(projectId).map { req -> req.appendBalanceData(it) }
@@ -60,7 +61,7 @@ class AssetBalanceRequestServiceImpl(
     }
 
     override fun attachWalletAddressAndSignedMessage(
-        id: UUID,
+        id: AssetBalanceRequestId,
         walletAddress: WalletAddress,
         signedMessage: SignedMessage
     ) {
@@ -73,7 +74,7 @@ class AssetBalanceRequestServiceImpl(
 
         if (attached.not()) {
             throw CannotAttachSignedMessageException(
-                "Unable to attach signed message to asset balance request with ID: $id"
+                "Unable to attach signed message to asset balance request with ID: ${id.value}"
             )
         }
     }

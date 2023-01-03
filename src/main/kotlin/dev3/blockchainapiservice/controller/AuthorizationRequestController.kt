@@ -4,6 +4,8 @@ import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
+import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.params.CreateAuthorizationRequestParams
 import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
 import dev3.blockchainapiservice.model.request.CreateAuthorizationRequest
@@ -19,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.validation.Valid
 
 @Validated
@@ -38,7 +39,7 @@ class AuthorizationRequestController(private val authorizationRequestService: Au
 
     @ApiReadLimitedMapping(IdType.AUTHORIZATION_REQUEST_ID, "/v1/wallet-authorization/{id}")
     fun getAuthorizationRequest(
-        @PathVariable("id") id: UUID
+        @PathVariable("id") id: AuthorizationRequestId
     ): ResponseEntity<AuthorizationRequestResponse> {
         val authorizationRequest = authorizationRequestService.getAuthorizationRequest(id)
         return ResponseEntity.ok(AuthorizationRequestResponse(authorizationRequest))
@@ -46,7 +47,7 @@ class AuthorizationRequestController(private val authorizationRequestService: Au
 
     @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/wallet-authorization/by-project/{projectId}")
     fun getAuthorizationRequestsByProjectId(
-        @PathVariable("projectId") projectId: UUID
+        @PathVariable("projectId") projectId: ProjectId
     ): ResponseEntity<AuthorizationRequestsResponse> {
         val authorizationRequests = authorizationRequestService.getAuthorizationRequestsByProjectId(projectId)
         return ResponseEntity.ok(
@@ -56,7 +57,7 @@ class AuthorizationRequestController(private val authorizationRequestService: Au
 
     @ApiWriteLimitedMapping(IdType.AUTHORIZATION_REQUEST_ID, RequestMethod.PUT, "/v1/wallet-authorization/{id}")
     fun attachSignedMessage(
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: AuthorizationRequestId,
         @Valid @RequestBody requestBody: AttachSignedMessageRequest
     ) {
         authorizationRequestService.attachWalletAddressAndSignedMessage(

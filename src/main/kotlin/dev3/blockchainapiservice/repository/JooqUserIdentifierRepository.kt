@@ -1,6 +1,7 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.result.UserIdentifier
@@ -10,7 +11,6 @@ import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIdentifierRepository {
@@ -29,7 +29,7 @@ class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIde
         return record.toModel()
     }
 
-    override fun getById(id: UUID): UserIdentifier? {
+    override fun getById(id: UserId): UserIdentifier? {
         logger.debug { "Get user identifier by id: $id" }
         return dslContext.selectFrom(UserIdentifierTable)
             .where(UserIdentifierTable.ID.eq(id))
@@ -55,7 +55,7 @@ class JooqUserIdentifierRepository(private val dslContext: DSLContext) : UserIde
             .fetchOne { it.toModel() }
     }
 
-    override fun setStripeClientId(id: UUID, stripeClientId: String): Boolean {
+    override fun setStripeClientId(id: UserId, stripeClientId: String): Boolean {
         logger.info { "Set Stripe client id, id: $id, stripeClientId: $stripeClientId" }
         return dslContext.update(UserIdentifierTable)
             .set(UserIdentifierTable.STRIPE_CLIENT_ID, stripeClientId)

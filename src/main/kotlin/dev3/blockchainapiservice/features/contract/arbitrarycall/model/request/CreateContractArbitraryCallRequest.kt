@@ -6,15 +6,15 @@ import dev3.blockchainapiservice.config.validation.MaxJsonNodeChars
 import dev3.blockchainapiservice.config.validation.MaxStringSize
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
 import dev3.blockchainapiservice.config.validation.ValidUint256
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.DeployedContractIdentifierRequestBody
 import java.math.BigInteger
-import java.util.UUID
 import javax.validation.Valid
 import javax.validation.constraints.NotNull
 
 data class CreateContractArbitraryCallRequest(
-    override val deployedContractId: UUID?,
+    override val deployedContractId: ContractDeploymentRequestId?,
     @field:MaxStringSize
     override val deployedContractAlias: String?,
     @field:ValidEthAddress

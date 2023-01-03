@@ -11,6 +11,9 @@ import dev3.blockchainapiservice.features.contract.arbitrarycall.model.request.C
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.response.ContractArbitraryCallRequestResponse
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.response.ContractArbitraryCallRequestsResponse
 import dev3.blockchainapiservice.features.contract.arbitrarycall.service.ContractArbitraryCallRequestService
+import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.ContractAddress
@@ -23,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.validation.Valid
 
 @Validated
@@ -44,7 +46,7 @@ class ContractArbitraryCallRequestController(
 
     @ApiReadLimitedMapping(IdType.ARBITRARY_CALL_REQUEST_ID, "/v1/arbitrary-call/{id}")
     fun getContractArbitraryCallRequest(
-        @PathVariable("id") id: UUID
+        @PathVariable("id") id: ContractArbitraryCallRequestId
     ): ResponseEntity<ContractArbitraryCallRequestResponse> {
         val contractArbitraryCallRequest = contractArbitraryCallRequestService.getContractArbitraryCallRequest(id)
         return ResponseEntity.ok(ContractArbitraryCallRequestResponse(contractArbitraryCallRequest))
@@ -52,8 +54,8 @@ class ContractArbitraryCallRequestController(
 
     @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/arbitrary-call/by-project/{projectId}")
     fun getContractArbitraryCallRequestsByProjectIdAndFilters(
-        @PathVariable("projectId") projectId: UUID,
-        @RequestParam("deployedContractId", required = false) deployedContractId: UUID?,
+        @PathVariable("projectId") projectId: ProjectId,
+        @RequestParam("deployedContractId", required = false) deployedContractId: ContractDeploymentRequestId?,
         @ValidEthAddress @RequestParam("contractAddress", required = false) contractAddress: String?
     ): ResponseEntity<ContractArbitraryCallRequestsResponse> {
         val contractArbitraryCallRequests = contractArbitraryCallRequestService
@@ -73,7 +75,7 @@ class ContractArbitraryCallRequestController(
 
     @ApiWriteLimitedMapping(IdType.ARBITRARY_CALL_REQUEST_ID, RequestMethod.PUT, "/v1/arbitrary-call/{id}")
     fun attachTransactionInfo(
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: ContractArbitraryCallRequestId,
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
         contractArbitraryCallRequestService.attachTxInfo(

@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.params.CreateProjectParams
 import dev3.blockchainapiservice.model.result.ApiKey
 import dev3.blockchainapiservice.model.result.Project
@@ -12,7 +14,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.Base64
-import java.util.UUID
 
 @Service
 class ProjectServiceImpl(
@@ -32,7 +33,7 @@ class ProjectServiceImpl(
         logger.info { "Creating project, userIdentifier: $userIdentifier, params: $params" }
 
         val project = Project(
-            id = uuidProvider.getUuid(),
+            id = uuidProvider.getUuid(ProjectId),
             ownerId = userIdentifier.id,
             issuerContractAddress = params.issuerContractAddress,
             baseRedirectUrl = params.baseRedirectUrl,
@@ -44,7 +45,7 @@ class ProjectServiceImpl(
         return projectRepository.store(project)
     }
 
-    override fun getProjectById(userIdentifier: UserIdentifier, id: UUID): Project {
+    override fun getProjectById(userIdentifier: UserIdentifier, id: ProjectId): Project {
         logger.debug {
             "Fetching project by ID, userIdentifier: $userIdentifier, id: $id"
         }
@@ -74,13 +75,13 @@ class ProjectServiceImpl(
         return projectRepository.getAllByOwnerId(userIdentifier.id)
     }
 
-    override fun getProjectApiKeys(userIdentifier: UserIdentifier, projectId: UUID): List<ApiKey> {
+    override fun getProjectApiKeys(userIdentifier: UserIdentifier, projectId: ProjectId): List<ApiKey> {
         logger.debug { "Fetch API keys for project, userIdentifier: $userIdentifier, projectId: $projectId" }
         val project = getProjectById(userIdentifier, projectId)
         return apiKeyRepository.getAllByProjectId(project.id)
     }
 
-    override fun createApiKey(userIdentifier: UserIdentifier, projectId: UUID): ApiKey {
+    override fun createApiKey(userIdentifier: UserIdentifier, projectId: ProjectId): ApiKey {
         logger.info { "Creating API key for project, userIdentifier: $userIdentifier, projectId: $projectId" }
         val project = getProjectById(userIdentifier, projectId)
         val apiKeyBytes = randomProvider.getBytes(API_KEY_BYTES)
@@ -89,7 +90,7 @@ class ProjectServiceImpl(
 
         return apiKeyRepository.store(
             ApiKey(
-                id = uuidProvider.getUuid(),
+                id = uuidProvider.getUuid(ApiKeyId),
                 projectId = project.id,
                 apiKey = apiKey,
                 createdAt = utcDateTimeProvider.getUtcDateTime()

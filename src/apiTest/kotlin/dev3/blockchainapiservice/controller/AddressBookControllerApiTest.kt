@@ -4,6 +4,8 @@ import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.response.AddressBookEntriesResponse
 import dev3.blockchainapiservice.model.response.AddressBookEntryResponse
@@ -23,9 +25,9 @@ import java.util.UUID
 class AddressBookControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val OWNER_ID = UUID.randomUUID()
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private const val OWNER_ADDRESS = "abc123"
-        private val OTHER_OWNER_ID = UUID.randomUUID()
+        private val OTHER_OWNER_ID = UserId(UUID.randomUUID())
         private const val OTHER_OWNER_ADDRESS = "def456"
     }
 
@@ -131,7 +133,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyUpdateAddressBookEntry() {
         val entry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "alias",
             address = WalletAddress("abc"),
             phoneNumber = "phone-number",
@@ -151,7 +153,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to update address book entry is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/address-book/${entry.id}")
+                MockMvcRequestBuilders.patch("/v1/address-book/${entry.id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -206,7 +208,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     @WithMockUser(OTHER_OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenUpdatingNonOwnedAddressBookEntry() {
         val entry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "alias",
             address = WalletAddress("abc"),
             phoneNumber = "phone-number",
@@ -226,7 +228,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-owned address book entry") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/address-book/${entry.id}")
+                MockMvcRequestBuilders.patch("/v1/address-book/${entry.id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -280,7 +282,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyDeleteAddressBookEntry() {
         val entry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "alias",
             address = WalletAddress("abc"),
             phoneNumber = "phone-number",
@@ -295,7 +297,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
 
         suppose("request to delete address book entry is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.delete("/v1/address-book/${entry.id}")
+                MockMvcRequestBuilders.delete("/v1/address-book/${entry.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
         }
@@ -310,7 +312,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     @WithMockUser(OTHER_OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenDeletingNonOwnedAddressBookEntry() {
         val entry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "alias",
             address = WalletAddress("abc"),
             phoneNumber = "phone-number",
@@ -325,7 +327,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-owned address book entry") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/v1/address-book/${entry.id}")
+                MockMvcRequestBuilders.delete("/v1/address-book/${entry.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -351,7 +353,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     @Test
     fun mustCorrectlyFetchAddressBookEntryById() {
         val entry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "alias",
             address = WalletAddress("abc"),
             phoneNumber = "phone-number",
@@ -366,7 +368,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch address book entry by id is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/address-book/${entry.id}")
+                MockMvcRequestBuilders.get("/v1/address-book/${entry.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -406,7 +408,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyFetchAddressBookEntryByAlias() {
         val entry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "alias",
             address = WalletAddress("abc"),
             phoneNumber = "phone-number",
@@ -461,7 +463,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
     @Test
     fun mustCorrectlyFetchAddressBookEntriesForWalletAddress() {
         val entry = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "alias",
             address = WalletAddress("abc"),
             phoneNumber = "phone-number",

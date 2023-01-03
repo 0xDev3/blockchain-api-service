@@ -3,6 +3,9 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
 import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
@@ -47,8 +50,8 @@ class AssetBalanceRequestControllerTest : TestBase() {
             )
         )
         val result = AssetBalanceRequest(
-            id = UUID.randomUUID(),
-            projectId = UUID.randomUUID(),
+            id = AssetBalanceRequestId(UUID.randomUUID()),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = ChainId(1337L),
             redirectUrl = params.redirectUrl!!,
             tokenAddress = params.tokenAddress,
@@ -62,7 +65,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
         )
         val project = Project(
             id = result.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -120,11 +123,11 @@ class AssetBalanceRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetBalanceRequest() {
-        val id = UUID.randomUUID()
+        val id = AssetBalanceRequestId(UUID.randomUUID())
         val service = mock<AssetBalanceRequestService>()
         val result = FullAssetBalanceRequest(
             id = id,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             status = Status.SUCCESS,
             chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url",
@@ -193,8 +196,8 @@ class AssetBalanceRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetBalanceRequestsByProjectId() {
-        val id = UUID.randomUUID()
-        val projectId = UUID.randomUUID()
+        val id = AssetBalanceRequestId(UUID.randomUUID())
+        val projectId = ProjectId(UUID.randomUUID())
         val service = mock<AssetBalanceRequestService>()
         val result = FullAssetBalanceRequest(
             id = id,
@@ -274,7 +277,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
         val service = mock<AssetBalanceRequestService>()
         val controller = AssetBalanceRequestController(service)
 
-        val id = UUID.randomUUID()
+        val id = AssetBalanceRequestId(UUID.randomUUID())
         val walletAddress = WalletAddress("abc")
         val signedMessage = SignedMessage("signed-message")
 

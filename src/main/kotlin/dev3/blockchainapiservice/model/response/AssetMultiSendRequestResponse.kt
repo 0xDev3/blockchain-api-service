@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.model.response
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.AssetMultiSendRequest
 import dev3.blockchainapiservice.util.AssetType
@@ -10,11 +12,10 @@ import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue
 import dev3.blockchainapiservice.util.WithMultiTransactionData
 import java.math.BigInteger
 import java.time.OffsetDateTime
-import java.util.UUID
 
 data class AssetMultiSendRequestResponse(
-    val id: UUID,
-    val projectId: UUID,
+    val id: AssetMultiSendRequestId,
+    val projectId: ProjectId,
     val approveStatus: Status?,
     val disperseStatus: Status?,
     val chainId: Long,

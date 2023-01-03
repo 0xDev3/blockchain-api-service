@@ -3,6 +3,9 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetBalanceRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -44,8 +47,8 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
         private const val BALANCE_SCREEN_AFTER_ACTION_MESSAGE = "balance-screen-after-action-message"
         private val ACTUAL_WALLET_ADDRESS = WalletAddress("c")
         private val SIGNED_MESSAGE = SignedMessage("signed-message")
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
     }
 
     @Suppress("unused")
@@ -85,7 +88,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetBalanceRequestById() {
-        val id = UUID.randomUUID()
+        val id = AssetBalanceRequestId(UUID.randomUUID())
 
         suppose("some asset balance request exists in database") {
             dslContext.executeInsert(
@@ -136,7 +139,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentAssetBalanceRequestById() {
         verify("null is returned when fetching non-existent asset balance request") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(AssetBalanceRequestId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -145,7 +148,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetLockRequestsByProject() {
-        val otherProjectId = UUID.randomUUID()
+        val otherProjectId = ProjectId(UUID.randomUUID())
 
         suppose("some other project is in database") {
             dslContext.executeInsert(
@@ -163,7 +166,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
 
         val projectRequests = listOf(
             AssetBalanceRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetBalanceRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -178,7 +181,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetBalanceRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetBalanceRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -195,7 +198,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
         )
         val otherRequests = listOf(
             AssetBalanceRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetBalanceRequestId(UUID.randomUUID()),
                 projectId = otherProjectId,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -210,7 +213,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetBalanceRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetBalanceRequestId(UUID.randomUUID()),
                 projectId = otherProjectId,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -260,7 +263,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreAssetBalanceRequest() {
-        val id = UUID.randomUUID()
+        val id = AssetBalanceRequestId(UUID.randomUUID())
         val params = StoreAssetBalanceRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -314,7 +317,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetSignedMessageForAssetBalanceRequestWithNullWalletAddressAndSignedMessage() {
-        val id = UUID.randomUUID()
+        val id = AssetBalanceRequestId(UUID.randomUUID())
         val params = StoreAssetBalanceRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -368,7 +371,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetWalletAddressAndSignedMessageForAssetBalanceRequestWhenWalletAddressAndSignedMessageAreAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = AssetBalanceRequestId(UUID.randomUUID())
         val params = StoreAssetBalanceRequestParams(
             id = id,
             projectId = PROJECT_ID,

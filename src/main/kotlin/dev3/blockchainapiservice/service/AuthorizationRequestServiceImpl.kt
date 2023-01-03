@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.CannotAttachSignedMessageException
+import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.params.CreateAuthorizationRequestParams
 import dev3.blockchainapiservice.model.params.StoreAuthorizationRequestParams
 import dev3.blockchainapiservice.model.result.AuthorizationRequest
@@ -12,7 +14,6 @@ import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithStatus
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class AuthorizationRequestServiceImpl(
@@ -33,7 +34,7 @@ class AuthorizationRequestServiceImpl(
         )
     }
 
-    override fun getAuthorizationRequest(id: UUID): WithStatus<AuthorizationRequest> {
+    override fun getAuthorizationRequest(id: AuthorizationRequestId): WithStatus<AuthorizationRequest> {
         logger.debug { "Fetching authorization request, id: $id" }
 
         val authorizationRequest = ethCommonService.fetchResource(
@@ -51,13 +52,13 @@ class AuthorizationRequestServiceImpl(
         return withStatus
     }
 
-    override fun getAuthorizationRequestsByProjectId(projectId: UUID): List<WithStatus<AuthorizationRequest>> {
+    override fun getAuthorizationRequestsByProjectId(projectId: ProjectId): List<WithStatus<AuthorizationRequest>> {
         logger.debug { "Fetching authorization requests for projectId: $projectId" }
         return authorizationRequestRepository.getAllByProjectId(projectId).map { it.determineStatus() }
     }
 
     override fun attachWalletAddressAndSignedMessage(
-        id: UUID,
+        id: AuthorizationRequestId,
         walletAddress: WalletAddress,
         signedMessage: SignedMessage
     ) {

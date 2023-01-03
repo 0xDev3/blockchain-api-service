@@ -4,6 +4,9 @@ import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.JsonConfig
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.model.params.OutputParameter
@@ -31,7 +34,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyCallContractReadonlyFunction() {
-        val deployedContractId = UUID.randomUUID()
+        val deployedContractId = ContractDeploymentRequestId(UUID.randomUUID())
         val params = CreateReadonlyFunctionCallParams(
             identifier = DeployedContractIdIdentifier(deployedContractId),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -55,8 +58,8 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
             contractAddress = ContractAddress("cafebafe")
         )
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),

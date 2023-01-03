@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.validation.MaxStringSize
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.filters.ContractDecoratorFilters
 import dev3.blockchainapiservice.model.filters.parseOrListWithNestedAndLists
 import dev3.blockchainapiservice.model.json.ArtifactJson
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.validation.Valid
 
 @Validated
@@ -37,7 +37,7 @@ class ContractDecoratorController(
     fun getContractDecorators(
         @Valid @RequestParam("tags", required = false) contractTags: List<@MaxStringSize String>?,
         @Valid @RequestParam("implements", required = false) contractImplements: List<@MaxStringSize String>?,
-        @RequestParam("projectId", required = false) projectId: UUID?
+        @RequestParam("projectId", required = false) projectId: ProjectId?
     ): ResponseEntity<ContractDecoratorsResponse> {
         val filters = ContractDecoratorFilters(
             contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
@@ -52,7 +52,7 @@ class ContractDecoratorController(
     fun getContractManifestJsonFiles(
         @Valid @RequestParam("tags", required = false) contractTags: List<@MaxStringSize String>?,
         @Valid @RequestParam("implements", required = false) contractImplements: List<@MaxStringSize String>?,
-        @RequestParam("projectId", required = false) projectId: UUID?
+        @RequestParam("projectId", required = false) projectId: ProjectId?
     ): ResponseEntity<ManifestJsonsResponse> {
         val filters = ContractDecoratorFilters(
             contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
@@ -67,7 +67,7 @@ class ContractDecoratorController(
     fun getContractArtifactJsonFiles(
         @Valid @RequestParam("tags", required = false) contractTags: List<@MaxStringSize String>?,
         @Valid @RequestParam("implements", required = false) contractImplements: List<@MaxStringSize String>?,
-        @RequestParam("projectId", required = false) projectId: UUID?
+        @RequestParam("projectId", required = false) projectId: ProjectId?
     ): ResponseEntity<ArtifactJsonsResponse> {
         val filters = ContractDecoratorFilters(
             contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
@@ -82,7 +82,7 @@ class ContractDecoratorController(
     fun getContractInfoMarkdownFiles(
         @Valid @RequestParam("tags", required = false) contractTags: List<@MaxStringSize String>?,
         @Valid @RequestParam("implements", required = false) contractImplements: List<@MaxStringSize String>?,
-        @RequestParam("projectId", required = false) projectId: UUID?
+        @RequestParam("projectId", required = false) projectId: ProjectId?
     ): ResponseEntity<InfoMarkdownsResponse> {
         val filters = ContractDecoratorFilters(
             contractTags = contractTags.parseOrListWithNestedAndLists { ContractTag(it) },
@@ -96,7 +96,7 @@ class ContractDecoratorController(
     @GetMapping("/v1/deployable-contracts/{id}")
     fun getContractDecorator(
         @PathVariable("id") id: String,
-        @RequestParam("projectId", required = false) projectId: UUID?
+        @RequestParam("projectId", required = false) projectId: ProjectId?
     ): ResponseEntity<ContractDecoratorResponse> {
         val contractId = ContractId(id)
         val contractDecorator = contractDecoratorRepository.getById(contractId)
@@ -108,7 +108,7 @@ class ContractDecoratorController(
     @GetMapping("/v1/deployable-contracts/{id}/manifest.json")
     fun getContractManifestJson(
         @PathVariable("id") id: String,
-        @RequestParam("projectId", required = false) projectId: UUID?
+        @RequestParam("projectId", required = false) projectId: ProjectId?
     ): ResponseEntity<ManifestJson> {
         val contractId = ContractId(id)
         val manifestJson = contractDecoratorRepository.getManifestJsonById(contractId)
@@ -121,7 +121,7 @@ class ContractDecoratorController(
     @GetMapping("/v1/deployable-contracts/{id}/artifact.json")
     fun getContractArtifactJson(
         @PathVariable("id") id: String,
-        @RequestParam("projectId", required = false) projectId: UUID?
+        @RequestParam("projectId", required = false) projectId: ProjectId?
     ): ResponseEntity<ArtifactJson> {
         val contractId = ContractId(id)
         val artifactJson = contractDecoratorRepository.getArtifactJsonById(contractId)
@@ -137,7 +137,7 @@ class ContractDecoratorController(
     )
     fun getContractInfoMarkdown(
         @PathVariable("id") id: String,
-        @RequestParam("projectId", required = false) projectId: UUID?
+        @RequestParam("projectId", required = false) projectId: ProjectId?
     ): ResponseEntity<String> {
         val contractId = ContractId(id)
         val infoMarkdown = contractDecoratorRepository.getInfoMarkdownById(contractId)
@@ -147,5 +147,6 @@ class ContractDecoratorController(
         return ResponseEntity.ok(infoMarkdown)
     }
 
-    private fun <T> UUID?.getIfPresent(fn: (UUID) -> List<T>): List<T> = if (this != null) fn(this) else emptyList()
+    private fun <T> ProjectId?.getIfPresent(fn: (ProjectId) -> List<T>): List<T> =
+        if (this != null) fn(this) else emptyList()
 }

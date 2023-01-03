@@ -1,11 +1,11 @@
 package dev3.blockchainapiservice.model.params
 
 import dev3.blockchainapiservice.exception.InvalidRequestBodyException
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.util.ContractAddress
-import java.util.UUID
 
 interface DeployedContractIdentifierRequestBody {
-    val deployedContractId: UUID?
+    val deployedContractId: ContractDeploymentRequestId?
     val deployedContractAlias: String?
     val contractAddress: String?
 }
@@ -27,6 +27,6 @@ sealed interface DeployedContractIdentifier {
     }
 }
 
-data class DeployedContractIdIdentifier(val id: UUID) : DeployedContractIdentifier
+data class DeployedContractIdIdentifier(val id: ContractDeploymentRequestId) : DeployedContractIdentifier
 data class DeployedContractAliasIdentifier(val alias: String) : DeployedContractIdentifier
 data class DeployedContractAddressIdentifier(val contractAddress: ContractAddress) : DeployedContractIdentifier

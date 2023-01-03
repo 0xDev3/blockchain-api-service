@@ -1,11 +1,12 @@
 package dev3.blockchainapiservice.model.result
 
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.util.UtcDateTime
-import java.util.UUID
 
 data class ApiKey(
-    val id: UUID,
-    val projectId: UUID,
+    val id: ApiKeyId,
+    val projectId: ProjectId,
     val apiKey: String,
     val createdAt: UtcDateTime
 )

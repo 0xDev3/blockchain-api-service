@@ -1,12 +1,13 @@
 package dev3.blockchainapiservice.model.response
 
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.result.ApiKey
 import java.time.OffsetDateTime
-import java.util.UUID
 
 data class ApiKeyResponse(
-    val id: UUID,
-    val projectId: UUID,
+    val id: ApiKeyId,
+    val projectId: ProjectId,
     val apiKey: String,
     val createdAt: OffsetDateTime
 ) {

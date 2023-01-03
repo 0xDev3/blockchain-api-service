@@ -1,11 +1,13 @@
 package dev3.blockchainapiservice.model.result
 
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import java.util.UUID
 
 sealed interface ItemsState
 
@@ -15,12 +17,12 @@ object NoItems : ItemsState
 value class WithItems(val value: List<MultiPaymentTemplateItem>) : ItemsState
 
 data class MultiPaymentTemplate<T : ItemsState>(
-    val id: UUID,
+    val id: MultiPaymentTemplateId,
     val items: T,
     val templateName: String,
     val tokenAddress: ContractAddress?,
     val chainId: ChainId,
-    val userId: UUID,
+    val userId: UserId,
     val createdAt: UtcDateTime,
     val updatedAt: UtcDateTime?
 ) {
@@ -50,8 +52,8 @@ data class MultiPaymentTemplate<T : ItemsState>(
 }
 
 data class MultiPaymentTemplateItem(
-    val id: UUID,
-    val templateId: UUID,
+    val id: MultiPaymentTemplateItemId,
+    val templateId: MultiPaymentTemplateId,
     val walletAddress: WalletAddress,
     val itemName: String?,
     val assetAmount: Balance,

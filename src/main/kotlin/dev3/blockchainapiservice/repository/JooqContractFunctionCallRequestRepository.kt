@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.ContractFunctionCallRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractFunctionCallRequestRecord
 import dev3.blockchainapiservice.model.ScreenConfig
@@ -13,7 +15,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.coalesce
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqContractFunctionCallRequestRepository(
@@ -45,7 +46,7 @@ class JooqContractFunctionCallRequestRepository(
         return record.toModel()
     }
 
-    override fun getById(id: UUID): ContractFunctionCallRequest? {
+    override fun getById(id: ContractFunctionCallRequestId): ContractFunctionCallRequest? {
         logger.debug { "Get contract function call request by id: $id" }
         return dslContext.selectFrom(ContractFunctionCallRequestTable)
             .where(ContractFunctionCallRequestTable.ID.eq(id))
@@ -53,7 +54,7 @@ class JooqContractFunctionCallRequestRepository(
     }
 
     override fun getAllByProjectId(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractFunctionCallRequestFilters
     ): List<ContractFunctionCallRequest> {
         logger.debug { "Get contract function call requests by projectId: $projectId, filters: $filters" }
@@ -70,7 +71,7 @@ class JooqContractFunctionCallRequestRepository(
             .fetch { it.toModel() }
     }
 
-    override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
+    override fun setTxInfo(id: ContractFunctionCallRequestId, txHash: TransactionHash, caller: WalletAddress): Boolean {
         logger.info { "Set txInfo for contract function call request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(ContractFunctionCallRequestTable)
             .set(ContractFunctionCallRequestTable.TX_HASH, txHash)

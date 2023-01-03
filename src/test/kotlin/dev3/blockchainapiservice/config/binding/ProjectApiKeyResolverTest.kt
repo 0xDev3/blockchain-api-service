@@ -5,6 +5,9 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.exception.NonExistentApiKeyException
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.result.ApiKey
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ApiKeyRepository
@@ -90,8 +93,8 @@ class ProjectApiKeyResolverTest : TestBase() {
 
         val apiKeyRepository = mock<ApiKeyRepository>()
         val apiKey = ApiKey(
-            id = UUID.randomUUID(),
-            projectId = UUID.randomUUID(),
+            id = ApiKeyId(UUID.randomUUID()),
+            projectId = ProjectId(UUID.randomUUID()),
             apiKey = apiKeyValue,
             createdAt = TestData.TIMESTAMP
         )
@@ -104,7 +107,7 @@ class ProjectApiKeyResolverTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
         val project = Project(
             id = apiKey.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),

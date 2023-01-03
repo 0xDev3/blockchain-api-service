@@ -2,6 +2,9 @@ package dev3.blockchainapiservice.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
@@ -13,15 +16,15 @@ import java.util.UUID
 import dev3.blockchainapiservice.model.params.PreStoreContractFunctionCallRequestParams as PreStoreParams
 
 data class StoreContractFunctionCallRequestParams(
-    val id: UUID,
-    val deployedContractId: UUID?,
+    val id: ContractFunctionCallRequestId,
+    val deployedContractId: ContractDeploymentRequestId?,
     val contractAddress: ContractAddress,
     val functionName: String,
     val functionParams: JsonNode,
     val ethAmount: Balance,
     val chainId: ChainId,
     val redirectUrl: String,
-    val projectId: UUID,
+    val projectId: ProjectId,
     val createdAt: UtcDateTime,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig,
@@ -37,7 +40,7 @@ data class StoreContractFunctionCallRequestParams(
             project: Project,
             createdAt: UtcDateTime
         ) = StoreContractFunctionCallRequestParams(
-            id = id,
+            id = ContractFunctionCallRequestId(id),
             deployedContractId = params.deployedContractId,
             contractAddress = params.contractAddress,
             functionName = params.createParams.functionName,

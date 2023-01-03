@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
@@ -43,7 +44,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchUserIdentifierById() {
-        val id = UUID.randomUUID()
+        val id = UserId(UUID.randomUUID())
 
         suppose("some user identifier is stored in database") {
             dslContext.executeInsert(
@@ -73,7 +74,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentUserIdentifierById() {
         verify("null is returned when fetching non-existent user identifier") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(UserId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -82,7 +83,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchUserIdentifierByIdentifier() {
-        val id = UUID.randomUUID()
+        val id = UserId(UUID.randomUUID())
 
         suppose("some user identifier is stored in database") {
             dslContext.executeInsert(
@@ -121,7 +122,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchUserIdentifierByWalletAddress() {
-        val id = UUID.randomUUID()
+        val id = UserId(UUID.randomUUID())
         val walletAddress = WalletAddress("0cafe0babe")
 
         suppose("some user identifier is stored in database") {
@@ -161,7 +162,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreUserIdentifier() {
-        val id = UUID.randomUUID()
+        val id = UserId(UUID.randomUUID())
         val userIdentifier = UserWalletAddressIdentifier(
             id = id,
             stripeClientId = null,
@@ -187,7 +188,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchUserByStripeClientId() {
-        val id = UUID.randomUUID()
+        val id = UserId(UUID.randomUUID())
         val clientId = "client-id"
 
         suppose("some user identifier is stored in database") {
@@ -227,7 +228,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetStripeClientId() {
-        val id = UUID.randomUUID()
+        val id = UserId(UUID.randomUUID())
         val userIdentifier = UserWalletAddressIdentifier(
             id = id,
             stripeClientId = null,

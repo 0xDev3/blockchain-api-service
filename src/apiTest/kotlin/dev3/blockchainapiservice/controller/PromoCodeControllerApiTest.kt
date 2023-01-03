@@ -7,6 +7,7 @@ import dev3.blockchainapiservice.features.promocodes.model.response.PromoCodeRes
 import dev3.blockchainapiservice.features.promocodes.model.response.PromoCodesResponse
 import dev3.blockchainapiservice.features.promocodes.model.result.PromoCode
 import dev3.blockchainapiservice.features.promocodes.repository.PromoCodeRepository
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.result.ApiUsagePeriod
 import dev3.blockchainapiservice.model.result.RequestUsage
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
@@ -32,7 +33,7 @@ import kotlin.time.toJavaDuration
 class PromoCodeControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val USER_ID = UUID.randomUUID()
+        private val USER_ID = UserId(UUID.randomUUID())
         private val MIN_TIME = UtcDateTime(OffsetDateTime.parse("1970-01-01T00:00:00Z"))
         private val MAX_TIME = UtcDateTime(OffsetDateTime.parse("9999-12-31T23:59:59Z"))
     }

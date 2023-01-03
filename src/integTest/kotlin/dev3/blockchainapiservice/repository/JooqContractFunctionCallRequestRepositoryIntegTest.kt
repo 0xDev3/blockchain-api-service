@@ -3,6 +3,11 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractFunctionCallRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
@@ -40,10 +45,10 @@ import java.util.UUID
 class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
 
     companion object {
-        private val PROJECT_ID_1 = UUID.randomUUID()
-        private val PROJECT_ID_2 = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
-        private val DEPLOYED_CONTRACT_ID = UUID.randomUUID()
+        private val PROJECT_ID_1 = ProjectId(UUID.randomUUID())
+        private val PROJECT_ID_2 = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
+        private val DEPLOYED_CONTRACT_ID = ContractDeploymentRequestId(UUID.randomUUID())
         private val CONTRACT_ADDRESS = ContractAddress("1337")
         private const val FUNCTION_NAME = "balanceOf"
         private val ETH_AMOUNT = Balance(BigInteger("10000"))
@@ -102,7 +107,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
             )
         )
 
-        val metadataId = UUID.randomUUID()
+        val metadataId = ContractMetadataId(UUID.randomUUID())
 
         dslContext.executeInsert(
             ContractMetadataRecord(
@@ -112,7 +117,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
                 contractImplements = emptyArray(),
                 name = null,
                 description = null,
-                projectId = Constants.NIL_UUID
+                projectId = Constants.NIL_PROJECT_ID
             )
         )
 
@@ -144,7 +149,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractFunctionCallRequestById() {
-        val id = UUID.randomUUID()
+        val id = ContractFunctionCallRequestId(UUID.randomUUID())
         val record = createRecord(id)
 
         suppose("some contract function call request exists in database") {
@@ -162,7 +167,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentContractFunctionCallRequestById() {
         verify("null is returned when fetching non-existent contract function call request") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(ContractFunctionCallRequestId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -172,28 +177,50 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchContractFunctionCallRequestsByProjectIdAndFilters() {
         val project1ContractsWithMatchingDeployedContractIdAndAddress = listOf(
-            createRecord(id = UUID.randomUUID()),
-            createRecord(id = UUID.randomUUID())
+            createRecord(id = ContractFunctionCallRequestId(UUID.randomUUID())),
+            createRecord(id = ContractFunctionCallRequestId(UUID.randomUUID()))
         )
         val project1ContractsWithMissingDeployedContractId = listOf(
-            createRecord(id = UUID.randomUUID(), deployedContractId = null),
-            createRecord(id = UUID.randomUUID(), deployedContractId = null)
+            createRecord(id = ContractFunctionCallRequestId(UUID.randomUUID()), deployedContractId = null),
+            createRecord(id = ContractFunctionCallRequestId(UUID.randomUUID()), deployedContractId = null)
         )
         val project1ContractsWithNonMatchingContractAddress = listOf(
-            createRecord(id = UUID.randomUUID(), contractAddress = ContractAddress("dead")),
-            createRecord(id = UUID.randomUUID(), contractAddress = ContractAddress("dead"))
+            createRecord(
+                id = ContractFunctionCallRequestId(UUID.randomUUID()),
+                contractAddress = ContractAddress("dead")
+            ),
+            createRecord(
+                id = ContractFunctionCallRequestId(UUID.randomUUID()),
+                contractAddress = ContractAddress("dead")
+            )
         )
         val project2ContractsWithMatchingDeployedContractIdAndAddress = listOf(
-            createRecord(id = UUID.randomUUID(), projectId = PROJECT_ID_2),
-            createRecord(id = UUID.randomUUID(), projectId = PROJECT_ID_2)
+            createRecord(id = ContractFunctionCallRequestId(UUID.randomUUID()), projectId = PROJECT_ID_2),
+            createRecord(id = ContractFunctionCallRequestId(UUID.randomUUID()), projectId = PROJECT_ID_2)
         )
         val project2ContractsWithMissingDeployedContractId = listOf(
-            createRecord(id = UUID.randomUUID(), deployedContractId = null, projectId = PROJECT_ID_2),
-            createRecord(id = UUID.randomUUID(), deployedContractId = null, projectId = PROJECT_ID_2)
+            createRecord(
+                id = ContractFunctionCallRequestId(UUID.randomUUID()),
+                deployedContractId = null,
+                projectId = PROJECT_ID_2
+            ),
+            createRecord(
+                id = ContractFunctionCallRequestId(UUID.randomUUID()),
+                deployedContractId = null,
+                projectId = PROJECT_ID_2
+            )
         )
         val project2ContractsWithNonMatchingContractAddress = listOf(
-            createRecord(id = UUID.randomUUID(), contractAddress = ContractAddress("dead"), projectId = PROJECT_ID_2),
-            createRecord(id = UUID.randomUUID(), contractAddress = ContractAddress("dead"), projectId = PROJECT_ID_2)
+            createRecord(
+                id = ContractFunctionCallRequestId(UUID.randomUUID()),
+                contractAddress = ContractAddress("dead"),
+                projectId = PROJECT_ID_2
+            ),
+            createRecord(
+                id = ContractFunctionCallRequestId(UUID.randomUUID()),
+                contractAddress = ContractAddress("dead"),
+                projectId = PROJECT_ID_2
+            )
         )
 
         suppose("some contract function call requests exist in database") {
@@ -340,7 +367,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreContractFunctionCallRequest() {
-        val id = UUID.randomUUID()
+        val id = ContractFunctionCallRequestId(UUID.randomUUID())
         val params = StoreContractFunctionCallRequestParams(
             id = id,
             deployedContractId = DEPLOYED_CONTRACT_ID,
@@ -399,7 +426,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetTxInfoForContractFunctionCallRequestWithNullTxHash() {
-        val id = UUID.randomUUID()
+        val id = ContractFunctionCallRequestId(UUID.randomUUID())
         val params = StoreContractFunctionCallRequestParams(
             id = id,
             deployedContractId = DEPLOYED_CONTRACT_ID,
@@ -458,7 +485,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotUpdateCallerAddressForContractFunctionCallRequestWhenCallerIsAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = ContractFunctionCallRequestId(UUID.randomUUID())
         val params = StoreContractFunctionCallRequestParams(
             id = id,
             deployedContractId = DEPLOYED_CONTRACT_ID,
@@ -518,7 +545,7 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetTxInfoForContractFunctionCallRequestWhenTxHashIsAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = ContractFunctionCallRequestId(UUID.randomUUID())
         val params = StoreContractFunctionCallRequestParams(
             id = id,
             deployedContractId = DEPLOYED_CONTRACT_ID,
@@ -586,10 +613,10 @@ class JooqContractFunctionCallRequestRepositoryIntegTest : TestBase() {
     }
 
     private fun createRecord(
-        id: UUID,
-        deployedContractId: UUID? = DEPLOYED_CONTRACT_ID,
+        id: ContractFunctionCallRequestId,
+        deployedContractId: ContractDeploymentRequestId? = DEPLOYED_CONTRACT_ID,
         contractAddress: ContractAddress = CONTRACT_ADDRESS,
-        projectId: UUID = PROJECT_ID_1
+        projectId: ProjectId = PROJECT_ID_1
     ) = ContractFunctionCallRequestRecord(
         id = id,
         deployedContractId = deployedContractId,

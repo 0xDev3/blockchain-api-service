@@ -3,6 +3,10 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
@@ -36,7 +40,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyCreateContractFunctionCallRequest() {
-        val deployedContractId = UUID.randomUUID()
+        val deployedContractId = ContractDeploymentRequestId(UUID.randomUUID())
         val params = CreateContractFunctionCallRequestParams(
             identifier = DeployedContractIdIdentifier(deployedContractId),
             functionName = "test",
@@ -52,11 +56,11 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
         )
         val result = WithFunctionData(
             value = ContractFunctionCallRequest(
-                id = UUID.randomUUID(),
+                id = ContractFunctionCallRequestId(UUID.randomUUID()),
                 deployedContractId = deployedContractId,
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -74,7 +78,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
         )
         val project = Project(
             id = result.value.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = result.value.chainId,
@@ -145,16 +149,16 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractFunctionCallRequest() {
-        val id = UUID.randomUUID()
+        val id = ContractFunctionCallRequestId(UUID.randomUUID())
         val service = mock<ContractFunctionCallRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionAndFunctionData(
             value = ContractFunctionCallRequest(
                 id = id,
-                deployedContractId = UUID.randomUUID(),
+                deployedContractId = ContractDeploymentRequestId(UUID.randomUUID()),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -231,16 +235,16 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractFunctionCallRequestsByProjectIdAndFilters() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val service = mock<ContractFunctionCallRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionAndFunctionData(
             value = ContractFunctionCallRequest(
-                id = UUID.randomUUID(),
-                deployedContractId = UUID.randomUUID(),
+                id = ContractFunctionCallRequestId(UUID.randomUUID()),
+                deployedContractId = ContractDeploymentRequestId(UUID.randomUUID()),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -333,7 +337,7 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
         val service = mock<ContractFunctionCallRequestService>()
         val controller = ContractFunctionCallRequestController(service)
 
-        val id = UUID.randomUUID()
+        val id = ContractFunctionCallRequestId(UUID.randomUUID())
         val txHash = "tx-hash"
         val caller = "c"
 

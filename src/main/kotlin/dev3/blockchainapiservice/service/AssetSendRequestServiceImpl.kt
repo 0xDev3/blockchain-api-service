@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.params.CreateAssetSendRequestParams
 import dev3.blockchainapiservice.model.params.StoreAssetSendRequestParams
 import dev3.blockchainapiservice.model.result.AssetSendRequest
@@ -19,7 +21,6 @@ import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue
 import dev3.blockchainapiservice.util.WithTransactionData
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 @Suppress("TooManyFunctions")
@@ -48,7 +49,7 @@ class AssetSendRequestServiceImpl(
         return WithFunctionDataOrEthValue(assetSendRequest, data, ethValue)
     }
 
-    override fun getAssetSendRequest(id: UUID): WithTransactionData<AssetSendRequest> {
+    override fun getAssetSendRequest(id: AssetSendRequestId): WithTransactionData<AssetSendRequest> {
         logger.debug { "Fetching asset send request, id: $id" }
 
         val assetSendRequest = ethCommonService.fetchResource(
@@ -60,7 +61,7 @@ class AssetSendRequestServiceImpl(
         return assetSendRequest.appendTransactionData(project)
     }
 
-    override fun getAssetSendRequestsByProjectId(projectId: UUID): List<WithTransactionData<AssetSendRequest>> {
+    override fun getAssetSendRequestsByProjectId(projectId: ProjectId): List<WithTransactionData<AssetSendRequest>> {
         logger.debug { "Fetching asset send requests for projectId: $projectId" }
         return projectRepository.getById(projectId)?.let {
             assetSendRequestRepository.getAllByProjectId(projectId).map { req -> req.appendTransactionData(it) }
@@ -85,7 +86,7 @@ class AssetSendRequestServiceImpl(
         }
     }
 
-    override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
+    override fun attachTxInfo(id: AssetSendRequestId, txHash: TransactionHash, caller: WalletAddress) {
         logger.info { "Attach txInfo to asset send request, id: $id, txHash: $txHash, caller: $caller" }
 
         val txInfoAttached = assetSendRequestRepository.setTxInfo(id, txHash, caller)

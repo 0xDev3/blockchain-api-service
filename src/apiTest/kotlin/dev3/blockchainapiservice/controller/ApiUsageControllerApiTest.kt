@@ -6,6 +6,9 @@ import dev3.blockchainapiservice.config.ApiRateProperties
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -28,8 +31,8 @@ import java.util.UUID
 class ApiUsageControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val PROJECT = Project(
             id = PROJECT_ID,
             ownerId = OWNER_ID,
@@ -75,7 +78,7 @@ class ApiUsageControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 apiKey = API_KEY,
                 createdAt = TestData.TIMESTAMP

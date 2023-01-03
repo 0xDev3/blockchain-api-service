@@ -7,6 +7,9 @@ import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
@@ -48,8 +51,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -83,7 +86,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             manifest = ManifestJson.EMPTY,
             artifact = ArtifactJson.EMPTY
         )
-        private val ID = UUID.randomUUID()
+        private val ID = ContractDeploymentRequestId(UUID.randomUUID())
         private val ENCODED_CONSTRUCTOR = FunctionData("0x1234")
         private val STORE_PARAMS = StoreContractDeploymentRequestParams(
             id = ID,
@@ -94,7 +97,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             deployerAddress = CREATE_PARAMS.deployerAddress,
             initialEthAmount = CREATE_PARAMS.initialEthAmount,
             chainId = PROJECT.chainId,
-            redirectUrl = CREATE_PARAMS.redirectUrl!!.replace("\${id}", ID.toString()),
+            redirectUrl = CREATE_PARAMS.redirectUrl!!.replace("\${id}", ID.value.toString()),
             projectId = PROJECT.id,
             createdAt = TestData.TIMESTAMP,
             arbitraryData = CREATE_PARAMS.arbitraryData,
@@ -158,8 +161,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(ID)
+            call(uuidProvider.getRawUuid())
+                .willReturn(ID.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -179,7 +182,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request is stored in database") {
-            call(contractDeploymentRequestRepository.store(STORE_PARAMS, Constants.NIL_UUID))
+            call(contractDeploymentRequestRepository.store(STORE_PARAMS, Constants.NIL_PROJECT_ID))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -203,7 +206,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
                 .isEqualTo(STORED_REQUEST)
 
             expectInteractions(contractDeploymentRequestRepository) {
-                once.store(STORE_PARAMS, Constants.NIL_UUID)
+                once.store(STORE_PARAMS, Constants.NIL_PROJECT_ID)
             }
         }
     }
@@ -330,7 +333,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         verify("contract deployment request is successfully marked as deleted") {
             expectThrows<ResourceNotFoundException> {
-                service.markContractDeploymentRequestAsDeleted(ID, UUID.randomUUID())
+                service.markContractDeploymentRequestAsDeleted(ID, ProjectId(UUID.randomUUID()))
             }
 
             expectInteractions(contractDeploymentRequestRepository) {
@@ -379,9 +382,18 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("contract deployment request does not exist in database") {
-            call(contractDeploymentRequestRepository.getById(any()))
+            call(
+                contractDeploymentRequestRepository.getById(
+                    anyValueClass(ContractDeploymentRequestId(UUID.randomUUID()))
+                )
+            )
                 .willReturn(null)
-            call(contractDeploymentRequestRepository.getByAliasAndProjectId(any(), any()))
+            call(
+                contractDeploymentRequestRepository.getByAliasAndProjectId(
+                    alias = any(),
+                    projectId = anyValueClass(ProjectId(UUID.randomUUID()))
+                )
+            )
                 .willReturn(null)
         }
 
@@ -402,14 +414,14 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
         verify("ResourceNotFoundException is thrown when fetching by id") {
             expectThrows<ResourceNotFoundException> {
-                service.getContractDeploymentRequest(id = UUID.randomUUID())
+                service.getContractDeploymentRequest(ContractDeploymentRequestId(UUID.randomUUID()))
             }
         }
 
         verify("ResourceNotFoundException is thrown when fetching by alias and project id") {
             expectThrows<ResourceNotFoundException> {
                 service.getContractDeploymentRequestByProjectIdAndAlias(
-                    projectId = UUID.randomUUID(),
+                    projectId = ProjectId(UUID.randomUUID()),
                     alias = "random-alias"
                 )
             }
@@ -1283,7 +1295,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnEmptyListOfContractDeploymentRequestsForNonExistentProject() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val filters = ContractDeploymentRequestFilters(
             contractIds = OrList(),
             contractTags = OrList(),
@@ -1383,7 +1395,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         }
     }
 
-    private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
+    private fun projectRepositoryMock(projectId: ProjectId): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("some project will be returned") {
@@ -1391,7 +1403,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
                 .willReturn(
                     Project(
                         id = projectId,
-                        ownerId = UUID.randomUUID(),
+                        ownerId = UserId(UUID.randomUUID()),
                         issuerContractAddress = ContractAddress("dead"),
                         baseRedirectUrl = BaseUrl(""),
                         chainId = ChainId(0L),
@@ -1408,7 +1420,7 @@ class ContractDeploymentRequestServiceTest : TestBase() {
         val contractMetadataRepository = mock<ContractMetadataRepository>()
 
         suppose("some metadata will be returned") {
-            call(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_UUID))
+            call(contractMetadataRepository.exists(CONTRACT_ID, Constants.NIL_PROJECT_ID))
                 .willReturn(exists)
         }
 

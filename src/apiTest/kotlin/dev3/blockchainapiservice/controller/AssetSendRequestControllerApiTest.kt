@@ -6,6 +6,10 @@ import dev3.blockchainapiservice.blockchain.SimpleERC20
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -45,8 +49,8 @@ import java.util.UUID
 class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val PROJECT = Project(
             id = PROJECT_ID,
             ownerId = OWNER_ID,
@@ -119,7 +123,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 apiKey = API_KEY,
                 createdAt = TestData.TIMESTAMP
@@ -182,7 +186,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id.value}/action",
                         sendTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -210,7 +214,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id.value}/action",
                         tokenAddress = tokenAddress,
                         assetAmount = amount,
                         assetSenderAddress = senderAddress,
@@ -287,7 +291,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         sendTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -315,7 +319,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         tokenAddress = tokenAddress,
                         assetAmount = amount,
                         assetSenderAddress = senderAddress,
@@ -388,7 +392,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id.value}/action",
                         sendTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -416,7 +420,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${response.id.value}/action",
                         tokenAddress = null,
                         assetAmount = amount,
                         assetSenderAddress = senderAddress,
@@ -491,7 +495,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         sendTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -519,7 +523,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         tokenAddress = null,
                         assetAmount = amount,
                         assetSenderAddress = senderAddress,
@@ -715,7 +719,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset send request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/send/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/send/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -741,7 +745,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id.value}/action",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -833,7 +837,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch asset send request is made") {
-            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/send/${createResponse.id}"))
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/send/${createResponse.id.value}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -858,7 +862,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id.value}/action",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -938,7 +942,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset send request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/send/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/send/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -964,7 +968,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id.value}/action",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -1047,7 +1051,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch asset send request is made") {
-            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/send/${createResponse.id}"))
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/send/${createResponse.id.value}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -1072,7 +1076,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-send/${createResponse.id.value}/action",
                         sendTx = TransactionResponse(
                             txHash = txHash.value,
                             from = senderAddress.rawValue,
@@ -1174,7 +1178,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset send requests by project ID is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/send/by-project/${createResponse.projectId}")
+                MockMvcRequestBuilders.get("/v1/send/by-project/${createResponse.projectId.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1203,7 +1207,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     afterActionMessage = "after-action-message"
                                 ),
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-send/${createResponse.id}/action",
+                                    "/request-send/${createResponse.id.value}/action",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -1299,7 +1303,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         val fetchResponse = suppose("request to fetch asset send requests by project ID is made") {
-            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/send/by-project/$projectId"))
+            val fetchResponse = mockMvc.perform(MockMvcRequestBuilders.get("/v1/send/by-project/${projectId.value}"))
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
@@ -1326,7 +1330,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                                redirectUrl = redirectUrl.replace("\${id}", createResponse.id.value.toString()),
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -1446,7 +1450,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     afterActionMessage = "after-action-message"
                                 ),
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-send/${createResponse.id}/action",
+                                    "/request-send/${createResponse.id.value}/action",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -1571,7 +1575,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                redirectUrl = redirectUrl.replace("\${id}", createResponse.id.toString()),
+                                redirectUrl = redirectUrl.replace("\${id}", createResponse.id.value.toString()),
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -1691,7 +1695,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     afterActionMessage = "after-action-message"
                                 ),
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-send/${createResponse.id}/action",
+                                    "/request-send/${createResponse.id.value}/action",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -1815,7 +1819,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     afterActionMessage = "after-action-message"
                                 ),
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-send/${createResponse.id}/action",
+                                    "/request-send/${createResponse.id.value}/action",
                                 sendTx = TransactionResponse(
                                     txHash = txHash.value,
                                     from = senderAddress.rawValue,
@@ -1843,7 +1847,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyAttachTransactionInfo() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val tokenSender = WalletAddress("b")
 
         suppose("some asset send request without transaction info exists in database") {
@@ -1852,7 +1856,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     tokenAddress = ContractAddress("a"),
                     assetAmount = Balance(BigInteger.TEN),
                     assetSenderAddress = tokenSender,
@@ -1871,7 +1875,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach transaction info to asset send request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/send/$id")
+                MockMvcRequestBuilders.put("/v1/send/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1896,7 +1900,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustReturn400BadRequestWhenTransactionInfoIsNotAttached() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val txHash = TransactionHash("0x1")
         val tokenSender = WalletAddress("b")
 
@@ -1906,7 +1910,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     tokenAddress = ContractAddress("a"),
                     assetAmount = Balance(BigInteger.TEN),
                     assetSenderAddress = tokenSender,
@@ -1924,7 +1928,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned when attaching transaction info") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/send/$id")
+                MockMvcRequestBuilders.put("/v1/send/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1949,8 +1953,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    private fun insertProjectWithCustomRpcUrl(): Triple<UUID, ChainId, String> {
-        val projectId = UUID.randomUUID()
+    private fun insertProjectWithCustomRpcUrl(): Triple<ProjectId, ChainId, String> {
+        val projectId = ProjectId(UUID.randomUUID())
         val chainId = ChainId(1337L)
 
         dslContext.executeInsert(
@@ -1969,7 +1973,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = projectId,
                 apiKey = apiKey,
                 createdAt = TestData.TIMESTAMP

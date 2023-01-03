@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.model.response
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.Erc20LockRequest
 import dev3.blockchainapiservice.util.Balance
@@ -9,11 +11,10 @@ import dev3.blockchainapiservice.util.WithFunctionData
 import dev3.blockchainapiservice.util.WithTransactionData
 import java.math.BigInteger
 import java.time.OffsetDateTime
-import java.util.UUID
 
 data class Erc20LockRequestResponse(
-    val id: UUID,
-    val projectId: UUID,
+    val id: Erc20LockRequestId,
+    val projectId: ProjectId,
     val status: Status,
     val chainId: Long,
     val tokenAddress: String,

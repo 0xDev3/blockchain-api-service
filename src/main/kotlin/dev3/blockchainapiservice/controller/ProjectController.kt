@@ -4,6 +4,7 @@ import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
 import dev3.blockchainapiservice.exception.ApiKeyAlreadyExistsException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.params.CreateProjectParams
 import dev3.blockchainapiservice.model.request.CreateProjectRequest
 import dev3.blockchainapiservice.model.response.ApiKeyResponse
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 import javax.validation.Valid
 
@@ -53,7 +53,7 @@ class ProjectController(
     @GetMapping("/v1/projects/{id}")
     fun getById(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
-        @PathVariable id: UUID
+        @PathVariable id: ProjectId
     ): ResponseEntity<ProjectResponse> {
         val project = projectService.getProjectById(userIdentifier, id)
         return ResponseEntity.ok(ProjectResponse(project))
@@ -82,7 +82,7 @@ class ProjectController(
     @GetMapping("/v1/projects/{id}/api-key")
     fun getApiKey(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
-        @PathVariable id: UUID
+        @PathVariable id: ProjectId
     ): ResponseEntity<ApiKeyResponse> { // TODO return multiple API keys in the future
         val apiKey = projectService.getProjectApiKeys(userIdentifier, id).firstOrNull()
             ?: throw ResourceNotFoundException("API key not yet generated for provided project ID")
@@ -92,7 +92,7 @@ class ProjectController(
     @PostMapping("/v1/projects/{id}/api-key")
     fun createApiKey(
         @UserIdentifierBinding userIdentifier: UserIdentifier,
-        @PathVariable id: UUID,
+        @PathVariable id: ProjectId,
         request: HttpServletRequest
     ): ResponseEntity<ApiKeyResponse> { // TODO allow multiple API key creation in the future
         if (projectService.getProjectApiKeys(userIdentifier, id).isNotEmpty()) {

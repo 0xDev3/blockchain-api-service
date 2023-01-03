@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.exception.DuplicateIssuerContractAddressException
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.ProjectTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.model.result.Project
@@ -11,7 +13,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqProjectRepository(private val dslContext: DSLContext) : ProjectRepository {
@@ -39,7 +40,7 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
         return record.toModel()
     }
 
-    override fun getById(id: UUID): Project? {
+    override fun getById(id: ProjectId): Project? {
         logger.debug { "Get project by id: $id" }
         return dslContext.selectFrom(ProjectTable)
             .where(ProjectTable.ID.eq(id))
@@ -58,7 +59,7 @@ class JooqProjectRepository(private val dslContext: DSLContext) : ProjectReposit
             .fetchOne { it.toModel() }
     }
 
-    override fun getAllByOwnerId(ownerId: UUID): List<Project> {
+    override fun getAllByOwnerId(ownerId: UserId): List<Project> {
         logger.info { "Get projects by ownerId: $ownerId" }
         return dslContext.selectFrom(ProjectTable)
             .where(ProjectTable.OWNER_ID.eq(ownerId))

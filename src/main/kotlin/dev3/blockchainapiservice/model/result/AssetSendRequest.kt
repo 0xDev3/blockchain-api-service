@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.model.result
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
@@ -12,11 +14,10 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithTransactionData
-import java.util.UUID
 
 data class AssetSendRequest(
-    val id: UUID,
-    val projectId: UUID,
+    val id: AssetSendRequestId,
+    val projectId: ProjectId,
     val chainId: ChainId,
     val redirectUrl: String,
     val tokenAddress: ContractAddress?,

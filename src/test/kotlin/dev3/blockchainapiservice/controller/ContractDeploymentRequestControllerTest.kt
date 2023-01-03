@@ -3,6 +3,9 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.AndList
 import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
@@ -56,7 +59,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             )
         )
         val result = ContractDeploymentRequest(
-            id = UUID.randomUUID(),
+            id = ContractDeploymentRequestId(UUID.randomUUID()),
             alias = params.alias,
             name = "name",
             description = "description",
@@ -68,7 +71,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             initialEthAmount = params.initialEthAmount,
             chainId = ChainId(1337),
             redirectUrl = params.redirectUrl!!,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             createdAt = TestData.TIMESTAMP,
             arbitraryData = params.arbitraryData,
             screenConfig = params.screenConfig,
@@ -81,7 +84,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         )
         val project = Project(
             id = result.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = result.chainId,
@@ -157,10 +160,10 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyMarkContractDeploymentRequestAsDeleted() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -182,12 +185,12 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequest() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val service = mock<ContractDeploymentRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = id,
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -199,7 +202,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -282,12 +285,12 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestsByProjectIdAndFilters() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val service = mock<ContractDeploymentRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -299,7 +302,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -399,13 +402,13 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestByProjectIdAndAlias() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val alias = "alias"
         val service = mock<ContractDeploymentRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = alias,
                 name = "name",
                 description = "description",
@@ -503,7 +506,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         val service = mock<ContractDeploymentRequestService>()
         val controller = ContractDeploymentRequestController(service)
 
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val txHash = "tx-hash"
         val caller = "c"
 

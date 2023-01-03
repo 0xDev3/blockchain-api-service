@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.model.result
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
@@ -17,10 +19,9 @@ import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithTransactionData
 import dev3.blockchainapiservice.util.ZeroAddress
-import java.util.UUID
 
 data class ContractDeploymentRequest(
-    val id: UUID,
+    val id: ContractDeploymentRequestId,
     val alias: String,
     val name: String?,
     val description: String?,
@@ -32,7 +33,7 @@ data class ContractDeploymentRequest(
     val initialEthAmount: Balance,
     val chainId: ChainId,
     val redirectUrl: String,
-    val projectId: UUID,
+    val projectId: ProjectId,
     val createdAt: UtcDateTime,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig,
