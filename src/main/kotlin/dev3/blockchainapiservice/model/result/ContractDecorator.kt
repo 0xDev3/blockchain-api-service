@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.model.result
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.ContractDecoratorException
 import dev3.blockchainapiservice.exception.ContractInterfaceNotFoundException
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.DeserializableEventInput
 import dev3.blockchainapiservice.model.json.AbiInputOutput
@@ -16,7 +17,6 @@ import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.json.OverridableDecorator
 import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.json.TypeDecorator
-import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag

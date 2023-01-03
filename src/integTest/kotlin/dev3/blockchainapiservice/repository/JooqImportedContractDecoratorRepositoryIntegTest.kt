@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.contract.interfaces.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.features.contract.interfaces.repository.InMemoryContractInterfacesRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.ImportedContractDecoratorId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
@@ -11,7 +13,6 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.filters.AndList
 import dev3.blockchainapiservice.model.filters.ContractDecoratorFilters
-import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
 import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson

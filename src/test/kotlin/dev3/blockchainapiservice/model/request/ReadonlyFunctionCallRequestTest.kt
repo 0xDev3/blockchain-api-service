@@ -4,7 +4,8 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.validation.ValidationConstants
 import dev3.blockchainapiservice.config.validation.ValidationConstants.FUNCTION_ARGUMENT_MAX_JSON_CHARS
-import dev3.blockchainapiservice.model.params.OutputParameter
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
+import dev3.blockchainapiservice.features.contract.readcall.model.request.ReadonlyFunctionCallRequest
 import dev3.blockchainapiservice.util.BoolType
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.JsonNodeConverter

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.JsonConfig
-import dev3.blockchainapiservice.model.params.OutputParameter
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
 import dev3.blockchainapiservice.util.AddressType
 import dev3.blockchainapiservice.util.BoolType
 import dev3.blockchainapiservice.util.DynamicArrayType

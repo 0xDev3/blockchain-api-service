@@ -1,7 +1,8 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.features.contract.interfaces.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.features.contract.interfaces.repository.InMemoryContractInterfacesRepository
 import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.json.EventDecorator
 import dev3.blockchainapiservice.model.json.FunctionDecorator

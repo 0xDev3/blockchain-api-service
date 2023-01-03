@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.generated.jooq.id.ImportedContractDecoratorId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.ImportedContractDecoratorTable

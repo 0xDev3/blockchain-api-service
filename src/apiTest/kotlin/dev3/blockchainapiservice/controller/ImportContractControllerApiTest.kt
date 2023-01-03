@@ -9,6 +9,11 @@ import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.importing.model.response.ImportPreviewResponse
+import dev3.blockchainapiservice.features.contract.importing.service.ContractImportServiceImpl.Companion.TypeAndValue
+import dev3.blockchainapiservice.features.contract.interfaces.model.response.ContractInterfaceManifestResponse
+import dev3.blockchainapiservice.features.contract.interfaces.model.response.SuggestedContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
 import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
@@ -26,12 +31,9 @@ import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.json.TypeDecorator
 import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponseType
 import dev3.blockchainapiservice.model.response.EventInfoResponse
-import dev3.blockchainapiservice.model.response.ImportPreviewResponse
-import dev3.blockchainapiservice.model.response.SuggestedContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractConstructor
 import dev3.blockchainapiservice.model.result.ContractDecorator
@@ -41,10 +43,8 @@ import dev3.blockchainapiservice.model.result.ContractParameter
 import dev3.blockchainapiservice.model.result.EventParameter
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
-import dev3.blockchainapiservice.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
-import dev3.blockchainapiservice.service.ContractImportServiceImpl.Companion.TypeAndValue
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Balance
