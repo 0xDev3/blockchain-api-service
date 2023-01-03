@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.generated.jooq.id.ImportedContractDecoratorId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.ImportedContractDecoratorTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ImportedContractDecoratorRecord
 import dev3.blockchainapiservice.model.filters.AndList
@@ -17,7 +19,6 @@ import org.jooq.Condition
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 @Suppress("TooManyFunctions")
@@ -29,8 +30,8 @@ class JooqImportedContractDecoratorRepository(
     companion object : KLogging()
 
     override fun store(
-        id: UUID,
-        projectId: UUID,
+        id: ImportedContractDecoratorId,
+        projectId: ProjectId,
         contractId: ContractId,
         manifestJson: ManifestJson,
         artifactJson: ArtifactJson,
@@ -70,7 +71,7 @@ class JooqImportedContractDecoratorRepository(
 
     override fun updateInterfaces(
         contractId: ContractId,
-        projectId: UUID,
+        projectId: ProjectId,
         interfaces: List<InterfaceId>,
         manifest: ManifestJson
     ): Boolean {
@@ -93,7 +94,7 @@ class JooqImportedContractDecoratorRepository(
             .execute() > 0
     }
 
-    override fun getByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ContractDecorator? {
+    override fun getByContractIdAndProjectId(contractId: ContractId, projectId: ProjectId): ContractDecorator? {
         logger.debug { "Get imported contract decorator by contract id: $contractId" }
         return dslContext.selectFrom(ImportedContractDecoratorTable)
             .where(
@@ -114,7 +115,7 @@ class JooqImportedContractDecoratorRepository(
             }
     }
 
-    override fun getManifestJsonByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ManifestJson? {
+    override fun getManifestJsonByContractIdAndProjectId(contractId: ContractId, projectId: ProjectId): ManifestJson? {
         logger.debug { "Get imported manifest.json by contract id: $contractId, project id: $projectId" }
         return dslContext.select(ImportedContractDecoratorTable.MANIFEST_JSON)
             .from(ImportedContractDecoratorTable)
@@ -128,7 +129,7 @@ class JooqImportedContractDecoratorRepository(
             ?.value1()
     }
 
-    override fun getArtifactJsonByContractIdAndProjectId(contractId: ContractId, projectId: UUID): ArtifactJson? {
+    override fun getArtifactJsonByContractIdAndProjectId(contractId: ContractId, projectId: ProjectId): ArtifactJson? {
         logger.debug { "Get imported artifact.json by contract id: $contractId, project id: $projectId" }
         return dslContext.select(ImportedContractDecoratorTable.ARTIFACT_JSON)
             .from(ImportedContractDecoratorTable)
@@ -142,7 +143,7 @@ class JooqImportedContractDecoratorRepository(
             ?.value1()
     }
 
-    override fun getInfoMarkdownByContractIdAndProjectId(contractId: ContractId, projectId: UUID): String? {
+    override fun getInfoMarkdownByContractIdAndProjectId(contractId: ContractId, projectId: ProjectId): String? {
         logger.debug { "Get imported info.md by contract id: $contractId, project id: $projectId" }
         return dslContext.select(ImportedContractDecoratorTable.INFO_MARKDOWN)
             .from(ImportedContractDecoratorTable)
@@ -156,7 +157,7 @@ class JooqImportedContractDecoratorRepository(
             ?.value1()
     }
 
-    override fun getAll(projectId: UUID, filters: ContractDecoratorFilters): List<ContractDecorator> {
+    override fun getAll(projectId: ProjectId, filters: ContractDecoratorFilters): List<ContractDecorator> {
         logger.debug { "Get imported contract decorators by projectId: $projectId, filters: $filters" }
         return dslContext.selectFrom(ImportedContractDecoratorTable)
             .where(createConditions(projectId, filters))
@@ -172,7 +173,7 @@ class JooqImportedContractDecoratorRepository(
             }
     }
 
-    override fun getAllManifestJsonFiles(projectId: UUID, filters: ContractDecoratorFilters): List<ManifestJson> {
+    override fun getAllManifestJsonFiles(projectId: ProjectId, filters: ContractDecoratorFilters): List<ManifestJson> {
         logger.debug { "Get imported manifest.json files by projectId: $projectId, filters: $filters" }
         return dslContext.select(ImportedContractDecoratorTable.MANIFEST_JSON)
             .from(ImportedContractDecoratorTable)
@@ -181,7 +182,7 @@ class JooqImportedContractDecoratorRepository(
             .fetch { it.value1() }
     }
 
-    override fun getAllArtifactJsonFiles(projectId: UUID, filters: ContractDecoratorFilters): List<ArtifactJson> {
+    override fun getAllArtifactJsonFiles(projectId: ProjectId, filters: ContractDecoratorFilters): List<ArtifactJson> {
         logger.debug { "Get imported artifact.json files by projectId: $projectId, filters: $filters" }
         return dslContext.select(ImportedContractDecoratorTable.ARTIFACT_JSON)
             .from(ImportedContractDecoratorTable)
@@ -190,7 +191,7 @@ class JooqImportedContractDecoratorRepository(
             .fetch { it.value1() }
     }
 
-    override fun getAllInfoMarkdownFiles(projectId: UUID, filters: ContractDecoratorFilters): List<String> {
+    override fun getAllInfoMarkdownFiles(projectId: ProjectId, filters: ContractDecoratorFilters): List<String> {
         logger.debug { "Get imported info.md files by projectId: $projectId, filters: $filters" }
         return dslContext.select(ImportedContractDecoratorTable.INFO_MARKDOWN)
             .from(ImportedContractDecoratorTable)
@@ -199,7 +200,7 @@ class JooqImportedContractDecoratorRepository(
             .fetch { it.value1() }
     }
 
-    private fun createConditions(projectId: UUID, filters: ContractDecoratorFilters) =
+    private fun createConditions(projectId: ProjectId, filters: ContractDecoratorFilters) =
         listOfNotNull(
             ImportedContractDecoratorTable.PROJECT_ID.eq(projectId),
             filters.contractTags.orAndCondition { it.contractTagsAndCondition() },

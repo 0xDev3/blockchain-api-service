@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.config.binding
 
 import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
 import dev3.blockchainapiservice.exception.BadAuthenticationException
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.repository.UserIdentifierRepository
@@ -43,7 +44,7 @@ class UserIdentifierResolver(
         return userIdentifierRepository.getByWalletAddress(principal)
             ?: userIdentifierRepository.store(
                 UserWalletAddressIdentifier(
-                    id = uuidProvider.getUuid(),
+                    id = uuidProvider.getUuid(UserId),
                     walletAddress = principal,
                     stripeClientId = null
                 )

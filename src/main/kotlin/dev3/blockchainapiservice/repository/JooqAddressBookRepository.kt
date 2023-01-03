@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.exception.AliasAlreadyInUseException
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.AddressBookTable
 import dev3.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
@@ -12,7 +14,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqAddressBookRepository(private val dslContext: DSLContext) : AddressBookRepository {
@@ -51,21 +52,21 @@ class JooqAddressBookRepository(private val dslContext: DSLContext) : AddressBoo
         }
     }
 
-    override fun delete(id: UUID): Boolean {
+    override fun delete(id: AddressBookId): Boolean {
         logger.info { "Delete address book entry, id: $id" }
         return dslContext.deleteFrom(AddressBookTable)
             .where(AddressBookTable.ID.eq(id))
             .execute() > 0
     }
 
-    override fun getById(id: UUID): AddressBookEntry? {
+    override fun getById(id: AddressBookId): AddressBookEntry? {
         logger.debug { "Get address book entry by id: $id" }
         return dslContext.selectFrom(AddressBookTable)
             .where(AddressBookTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
-    override fun getByAliasAndUserId(alias: String, userId: UUID): AddressBookEntry? {
+    override fun getByAliasAndUserId(alias: String, userId: UserId): AddressBookEntry? {
         logger.debug { "Get address book entry by alias and project ID, alias: $alias, userId: $userId" }
         return dslContext.selectFrom(AddressBookTable)
             .where(

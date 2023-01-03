@@ -6,6 +6,11 @@ import dev3.blockchainapiservice.blockchain.ExampleContract
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
@@ -58,8 +63,8 @@ import java.util.UUID
 class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val PROJECT = Project(
             id = PROJECT_ID,
             ownerId = OWNER_ID,
@@ -207,13 +212,13 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ContractMetadataRecord(
-                id = UUID.randomUUID(),
+                id = ContractMetadataId(UUID.randomUUID()),
                 name = CONTRACT_DECORATOR.name,
                 description = CONTRACT_DECORATOR.description,
                 contractId = CONTRACT_DECORATOR.id,
                 contractTags = CONTRACT_DECORATOR.tags.map { it.value }.toTypedArray(),
                 contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray(),
-                projectId = Constants.NIL_UUID
+                projectId = Constants.NIL_PROJECT_ID
             )
         )
 
@@ -240,7 +245,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 apiKey = API_KEY,
                 createdAt = TestData.TIMESTAMP
@@ -315,7 +320,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = response.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -362,7 +367,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements,
                         initialEthAmount = initialEthAmount,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -453,7 +458,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         projectId = PROJECT_ID,
                         createdAt = response.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -500,7 +505,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements,
                         initialEthAmount = initialEthAmount,
                         chainId = PROJECT.chainId,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -670,7 +675,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to delete contract deployment request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.delete("/v1/deploy/${createResponse.id}")
+                MockMvcRequestBuilders.delete("/v1/deploy/${createResponse.id.value}")
                     .header(CustomHeaders.API_KEY_HEADER, API_KEY)
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
@@ -747,7 +752,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-existent contract deployment request") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/v1/deploy/${createResponse.id}")
+                MockMvcRequestBuilders.delete("/v1/deploy/${createResponse.id.value}")
                     .header(CustomHeaders.API_KEY_HEADER, apiKey)
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
@@ -852,7 +857,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch contract deployment request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/deploy/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/deploy/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -879,7 +884,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${createResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-deploy/${createResponse.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = createResponse.createdAt,
                         arbitraryData = createResponse.arbitraryData,
@@ -992,7 +998,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             val fetchResponse = mockMvc
                 .perform(
                     MockMvcRequestBuilders.get(
-                        "/v1/deploy/by-project/${createResponse.projectId}/by-alias/${createResponse.alias}"
+                        "/v1/deploy/by-project/${createResponse.projectId.value}/by-alias/${createResponse.alias}"
                     )
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk)
@@ -1020,7 +1026,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${createResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-deploy/${createResponse.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = createResponse.createdAt,
                         arbitraryData = createResponse.arbitraryData,
@@ -1135,7 +1142,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch contract deployment request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/deploy/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/deploy/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1162,7 +1169,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
                         chainId = chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${createResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-deploy/${createResponse.id.value}/action",
                         projectId = projectId,
                         createdAt = createResponse.createdAt,
                         arbitraryData = createResponse.arbitraryData,
@@ -1279,7 +1287,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             val fetchResponse = mockMvc
                 .perform(
                     MockMvcRequestBuilders.get(
-                        "/v1/deploy/by-project/${createResponse.projectId}/by-alias/${createResponse.alias}"
+                        "/v1/deploy/by-project/${createResponse.projectId.value}/by-alias/${createResponse.alias}"
                     )
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk)
@@ -1307,7 +1315,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = initialEthAmount.rawValue,
                         chainId = chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${createResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-deploy/${createResponse.id.value}/action",
                         projectId = projectId,
                         createdAt = createResponse.createdAt,
                         arbitraryData = createResponse.arbitraryData,
@@ -1448,7 +1457,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val fetchResponse = suppose("request to fetch contract deployment requests by project ID is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get(
-                    "/v1/deploy/by-project/${createResponse.projectId}?contractIds=${CONTRACT_DECORATOR.id.value}" +
+                    "/v1/deploy/by-project/${createResponse.projectId.value}" +
+                        "?contractIds=${CONTRACT_DECORATOR.id.value}" +
                         "&contractTags=example AND simple,other" +
                         "&contractImplements=traits/example AND traits/exampleOwnable,traits/other" +
                         "&deployedOnly=true"
@@ -1482,7 +1492,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                 initialEthAmount = initialEthAmount.rawValue,
                                 chainId = PROJECT.chainId.value,
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-deploy/${createResponse.id}/action",
+                                    "/request-deploy/${createResponse.id.value}/action",
                                 projectId = PROJECT_ID,
                                 createdAt = createResponse.createdAt,
                                 arbitraryData = createResponse.arbitraryData,
@@ -1600,7 +1610,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         val fetchResponse = suppose("request to fetch contract deployment requests by project ID is made") {
             val fetchResponse = mockMvc.perform(
                 MockMvcRequestBuilders.get(
-                    "/v1/deploy/by-project/${createResponse.projectId}?contractIds=${CONTRACT_DECORATOR.id.value}" +
+                    "/v1/deploy/by-project/${createResponse.projectId.value}" +
+                        "?contractIds=${CONTRACT_DECORATOR.id.value}" +
                         "&contractTags=example AND simple,other" +
                         "&contractImplements=traits/example AND traits/exampleOwnable,traits/other" +
                         "&deployedOnly=true"
@@ -1634,7 +1645,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                 initialEthAmount = initialEthAmount.rawValue,
                                 chainId = chainId.value,
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-deploy/${createResponse.id}/action",
+                                    "/request-deploy/${createResponse.id.value}/action",
                                 projectId = projectId,
                                 createdAt = createResponse.createdAt,
                                 arbitraryData = createResponse.arbitraryData,
@@ -1673,7 +1684,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyAttachTransactionInfo() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val alias = "alias"
         val deployerAddress = WalletAddress("b")
 
@@ -1688,7 +1699,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,
@@ -1700,7 +1711,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     proxy = false,
                     implementationContractAddress = null
                 ),
-                metadataProjectId = Constants.NIL_UUID
+                metadataProjectId = Constants.NIL_PROJECT_ID
             )
         }
 
@@ -1708,7 +1719,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach transaction info to contract deployment request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/deploy/$id")
+                MockMvcRequestBuilders.put("/v1/deploy/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1733,7 +1744,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustReturn400BadRequestWhenTransactionInfoIsNotAttached() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val alias = "alias"
         val txHash = TransactionHash("0x1")
         val deployerAddress = WalletAddress("b")
@@ -1749,7 +1760,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,
                     arbitraryData = TestData.EMPTY_JSON_OBJECT,
@@ -1761,14 +1772,14 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     proxy = false,
                     implementationContractAddress = null
                 ),
-                metadataProjectId = Constants.NIL_UUID
+                metadataProjectId = Constants.NIL_PROJECT_ID
             )
             contractDeploymentRequestRepository.setTxInfo(id, txHash, deployerAddress)
         }
 
         verify("400 is returned when attaching transaction info") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/deploy/$id")
+                MockMvcRequestBuilders.put("/v1/deploy/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1793,8 +1804,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    private fun insertProjectWithCustomRpcUrl(): Triple<UUID, ChainId, String> {
-        val projectId = UUID.randomUUID()
+    private fun insertProjectWithCustomRpcUrl(): Triple<ProjectId, ChainId, String> {
+        val projectId = ProjectId(UUID.randomUUID())
         val chainId = ChainId(1337L)
 
         dslContext.executeInsert(
@@ -1813,7 +1824,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = projectId,
                 apiKey = apiKey,
                 createdAt = TestData.TIMESTAMP

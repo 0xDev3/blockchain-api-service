@@ -3,6 +3,8 @@ package dev3.blockchainapiservice.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.params.PreStoreContractDeploymentRequestParams
@@ -25,7 +27,6 @@ import dev3.blockchainapiservice.util.WithTransactionData
 import dev3.blockchainapiservice.util.ZeroAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 @Suppress("TooManyFunctions")
@@ -55,7 +56,7 @@ class ContractDeploymentRequestServiceImpl(
             decoratorNotFoundMessage
         )
 
-        if (!contractMetadataRepository.exists(params.contractId, Constants.NIL_UUID)) {
+        if (!contractMetadataRepository.exists(params.contractId, Constants.NIL_PROJECT_ID)) {
             throw ResourceNotFoundException(decoratorNotFoundMessage)
         }
 
@@ -72,10 +73,10 @@ class ContractDeploymentRequestServiceImpl(
             project = project
         )
 
-        return contractDeploymentRequestRepository.store(databaseParams, Constants.NIL_UUID)
+        return contractDeploymentRequestRepository.store(databaseParams, Constants.NIL_PROJECT_ID)
     }
 
-    override fun markContractDeploymentRequestAsDeleted(id: UUID, projectId: UUID) {
+    override fun markContractDeploymentRequestAsDeleted(id: ContractDeploymentRequestId, projectId: ProjectId) {
         logger.info { "Mark contract deployment request as deleted by id: $id, projectId: $projectId" }
         ethCommonService.fetchResource(
             contractDeploymentRequestRepository.getById(id)?.takeIf { it.projectId == projectId },
@@ -83,7 +84,9 @@ class ContractDeploymentRequestServiceImpl(
         ).let { contractDeploymentRequestRepository.markAsDeleted(it.id) }
     }
 
-    override fun getContractDeploymentRequest(id: UUID): WithTransactionData<ContractDeploymentRequest> {
+    override fun getContractDeploymentRequest(
+        id: ContractDeploymentRequestId
+    ): WithTransactionData<ContractDeploymentRequest> {
         logger.debug { "Fetching contract deployment request, id: $id" }
 
         val contractDeploymentRequest = ethCommonService.fetchResource(
@@ -96,7 +99,7 @@ class ContractDeploymentRequestServiceImpl(
     }
 
     override fun getContractDeploymentRequestsByProjectIdAndFilters(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractDeploymentRequestFilters
     ): List<WithTransactionData<ContractDeploymentRequest>> {
         logger.debug { "Fetching contract deployment requests for projectId: $projectId, filters: $filters" }
@@ -114,7 +117,7 @@ class ContractDeploymentRequestServiceImpl(
     }
 
     override fun getContractDeploymentRequestByProjectIdAndAlias(
-        projectId: UUID,
+        projectId: ProjectId,
         alias: String
     ): WithTransactionData<ContractDeploymentRequest> {
         logger.debug { "Fetching contract deployment requests for projectId: $projectId, alias: $alias" }
@@ -128,7 +131,7 @@ class ContractDeploymentRequestServiceImpl(
         return contractDeploymentRequest.appendTransactionData(project)
     }
 
-    override fun attachTxInfo(id: UUID, txHash: TransactionHash, deployer: WalletAddress) {
+    override fun attachTxInfo(id: ContractDeploymentRequestId, txHash: TransactionHash, deployer: WalletAddress) {
         logger.info { "Attach txInfo to contract deployment request, id: $id, txHash: $txHash, deployer: $deployer" }
 
         val txInfoAttached = contractDeploymentRequestRepository.setTxInfo(id, txHash, deployer)

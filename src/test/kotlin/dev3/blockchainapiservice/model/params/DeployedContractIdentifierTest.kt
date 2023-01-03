@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.model.params
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.exception.InvalidRequestBodyException
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.util.ContractAddress
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -10,7 +11,7 @@ class DeployedContractIdentifierTest : TestBase() {
 
     companion object {
         data class RequestBody(
-            override val deployedContractId: UUID?,
+            override val deployedContractId: ContractDeploymentRequestId?,
             override val deployedContractAlias: String?,
             override val contractAddress: String?
         ) : DeployedContractIdentifierRequestBody
@@ -18,7 +19,7 @@ class DeployedContractIdentifierTest : TestBase() {
 
     @Test
     fun mustCorrectlyCreateDeployedContractIdentifierFromDeployedContractId() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
 
         val result = suppose("deployed contract identifier will be created") {
             DeployedContractIdentifier(
@@ -82,7 +83,7 @@ class DeployedContractIdentifierTest : TestBase() {
             expectThrows<InvalidRequestBodyException> {
                 DeployedContractIdentifier(
                     RequestBody(
-                        deployedContractId = UUID.randomUUID(),
+                        deployedContractId = ContractDeploymentRequestId(UUID.randomUUID()),
                         deployedContractAlias = "alias",
                         contractAddress = "a"
                     )

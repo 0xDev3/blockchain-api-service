@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.model.response
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.AssetBalanceRequest
 import dev3.blockchainapiservice.model.result.FullAssetBalanceRequest
@@ -8,11 +10,10 @@ import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.Status
 import java.math.BigInteger
 import java.time.OffsetDateTime
-import java.util.UUID
 
 data class AssetBalanceRequestResponse(
-    val id: UUID,
-    val projectId: UUID,
+    val id: AssetBalanceRequestId,
+    val projectId: ProjectId,
     val status: Status,
     val chainId: Long,
     val redirectUrl: String,

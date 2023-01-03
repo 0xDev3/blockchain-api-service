@@ -1,12 +1,12 @@
 package dev3.blockchainapiservice.model.response
 
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.result.ApiUsagePeriod
 import dev3.blockchainapiservice.model.result.RequestUsage
 import java.time.OffsetDateTime
-import java.util.UUID
 
 data class ApiUsagePeriodResponse(
-    val userId: UUID,
+    val userId: UserId,
     val writeRequestUsage: RequestUsage,
     val readRequestUsage: RequestUsage,
     val startDate: OffsetDateTime,

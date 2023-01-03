@@ -4,6 +4,7 @@ import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.blockchain.ExampleContract
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.filters.AndList
 import dev3.blockchainapiservice.model.filters.ContractDecoratorFilters
 import dev3.blockchainapiservice.model.filters.OrList
@@ -187,7 +188,7 @@ class ContractDecoratorControllerTest : TestBase() {
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
             contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
 
         suppose("some contract decorators will be fetched with filters") {
             call(repository.getAll(projectId, filters))
@@ -284,7 +285,7 @@ class ContractDecoratorControllerTest : TestBase() {
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
             contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
 
         suppose("some contract manifest.json files will be fetched with filters") {
             call(repository.getAllManifestJsonFiles(projectId, filters))
@@ -363,7 +364,7 @@ class ContractDecoratorControllerTest : TestBase() {
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
             contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
 
         suppose("some contract artifact.json files will be fetched with filters") {
             call(repository.getAllArtifactJsonFiles(projectId, filters))
@@ -426,7 +427,7 @@ class ContractDecoratorControllerTest : TestBase() {
             contractTags = OrList(AndList(ContractTag("tag-1"), ContractTag("tag-2"))),
             contractImplements = OrList(AndList(InterfaceId("trait-1"), InterfaceId("trait-2")))
         )
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
 
         suppose("some contract info.md files will be fetched with filters") {
             call(repository.getAllInfoMarkdownFiles(projectId, filters))
@@ -589,7 +590,7 @@ class ContractDecoratorControllerTest : TestBase() {
             manifest = ManifestJson.EMPTY,
             artifact = ArtifactJson.EMPTY
         )
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
 
         suppose("some contract decorator will be fetched") {
             call(repository.getByContractIdAndProjectId(id, projectId))
@@ -687,7 +688,7 @@ class ContractDecoratorControllerTest : TestBase() {
             constructorDecorators = emptyList(),
             functionDecorators = emptyList()
         )
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
 
         suppose("some contract manifest.json will be fetched") {
             call(repository.getManifestJsonByContractIdAndProjectId(id, projectId))
@@ -773,7 +774,7 @@ class ContractDecoratorControllerTest : TestBase() {
             linkReferences = null,
             deployedLinkReferences = null
         )
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
 
         suppose("some contract artifact.json will be fetched") {
             call(repository.getArtifactJsonByContractIdAndProjectId(id, projectId))
@@ -841,7 +842,7 @@ class ContractDecoratorControllerTest : TestBase() {
         val id = ContractId("example")
         val repository = mock<ImportedContractDecoratorRepository>()
         val result = "info-md"
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
 
         suppose("some contract info.md will be fetched") {
             call(repository.getInfoMarkdownByContractIdAndProjectId(id, projectId))

@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.service
 
+import dev3.blockchainapiservice.generated.jooq.id.DatabaseIdWrapper
 import dev3.blockchainapiservice.util.UtcDateTime
 import io.micrometer.core.instrument.util.NamedThreadFactory
 import org.springframework.stereotype.Service
@@ -10,12 +11,14 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 interface UuidProvider {
-    fun getUuid(): UUID
+    fun <T> getUuid(wrapper: DatabaseIdWrapper<T>): T
+    fun getRawUuid(): UUID
 }
 
 @Service
 class RandomUuidProvider : UuidProvider {
-    override fun getUuid(): UUID = UUID.randomUUID()
+    override fun <T> getUuid(wrapper: DatabaseIdWrapper<T>): T = wrapper.wrap(UUID.randomUUID())
+    override fun getRawUuid(): UUID = UUID.randomUUID()
 }
 
 interface UtcDateTimeProvider {

@@ -1,21 +1,22 @@
 package dev3.blockchainapiservice.model.result
 
+import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import java.util.UUID
 
 data class AddressBookEntry(
-    val id: UUID,
+    val id: AddressBookId,
     val alias: String,
     val address: WalletAddress,
     val phoneNumber: String?,
     val email: String?,
     val createdAt: UtcDateTime,
-    val userId: UUID
+    val userId: UserId
 ) {
     constructor(
-        id: UUID,
+        id: AddressBookId,
         createdAt: UtcDateTime,
         request: CreateOrUpdateAddressBookEntryRequest,
         userIdentifier: UserIdentifier

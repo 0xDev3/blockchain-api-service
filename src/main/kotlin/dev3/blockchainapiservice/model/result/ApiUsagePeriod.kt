@@ -1,10 +1,10 @@
 package dev3.blockchainapiservice.model.result
 
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.util.UtcDateTime
-import java.util.UUID
 
 data class ApiUsagePeriod(
-    val userId: UUID,
+    val userId: UserId,
     val writeRequestUsage: RequestUsage,
     val readRequestUsage: RequestUsage,
     val startDate: UtcDateTime,

@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.config.ApiRateProperties
+import dev3.blockchainapiservice.generated.jooq.id.ApiUsagePeriodId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.ApiUsagePeriodTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiReadCallRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiUsagePeriodRecord
@@ -29,7 +31,7 @@ class JooqApiRateLimitRepository(
 
     companion object : KLogging()
 
-    override fun createNewFutureUsageLimits(userId: UUID, currentTime: UtcDateTime, limits: List<ApiUsageLimit>) {
+    override fun createNewFutureUsageLimits(userId: UserId, currentTime: UtcDateTime, limits: List<ApiUsageLimit>) {
         logger.info { "Create future API usage limits, userId: $userId, currentTime: $currentTime, limits: $limits" }
 
         // delete all future usage limits
@@ -56,7 +58,7 @@ class JooqApiRateLimitRepository(
 
         val records = limits.map {
             ApiUsagePeriodRecord(
-                id = UUID.randomUUID(),
+                id = ApiUsagePeriodId(UUID.randomUUID()),
                 userId = userId,
                 allowedWriteRequests = it.allowedWriteRequests,
                 allowedReadRequests = it.allowedReadRequests,
@@ -71,7 +73,7 @@ class JooqApiRateLimitRepository(
         dslContext.batchInsert(records).execute()
     }
 
-    override fun getCurrentApiUsagePeriod(userId: UUID, currentTime: UtcDateTime): ApiUsagePeriod {
+    override fun getCurrentApiUsagePeriod(userId: UserId, currentTime: UtcDateTime): ApiUsagePeriod {
         logger.debug { "Get current API usage period, userId: $userId, currentTime: $currentTime" }
 
         val currentPeriod = getOrCreateApiUsagePeriod(userId, currentTime)
@@ -85,17 +87,17 @@ class JooqApiRateLimitRepository(
         )
     }
 
-    override fun remainingWriteLimit(userId: UUID, currentTime: UtcDateTime): Long {
+    override fun remainingWriteLimit(userId: UserId, currentTime: UtcDateTime): Long {
         val currentPeriod = getOrCreateApiUsagePeriod(userId, currentTime)
         return calculateUsage(currentPeriod.usedWriteRequests, currentPeriod.allowedWriteRequests).remaining
     }
 
-    override fun remainingReadLimit(userId: UUID, currentTime: UtcDateTime): Long {
+    override fun remainingReadLimit(userId: UserId, currentTime: UtcDateTime): Long {
         val currentPeriod = getOrCreateApiUsagePeriod(userId, currentTime)
         return calculateUsage(currentPeriod.usedReadRequests, currentPeriod.allowedReadRequests).remaining
     }
 
-    override fun addWriteCall(userId: UUID, currentTime: UtcDateTime, method: RequestMethod, endpoint: String) {
+    override fun addWriteCall(userId: UserId, currentTime: UtcDateTime, method: RequestMethod, endpoint: String) {
         logger.info {
             "Adding write call, userId: $userId, currentTime: $currentTime, method: $method, endpoint: $endpoint"
         }
@@ -112,7 +114,7 @@ class JooqApiRateLimitRepository(
         getOrCreateApiUsagePeriod(userId, currentTime).incrementField(ApiUsagePeriodTable.USED_WRITE_REQUESTS)
     }
 
-    override fun addReadCall(userId: UUID, currentTime: UtcDateTime, endpoint: String) {
+    override fun addReadCall(userId: UserId, currentTime: UtcDateTime, endpoint: String) {
         logger.info { "Adding read call, userId: $userId, currentTime: $currentTime, endpoint: $endpoint" }
 
         dslContext.executeInsert(
@@ -126,7 +128,7 @@ class JooqApiRateLimitRepository(
         getOrCreateApiUsagePeriod(userId, currentTime).incrementField(ApiUsagePeriodTable.USED_READ_REQUESTS)
     }
 
-    private fun getOrCreateApiUsagePeriod(userId: UUID, currentTime: UtcDateTime): ApiUsagePeriodRecord =
+    private fun getOrCreateApiUsagePeriod(userId: UserId, currentTime: UtcDateTime): ApiUsagePeriodRecord =
         dslContext.selectFrom(ApiUsagePeriodTable)
             .where(
                 DSL.and(
@@ -139,7 +141,7 @@ class JooqApiRateLimitRepository(
             .limit(1)
             .fetchOne() ?: insertNewApiUsagePeriodRecord(userId, currentTime)
 
-    private fun insertNewApiUsagePeriodRecord(userId: UUID, startDate: UtcDateTime): ApiUsagePeriodRecord {
+    private fun insertNewApiUsagePeriodRecord(userId: UserId, startDate: UtcDateTime): ApiUsagePeriodRecord {
         val endDate = startDate + apiRateProperties.usagePeriodDuration.toKotlinDuration()
 
         logger.info {
@@ -147,7 +149,7 @@ class JooqApiRateLimitRepository(
         }
 
         val record = ApiUsagePeriodRecord(
-            id = UUID.randomUUID(),
+            id = ApiUsagePeriodId(UUID.randomUUID()),
             userId = userId,
             allowedWriteRequests = apiRateProperties.freeTierWriteRequests,
             allowedReadRequests = apiRateProperties.freeTierReadRequests,

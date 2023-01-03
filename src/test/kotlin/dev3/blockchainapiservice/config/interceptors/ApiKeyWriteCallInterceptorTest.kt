@@ -8,6 +8,9 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedM
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.exception.ErrorResponse
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.result.ApiKey
 import dev3.blockchainapiservice.repository.ApiKeyRepository
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
@@ -87,14 +90,14 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
                 .willReturn(apiKey)
         }
 
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val apiKeyRepository = mock<ApiKeyRepository>()
 
         suppose("API key repository will return some API key") {
             call(apiKeyRepository.getByValue(apiKey))
                 .willReturn(
                     ApiKey(
-                        id = UUID.randomUUID(),
+                        id = ApiKeyId(UUID.randomUUID()),
                         projectId = projectId,
                         apiKey = apiKey,
                         createdAt = TestData.TIMESTAMP
@@ -103,10 +106,10 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
         }
 
         val userIdResolverRepository = mock<UserIdResolverRepository>()
-        val userId = UUID.randomUUID()
+        val userId = UserId(UUID.randomUUID())
 
         suppose("userId will be resolved in the repository") {
-            call(userIdResolverRepository.getUserId(IdType.PROJECT_ID, projectId))
+            call(userIdResolverRepository.getByProjectId(projectId))
                 .willReturn(userId)
         }
 
@@ -158,7 +161,7 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
             }
 
             expectInteractions(userIdResolverRepository) {
-                twice.getUserId(IdType.PROJECT_ID, projectId)
+                twice.getByProjectId(projectId)
             }
         }
     }
@@ -175,7 +178,7 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
         }
 
         val userIdResolverRepository = mock<UserIdResolverRepository>()
-        val userId = UUID.randomUUID()
+        val userId = UserId(UUID.randomUUID())
 
         suppose("userId will be resolved in the repository") {
             call(userIdResolverRepository.getUserId(idType, projectId))
@@ -247,7 +250,7 @@ class ApiKeyWriteCallInterceptorTest : TestBase() {
         }
 
         val userIdResolverRepository = mock<UserIdResolverRepository>()
-        val userId = UUID.randomUUID()
+        val userId = UserId(UUID.randomUUID())
 
         suppose("userId will be resolved in the repository") {
             call(userIdResolverRepository.getUserId(idType, projectId))

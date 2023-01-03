@@ -332,18 +332,18 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         }
 
         verify("correct contract metadata exists in the database") {
-            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
-            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
-            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
 
-            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
         }
     }
@@ -547,18 +547,18 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         }
 
         verify("correct contract metadata exists in the database") {
-            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
-            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
-            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
 
-            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
         }
     }
@@ -604,17 +604,22 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         }
 
         verify("correct contract metadata exists in the database") {
-            expectThat(contractMetadataRepository.exists(unparsableArtifactContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(unparsableArtifactContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(unparsableManifestContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(unparsableManifestContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(missingConstructorSignatureContractId, Constants.NIL_UUID))
+            expectThat(
+                contractMetadataRepository.exists(
+                    missingConstructorSignatureContractId,
+                    Constants.NIL_PROJECT_ID
+                )
+            )
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(missingEventNameContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(missingEventNameContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(missingFunctionNameContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(missingFunctionNameContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(missingFunctionOutputsContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(missingFunctionOutputsContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
         }
     }

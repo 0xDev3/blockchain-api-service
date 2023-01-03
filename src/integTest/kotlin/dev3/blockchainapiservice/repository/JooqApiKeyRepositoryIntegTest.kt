@@ -3,6 +3,9 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -29,8 +32,8 @@ import kotlin.time.Duration.Companion.seconds
 class JooqApiKeyRepositoryIntegTest : TestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private const val API_KEY = "api-key"
     }
 
@@ -71,7 +74,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchApiKeyById() {
-        val id = UUID.randomUUID()
+        val id = ApiKeyId(UUID.randomUUID())
 
         suppose("some API key is stored in database") {
             dslContext.executeInsert(
@@ -101,7 +104,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchApiKeyByValue() {
-        val id = UUID.randomUUID()
+        val id = ApiKeyId(UUID.randomUUID())
 
         suppose("some API key is stored in database") {
             dslContext.executeInsert(
@@ -132,7 +135,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentApiKeyById() {
         verify("null is returned when fetching non-existent API key") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(ApiKeyId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -144,13 +147,13 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         suppose("some API keys are stored in database") {
             dslContext.batchInsert(
                 ApiKeyRecord(
-                    id = UUID.randomUUID(),
+                    id = ApiKeyId(UUID.randomUUID()),
                     projectId = PROJECT_ID,
                     apiKey = "api-key-1",
                     createdAt = TestData.TIMESTAMP
                 ),
                 ApiKeyRecord(
-                    id = UUID.randomUUID(),
+                    id = ApiKeyId(UUID.randomUUID()),
                     projectId = PROJECT_ID,
                     apiKey = "api-key-2",
                     createdAt = TestData.TIMESTAMP + 10.seconds
@@ -173,7 +176,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
         suppose("some API key is stored in database") {
             dslContext.executeInsert(
                 ApiKeyRecord(
-                    id = UUID.randomUUID(),
+                    id = ApiKeyId(UUID.randomUUID()),
                     projectId = PROJECT_ID,
                     apiKey = API_KEY,
                     createdAt = TestData.TIMESTAMP
@@ -191,7 +194,7 @@ class JooqApiKeyRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreApiKey() {
-        val id = UUID.randomUUID()
+        val id = ApiKeyId(UUID.randomUUID())
         val apiKey = ApiKey(
             id = id,
             projectId = PROJECT_ID,

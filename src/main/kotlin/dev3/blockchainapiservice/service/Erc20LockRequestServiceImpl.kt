@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import dev3.blockchainapiservice.model.params.StoreErc20LockRequestParams
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
@@ -21,7 +23,6 @@ import dev3.blockchainapiservice.util.WithTransactionData
 import dev3.blockchainapiservice.util.ZeroAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class Erc20LockRequestServiceImpl(
@@ -52,7 +53,7 @@ class Erc20LockRequestServiceImpl(
         return WithFunctionData(erc20LockRequest, data)
     }
 
-    override fun getErc20LockRequest(id: UUID): WithTransactionData<Erc20LockRequest> {
+    override fun getErc20LockRequest(id: Erc20LockRequestId): WithTransactionData<Erc20LockRequest> {
         logger.debug { "Fetching ERC20 lock request, id: $id" }
 
         val erc20LockRequest = ethCommonService.fetchResource(
@@ -64,14 +65,14 @@ class Erc20LockRequestServiceImpl(
         return erc20LockRequest.appendTransactionData(project)
     }
 
-    override fun getErc20LockRequestsByProjectId(projectId: UUID): List<WithTransactionData<Erc20LockRequest>> {
+    override fun getErc20LockRequestsByProjectId(projectId: ProjectId): List<WithTransactionData<Erc20LockRequest>> {
         logger.debug { "Fetching ERC20 lock requests for projectId: $projectId" }
         return projectRepository.getById(projectId)?.let {
             erc20LockRequestRepository.getAllByProjectId(projectId).map { req -> req.appendTransactionData(it) }
         } ?: emptyList()
     }
 
-    override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
+    override fun attachTxInfo(id: Erc20LockRequestId, txHash: TransactionHash, caller: WalletAddress) {
         logger.info { "Attach txInfo to ERC20 lock request, id: $id, txHash: $txHash, caller: $caller" }
 
         val txInfoAttached = erc20LockRequestRepository.setTxInfo(id, txHash, caller)
@@ -85,7 +86,7 @@ class Erc20LockRequestServiceImpl(
         tokenAddress: ContractAddress,
         tokenAmount: Balance,
         lockDuration: DurationSeconds,
-        id: UUID
+        id: Erc20LockRequestId
     ): FunctionData =
         functionEncoderService.encode(
             functionName = "lock",
@@ -93,7 +94,7 @@ class Erc20LockRequestServiceImpl(
                 FunctionArgument(tokenAddress),
                 FunctionArgument(tokenAmount),
                 FunctionArgument(lockDuration),
-                FunctionArgument(id.toString()),
+                FunctionArgument(id.value.toString()),
                 FunctionArgument(ZeroAddress)
             )
         )

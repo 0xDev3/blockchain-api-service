@@ -3,6 +3,9 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateAssetMultiSendRequestParams
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
@@ -56,8 +59,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
             )
         )
         val result = AssetMultiSendRequest(
-            id = UUID.randomUUID(),
-            projectId = UUID.randomUUID(),
+            id = AssetMultiSendRequestId(UUID.randomUUID()),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = ChainId(1337L),
             redirectUrl = params.redirectUrl!!,
             tokenAddress = params.tokenAddress,
@@ -75,7 +78,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
         )
         val project = Project(
             id = result.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -160,14 +163,14 @@ class AssetMultiSendRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetMultiSendRequest() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val service = mock<AssetMultiSendRequestService>()
         val approveTxHash = TransactionHash("approve-tx-hash")
         val disperseTxHash = TransactionHash("disperse-tx-hash")
         val result = WithMultiTransactionData(
             value = AssetMultiSendRequest(
                 id = id,
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 chainId = ChainId(123L),
                 redirectUrl = "redirect-url",
                 tokenAddress = ContractAddress("a"),
@@ -278,8 +281,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetMultiSendRequestsByProjectId() {
-        val id = UUID.randomUUID()
-        val projectId = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
+        val projectId = ProjectId(UUID.randomUUID())
         val service = mock<AssetMultiSendRequestService>()
         val approveTxHash = TransactionHash("approve-tx-hash")
         val disperseTxHash = TransactionHash("disperse-tx-hash")
@@ -401,7 +404,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetMultiSendRequestsBySender() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val sender = WalletAddress("d")
         val service = mock<AssetMultiSendRequestService>()
         val approveTxHash = TransactionHash("approve-tx-hash")
@@ -409,7 +412,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
         val result = WithMultiTransactionData(
             value = AssetMultiSendRequest(
                 id = id,
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 chainId = ChainId(123L),
                 redirectUrl = "redirect-url",
                 tokenAddress = ContractAddress("a"),
@@ -527,7 +530,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
         val service = mock<AssetMultiSendRequestService>()
         val controller = AssetMultiSendRequestController(service)
 
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val txHash = "approve-tx-hash"
         val caller = "c"
 
@@ -549,7 +552,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
         val service = mock<AssetMultiSendRequestService>()
         val controller = AssetMultiSendRequestController(service)
 
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val txHash = "disperse-tx-hash"
         val caller = "c"
 

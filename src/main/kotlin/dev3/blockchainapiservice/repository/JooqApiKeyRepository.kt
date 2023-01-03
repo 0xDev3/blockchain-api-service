@@ -1,12 +1,13 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.ApiKeyTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.model.result.ApiKey
 import mu.KLogging
 import org.jooq.DSLContext
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepository {
@@ -25,7 +26,7 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
         return record.toModel()
     }
 
-    override fun getById(id: UUID): ApiKey? {
+    override fun getById(id: ApiKeyId): ApiKey? {
         logger.debug { "Get API key by id: $id" }
         return dslContext.selectFrom(ApiKeyTable)
             .where(ApiKeyTable.ID.eq(id))
@@ -39,7 +40,7 @@ class JooqApiKeyRepository(private val dslContext: DSLContext) : ApiKeyRepositor
             .fetchOne { it.toModel() }
     }
 
-    override fun getAllByProjectId(projectId: UUID): List<ApiKey> {
+    override fun getAllByProjectId(projectId: ProjectId): List<ApiKey> {
         logger.debug { "Get API keys by projectId: $projectId" }
         return dslContext.selectFrom(ApiKeyTable)
             .where(ApiKeyTable.PROJECT_ID.eq(projectId))

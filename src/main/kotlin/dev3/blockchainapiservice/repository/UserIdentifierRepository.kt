@@ -1,14 +1,14 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.util.WalletAddress
-import java.util.UUID
 
 interface UserIdentifierRepository {
     fun store(userIdentifier: UserIdentifier): UserIdentifier
-    fun getById(id: UUID): UserIdentifier?
+    fun getById(id: UserId): UserIdentifier?
     fun getByUserIdentifier(userIdentifier: String, identifierType: UserIdentifierType): UserIdentifier?
 
     fun getByWalletAddress(walletAddress: WalletAddress): UserWalletAddressIdentifier? =
@@ -21,5 +21,5 @@ interface UserIdentifierRepository {
         }
 
     fun getByStripeClientId(stripeClientId: String): UserIdentifier?
-    fun setStripeClientId(id: UUID, stripeClientId: String): Boolean
+    fun setStripeClientId(id: UserId, stripeClientId: String): Boolean
 }

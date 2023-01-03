@@ -5,6 +5,8 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMa
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.MaxStringSize
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.filters.parseOrListWithNestedAndLists
@@ -28,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.validation.Valid
 
 @Validated
@@ -50,14 +51,14 @@ class ContractDeploymentRequestController(
     @DeleteMapping("/v1/deploy/{id}")
     fun markContractDeploymentRequestAsDeleted(
         @ApiKeyBinding project: Project,
-        @PathVariable("id") id: UUID
+        @PathVariable("id") id: ContractDeploymentRequestId
     ) {
         contractDeploymentRequestService.markContractDeploymentRequestAsDeleted(id, project.id)
     }
 
     @ApiReadLimitedMapping(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, "/v1/deploy/{id}")
     fun getContractDeploymentRequest(
-        @PathVariable("id") id: UUID
+        @PathVariable("id") id: ContractDeploymentRequestId
     ): ResponseEntity<ContractDeploymentRequestResponse> {
         val contractDeploymentRequest = contractDeploymentRequestService.getContractDeploymentRequest(id)
         return ResponseEntity.ok(ContractDeploymentRequestResponse(contractDeploymentRequest))
@@ -65,7 +66,7 @@ class ContractDeploymentRequestController(
 
     @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/deploy/by-project/{projectId}/by-alias/{alias}")
     fun getContractDeploymentRequestByProjectIdAndAlias(
-        @PathVariable("projectId") projectId: UUID,
+        @PathVariable("projectId") projectId: ProjectId,
         @PathVariable("alias") alias: String
     ): ResponseEntity<ContractDeploymentRequestResponse> {
         val contractDeploymentRequest = contractDeploymentRequestService
@@ -78,7 +79,7 @@ class ContractDeploymentRequestController(
 
     @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/deploy/by-project/{projectId}")
     fun getContractDeploymentRequestsByProjectIdAndFilters(
-        @PathVariable("projectId") projectId: UUID,
+        @PathVariable("projectId") projectId: ProjectId,
         @Valid @RequestParam("contractIds", required = false) contractIds: List<@MaxStringSize String>?,
         @Valid @RequestParam("contractTags", required = false) contractTags: List<@MaxStringSize String>?,
         @Valid @RequestParam("contractImplements", required = false) contractImplements: List<@MaxStringSize String>?,
@@ -101,7 +102,7 @@ class ContractDeploymentRequestController(
 
     @ApiWriteLimitedMapping(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, RequestMethod.PUT, "/v1/deploy/{id}")
     fun attachTransactionInfo(
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: ContractDeploymentRequestId,
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
         contractDeploymentRequestService.attachTxInfo(

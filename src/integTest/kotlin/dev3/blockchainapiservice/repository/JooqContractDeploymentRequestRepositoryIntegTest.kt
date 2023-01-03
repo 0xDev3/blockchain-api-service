@@ -4,6 +4,10 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.AliasAlreadyInUseException
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
@@ -46,9 +50,9 @@ import kotlin.time.Duration.Companion.days
 class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     companion object {
-        private val PROJECT_ID_1 = UUID.randomUUID()
-        private val PROJECT_ID_2 = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID_1 = ProjectId(UUID.randomUUID())
+        private val PROJECT_ID_2 = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private const val ALIAS = "alias"
         private const val NAME = "name"
         private const val DESCRIPTION = "description"
@@ -114,7 +118,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestById() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val metadata = createMetadataRecord()
         val record = createRecord(id, metadata)
 
@@ -134,7 +138,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentContractDeploymentRequestById() {
         verify("null is returned when fetching non-existent contract deployment request by id") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(ContractDeploymentRequestId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -144,7 +148,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestByAliasAndProjectId() {
         val metadata = createMetadataRecord()
-        val record = createRecord(UUID.randomUUID(), metadata)
+        val record = createRecord(ContractDeploymentRequestId(UUID.randomUUID()), metadata)
 
         suppose("some contract deployment request exists in database") {
             dslContext.executeInsert(metadata)
@@ -162,7 +166,8 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentContractDeploymentRequestByAliasAndProjectId() {
         verify("null is returned when fetching non-existent contract deployment request by alias and project id") {
-            val result = repository.getByAliasAndProjectId("non-existent-alias", UUID.randomUUID())
+            val result =
+                repository.getByAliasAndProjectId("non-existent-alias", ProjectId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -173,7 +178,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     fun mustCorrectlyFetchContractDeploymentRequestByContractAddressAndChainId() {
         val metadata = createMetadataRecord()
         val olderRecord = createRecord(
-            id = UUID.randomUUID(),
+            id = ContractDeploymentRequestId(UUID.randomUUID()),
             metadata = metadata,
             createdAt = TestData.TIMESTAMP
         )
@@ -185,7 +190,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         val newerRecord = createRecord(
-            id = UUID.randomUUID(),
+            id = ContractDeploymentRequestId(UUID.randomUUID()),
             metadata = metadata,
             createdAt = TestData.TIMESTAMP + 1.days
         )
@@ -217,7 +222,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
     fun mustCorrectlyFetchContractDeploymentRequestByContractAddressChainIdAndProjectId() {
         val metadata = createMetadataRecord()
         val olderRecord = createRecord(
-            id = UUID.randomUUID(),
+            id = ContractDeploymentRequestId(UUID.randomUUID()),
             metadata = metadata,
             createdAt = TestData.TIMESTAMP
         )
@@ -229,7 +234,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         }
 
         val newerRecord = createRecord(
-            id = UUID.randomUUID(),
+            id = ContractDeploymentRequestId(UUID.randomUUID()),
             metadata = metadata,
             createdAt = TestData.TIMESTAMP + 1.days
         )
@@ -257,7 +262,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             val result = repository.getByContractAddressChainIdAndProjectId(
                 contractAddress = ContractAddress("dead"),
                 chainId = ChainId(1337L),
-                projectId = UUID.randomUUID()
+                projectId = ProjectId(UUID.randomUUID())
             )
 
             expectThat(result)
@@ -352,7 +357,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             dslContext.batchInsert(metadataById.values).execute()
         }
 
-        fun uuid() = UUID.randomUUID()
+        fun uuid() = ContractDeploymentRequestId(UUID.randomUUID())
 
         val project1ContractsWithMatchingCid = listOf(
             createRecord(id = uuid(), projectId = PROJECT_ID_1, metadata = cid1Metadata),
@@ -520,7 +525,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(metadata)
         }
 
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
@@ -589,14 +594,14 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
 
         verify("storing contract deployment request with conflicting alias throws AliasAlreadyInUseException") {
             expectThrows<AliasAlreadyInUseException> {
-                repository.store(params.copy(id = UUID.randomUUID()), metadata.projectId)
+                repository.store(params.copy(id = ContractDeploymentRequestId(UUID.randomUUID())), metadata.projectId)
             }
         }
     }
 
     @Test
     fun mustCorrectlyMarkContractDeploymentRequestAsDeletedById() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val metadata = createMetadataRecord()
         val record = createRecord(id, metadata)
 
@@ -633,7 +638,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(metadata)
         }
 
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
@@ -712,7 +717,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(metadata)
         }
 
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
@@ -792,7 +797,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(metadata)
         }
 
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
@@ -881,7 +886,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(metadata)
         }
 
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
@@ -960,7 +965,7 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
             dslContext.executeInsert(metadata)
         }
 
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val params = StoreContractDeploymentRequestParams(
             id = id,
             alias = ALIAS,
@@ -1038,26 +1043,26 @@ class JooqContractDeploymentRequestRepositoryIntegTest : TestBase() {
         tags: List<String> = emptyList(),
         traits: List<String> = emptyList()
     ) = ContractMetadataRecord(
-        id = UUID.randomUUID(),
+        id = ContractMetadataId(UUID.randomUUID()),
         name = NAME,
         description = DESCRIPTION,
         contractId = contractId,
         contractTags = tags.toTypedArray(),
         contractImplements = traits.toTypedArray(),
-        projectId = Constants.NIL_UUID
+        projectId = Constants.NIL_PROJECT_ID
     )
 
     private fun createRecord(
-        id: UUID,
+        id: ContractDeploymentRequestId,
         metadata: ContractMetadataRecord,
-        projectId: UUID = PROJECT_ID_1,
+        projectId: ProjectId = PROJECT_ID_1,
         contractAddress: ContractAddress? = CONTRACT_ADDRESS,
         deployerAddress: WalletAddress? = DEPLOYER_ADDRESS,
         txHash: TransactionHash? = TX_HASH,
         createdAt: UtcDateTime = TestData.TIMESTAMP
     ) = ContractDeploymentRequestRecord(
         id = id,
-        alias = UUID.randomUUID().toString(),
+        alias = ContractDeploymentRequestId(UUID.randomUUID()).toString(),
         contractMetadataId = metadata.id,
         contractData = CONTRACT_DATA,
         constructorParams = TestData.EMPTY_JSON_ARRAY,

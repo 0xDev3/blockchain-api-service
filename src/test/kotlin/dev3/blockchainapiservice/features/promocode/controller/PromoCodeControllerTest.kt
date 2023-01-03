@@ -9,6 +9,7 @@ import dev3.blockchainapiservice.features.promocodes.model.response.PromoCodeRes
 import dev3.blockchainapiservice.features.promocodes.model.response.PromoCodesResponse
 import dev3.blockchainapiservice.features.promocodes.model.result.PromoCode
 import dev3.blockchainapiservice.features.promocodes.service.PromoCodeService
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
@@ -25,7 +26,7 @@ class PromoCodeControllerTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("abc")
         )

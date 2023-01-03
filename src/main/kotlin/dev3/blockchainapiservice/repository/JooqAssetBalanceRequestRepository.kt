@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetBalanceRequestRecord
 import dev3.blockchainapiservice.model.ScreenConfig
@@ -11,7 +13,6 @@ import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : AssetBalanceRequestRepository {
@@ -39,14 +40,14 @@ class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : As
         return record.toModel()
     }
 
-    override fun getById(id: UUID): AssetBalanceRequest? {
+    override fun getById(id: AssetBalanceRequestId): AssetBalanceRequest? {
         logger.debug { "Get asset balance request by id: $id" }
         return dslContext.selectFrom(AssetBalanceRequestTable)
             .where(AssetBalanceRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
-    override fun getAllByProjectId(projectId: UUID): List<AssetBalanceRequest> {
+    override fun getAllByProjectId(projectId: ProjectId): List<AssetBalanceRequest> {
         logger.debug { "Get asset balance requests filtered by projectId: $projectId" }
         return dslContext.selectFrom(AssetBalanceRequestTable)
             .where(AssetBalanceRequestTable.PROJECT_ID.eq(projectId))
@@ -54,7 +55,11 @@ class JooqAssetBalanceRequestRepository(private val dslContext: DSLContext) : As
             .fetch { it.toModel() }
     }
 
-    override fun setSignedMessage(id: UUID, walletAddress: WalletAddress, signedMessage: SignedMessage): Boolean {
+    override fun setSignedMessage(
+        id: AssetBalanceRequestId,
+        walletAddress: WalletAddress,
+        signedMessage: SignedMessage
+    ): Boolean {
         logger.info {
             "Set walletAddress and signedMessage for asset balance request, id: $id, walletAddress: $walletAddress," +
                 " signedMessage: $signedMessage"

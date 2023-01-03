@@ -3,6 +3,9 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.request.CreateMultiPaymentTemplateRequest
 import dev3.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.model.request.UpdateMultiPaymentTemplateRequest
@@ -29,13 +32,13 @@ class MultiPaymentTemplateControllerTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("cafebabe")
         )
-        private val TEMPLATE_ID = UUID.randomUUID()
+        private val TEMPLATE_ID = MultiPaymentTemplateId(UUID.randomUUID())
         private val ITEM = MultiPaymentTemplateItem(
-            id = UUID.randomUUID(),
+            id = MultiPaymentTemplateItemId(UUID.randomUUID()),
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("a"),
             itemName = "itemName",

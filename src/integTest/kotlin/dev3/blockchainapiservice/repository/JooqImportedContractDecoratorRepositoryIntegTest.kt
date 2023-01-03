@@ -3,6 +3,9 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ImportedContractDecoratorId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ImportedContractDecoratorRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -38,9 +41,9 @@ import java.util.UUID
 class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
 
     companion object {
-        private val PROJECT_ID_1 = UUID.randomUUID()
-        private val PROJECT_ID_2 = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID_1 = ProjectId(UUID.randomUUID())
+        private val PROJECT_ID_2 = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val EMPTY_INTERFACE_MANIFEST = InterfaceManifestJson(
             name = null,
             description = null,
@@ -57,7 +60,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         )
 
         private data class DecoratorWithProjectId(
-            val projectId: UUID,
+            val projectId: ProjectId,
             val decorator: ContractDecorator,
             val manifest: ManifestJson,
             val artifact: ArtifactJson,
@@ -126,7 +129,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreAndFetchImportedContractDecoratorWhenPreviewOnlyIsSetToFalse() {
-        val id = UUID.randomUUID()
+        val id = ImportedContractDecoratorId(UUID.randomUUID())
         val contractId = ContractId("imported-contract")
         val manifestJson = ManifestJson(
             name = "name",
@@ -192,7 +195,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyUpdateImportedContractDecoratorInterfaces() {
-        val id = UUID.randomUUID()
+        val id = ImportedContractDecoratorId(UUID.randomUUID())
         val contractId = ContractId("imported-contract")
         val manifestJson = ManifestJson(
             name = "name",
@@ -260,7 +263,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotStoreImportedContractDecoratorWhenPreviewOnlyIsSetToTrue() {
-        val id = UUID.randomUUID()
+        val id = ImportedContractDecoratorId(UUID.randomUUID())
         val contractId = ContractId("imported-contract")
         val manifestJson = ManifestJson(
             name = "name",
@@ -323,7 +326,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentImportedContractDecoratorByContractId() {
         val contractId = ContractId("abc")
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
 
         verify("null is returned when fetching non-existent imported contract decorator by contract id") {
             expectThat(repository.getByContractIdAndProjectId(contractId, projectId))
@@ -436,7 +439,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
                     )
                     .map {
                         ImportedContractDecoratorRecord(
-                            id = UUID.randomUUID(),
+                            id = ImportedContractDecoratorId(UUID.randomUUID()),
                             projectId = it.projectId,
                             contractId = it.decorator.id,
                             manifestJson = it.manifest,
@@ -561,7 +564,7 @@ class JooqImportedContractDecoratorRepositoryIntegTest : TestBase() {
         markdown = "markdown-${contractId.value}"
     )
 
-    private fun createDecorator(projectId: UUID, testData: DecoratorTestData) = DecoratorWithProjectId(
+    private fun createDecorator(projectId: ProjectId, testData: DecoratorTestData) = DecoratorWithProjectId(
         projectId = projectId,
         decorator = ContractDecorator(
             id = testData.contractId,

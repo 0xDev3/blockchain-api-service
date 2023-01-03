@@ -5,6 +5,8 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.params.ParamsFactory
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.Project
@@ -38,7 +40,7 @@ class EthCommonServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
+            call(uuidProvider.getRawUuid())
                 .willReturn(uuid)
         }
 
@@ -51,8 +53,8 @@ class EthCommonServiceTest : TestBase() {
 
         val params = InParams(1)
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),

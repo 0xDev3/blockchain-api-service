@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.result.ContractDecorator
@@ -12,7 +14,6 @@ import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.util.InterfaceId
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class ContractInterfacesServiceImpl(
@@ -49,7 +50,9 @@ class ContractInterfacesServiceImpl(
         )
     }
 
-    override fun getSuggestedInterfacesForImportedSmartContract(id: UUID): MatchingContractInterfaces {
+    override fun getSuggestedInterfacesForImportedSmartContract(
+        id: ContractDeploymentRequestId
+    ): MatchingContractInterfaces {
         logger.debug { "Fetching suggested interface for contract with id: $id" }
 
         val contractDeploymentRequest = contractDeploymentRequestRepository.getById(id)?.takeIf { it.imported }
@@ -77,8 +80,8 @@ class ContractInterfacesServiceImpl(
     }
 
     override fun addInterfacesToImportedContract(
-        importedContractId: UUID,
-        projectId: UUID,
+        importedContractId: ContractDeploymentRequestId,
+        projectId: ProjectId,
         interfaces: List<InterfaceId>
     ) {
         logger.info {
@@ -90,8 +93,8 @@ class ContractInterfacesServiceImpl(
     }
 
     override fun removeInterfacesFromImportedContract(
-        importedContractId: UUID,
-        projectId: UUID,
+        importedContractId: ContractDeploymentRequestId,
+        projectId: ProjectId,
         interfaces: List<InterfaceId>
     ) {
         logger.info {
@@ -103,8 +106,8 @@ class ContractInterfacesServiceImpl(
     }
 
     override fun setImportedContractInterfaces(
-        importedContractId: UUID,
-        projectId: UUID,
+        importedContractId: ContractDeploymentRequestId,
+        projectId: ProjectId,
         interfaces: List<InterfaceId>
     ) {
         logger.info {
@@ -116,8 +119,8 @@ class ContractInterfacesServiceImpl(
     }
 
     private fun updateInterfaces(
-        importedContractId: UUID,
-        projectId: UUID,
+        importedContractId: ContractDeploymentRequestId,
+        projectId: ProjectId,
         interfacesProvider: (Set<String>) -> Set<String>
     ) {
         val contractDeploymentRequest = contractDeploymentRequestRepository.getById(importedContractId)

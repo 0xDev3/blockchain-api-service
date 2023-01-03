@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.UtcDateTime
@@ -8,8 +10,8 @@ import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 data class StoreAuthorizationRequestParams(
-    val id: UUID,
-    val projectId: UUID,
+    val id: AuthorizationRequestId,
+    val projectId: ProjectId,
     val redirectUrl: String,
     val messageToSignOverride: String?,
     val storeIndefinitely: Boolean,
@@ -27,7 +29,7 @@ data class StoreAuthorizationRequestParams(
             project: Project,
             createdAt: UtcDateTime
         ) = StoreAuthorizationRequestParams(
-            id = id,
+            id = AuthorizationRequestId(id),
             projectId = project.id,
             redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),
             messageToSignOverride = params.messageToSign,

@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.params.CreateAssetMultiSendRequestParams
 import dev3.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
 import dev3.blockchainapiservice.model.result.AssetMultiSendRequest
@@ -20,7 +22,6 @@ import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue
 import dev3.blockchainapiservice.util.WithMultiTransactionData
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 @Suppress("TooManyFunctions")
@@ -55,7 +56,9 @@ class AssetMultiSendRequestServiceImpl(
         }
     }
 
-    override fun getAssetMultiSendRequest(id: UUID): WithMultiTransactionData<AssetMultiSendRequest> {
+    override fun getAssetMultiSendRequest(
+        id: AssetMultiSendRequestId
+    ): WithMultiTransactionData<AssetMultiSendRequest> {
         logger.debug { "Fetching asset multi-send request, id: $id" }
 
         val assetMultiSendRequest = ethCommonService.fetchResource(
@@ -68,7 +71,7 @@ class AssetMultiSendRequestServiceImpl(
     }
 
     override fun getAssetMultiSendRequestsByProjectId(
-        projectId: UUID
+        projectId: ProjectId
     ): List<WithMultiTransactionData<AssetMultiSendRequest>> {
         logger.debug { "Fetching asset multi-send requests for projectId: $projectId" }
         return projectRepository.getById(projectId)?.let {
@@ -86,7 +89,7 @@ class AssetMultiSendRequestServiceImpl(
         }
     }
 
-    override fun attachApproveTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
+    override fun attachApproveTxInfo(id: AssetMultiSendRequestId, txHash: TransactionHash, caller: WalletAddress) {
         logger.info { "Attach approve txInfo to asset multi-send request, id: $id, txHash: $txHash, caller: $caller" }
 
         val txInfoAttached = assetMultiSendRequestRepository.setApproveTxInfo(id, txHash, caller)
@@ -98,7 +101,7 @@ class AssetMultiSendRequestServiceImpl(
         }
     }
 
-    override fun attachDisperseTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
+    override fun attachDisperseTxInfo(id: AssetMultiSendRequestId, txHash: TransactionHash, caller: WalletAddress) {
         logger.info { "Attach disperse txInfo to asset multi-send request, id: $id, txHash: $txHash, caller: $caller" }
 
         val txInfoAttached = assetMultiSendRequestRepository.setDisperseTxInfo(id, txHash, caller)

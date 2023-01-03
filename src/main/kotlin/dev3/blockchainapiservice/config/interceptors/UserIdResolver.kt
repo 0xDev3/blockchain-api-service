@@ -1,6 +1,7 @@
 package dev3.blockchainapiservice.config.interceptors
 
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import mu.KLogging
 import org.springframework.web.servlet.HandlerMapping
@@ -18,15 +19,13 @@ object UserIdResolver : KLogging() {
         request: HttpServletRequest,
         idType: IdType,
         path: String
-    ): UUID? {
+    ): UserId? {
         val idVariable = (request.getAttribute(PATH_VARIABLES) as Map<String, String>)[idType.idVariableName]
             ?: throw IllegalStateException("$interceptorName is improperly configured for endpoint: $path")
 
         return idVariable.parseId()
             ?.let { userIdResolverRepository.getUserId(idType, it) }
     }
-
-    fun parseUuid(uuid: String?): UUID? = uuid?.parseId()
 
     private fun String.parseId(): UUID? =
         try {

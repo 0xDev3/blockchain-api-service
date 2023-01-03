@@ -6,6 +6,9 @@ import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateErc20LockRequestParams
@@ -28,7 +31,6 @@ import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionData
 import dev3.blockchainapiservice.util.ZeroAddress
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import java.math.BigInteger
 import java.util.UUID
@@ -37,8 +39,8 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -65,11 +67,11 @@ class Erc20LockRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyCreateErc20LockRequest() {
         val uuidProvider = mock<UuidProvider>()
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(id)
+            call(uuidProvider.getRawUuid())
+                .willReturn(id.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -90,7 +92,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(CREATE_PARAMS.tokenAddress),
                         FunctionArgument(CREATE_PARAMS.tokenAmount),
                         FunctionArgument(CREATE_PARAMS.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -105,7 +107,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             id = id,
             projectId = PROJECT.id,
             chainId = PROJECT.chainId,
-            redirectUrl = redirectUrl.replace("\${id}", id.toString()),
+            redirectUrl = redirectUrl.replace("\${id}", id.value.toString()),
             tokenAddress = CREATE_PARAMS.tokenAddress,
             tokenAmount = CREATE_PARAMS.tokenAmount,
             lockDuration = CREATE_PARAMS.lockDuration,
@@ -163,7 +165,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request does not exist in database") {
-            call(erc20LockRequestRepository.getById(any()))
+            call(erc20LockRequestRepository.getById(anyValueClass(Erc20LockRequestId(UUID.randomUUID()))))
                 .willReturn(null)
         }
 
@@ -180,14 +182,14 @@ class Erc20LockRequestServiceTest : TestBase() {
 
         verify("ResourceNotFoundException is thrown") {
             expectThrows<ResourceNotFoundException> {
-                service.getErc20LockRequest(id = UUID.randomUUID())
+                service.getErc20LockRequest(id = Erc20LockRequestId(UUID.randomUUID()))
             }
         }
     }
 
     @Test
     fun mustReturnErc20LockRequestWithPendingStatusWhenErc20LockRequestHasNullTxHash() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -224,7 +226,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -257,7 +259,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnErc20LockRequestWithPendingStatusWhenTransactionIsNotYetMined() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -302,7 +304,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -335,7 +337,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnErc20LockRequestWithFailedStatusWhenTransactionIsNotSuccessful() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -392,7 +394,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -425,7 +427,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnErc20LockRequestWithFailedStatusWhenTransactionHasWrongToAddress() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -482,7 +484,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -515,7 +517,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnErc20LockRequestWithFailedStatusWhenTransactionHasWrongTxHash() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -572,7 +574,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -605,7 +607,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnErc20LockRequestWithFailedStatusWhenTransactionHasWrongFromAddress() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -662,7 +664,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -695,7 +697,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnErc20LockRequestWithFailedStatusWhenTransactionHasWrongData() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -752,7 +754,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -785,7 +787,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnErc20LockRequestWithSuccessfulStatusWhenFromAddressIsNull() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -842,7 +844,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -875,7 +877,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnErc20LockRequestWithSuccessfulStatusWhenFromAddressIsSpecified() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -932,7 +934,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -965,7 +967,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnListOfErc20LockRequestsByProjectId() {
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
@@ -1022,7 +1024,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                         FunctionArgument(lockRequest.tokenAddress),
                         FunctionArgument(lockRequest.tokenAmount),
                         FunctionArgument(lockRequest.lockDuration),
-                        FunctionArgument(id.toString()),
+                        FunctionArgument(id.value.toString()),
                         FunctionArgument(ZeroAddress)
                     )
                 )
@@ -1057,7 +1059,7 @@ class Erc20LockRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnEmptyListOfErc20LockRequestsForNonExistentProject() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val service = Erc20LockRequestServiceImpl(
             functionEncoderService = mock(),
             erc20LockRequestRepository = mock(),
@@ -1080,7 +1082,7 @@ class Erc20LockRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyAttachTxInfo() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("txInfo will be successfully attached to the request") {
@@ -1111,7 +1113,7 @@ class Erc20LockRequestServiceTest : TestBase() {
     @Test
     fun mustThrowCannotAttachTxInfoExceptionWhenAttachingTxInfoFails() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
-        val id = UUID.randomUUID()
+        val id = Erc20LockRequestId(UUID.randomUUID())
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching txInfo will fail") {
@@ -1141,7 +1143,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         }
     }
 
-    private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
+    private fun projectRepositoryMock(projectId: ProjectId): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("some project will be returned") {
@@ -1149,7 +1151,7 @@ class Erc20LockRequestServiceTest : TestBase() {
                 .willReturn(
                     Project(
                         id = projectId,
-                        ownerId = UUID.randomUUID(),
+                        ownerId = UserId(UUID.randomUUID()),
                         issuerContractAddress = ContractAddress("dead"),
                         baseRedirectUrl = BaseUrl(""),
                         chainId = ChainId(0L),

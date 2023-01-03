@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
 import dev3.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
 import dev3.blockchainapiservice.model.response.AddressBookEntriesResponse
 import dev3.blockchainapiservice.model.response.AddressBookEntryResponse
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.validation.Valid
 
 @Validated
@@ -41,7 +41,7 @@ class AddressBookController(private val addressBookService: AddressBookService) 
 
     @PatchMapping("/v1/address-book/{id}")
     fun updateAddressBookEntry(
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: AddressBookId,
         @UserIdentifierBinding userIdentifier: UserIdentifier,
         @Valid @RequestBody requestBody: CreateOrUpdateAddressBookEntryRequest
     ): ResponseEntity<AddressBookEntryResponse> {
@@ -58,7 +58,7 @@ class AddressBookController(private val addressBookService: AddressBookService) 
 
     @DeleteMapping("/v1/address-book/{id}")
     fun deleteAddressBookEntry(
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: AddressBookId,
         @UserIdentifierBinding userIdentifier: UserIdentifier
     ) {
         addressBookService.deleteAddressBookEntryById(id, userIdentifier)
@@ -66,9 +66,9 @@ class AddressBookController(private val addressBookService: AddressBookService) 
 
     @GetMapping("/v1/address-book/{id}")
     fun getAddressBookEntryById(
-        @PathVariable("id") id: UUID
+        @PathVariable("id") id: AddressBookId
     ): ResponseEntity<AddressBookEntryResponse> {
-        return ResponseEntity.ok(AddressBookEntryResponse(addressBookService.getAddressBookEntryById(id = id)))
+        return ResponseEntity.ok(AddressBookEntryResponse(addressBookService.getAddressBookEntryById(id)))
     }
 
     @GetMapping("/v1/address-book/by-alias/{alias}")

@@ -1,15 +1,16 @@
 package dev3.blockchainapiservice.model.response
 
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
 import dev3.blockchainapiservice.model.result.MultiPaymentTemplate
 import dev3.blockchainapiservice.model.result.MultiPaymentTemplateItem
 import dev3.blockchainapiservice.model.result.WithItems
 import dev3.blockchainapiservice.util.AssetType
 import java.math.BigInteger
 import java.time.OffsetDateTime
-import java.util.UUID
 
 data class MultiPaymentTemplateWithItemsResponse(
-    val id: UUID,
+    val id: MultiPaymentTemplateId,
     val items: List<MultiPaymentTemplateItemResponse>,
     val templateName: String,
     val assetType: AssetType,
@@ -31,8 +32,8 @@ data class MultiPaymentTemplateWithItemsResponse(
 }
 
 data class MultiPaymentTemplateItemResponse(
-    val id: UUID,
-    val templateId: UUID,
+    val id: MultiPaymentTemplateItemId,
+    val templateId: MultiPaymentTemplateId,
     val walletAddress: String,
     val itemName: String?,
     val amount: BigInteger,

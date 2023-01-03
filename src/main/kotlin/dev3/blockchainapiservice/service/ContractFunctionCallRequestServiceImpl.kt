@@ -3,6 +3,8 @@ package dev3.blockchainapiservice.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
+import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
 import dev3.blockchainapiservice.model.params.PreStoreContractFunctionCallRequestParams
@@ -24,7 +26,6 @@ import dev3.blockchainapiservice.util.WithFunctionData
 import dev3.blockchainapiservice.util.WithTransactionAndFunctionData
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 @Suppress("TooManyFunctions", "LongParameterList")
@@ -70,7 +71,9 @@ class ContractFunctionCallRequestServiceImpl(
         return WithFunctionData(contractFunctionCallRequest, data)
     }
 
-    override fun getContractFunctionCallRequest(id: UUID): WithTransactionAndFunctionData<ContractFunctionCallRequest> {
+    override fun getContractFunctionCallRequest(
+        id: ContractFunctionCallRequestId
+    ): WithTransactionAndFunctionData<ContractFunctionCallRequest> {
         logger.debug { "Fetching contract function call request, id: $id" }
 
         val contractFunctionCallRequest = ethCommonService.fetchResource(
@@ -83,7 +86,7 @@ class ContractFunctionCallRequestServiceImpl(
     }
 
     override fun getContractFunctionCallRequestsByProjectIdAndFilters(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractFunctionCallRequestFilters
     ): List<WithTransactionAndFunctionData<ContractFunctionCallRequest>> {
         logger.debug { "Fetching contract function call requests for projectId: $projectId, filters: $filters" }
@@ -93,7 +96,7 @@ class ContractFunctionCallRequestServiceImpl(
         } ?: emptyList()
     }
 
-    override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
+    override fun attachTxInfo(id: ContractFunctionCallRequestId, txHash: TransactionHash, caller: WalletAddress) {
         logger.info { "Attach txInfo to contract function call request, id: $id, txHash: $txHash, caller: $caller" }
 
         val txInfoAttached = contractFunctionCallRequestRepository.setTxInfo(id, txHash, caller)

@@ -4,6 +4,9 @@ import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
@@ -92,7 +95,7 @@ class ImportContractControllerTest : TestBase() {
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -104,7 +107,7 @@ class ImportContractControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -140,10 +143,10 @@ class ImportContractControllerTest : TestBase() {
             arbitraryData = result.value.arbitraryData,
             screenConfig = result.value.screenConfig
         )
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val project = Project(
             id = projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("abc123"),
             baseRedirectUrl = BaseUrl("base-url"),
             chainId = ChainId(1337L),
@@ -231,7 +234,7 @@ class ImportContractControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlySuggestInterfacesForSmartContract() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val result = InterfaceManifestJsonWithId(
             id = InterfaceId("interface-id"),
             name = "name",
@@ -277,7 +280,7 @@ class ImportContractControllerTest : TestBase() {
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -289,7 +292,7 @@ class ImportContractControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -317,7 +320,7 @@ class ImportContractControllerTest : TestBase() {
         )
         val project = Project(
             id = result.value.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("abc123"),
             baseRedirectUrl = BaseUrl("base-url"),
             chainId = ChainId(1337L),
@@ -397,7 +400,7 @@ class ImportContractControllerTest : TestBase() {
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -409,7 +412,7 @@ class ImportContractControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -437,7 +440,7 @@ class ImportContractControllerTest : TestBase() {
         )
         val project = Project(
             id = result.value.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("abc123"),
             baseRedirectUrl = BaseUrl("base-url"),
             chainId = ChainId(1337L),
@@ -517,7 +520,7 @@ class ImportContractControllerTest : TestBase() {
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -529,7 +532,7 @@ class ImportContractControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -557,7 +560,7 @@ class ImportContractControllerTest : TestBase() {
         )
         val project = Project(
             id = result.value.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("abc123"),
             baseRedirectUrl = BaseUrl("base-url"),
             chainId = ChainId(1337L),

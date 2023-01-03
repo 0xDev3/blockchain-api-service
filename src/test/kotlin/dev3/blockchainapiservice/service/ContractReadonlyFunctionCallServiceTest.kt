@@ -4,6 +4,9 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
@@ -37,15 +40,15 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
             customRpcUrl = "custom-rpc-url",
             createdAt = TestData.TIMESTAMP
         )
-        private val DEPLOYED_CONTRACT_ID = UUID.randomUUID()
+        private val DEPLOYED_CONTRACT_ID = ContractDeploymentRequestId(UUID.randomUUID())
         private val CONTRACT_ADDRESS = ContractAddress("abc123")
         private val CALLER_ADDRESS = WalletAddress("a")
         private val CREATE_PARAMS = CreateReadonlyFunctionCallParams(

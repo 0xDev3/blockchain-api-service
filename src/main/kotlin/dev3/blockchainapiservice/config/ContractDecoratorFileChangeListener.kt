@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DatabindException
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.ContractDecoratorException
 import dev3.blockchainapiservice.exception.ContractInterfaceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.ManifestJson
@@ -170,13 +171,13 @@ class ContractDecoratorFileChangeListener(
                 contractDecoratorRepository.store(decorator.id, infoMarkdown)
                 contractMetadataRepository.createOrUpdate(
                     ContractMetadata(
-                        id = uuidProvider.getUuid(),
+                        id = uuidProvider.getUuid(ContractMetadataId),
                         name = decorator.name,
                         description = decorator.description,
                         contractId = decorator.id,
                         contractTags = decorator.tags,
                         contractImplements = decorator.implements,
-                        projectId = Constants.NIL_UUID
+                        projectId = Constants.NIL_PROJECT_ID
                     )
                 )
             } catch (e: ContractDecoratorException) {

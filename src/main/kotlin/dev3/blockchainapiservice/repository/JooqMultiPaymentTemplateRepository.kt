@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
 import dev3.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateItemTable
 import dev3.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateTable
 import dev3.blockchainapiservice.generated.jooq.tables.UserIdentifierTable
@@ -17,7 +19,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 @Suppress("TooManyFunctions")
@@ -72,7 +73,7 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
             ?.withItems(getItemsById(multiPaymentTemplate.id))
     }
 
-    override fun delete(id: UUID): Boolean {
+    override fun delete(id: MultiPaymentTemplateId): Boolean {
         logger.info { "Delete multi-payment template, id: $id" }
         dslContext.deleteFrom(MultiPaymentTemplateItemTable)
             .where(MultiPaymentTemplateItemTable.TEMPLATE_ID.eq(id))
@@ -82,7 +83,7 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
             .execute() > 0
     }
 
-    override fun getById(id: UUID): MultiPaymentTemplate<WithItems>? {
+    override fun getById(id: MultiPaymentTemplateId): MultiPaymentTemplate<WithItems>? {
         logger.debug { "Get multi-payment template by id: $id" }
         return dslContext.selectFrom(MultiPaymentTemplateTable)
             .where(MultiPaymentTemplateTable.ID.eq(id))
@@ -90,7 +91,7 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
             ?.withItems(getItemsById(id))
     }
 
-    override fun getItemsById(id: UUID): List<MultiPaymentTemplateItem> {
+    override fun getItemsById(id: MultiPaymentTemplateId): List<MultiPaymentTemplateItem> {
         logger.debug { "Get multi-payment template items by id: $id" }
         return dslContext.selectFrom(MultiPaymentTemplateItemTable)
             .where(MultiPaymentTemplateItemTable.TEMPLATE_ID.eq(id))
@@ -155,7 +156,11 @@ class JooqMultiPaymentTemplateRepository(private val dslContext: DSLContext) : M
         return getById(item.templateId)
     }
 
-    override fun deleteItem(templateId: UUID, itemId: UUID, updatedAt: UtcDateTime): MultiPaymentTemplate<WithItems>? {
+    override fun deleteItem(
+        templateId: MultiPaymentTemplateId,
+        itemId: MultiPaymentTemplateItemId,
+        updatedAt: UtcDateTime
+    ): MultiPaymentTemplate<WithItems>? {
         logger.info { "Delete multi-payment template item, templateId: $templateId, itemId: $templateId" }
         dslContext.deleteFrom(MultiPaymentTemplateItemTable)
             .where(

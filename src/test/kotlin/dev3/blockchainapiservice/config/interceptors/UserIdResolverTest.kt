@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.config.interceptors
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -18,7 +19,7 @@ class UserIdResolverTest : TestBase() {
     @Test
     fun mustCorrectlyResolveSomeIdToUserId() {
         val id = UUID.randomUUID()
-        val userId = UUID.randomUUID()
+        val userId = UserId(UUID.randomUUID())
         val idType = IdType.ASSET_SEND_REQUEST_ID
         val userIdResolverRepository = mock<UserIdResolverRepository>()
 
@@ -51,7 +52,7 @@ class UserIdResolverTest : TestBase() {
     @Test
     fun mustThrowIllegalStateExceptionWhenIdIsNotPresentInTheRequest() {
         val id = UUID.randomUUID()
-        val userId = UUID.randomUUID()
+        val userId = UserId(UUID.randomUUID())
         val idType = IdType.ASSET_SEND_REQUEST_ID
         val userIdResolverRepository = mock<UserIdResolverRepository>()
 

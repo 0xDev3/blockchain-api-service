@@ -7,6 +7,10 @@ import dev3.blockchainapiservice.exception.ContractDecoratorBinaryMismatchExcept
 import dev3.blockchainapiservice.exception.ContractNotFoundException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.features.contract.abi.service.AbiProviderService
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
+import dev3.blockchainapiservice.generated.jooq.id.ImportedContractDecoratorId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.DecompiledContractJson
@@ -38,7 +42,6 @@ import dev3.blockchainapiservice.util.Tuple
 import dev3.blockchainapiservice.util.ZeroAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 import kotlin.math.min
 
 @Service
@@ -86,7 +89,7 @@ class ContractImportServiceImpl(
         data class TypeAndValue(val type: String, val value: Any)
     }
 
-    override fun importExistingContract(params: ImportContractParams, project: Project): UUID? {
+    override fun importExistingContract(params: ImportContractParams, project: Project): ContractDeploymentRequestId? {
         logger.info { "Attempting to import existing smart contract, params: $params, project: $project" }
 
         return contractDeploymentRequestRepository.getByContractAddressAndChainId(
@@ -106,7 +109,7 @@ class ContractImportServiceImpl(
     override fun importContract(
         params: ImportContractParams,
         project: Project
-    ): UUID {
+    ): ContractDeploymentRequestId {
         logger.info { "Importing smart contract, params: $params, project: $project" }
 
         return if (params.contractId != null) {
@@ -146,7 +149,7 @@ class ContractImportServiceImpl(
         return decorator ?: decompileContract(
             importContractAddress = contractAddress,
             chainSpec = chainSpec,
-            projectId = Constants.NIL_UUID,
+            projectId = Constants.NIL_PROJECT_ID,
             previewDecorator = true
         ).decorator
     }
@@ -155,8 +158,8 @@ class ContractImportServiceImpl(
         params: ImportContractParams,
         project: Project,
         request: ContractDeploymentRequest
-    ): UUID {
-        val id = uuidProvider.getUuid()
+    ): ContractDeploymentRequestId {
+        val id = uuidProvider.getUuid(ContractDeploymentRequestId)
         val storedRequest = contractDeploymentRequestRepository.store(
             params = StoreContractDeploymentRequestParams.fromContractDeploymentRequest(
                 id = id,
@@ -166,14 +169,14 @@ class ContractImportServiceImpl(
                 createdAt = utcDateTimeProvider.getUtcDateTime(),
                 imported = false
             ),
-            metadataProjectId = Constants.NIL_UUID
+            metadataProjectId = Constants.NIL_PROJECT_ID
         )
 
         if (request.txHash != null && request.deployerAddress != null) {
-            contractDeploymentRequestRepository.setTxInfo(id, request.txHash, request.deployerAddress)
+            contractDeploymentRequestRepository.setTxInfo(storedRequest.id, request.txHash, request.deployerAddress)
         }
 
-        contractDeploymentRequestRepository.setContractAddress(id, params.contractAddress)
+        contractDeploymentRequestRepository.setContractAddress(storedRequest.id, params.contractAddress)
 
         return storedRequest.id
     }
@@ -182,7 +185,7 @@ class ContractImportServiceImpl(
         params: ImportContractParams,
         project: Project,
         request: ContractDeploymentRequest
-    ): UUID {
+    ): ContractDeploymentRequestId {
         val existingManifestJson = importedContractDecoratorRepository.getManifestJsonByContractIdAndProjectId(
             contractId = request.contractId,
             projectId = request.projectId
@@ -201,7 +204,7 @@ class ContractImportServiceImpl(
             contractId = newContractId,
             projectId = project.id
         ) ?: importedContractDecoratorRepository.store(
-            id = uuidProvider.getUuid(),
+            id = uuidProvider.getUuid(ImportedContractDecoratorId),
             projectId = project.id,
             contractId = newContractId,
             manifestJson = existingManifestJson,
@@ -213,7 +216,7 @@ class ContractImportServiceImpl(
 
         contractMetadataRepository.createOrUpdate(
             ContractMetadata(
-                id = uuidProvider.getUuid(),
+                id = uuidProvider.getUuid(ContractMetadataId),
                 name = newDecorator.name,
                 description = newDecorator.description,
                 contractId = newContractId,
@@ -223,7 +226,7 @@ class ContractImportServiceImpl(
             )
         )
 
-        val id = uuidProvider.getUuid()
+        val id = uuidProvider.getUuid(ContractDeploymentRequestId)
         val storedRequest = contractDeploymentRequestRepository.store(
             params = StoreContractDeploymentRequestParams.fromContractDeploymentRequest(
                 id = id,
@@ -250,13 +253,13 @@ class ContractImportServiceImpl(
         params: ImportContractParams,
         project: Project,
         contractId: ContractId
-    ): UUID {
+    ): ContractDeploymentRequestId {
         val decoratorNotFoundMessage = "Contract decorator not found for contract ID: ${contractId.value}"
 
         val contractDecorator = contractDecoratorRepository.getById(contractId)
             ?: throw ResourceNotFoundException(decoratorNotFoundMessage)
 
-        if (!contractMetadataRepository.exists(contractId, Constants.NIL_UUID)) {
+        if (!contractMetadataRepository.exists(contractId, Constants.NIL_PROJECT_ID)) {
             throw ResourceNotFoundException(decoratorNotFoundMessage)
         }
 
@@ -290,7 +293,7 @@ class ContractImportServiceImpl(
             contractId = contractId,
             contractDeploymentTransactionInfo = contractDeploymentTransactionInfo,
             project = project,
-            metadataProjectId = Constants.NIL_UUID,
+            metadataProjectId = Constants.NIL_PROJECT_ID,
             proxy = false,
             implementationContractAddress = null
         )
@@ -299,7 +302,7 @@ class ContractImportServiceImpl(
     private fun decompileContract(
         importContractAddress: ContractAddress,
         chainSpec: ChainSpec,
-        projectId: UUID,
+        projectId: ProjectId,
         previewDecorator: Boolean
     ): DecompiledContract {
         val contractDeploymentTransactionInfo = findContractDeploymentTransaction(
@@ -338,7 +341,7 @@ class ContractImportServiceImpl(
         val contractDecorator =
             importedContractDecoratorRepository.getByContractIdAndProjectId(contractId, projectId)
                 ?: importedContractDecoratorRepository.store(
-                    id = uuidProvider.getUuid(),
+                    id = uuidProvider.getUuid(ImportedContractDecoratorId),
                     projectId = projectId,
                     contractId = contractId,
                     manifestJson = decompiledContract.manifest,
@@ -361,10 +364,10 @@ class ContractImportServiceImpl(
         decompiledContract: DecompiledContract,
         params: ImportContractParams,
         project: Project
-    ): UUID {
+    ): ContractDeploymentRequestId {
         contractMetadataRepository.createOrUpdate(
             ContractMetadata(
-                id = uuidProvider.getUuid(),
+                id = uuidProvider.getUuid(ContractMetadataId),
                 name = decompiledContract.decorator.name,
                 description = decompiledContract.decorator.description,
                 contractId = decompiledContract.contractId,
@@ -511,10 +514,10 @@ class ContractImportServiceImpl(
         contractId: ContractId,
         contractDeploymentTransactionInfo: ContractDeploymentTransactionInfo,
         project: Project,
-        metadataProjectId: UUID,
+        metadataProjectId: ProjectId,
         proxy: Boolean,
         implementationContractAddress: ContractAddress?
-    ): UUID {
+    ): ContractDeploymentRequestId {
         val constructorInputTypes = constructorInputs
             .joinToString(separator = ",") { it.toSolidityTypeJson() }
             .let { objectMapper.readValue("{\"params\":[$it]}", OutputParams::class.java) }
@@ -525,7 +528,7 @@ class ContractImportServiceImpl(
             encodedInput = constructorParams
         )
 
-        val id = uuidProvider.getUuid()
+        val id = uuidProvider.getUuid(ContractDeploymentRequestId)
         val storeParams = StoreContractDeploymentRequestParams.fromImportedContract(
             id = id,
             params = params,

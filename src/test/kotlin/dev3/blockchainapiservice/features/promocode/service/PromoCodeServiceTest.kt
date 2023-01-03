@@ -15,6 +15,7 @@ import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeDoesN
 import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeExpired
 import dev3.blockchainapiservice.features.promocodes.repository.PromoCodeRepository
 import dev3.blockchainapiservice.features.promocodes.service.PromoCodeServiceImpl
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.repository.ApiRateLimitRepository
@@ -30,7 +31,7 @@ class PromoCodeServiceTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = "client-id",
             walletAddress = WalletAddress("abc")
         )

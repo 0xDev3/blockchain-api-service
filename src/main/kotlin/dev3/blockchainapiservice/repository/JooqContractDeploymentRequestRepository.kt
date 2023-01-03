@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.exception.AliasAlreadyInUseException
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
@@ -25,7 +27,6 @@ import org.jooq.impl.DSL
 import org.jooq.impl.DSL.coalesce
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Suppress("TooManyFunctions")
 @Repository
@@ -37,7 +38,7 @@ class JooqContractDeploymentRequestRepository(
 
     override fun store(
         params: StoreContractDeploymentRequestParams,
-        metadataProjectId: UUID
+        metadataProjectId: ProjectId
     ): ContractDeploymentRequest {
         logger.info { "Store contract deployment request, params: $params, metadataProjectId: $metadataProjectId" }
         val contractMetadataId = dslContext.select(ContractMetadataTable.ID)
@@ -80,7 +81,7 @@ class JooqContractDeploymentRequestRepository(
         return getById(params.id)!!
     }
 
-    override fun markAsDeleted(id: UUID): Boolean {
+    override fun markAsDeleted(id: ContractDeploymentRequestId): Boolean {
         logger.info { "Marking contract deployment request as deleted, id: $id" }
         return dslContext.update(ContractDeploymentRequestTable)
             .set(ContractDeploymentRequestTable.DELETED, true)
@@ -93,7 +94,7 @@ class JooqContractDeploymentRequestRepository(
             .execute() > 0
     }
 
-    override fun getById(id: UUID): ContractDeploymentRequest? {
+    override fun getById(id: ContractDeploymentRequestId): ContractDeploymentRequest? {
         logger.debug { "Get contract deployment request by id: $id" }
         return dslContext.selectWithJoin()
             .where(
@@ -105,7 +106,7 @@ class JooqContractDeploymentRequestRepository(
             .fetchOne { it.toModel() }
     }
 
-    override fun getByAliasAndProjectId(alias: String, projectId: UUID): ContractDeploymentRequest? {
+    override fun getByAliasAndProjectId(alias: String, projectId: ProjectId): ContractDeploymentRequest? {
         logger.debug { "Get contract deployment request by alias: $alias, projectId: $projectId" }
         return dslContext.selectWithJoin()
             .where(
@@ -139,7 +140,7 @@ class JooqContractDeploymentRequestRepository(
     override fun getByContractAddressChainIdAndProjectId(
         contractAddress: ContractAddress,
         chainId: ChainId,
-        projectId: UUID
+        projectId: ProjectId
     ): ContractDeploymentRequest? {
         logger.debug {
             "Get contract deployment request by contractAddress: $contractAddress, chainId: $chainId," +
@@ -160,7 +161,7 @@ class JooqContractDeploymentRequestRepository(
     }
 
     override fun getAllByProjectId(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractDeploymentRequestFilters
     ): List<ContractDeploymentRequest> {
         logger.debug { "Get contract deployment requests by projectId: $projectId, filters: $filters" }
@@ -185,7 +186,7 @@ class JooqContractDeploymentRequestRepository(
             .fetch { it.toModel() }
     }
 
-    override fun setTxInfo(id: UUID, txHash: TransactionHash, deployer: WalletAddress): Boolean {
+    override fun setTxInfo(id: ContractDeploymentRequestId, txHash: TransactionHash, deployer: WalletAddress): Boolean {
         logger.info { "Set txInfo for contract deployment request, id: $id, txHash: $txHash, deployer: $deployer" }
         return dslContext.update(ContractDeploymentRequestTable)
             .set(ContractDeploymentRequestTable.TX_HASH, txHash)
@@ -203,7 +204,7 @@ class JooqContractDeploymentRequestRepository(
             .execute() > 0
     }
 
-    override fun setContractAddress(id: UUID, contractAddress: ContractAddress): Boolean {
+    override fun setContractAddress(id: ContractDeploymentRequestId, contractAddress: ContractAddress): Boolean {
         logger.info {
             "Set contract address for contract deployment request, id: $id, contractAddress: $contractAddress"
         }

@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.service
 
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
 import dev3.blockchainapiservice.model.request.CreateMultiPaymentTemplateRequest
 import dev3.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.model.request.UpdateMultiPaymentTemplateRequest
@@ -8,7 +10,6 @@ import dev3.blockchainapiservice.model.result.NoItems
 import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.model.result.WithItems
 import dev3.blockchainapiservice.util.WalletAddress
-import java.util.UUID
 
 interface MultiPaymentTemplateService {
     fun createMultiPaymentTemplate(
@@ -17,30 +18,30 @@ interface MultiPaymentTemplateService {
     ): MultiPaymentTemplate<WithItems>
 
     fun updateMultiPaymentTemplate(
-        templateId: UUID,
+        templateId: MultiPaymentTemplateId,
         request: UpdateMultiPaymentTemplateRequest,
         userIdentifier: UserIdentifier
     ): MultiPaymentTemplate<WithItems>
 
-    fun deleteMultiPaymentTemplateById(templateId: UUID, userIdentifier: UserIdentifier)
-    fun getMultiPaymentTemplateById(templateId: UUID): MultiPaymentTemplate<WithItems>
+    fun deleteMultiPaymentTemplateById(templateId: MultiPaymentTemplateId, userIdentifier: UserIdentifier)
+    fun getMultiPaymentTemplateById(templateId: MultiPaymentTemplateId): MultiPaymentTemplate<WithItems>
     fun getAllMultiPaymentTemplatesByWalletAddress(walletAddress: WalletAddress): List<MultiPaymentTemplate<NoItems>>
     fun addItemToMultiPaymentTemplate(
-        templateId: UUID,
+        templateId: MultiPaymentTemplateId,
         request: MultiPaymentTemplateItemRequest,
         userIdentifier: UserIdentifier
     ): MultiPaymentTemplate<WithItems>
 
     fun updateMultiPaymentTemplateItem(
-        templateId: UUID,
-        itemId: UUID,
+        templateId: MultiPaymentTemplateId,
+        itemId: MultiPaymentTemplateItemId,
         request: MultiPaymentTemplateItemRequest,
         userIdentifier: UserIdentifier
     ): MultiPaymentTemplate<WithItems>
 
     fun deleteMultiPaymentTemplateItem(
-        templateId: UUID,
-        itemId: UUID,
+        templateId: MultiPaymentTemplateId,
+        itemId: MultiPaymentTemplateItemId,
         userIdentifier: UserIdentifier
     ): MultiPaymentTemplate<WithItems>
 }

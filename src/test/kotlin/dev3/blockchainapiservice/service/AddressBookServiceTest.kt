@@ -3,6 +3,8 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
 import dev3.blockchainapiservice.model.result.AddressBookEntry
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
@@ -16,12 +18,12 @@ class AddressBookServiceTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("cafebabe")
         )
         private val ENTRY = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "alias",
             address = WalletAddress("a"),
             phoneNumber = "phone-number",
@@ -36,7 +38,7 @@ class AddressBookServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
+            call(uuidProvider.getUuid(AddressBookId))
                 .willReturn(ENTRY.id)
         }
 
@@ -135,7 +137,7 @@ class AddressBookServiceTest : TestBase() {
 
         suppose("non-owned address book entry is fetched by id") {
             call(addressBookRepository.getById(ENTRY.id))
-                .willReturn(ENTRY.copy(userId = UUID.randomUUID()))
+                .willReturn(ENTRY.copy(userId = UserId(UUID.randomUUID())))
         }
 
         val service = AddressBookServiceImpl(
@@ -248,7 +250,7 @@ class AddressBookServiceTest : TestBase() {
 
         suppose("non-owned address book entry is fetched by id") {
             call(addressBookRepository.getById(ENTRY.id))
-                .willReturn(ENTRY.copy(userId = UUID.randomUUID()))
+                .willReturn(ENTRY.copy(userId = UserId(UUID.randomUUID())))
         }
 
         suppose("address book entry is deleted by id") {

@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.ContractNotYetDeployedException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.model.params.DeployedContractAddressIdentifier
 import dev3.blockchainapiservice.model.params.DeployedContractAliasIdentifier
 import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
@@ -12,7 +13,8 @@ import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
+
+private typealias IdAndAddress = Pair<ContractDeploymentRequestId?, ContractAddress>
 
 @Service
 class DeployedContractIdentifierResolverServiceImpl(
@@ -25,7 +27,7 @@ class DeployedContractIdentifierResolverServiceImpl(
     override fun resolveContractIdAndAddress(
         identifier: DeployedContractIdentifier,
         project: Project
-    ): Pair<UUID?, ContractAddress> =
+    ): Pair<ContractDeploymentRequestId?, ContractAddress> =
         when (identifier) {
             is DeployedContractIdIdentifier -> {
                 logger.info { "Fetching deployed contract by id: ${identifier.id}" }
@@ -54,7 +56,7 @@ class DeployedContractIdentifierResolverServiceImpl(
             }
         }
 
-    private fun ContractDeploymentRequest.deployedContractIdAndAddress(): Pair<UUID?, ContractAddress> =
+    private fun ContractDeploymentRequest.deployedContractIdAndAddress(): IdAndAddress =
         Pair(id, contractAddress ?: throw ContractNotYetDeployedException(id, alias))
 
     private fun ContractDeploymentRequest.setContractAddressIfNecessary(project: Project): ContractDeploymentRequest =

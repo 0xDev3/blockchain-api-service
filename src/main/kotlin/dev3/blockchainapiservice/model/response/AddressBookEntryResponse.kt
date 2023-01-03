@@ -1,11 +1,11 @@
 package dev3.blockchainapiservice.model.response
 
+import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
 import dev3.blockchainapiservice.model.result.AddressBookEntry
 import java.time.OffsetDateTime
-import java.util.UUID
 
 data class AddressBookEntryResponse(
-    val id: UUID,
+    val id: AddressBookId,
     val alias: String,
     val address: String,
     val phoneNumber: String?,

@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.service
 
+import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
 import dev3.blockchainapiservice.model.result.ContractFunctionCallRequest
@@ -8,7 +10,6 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionData
 import dev3.blockchainapiservice.util.WithTransactionAndFunctionData
-import java.util.UUID
 
 interface ContractFunctionCallRequestService {
     fun createContractFunctionCallRequest(
@@ -16,11 +17,14 @@ interface ContractFunctionCallRequestService {
         project: Project
     ): WithFunctionData<ContractFunctionCallRequest>
 
-    fun getContractFunctionCallRequest(id: UUID): WithTransactionAndFunctionData<ContractFunctionCallRequest>
+    fun getContractFunctionCallRequest(
+        id: ContractFunctionCallRequestId
+    ): WithTransactionAndFunctionData<ContractFunctionCallRequest>
+
     fun getContractFunctionCallRequestsByProjectIdAndFilters(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractFunctionCallRequestFilters
     ): List<WithTransactionAndFunctionData<ContractFunctionCallRequest>>
 
-    fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress)
+    fun attachTxInfo(id: ContractFunctionCallRequestId, txHash: TransactionHash, caller: WalletAddress)
 }

@@ -5,6 +5,9 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ApiKeyAlreadyExistsException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.params.CreateProjectParams
 import dev3.blockchainapiservice.model.request.CreateProjectRequest
 import dev3.blockchainapiservice.model.response.ApiKeyResponse
@@ -41,8 +44,8 @@ class ProjectControllerTest : TestBase() {
             customRpcUrl = "custom-rpc-url"
         )
         val result = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = params.issuerContractAddress,
             baseRedirectUrl = params.baseRedirectUrl,
             chainId = params.chainId,
@@ -85,8 +88,8 @@ class ProjectControllerTest : TestBase() {
     @Test
     fun mustCorrectlyGetProjectById() {
         val result = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -122,8 +125,8 @@ class ProjectControllerTest : TestBase() {
     @Test
     fun mustCorrectlyGetProjectByIssuerAddress() {
         val result = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -163,13 +166,13 @@ class ProjectControllerTest : TestBase() {
     @Test
     fun mustCorrectlyGetAllProjectsForUser() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
         val result = listOf(
             Project(
-                id = UUID.randomUUID(),
+                id = ProjectId(UUID.randomUUID()),
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("155034a"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-1"),
@@ -178,7 +181,7 @@ class ProjectControllerTest : TestBase() {
                 createdAt = CREATED_AT
             ),
             Project(
-                id = UUID.randomUUID(),
+                id = ProjectId(UUID.randomUUID()),
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("155034b"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-2"),
@@ -211,13 +214,13 @@ class ProjectControllerTest : TestBase() {
     @Test
     fun mustCorrectlyGetApiKey() {
         val result = ApiKey(
-            id = UUID.randomUUID(),
-            projectId = UUID.randomUUID(),
+            id = ApiKeyId(UUID.randomUUID()),
+            projectId = ProjectId(UUID.randomUUID()),
             apiKey = "api-key",
             createdAt = CREATED_AT
         )
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
@@ -244,9 +247,9 @@ class ProjectControllerTest : TestBase() {
 
     @Test
     fun mustThrowResourceNotFoundExceptionForNonExistentApiKey() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
@@ -271,13 +274,13 @@ class ProjectControllerTest : TestBase() {
     @Test
     fun mustCorrectlyCreateApiKey() {
         val result = ApiKey(
-            id = UUID.randomUUID(),
-            projectId = UUID.randomUUID(),
+            id = ApiKeyId(UUID.randomUUID()),
+            projectId = ProjectId(UUID.randomUUID()),
             apiKey = "api-key",
             createdAt = CREATED_AT
         )
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
@@ -310,13 +313,13 @@ class ProjectControllerTest : TestBase() {
     @Test
     fun mustThrowApiKeyAlreadyExistsExceptionWhenApiKeyAlreadyExists() {
         val result = ApiKey(
-            id = UUID.randomUUID(),
-            projectId = UUID.randomUUID(),
+            id = ApiKeyId(UUID.randomUUID()),
+            projectId = ProjectId(UUID.randomUUID()),
             apiKey = "api-key",
             createdAt = CREATED_AT
         )
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("a")
         )

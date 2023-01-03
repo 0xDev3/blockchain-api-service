@@ -8,6 +8,10 @@ import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
@@ -44,8 +48,8 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -56,7 +60,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         private val RAW_FUNCTION_PARAMS = JsonNodeConverter().from(
             JSON.valueOf("[{\"type\": \"string\", \"value\": \"test\"}]")
         )!!
-        private val DEPLOYED_CONTRACT_ID = UUID.randomUUID()
+        private val DEPLOYED_CONTRACT_ID = ContractDeploymentRequestId(UUID.randomUUID())
         private val DEPLOYED_CONTRACT_ID_CREATE_PARAMS = CreateContractFunctionCallRequestParams(
             identifier = DeployedContractIdIdentifier(DEPLOYED_CONTRACT_ID),
             functionName = "test",
@@ -72,7 +76,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             )
         )
         private val CONTRACT_ADDRESS = ContractAddress("abc123")
-        private val ID = UUID.randomUUID()
+        private val ID = ContractFunctionCallRequestId(UUID.randomUUID())
         private val ENCODED_FUNCTION_DATA = FunctionData("0x1234")
         private val STORE_PARAMS = StoreContractFunctionCallRequestParams(
             id = ID,
@@ -82,7 +86,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
             functionParams = RAW_FUNCTION_PARAMS,
             ethAmount = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.ethAmount,
             chainId = PROJECT.chainId,
-            redirectUrl = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.redirectUrl!!.replace("\${id}", ID.toString()),
+            redirectUrl = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.redirectUrl!!.replace("\${id}", ID.value.toString()),
             projectId = PROJECT.id,
             createdAt = TestData.TIMESTAMP,
             arbitraryData = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.arbitraryData,
@@ -151,8 +155,8 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(ID)
+            call(uuidProvider.getRawUuid())
+                .willReturn(ID.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -228,8 +232,8 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(ID)
+            call(uuidProvider.getRawUuid())
+                .willReturn(ID.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -920,7 +924,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
     fun mustCorrectlyReturnListOfContractFunctionCallRequestsByProjectId() {
         val contractFunctionCallRequestRepository = mock<ContractFunctionCallRequestRepository>()
         val filters = ContractFunctionCallRequestFilters(
-            deployedContractId = UUID.randomUUID(),
+            deployedContractId = ContractDeploymentRequestId(UUID.randomUUID()),
             contractAddress = ContractAddress("cafebabe")
         )
 
@@ -976,9 +980,9 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnEmptyListOfContractFunctionCallRequestsForNonExistentProject() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val filters = ContractFunctionCallRequestFilters(
-            deployedContractId = UUID.randomUUID(),
+            deployedContractId = ContractDeploymentRequestId(UUID.randomUUID()),
             contractAddress = ContractAddress("cafebabe")
         )
 
@@ -1079,7 +1083,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
         }
     }
 
-    private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
+    private fun projectRepositoryMock(projectId: ProjectId): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("some project will be returned") {
@@ -1087,7 +1091,7 @@ class ContractFunctionCallRequestServiceTest : TestBase() {
                 .willReturn(
                     Project(
                         id = projectId,
-                        ownerId = UUID.randomUUID(),
+                        ownerId = UserId(UUID.randomUUID()),
                         issuerContractAddress = ContractAddress("dead"),
                         baseRedirectUrl = BaseUrl(""),
                         chainId = ChainId(0L),

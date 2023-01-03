@@ -5,6 +5,9 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMa
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
@@ -23,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.util.UUID
 import javax.validation.Valid
 
 @Validated
@@ -44,7 +46,7 @@ class ContractFunctionCallRequestController(
 
     @ApiReadLimitedMapping(IdType.FUNCTION_CALL_REQUEST_ID, "/v1/function-call/{id}")
     fun getContractFunctionCallRequest(
-        @PathVariable("id") id: UUID
+        @PathVariable("id") id: ContractFunctionCallRequestId
     ): ResponseEntity<ContractFunctionCallRequestResponse> {
         val contractFunctionCallRequest = contractFunctionCallRequestService.getContractFunctionCallRequest(id)
         return ResponseEntity.ok(ContractFunctionCallRequestResponse(contractFunctionCallRequest))
@@ -52,8 +54,8 @@ class ContractFunctionCallRequestController(
 
     @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/function-call/by-project/{projectId}")
     fun getContractFunctionCallRequestsByProjectIdAndFilters(
-        @PathVariable("projectId") projectId: UUID,
-        @RequestParam("deployedContractId", required = false) deployedContractId: UUID?,
+        @PathVariable("projectId") projectId: ProjectId,
+        @RequestParam("deployedContractId", required = false) deployedContractId: ContractDeploymentRequestId?,
         @ValidEthAddress @RequestParam("contractAddress", required = false) contractAddress: String?
     ): ResponseEntity<ContractFunctionCallRequestsResponse> {
         val contractFunctionCallRequests = contractFunctionCallRequestService
@@ -73,7 +75,7 @@ class ContractFunctionCallRequestController(
 
     @ApiWriteLimitedMapping(IdType.FUNCTION_CALL_REQUEST_ID, RequestMethod.PUT, "/v1/function-call/{id}")
     fun attachTransactionInfo(
-        @PathVariable("id") id: UUID,
+        @PathVariable("id") id: ContractFunctionCallRequestId,
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
         contractFunctionCallRequestService.attachTxInfo(

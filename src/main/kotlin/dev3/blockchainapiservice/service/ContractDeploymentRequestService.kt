@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.service
 
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
@@ -7,7 +9,6 @@ import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithTransactionData
-import java.util.UUID
 
 interface ContractDeploymentRequestService {
     fun createContractDeploymentRequest(
@@ -15,18 +16,18 @@ interface ContractDeploymentRequestService {
         project: Project
     ): ContractDeploymentRequest
 
-    fun markContractDeploymentRequestAsDeleted(id: UUID, projectId: UUID)
+    fun markContractDeploymentRequestAsDeleted(id: ContractDeploymentRequestId, projectId: ProjectId)
 
-    fun getContractDeploymentRequest(id: UUID): WithTransactionData<ContractDeploymentRequest>
+    fun getContractDeploymentRequest(id: ContractDeploymentRequestId): WithTransactionData<ContractDeploymentRequest>
     fun getContractDeploymentRequestsByProjectIdAndFilters(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractDeploymentRequestFilters
     ): List<WithTransactionData<ContractDeploymentRequest>>
 
     fun getContractDeploymentRequestByProjectIdAndAlias(
-        projectId: UUID,
+        projectId: ProjectId,
         alias: String
     ): WithTransactionData<ContractDeploymentRequest>
 
-    fun attachTxInfo(id: UUID, txHash: TransactionHash, deployer: WalletAddress)
+    fun attachTxInfo(id: ContractDeploymentRequestId, txHash: TransactionHash, deployer: WalletAddress)
 }

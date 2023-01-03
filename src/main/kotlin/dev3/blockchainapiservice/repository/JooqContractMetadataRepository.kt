@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.ContractMetadataTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import dev3.blockchainapiservice.model.result.ContractMetadata
@@ -9,7 +10,6 @@ import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqContractMetadataRepository(private val dslContext: DSLContext) : ContractMetadataRepository {
@@ -42,7 +42,11 @@ class JooqContractMetadataRepository(private val dslContext: DSLContext) : Contr
             .execute() > 0
     }
 
-    override fun updateInterfaces(contractId: ContractId, projectId: UUID, interfaces: List<InterfaceId>): Boolean {
+    override fun updateInterfaces(
+        contractId: ContractId,
+        projectId: ProjectId,
+        interfaces: List<InterfaceId>
+    ): Boolean {
         logger.info {
             "Update contract metadata interfaces, contractId: $contractId, projectId: $projectId," +
                 " interfaces: $interfaces"
@@ -59,7 +63,7 @@ class JooqContractMetadataRepository(private val dslContext: DSLContext) : Contr
             .execute() > 0
     }
 
-    override fun exists(contractId: ContractId, projectId: UUID): Boolean {
+    override fun exists(contractId: ContractId, projectId: ProjectId): Boolean {
         logger.debug { "Check if contract metadata exists, contractId: $contractId, projectId: $projectId" }
         return dslContext.fetchExists(
             ContractMetadataTable,

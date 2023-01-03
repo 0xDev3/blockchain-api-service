@@ -4,6 +4,8 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ContractInterfaceNotFoundException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.json.AbiInputOutput
 import dev3.blockchainapiservice.model.json.AbiObject
@@ -34,8 +36,8 @@ import java.util.UUID
 class ContractInterfacesServiceTest : TestBase() {
 
     companion object {
-        private val ID = UUID.randomUUID()
-        private val PROJECT_ID = UUID.randomUUID()
+        private val ID = ContractDeploymentRequestId(UUID.randomUUID())
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
         private val CONTRACT_ID = ContractId("contract-id")
         private val CONTRACT_DEPLOYMENT_REQUEST = ContractDeploymentRequest(
             id = ID,
@@ -729,7 +731,7 @@ class ContractInterfacesServiceTest : TestBase() {
 
         suppose("some non-owned contract deployment request will be returned") {
             call(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = UUID.randomUUID()))
+                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = ProjectId(UUID.randomUUID())))
         }
 
         val service = ContractInterfacesServiceImpl(
@@ -930,7 +932,7 @@ class ContractInterfacesServiceTest : TestBase() {
 
         suppose("some non-owned contract deployment request will be returned") {
             call(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = UUID.randomUUID()))
+                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = ProjectId(UUID.randomUUID())))
         }
 
         val service = ContractInterfacesServiceImpl(
@@ -1094,7 +1096,7 @@ class ContractInterfacesServiceTest : TestBase() {
 
         suppose("some non-owned contract deployment request will be returned") {
             call(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = UUID.randomUUID()))
+                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = ProjectId(UUID.randomUUID())))
         }
 
         val service = ContractInterfacesServiceImpl(

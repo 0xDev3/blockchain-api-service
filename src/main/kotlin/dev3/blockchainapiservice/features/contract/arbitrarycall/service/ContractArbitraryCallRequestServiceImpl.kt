@@ -10,6 +10,8 @@ import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.St
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.result.ContractArbitraryCallRequest
 import dev3.blockchainapiservice.features.contract.arbitrarycall.repository.ContractArbitraryCallRequestRepository
 import dev3.blockchainapiservice.features.functions.service.FunctionDecoderService
+import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
@@ -24,7 +26,6 @@ import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithTransactionData
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 @Suppress("LongParameterList")
@@ -71,7 +72,9 @@ class ContractArbitraryCallRequestServiceImpl(
         return contractArbitraryCallRequestRepository.store(databaseParams)
     }
 
-    override fun getContractArbitraryCallRequest(id: UUID): WithTransactionData<ContractArbitraryCallRequest> {
+    override fun getContractArbitraryCallRequest(
+        id: ContractArbitraryCallRequestId
+    ): WithTransactionData<ContractArbitraryCallRequest> {
         logger.debug { "Fetching contract arbitrary call request, id: $id" }
 
         val contractArbitraryCallRequest = ethCommonService.fetchResource(
@@ -84,7 +87,7 @@ class ContractArbitraryCallRequestServiceImpl(
     }
 
     override fun getContractArbitraryCallRequestsByProjectIdAndFilters(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractArbitraryCallRequestFilters
     ): List<WithTransactionData<ContractArbitraryCallRequest>> {
         logger.debug { "Fetching contract arbitrary call requests for projectId: $projectId, filters: $filters" }
@@ -94,7 +97,7 @@ class ContractArbitraryCallRequestServiceImpl(
         } ?: emptyList()
     }
 
-    override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
+    override fun attachTxInfo(id: ContractArbitraryCallRequestId, txHash: TransactionHash, caller: WalletAddress) {
         logger.info { "Attach txInfo to contract arbitrary call request, id: $id, txHash: $txHash, caller: $caller" }
 
         val txInfoAttached = contractArbitraryCallRequestRepository.setTxInfo(id, txHash, caller)

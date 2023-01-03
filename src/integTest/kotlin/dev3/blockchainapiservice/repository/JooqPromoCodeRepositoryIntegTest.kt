@@ -8,6 +8,7 @@ import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeDoesN
 import dev3.blockchainapiservice.features.promocodes.model.result.PromoCodeExpired
 import dev3.blockchainapiservice.features.promocodes.repository.JooqPromoCodeRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeTable
 import dev3.blockchainapiservice.generated.jooq.tables.PromoCodeUsageTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.PromoCodeRecord
@@ -154,7 +155,7 @@ class JooqPromoCodeRepositoryIntegTest : TestBase() {
             )
         }
 
-        val userId = UUID.randomUUID()
+        val userId = UserId(UUID.randomUUID())
 
         suppose("some user exists in the database") {
             dslContext.executeInsert(
@@ -211,7 +212,7 @@ class JooqPromoCodeRepositoryIntegTest : TestBase() {
             )
         }
 
-        val userId = UUID.randomUUID()
+        val userId = UserId(UUID.randomUUID())
 
         suppose("some user exists in the database") {
             dslContext.executeInsert(
@@ -279,7 +280,7 @@ class JooqPromoCodeRepositoryIntegTest : TestBase() {
             )
         }
 
-        val userId = UUID.randomUUID()
+        val userId = UserId(UUID.randomUUID())
 
         suppose("some user exists in the database") {
             dslContext.executeInsert(
@@ -319,7 +320,7 @@ class JooqPromoCodeRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotUseNonExistentPromoCode() {
-        val userId = UUID.randomUUID()
+        val userId = UserId(UUID.randomUUID())
 
         suppose("some user exists in the database") {
             dslContext.executeInsert(

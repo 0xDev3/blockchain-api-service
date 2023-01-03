@@ -6,6 +6,11 @@ import dev3.blockchainapiservice.blockchain.ReadonlyFunctionCallsContract
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
@@ -37,8 +42,8 @@ import java.util.UUID
 class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val PROJECT = Project(
             id = PROJECT_ID,
             ownerId = OWNER_ID,
@@ -51,7 +56,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         private const val API_KEY = "api-key"
         private val CONTRACT_DECORATOR_ID = ContractId("decorator.id")
         private val DEPLOYED_CONTRACT = StoreContractDeploymentRequestParams(
-            id = UUID.randomUUID(),
+            id = ContractDeploymentRequestId(UUID.randomUUID()),
             alias = "contract-alias",
             contractData = ContractBinaryData("00"),
             contractId = CONTRACT_DECORATOR_ID,
@@ -84,13 +89,13 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ContractMetadataRecord(
-                id = UUID.randomUUID(),
+                id = ContractMetadataId(UUID.randomUUID()),
                 contractId = CONTRACT_DECORATOR_ID,
                 contractTags = emptyArray(),
                 contractImplements = emptyArray(),
                 name = null,
                 description = null,
-                projectId = Constants.NIL_UUID
+                projectId = Constants.NIL_PROJECT_ID
             )
         )
 
@@ -117,7 +122,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 apiKey = API_KEY,
                 createdAt = TestData.TIMESTAMP
@@ -146,7 +151,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress(contract.contractAddress)
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -169,7 +174,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id}",
+                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id.value}",
                                 "block_number": "${blockNumber.value}",
                                 "function_name": "$functionName",
                                 "function_params": $paramsJson,
@@ -225,7 +230,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress(contract.contractAddress)
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID).apply {
                 contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
             }
         }
@@ -361,7 +366,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress("cafebabe")
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID)
             contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
         }
 
@@ -373,7 +378,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id}",
+                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id.value}",
                                 "deployed_contract_alias": "${DEPLOYED_CONTRACT.alias}",
                                 "contract_address": "${contractAddress.rawValue}",
                                 "block_number": "1",
@@ -398,7 +403,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress("cafebabe")
 
         suppose("some deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID)
             contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
         }
 
@@ -489,7 +494,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val callerAddress = WalletAddress("b")
 
         suppose("some non-deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID)
         }
 
         verify("400 is returned when calling readonly contract function request") {
@@ -500,7 +505,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                     .content(
                         """
                             {
-                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id}",
+                                "deployed_contract_id": "${DEPLOYED_CONTRACT.id.value}",
                                 "block_number": "1",
                                 "function_name": "example",
                                 "function_params": [],
@@ -522,7 +527,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         val callerAddress = WalletAddress("b")
 
         suppose("some non-deployed contract exists in the database") {
-            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID)
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_PROJECT_ID)
         }
 
         verify("400 is returned when calling readonly contract function request") {

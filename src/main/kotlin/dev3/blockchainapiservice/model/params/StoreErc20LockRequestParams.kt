@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
@@ -12,8 +14,8 @@ import dev3.blockchainapiservice.util.WalletAddress
 import java.util.UUID
 
 data class StoreErc20LockRequestParams(
-    val id: UUID,
-    val projectId: UUID,
+    val id: Erc20LockRequestId,
+    val projectId: ProjectId,
     val chainId: ChainId,
     val redirectUrl: String,
     val tokenAddress: ContractAddress,
@@ -34,7 +36,7 @@ data class StoreErc20LockRequestParams(
             project: Project,
             createdAt: UtcDateTime
         ) = StoreErc20LockRequestParams(
-            id = id,
+            id = Erc20LockRequestId(id),
             projectId = project.id,
             chainId = project.chainId,
             redirectUrl = project.createRedirectUrl(params.redirectUrl, id, PATH),

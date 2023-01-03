@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
 import dev3.blockchainapiservice.model.request.CreateMultiPaymentTemplateRequest
 import dev3.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.model.request.UpdateMultiPaymentTemplateRequest
@@ -16,7 +18,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.WalletAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 class MultiPaymentTemplateServiceImpl(
@@ -32,14 +33,14 @@ class MultiPaymentTemplateServiceImpl(
         userIdentifier: UserIdentifier
     ): MultiPaymentTemplate<WithItems> {
         logger.info { "Creating multi-payment template, request: $request" }
-        val templateId = uuidProvider.getUuid()
+        val templateId = uuidProvider.getUuid(MultiPaymentTemplateId)
         return multiPaymentTemplateRepository.store(
             MultiPaymentTemplate(
                 id = templateId,
                 items = WithItems(
                     request.items.map {
                         MultiPaymentTemplateItem(
-                            id = uuidProvider.getUuid(),
+                            id = uuidProvider.getUuid(MultiPaymentTemplateItemId),
                             templateId = templateId,
                             walletAddress = WalletAddress(it.walletAddress),
                             itemName = it.itemName,
@@ -59,7 +60,7 @@ class MultiPaymentTemplateServiceImpl(
     }
 
     override fun updateMultiPaymentTemplate(
-        templateId: UUID,
+        templateId: MultiPaymentTemplateId,
         request: UpdateMultiPaymentTemplateRequest,
         userIdentifier: UserIdentifier
     ): MultiPaymentTemplate<WithItems> {
@@ -78,12 +79,12 @@ class MultiPaymentTemplateServiceImpl(
         ) ?: throw ResourceNotFoundException("Multi-payment template not found for ID: $templateId")
     }
 
-    override fun deleteMultiPaymentTemplateById(templateId: UUID, userIdentifier: UserIdentifier) {
+    override fun deleteMultiPaymentTemplateById(templateId: MultiPaymentTemplateId, userIdentifier: UserIdentifier) {
         logger.info { "Delete multi-payment template by id: $templateId, userIdentifier: $userIdentifier" }
         multiPaymentTemplateRepository.delete(getOwnedMultiPaymentTemplateById(templateId, userIdentifier).id)
     }
 
-    override fun getMultiPaymentTemplateById(templateId: UUID): MultiPaymentTemplate<WithItems> {
+    override fun getMultiPaymentTemplateById(templateId: MultiPaymentTemplateId): MultiPaymentTemplate<WithItems> {
         logger.debug { "Get multi-payment template by id: $templateId" }
         return multiPaymentTemplateRepository.getById(templateId)
             ?: throw ResourceNotFoundException("Multi-payment template not found for ID: $templateId")
@@ -97,7 +98,7 @@ class MultiPaymentTemplateServiceImpl(
     }
 
     override fun addItemToMultiPaymentTemplate(
-        templateId: UUID,
+        templateId: MultiPaymentTemplateId,
         request: MultiPaymentTemplateItemRequest,
         userIdentifier: UserIdentifier
     ): MultiPaymentTemplate<WithItems> {
@@ -111,7 +112,7 @@ class MultiPaymentTemplateServiceImpl(
 
         return multiPaymentTemplateRepository.addItem(
             item = MultiPaymentTemplateItem(
-                id = uuidProvider.getUuid(),
+                id = uuidProvider.getUuid(MultiPaymentTemplateItemId),
                 templateId = template.id,
                 walletAddress = WalletAddress(request.walletAddress),
                 itemName = request.itemName,
@@ -123,8 +124,8 @@ class MultiPaymentTemplateServiceImpl(
     }
 
     override fun updateMultiPaymentTemplateItem(
-        templateId: UUID,
-        itemId: UUID,
+        templateId: MultiPaymentTemplateId,
+        itemId: MultiPaymentTemplateItemId,
         request: MultiPaymentTemplateItemRequest,
         userIdentifier: UserIdentifier
     ): MultiPaymentTemplate<WithItems> {
@@ -152,8 +153,8 @@ class MultiPaymentTemplateServiceImpl(
     }
 
     override fun deleteMultiPaymentTemplateItem(
-        templateId: UUID,
-        itemId: UUID,
+        templateId: MultiPaymentTemplateId,
+        itemId: MultiPaymentTemplateItemId,
         userIdentifier: UserIdentifier
     ): MultiPaymentTemplate<WithItems> {
         logger.info {
@@ -173,7 +174,7 @@ class MultiPaymentTemplateServiceImpl(
         )
     }
 
-    private fun getOwnedMultiPaymentTemplateById(id: UUID, userIdentifier: UserIdentifier) =
+    private fun getOwnedMultiPaymentTemplateById(id: MultiPaymentTemplateId, userIdentifier: UserIdentifier) =
         getMultiPaymentTemplateById(id).takeIf { it.userId == userIdentifier.id }
             ?: throw ResourceNotFoundException("Multi-payment template not found for ID: $id")
 }

@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.repository
 
+import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.AuthorizationRequestRecord
 import dev3.blockchainapiservice.model.ScreenConfig
@@ -11,7 +13,6 @@ import mu.KLogging
 import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : AuthorizationRequestRepository {
@@ -38,21 +39,21 @@ class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : A
         return record.toModel()
     }
 
-    override fun delete(id: UUID) {
+    override fun delete(id: AuthorizationRequestId) {
         logger.info { "Deleting authorization request, id: $id" }
         dslContext.deleteFrom(AuthorizationRequestTable)
             .where(AuthorizationRequestTable.ID.eq(id))
             .execute()
     }
 
-    override fun getById(id: UUID): AuthorizationRequest? {
+    override fun getById(id: AuthorizationRequestId): AuthorizationRequest? {
         logger.debug { "Get authorization request by id: $id" }
         return dslContext.selectFrom(AuthorizationRequestTable)
             .where(AuthorizationRequestTable.ID.eq(id))
             .fetchOne { it.toModel() }
     }
 
-    override fun getAllByProjectId(projectId: UUID): List<AuthorizationRequest> {
+    override fun getAllByProjectId(projectId: ProjectId): List<AuthorizationRequest> {
         logger.debug { "Get authorization requests filtered by projectId: $projectId" }
         return dslContext.selectFrom(AuthorizationRequestTable)
             .where(AuthorizationRequestTable.PROJECT_ID.eq(projectId))
@@ -60,7 +61,11 @@ class JooqAuthorizationRequestRepository(private val dslContext: DSLContext) : A
             .fetch { it.toModel() }
     }
 
-    override fun setSignedMessage(id: UUID, walletAddress: WalletAddress, signedMessage: SignedMessage): Boolean {
+    override fun setSignedMessage(
+        id: AuthorizationRequestId,
+        walletAddress: WalletAddress,
+        signedMessage: SignedMessage
+    ): Boolean {
         logger.info {
             "Set walletAddress and signedMessage for authorization request, id: $id, walletAddress: $walletAddress," +
                 " signedMessage: $signedMessage"

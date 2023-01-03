@@ -3,6 +3,8 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
 import dev3.blockchainapiservice.model.response.AddressBookEntriesResponse
 import dev3.blockchainapiservice.model.response.AddressBookEntryResponse
@@ -19,12 +21,12 @@ class AddressBookControllerTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("cafebabe")
         )
         private val ENTRY = AddressBookEntry(
-            id = UUID.randomUUID(),
+            id = AddressBookId(UUID.randomUUID()),
             alias = "alias",
             address = WalletAddress("a"),
             phoneNumber = "phone-number",
