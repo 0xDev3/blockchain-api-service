@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.config
 
 import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
+import dev3.blockchainapiservice.features.contract.interfaces.repository.InMemoryContractInterfacesRepository
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.ManifestJson
@@ -10,10 +12,8 @@ import dev3.blockchainapiservice.model.result.ContractEvent
 import dev3.blockchainapiservice.model.result.ContractFunction
 import dev3.blockchainapiservice.model.result.ContractParameter
 import dev3.blockchainapiservice.model.result.EventParameter
-import dev3.blockchainapiservice.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.repository.InMemoryContractDecoratorRepository
-import dev3.blockchainapiservice.repository.InMemoryContractInterfacesRepository
 import dev3.blockchainapiservice.repository.JooqContractMetadataRepository
 import dev3.blockchainapiservice.service.RandomUuidProvider
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers

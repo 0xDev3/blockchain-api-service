@@ -4,9 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ArrayNode
 import dev3.blockchainapiservice.config.ContractManifestServiceProperties
 import dev3.blockchainapiservice.exception.AbiDecodingException
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
 import dev3.blockchainapiservice.features.functions.model.EthFunction
 import dev3.blockchainapiservice.model.json.AbiInputOutput
-import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.service.AbiDecoderService
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData

@@ -10,11 +10,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.addDeserializer
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
 import dev3.blockchainapiservice.features.payout.util.MerkleTree
 import dev3.blockchainapiservice.features.payout.util.json.MerkleTreeJsonSerializer
 import dev3.blockchainapiservice.features.payout.util.json.PathSegmentJsonSerializer
 import dev3.blockchainapiservice.generated.jooq.id.GeneratedIdsJacksonModule
-import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.Tuple
 import dev3.blockchainapiservice.util.json.FunctionArgumentJsonDeserializer
