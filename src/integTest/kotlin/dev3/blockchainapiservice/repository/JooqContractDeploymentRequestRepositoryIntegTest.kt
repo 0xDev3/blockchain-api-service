@@ -3,6 +3,10 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.AliasAlreadyInUseException
+import dev3.blockchainapiservice.features.contract.deployment.model.filters.ContractDeploymentRequestFilters
+import dev3.blockchainapiservice.features.contract.deployment.model.params.StoreContractDeploymentRequestParams
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.repository.JooqContractDeploymentRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
@@ -14,10 +18,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.AndList
-import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.model.filters.OrList
-import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl

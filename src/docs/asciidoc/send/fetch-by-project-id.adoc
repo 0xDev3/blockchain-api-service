@@ -13,4 +13,4 @@ include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSen
 include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyFetchAssetSendRequestsByProjectId/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.AssetSendRequestsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.asset.send.model.response.AssetSendRequestsResponse.adoc[]

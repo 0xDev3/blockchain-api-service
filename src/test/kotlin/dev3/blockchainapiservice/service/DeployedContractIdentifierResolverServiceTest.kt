@@ -4,6 +4,8 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ContractNotYetDeployedException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
@@ -13,9 +15,7 @@ import dev3.blockchainapiservice.model.params.DeployedContractAddressIdentifier
 import dev3.blockchainapiservice.model.params.DeployedContractAliasIdentifier
 import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId

@@ -6,6 +6,9 @@ import dev3.blockchainapiservice.blockchain.DummyProxy
 import dev3.blockchainapiservice.blockchain.ExampleContract
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestResponse
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
 import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
@@ -23,7 +26,6 @@ import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.model.json.TypeDecorator
 import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
-import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponseType
@@ -33,14 +35,12 @@ import dev3.blockchainapiservice.model.response.SuggestedContractInterfaceManife
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractConstructor
 import dev3.blockchainapiservice.model.result.ContractDecorator
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.ContractEvent
 import dev3.blockchainapiservice.model.result.ContractFunction
 import dev3.blockchainapiservice.model.result.ContractParameter
 import dev3.blockchainapiservice.model.result.EventParameter
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository

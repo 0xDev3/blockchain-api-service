@@ -26,4 +26,4 @@ Schemas:
 .Request Schema
 include::{snippets}/dev3.blockchainapiservice.model.request.ImportContractRequest.adoc[]
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestResponse.adoc[]

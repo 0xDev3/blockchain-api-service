@@ -8,6 +8,8 @@ import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.features.contract.functioncall.model.filters.ContractFunctionCallRequestFilters
 import dev3.blockchainapiservice.features.contract.functioncall.model.params.CreateContractFunctionCallRequestParams
 import dev3.blockchainapiservice.features.contract.functioncall.model.params.StoreContractFunctionCallRequestParams
@@ -22,9 +24,7 @@ import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
