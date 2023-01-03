@@ -15,4 +15,4 @@ include::{snippets}/AssetMultiSendRequestControllerApiTest/mustCorrectlyFetchAss
 include::{snippets}/AssetMultiSendRequestControllerApiTest/mustCorrectlyFetchAssetMultiSendRequestsBySenderAddress/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.AssetMultiSendRequestsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.asset.multisend.model.response.AssetMultiSendRequestsResponse.adoc[]

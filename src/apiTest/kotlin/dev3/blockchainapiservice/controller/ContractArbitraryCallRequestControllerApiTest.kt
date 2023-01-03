@@ -10,6 +10,8 @@ import dev3.blockchainapiservice.features.contract.arbitrarycall.model.response.
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.response.ContractArbitraryCallRequestsResponse
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.result.ContractArbitraryCallRequest
 import dev3.blockchainapiservice.features.contract.arbitrarycall.repository.ContractArbitraryCallRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.model.params.StoreContractDeploymentRequestParams
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
 import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
@@ -24,7 +26,6 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRec
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.ManifestJson
-import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.response.EventArgumentResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponseType
 import dev3.blockchainapiservice.model.response.EventInfoResponse
@@ -37,7 +38,6 @@ import dev3.blockchainapiservice.model.result.ContractParameter
 import dev3.blockchainapiservice.model.result.EventParameter
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Balance

@@ -24,6 +24,6 @@ include::{snippets}/AssetSendRequestControllerApiTest/mustCorrectlyCreateAssetSe
 Schemas:
 
 .Request Schema
-include::{snippets}/dev3.blockchainapiservice.model.request.CreateAssetSendRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.asset.send.model.request.CreateAssetSendRequest.adoc[]
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.AssetSendRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.asset.send.model.response.AssetSendRequestResponse.adoc[]

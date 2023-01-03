@@ -13,6 +13,8 @@ import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.Cr
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.StoreContractArbitraryCallRequestParams
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.result.ContractArbitraryCallRequest
 import dev3.blockchainapiservice.features.contract.arbitrarycall.repository.ContractArbitraryCallRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.features.functions.model.EthFunction
 import dev3.blockchainapiservice.features.functions.service.FunctionDecoderService
 import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
@@ -23,9 +25,7 @@ import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.service.DeployedContractIdentifierResolverServiceImpl
 import dev3.blockchainapiservice.service.EthCommonServiceImpl

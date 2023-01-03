@@ -24,6 +24,6 @@ include::{snippets}/AssetBalanceRequestControllerApiTest/mustCorrectlyCreateAsse
 Schemas:
 
 .Request Schema
-include::{snippets}/dev3.blockchainapiservice.model.request.CreateAssetBalanceRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.asset.balance.model.request.CreateAssetBalanceRequest.adoc[]
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.AssetBalanceRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.asset.balance.model.response.AssetBalanceRequestResponse.adoc[]

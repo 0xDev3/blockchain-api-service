@@ -2,14 +2,14 @@ package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.exception.ContractNotYetDeployedException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.model.params.DeployedContractAddressIdentifier
 import dev3.blockchainapiservice.model.params.DeployedContractAliasIdentifier
 import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.model.params.DeployedContractIdentifier
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.springframework.stereotype.Service

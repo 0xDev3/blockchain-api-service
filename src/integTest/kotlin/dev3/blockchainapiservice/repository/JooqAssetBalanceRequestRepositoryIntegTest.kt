@@ -2,6 +2,9 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.asset.balance.model.params.StoreAssetBalanceRequestParams
+import dev3.blockchainapiservice.features.asset.balance.model.result.AssetBalanceRequest
+import dev3.blockchainapiservice.features.asset.balance.repository.JooqAssetBalanceRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
@@ -10,8 +13,6 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.AssetBalanceReque
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreAssetBalanceRequestParams
-import dev3.blockchainapiservice.model.result.AssetBalanceRequest
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.BlockNumber

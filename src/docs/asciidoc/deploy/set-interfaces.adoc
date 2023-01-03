@@ -18,4 +18,4 @@ include::{snippets}/dev3.blockchainapiservice.model.request.ImportedContractInte
 include::{snippets}/ImportContractControllerApiTest/mustCorrectlySetInterfacesForImportedSmartContractWhenContractDecoratorIsNotSpecified/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestResponse.adoc[]

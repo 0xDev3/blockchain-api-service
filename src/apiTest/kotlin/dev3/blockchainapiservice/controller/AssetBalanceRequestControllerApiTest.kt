@@ -5,6 +5,12 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.SimpleERC20
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.asset.balance.model.params.StoreAssetBalanceRequestParams
+import dev3.blockchainapiservice.features.asset.balance.model.response.AssetBalanceRequestResponse
+import dev3.blockchainapiservice.features.asset.balance.model.response.AssetBalanceRequestsResponse
+import dev3.blockchainapiservice.features.asset.balance.model.response.BalanceResponse
+import dev3.blockchainapiservice.features.asset.balance.model.result.AssetBalanceRequest
+import dev3.blockchainapiservice.features.asset.balance.repository.AssetBalanceRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
 import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
@@ -15,13 +21,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreAssetBalanceRequestParams
-import dev3.blockchainapiservice.model.response.AssetBalanceRequestResponse
-import dev3.blockchainapiservice.model.response.AssetBalanceRequestsResponse
-import dev3.blockchainapiservice.model.response.BalanceResponse
-import dev3.blockchainapiservice.model.result.AssetBalanceRequest
 import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.AssetBalanceRequestRepository
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.Balance

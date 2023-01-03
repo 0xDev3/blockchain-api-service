@@ -5,6 +5,7 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.validation.ValidationConstants
 import dev3.blockchainapiservice.config.validation.ValidationConstants.FUNCTION_ARGUMENT_MAX_JSON_CHARS
 import dev3.blockchainapiservice.config.validation.ValidationConstants.REQUEST_BODY_MAX_JSON_CHARS
+import dev3.blockchainapiservice.features.contract.deployment.model.request.CreateContractDeploymentRequest
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.JsonNodeConverter
