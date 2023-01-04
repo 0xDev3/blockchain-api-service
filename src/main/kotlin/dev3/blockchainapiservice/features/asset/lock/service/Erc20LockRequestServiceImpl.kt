@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.features.asset.lock.service
 
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
 import dev3.blockchainapiservice.features.asset.lock.model.params.CreateErc20LockRequestParams
 import dev3.blockchainapiservice.features.asset.lock.model.params.StoreErc20LockRequestParams
 import dev3.blockchainapiservice.features.asset.lock.model.result.Erc20LockRequest
@@ -10,8 +12,6 @@ import dev3.blockchainapiservice.features.functions.encoding.service.FunctionEnc
 import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.service.EthCommonService
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ContractAddress

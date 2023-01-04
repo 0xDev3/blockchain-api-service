@@ -1,11 +1,11 @@
 package dev3.blockchainapiservice.features.contract.deployment.service
 
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.deployment.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.features.contract.deployment.model.params.CreateContractDeploymentRequestParams
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithTransactionData

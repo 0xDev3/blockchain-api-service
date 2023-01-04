@@ -1,10 +1,11 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.api.access.repository.JooqUserIdentifierRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.WalletAddress
 import org.jooq.DSLContext

@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.features.promocode.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.features.api.promocodes.controller.PromoCodeController
 import dev3.blockchainapiservice.features.api.promocodes.model.request.GeneratePromoCodeRequest
 import dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCodeResponse
@@ -10,7 +11,6 @@ import dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCod
 import dev3.blockchainapiservice.features.api.promocodes.model.result.PromoCode
 import dev3.blockchainapiservice.features.api.promocodes.service.PromoCodeService
 import dev3.blockchainapiservice.generated.jooq.id.UserId
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress

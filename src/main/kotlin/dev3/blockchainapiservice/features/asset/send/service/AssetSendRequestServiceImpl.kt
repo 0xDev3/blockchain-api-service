@@ -1,6 +1,8 @@
 package dev3.blockchainapiservice.features.asset.send.service
 
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
 import dev3.blockchainapiservice.features.asset.send.model.params.CreateAssetSendRequestParams
 import dev3.blockchainapiservice.features.asset.send.model.params.StoreAssetSendRequestParams
 import dev3.blockchainapiservice.features.asset.send.model.result.AssetSendRequest
@@ -10,8 +12,6 @@ import dev3.blockchainapiservice.features.functions.encoding.service.FunctionEnc
 import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.service.EthCommonService
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.FunctionData

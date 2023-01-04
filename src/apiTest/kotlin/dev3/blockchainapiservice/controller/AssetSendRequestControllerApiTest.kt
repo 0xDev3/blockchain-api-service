@@ -5,6 +5,7 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.SimpleERC20
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.asset.send.model.params.StoreAssetSendRequestParams
 import dev3.blockchainapiservice.features.asset.send.model.response.AssetSendRequestResponse
 import dev3.blockchainapiservice.features.asset.send.model.response.AssetSendRequestsResponse
@@ -23,7 +24,6 @@ import dev3.blockchainapiservice.model.response.EventArgumentResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponseType
 import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.Balance

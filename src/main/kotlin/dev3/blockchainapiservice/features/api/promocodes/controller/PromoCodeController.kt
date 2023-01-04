@@ -1,11 +1,11 @@
 package dev3.blockchainapiservice.features.api.promocodes.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
+import dev3.blockchainapiservice.features.api.access.model.result.UserIdentifier
 import dev3.blockchainapiservice.features.api.promocodes.model.request.GeneratePromoCodeRequest
 import dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCodeResponse
 import dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCodesResponse
 import dev3.blockchainapiservice.features.api.promocodes.service.PromoCodeService
-import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
 import org.springframework.format.annotation.DateTimeFormat

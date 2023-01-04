@@ -1,13 +1,13 @@
 package dev3.blockchainapiservice.features.api.billing.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
+import dev3.blockchainapiservice.features.api.access.model.result.UserIdentifier
 import dev3.blockchainapiservice.features.api.billing.model.request.CreateCustomerRequest
 import dev3.blockchainapiservice.features.api.billing.model.request.CreateSubscriptionRequest
 import dev3.blockchainapiservice.features.api.billing.model.response.AvailableSubscriptionsResponse
 import dev3.blockchainapiservice.features.api.billing.model.response.PayableSubscriptionResponse
 import dev3.blockchainapiservice.features.api.billing.model.response.SubscriptionsResponse
 import dev3.blockchainapiservice.features.api.billing.service.StripeBillingService
-import dev3.blockchainapiservice.model.result.UserIdentifier
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping

@@ -2,6 +2,9 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.wallet.authorization.model.params.StoreAuthorizationRequestParams
+import dev3.blockchainapiservice.features.wallet.authorization.model.result.AuthorizationRequest
+import dev3.blockchainapiservice.features.wallet.authorization.repository.JooqAuthorizationRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
@@ -10,8 +13,6 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.AuthorizationRequ
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreAuthorizationRequestParams
-import dev3.blockchainapiservice.model.result.AuthorizationRequest
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId

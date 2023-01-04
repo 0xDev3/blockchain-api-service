@@ -5,6 +5,7 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMa
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.asset.multisend.model.params.CreateAssetMultiSendRequestParams
 import dev3.blockchainapiservice.features.asset.multisend.model.request.CreateAssetMultiSendRequest
 import dev3.blockchainapiservice.features.asset.multisend.model.response.AssetMultiSendRequestResponse
@@ -13,7 +14,6 @@ import dev3.blockchainapiservice.features.asset.multisend.service.AssetMultiSend
 import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity

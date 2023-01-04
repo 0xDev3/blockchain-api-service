@@ -1,10 +1,10 @@
 package dev3.blockchainapiservice.features.asset.send.service
 
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.asset.send.model.params.CreateAssetSendRequestParams
 import dev3.blockchainapiservice.features.asset.send.model.result.AssetSendRequest
 import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue

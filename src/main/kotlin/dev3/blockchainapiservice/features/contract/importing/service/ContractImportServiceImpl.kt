@@ -6,6 +6,7 @@ import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.ContractDecoratorBinaryMismatchException
 import dev3.blockchainapiservice.exception.ContractNotFoundException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.abi.model.AddressType
 import dev3.blockchainapiservice.features.contract.abi.model.Tuple
 import dev3.blockchainapiservice.features.contract.abi.service.AbiDecoderService
@@ -18,7 +19,9 @@ import dev3.blockchainapiservice.features.contract.deployment.model.result.Contr
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractParameter
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.features.contract.deployment.repository.ImportedContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.importing.model.json.DecompiledContractJson
 import dev3.blockchainapiservice.features.contract.importing.model.params.ImportContractParams
 import dev3.blockchainapiservice.features.contract.readcall.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
@@ -28,14 +31,10 @@ import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
 import dev3.blockchainapiservice.generated.jooq.id.ImportedContractDecoratorId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.DeserializableEvent
-import dev3.blockchainapiservice.model.json.DecompiledContractJson
 import dev3.blockchainapiservice.model.result.ContractBinaryInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractMetadata
 import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
-import dev3.blockchainapiservice.service.ContractDecompilerService
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.util.Constants

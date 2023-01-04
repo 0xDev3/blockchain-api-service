@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.features.asset.multisend.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.features.api.access.model.result.UserIdentifier
 import dev3.blockchainapiservice.features.asset.multisend.model.request.CreateMultiPaymentTemplateRequest
 import dev3.blockchainapiservice.features.asset.multisend.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.features.asset.multisend.model.request.UpdateMultiPaymentTemplateRequest
@@ -11,7 +12,6 @@ import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiPa
 import dev3.blockchainapiservice.features.asset.multisend.service.MultiPaymentTemplateService
 import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
 import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
-import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated

@@ -4,6 +4,7 @@ import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.asset.balance.model.params.CreateAssetBalanceRequestParams
 import dev3.blockchainapiservice.features.asset.balance.model.request.CreateAssetBalanceRequest
 import dev3.blockchainapiservice.features.asset.balance.model.response.AssetBalanceRequestResponse
@@ -12,7 +13,6 @@ import dev3.blockchainapiservice.features.asset.balance.service.AssetBalanceRequ
 import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity

@@ -1,11 +1,11 @@
 package dev3.blockchainapiservice.features.asset.lock.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.ParamsFactory
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress

@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
+import dev3.blockchainapiservice.features.api.usage.repository.JooqUserIdResolverRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
 import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId

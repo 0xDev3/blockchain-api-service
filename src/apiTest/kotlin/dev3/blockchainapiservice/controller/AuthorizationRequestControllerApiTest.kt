@@ -4,6 +4,12 @@ import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.wallet.authorization.model.params.StoreAuthorizationRequestParams
+import dev3.blockchainapiservice.features.wallet.authorization.model.response.AuthorizationRequestResponse
+import dev3.blockchainapiservice.features.wallet.authorization.model.response.AuthorizationRequestsResponse
+import dev3.blockchainapiservice.features.wallet.authorization.model.result.AuthorizationRequest
+import dev3.blockchainapiservice.features.wallet.authorization.repository.AuthorizationRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
 import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
@@ -14,12 +20,6 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreAuthorizationRequestParams
-import dev3.blockchainapiservice.model.response.AuthorizationRequestResponse
-import dev3.blockchainapiservice.model.response.AuthorizationRequestsResponse
-import dev3.blockchainapiservice.model.result.AuthorizationRequest
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.AuthorizationRequestRepository
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.SignedMessage

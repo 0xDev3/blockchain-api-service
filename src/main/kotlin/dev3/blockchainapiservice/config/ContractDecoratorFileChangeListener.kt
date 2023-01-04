@@ -9,10 +9,10 @@ import dev3.blockchainapiservice.features.contract.deployment.model.json.Interfa
 import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
 import dev3.blockchainapiservice.model.result.ContractMetadata
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.util.Constants
 import dev3.blockchainapiservice.util.ContractId

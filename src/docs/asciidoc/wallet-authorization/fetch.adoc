@@ -18,4 +18,4 @@ include::{snippets}/AuthorizationRequestControllerApiTest/mustCorrectlyFetchAuth
 include::{snippets}/AuthorizationRequestControllerApiTest/mustCorrectlyFetchAuthorizationRequest/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.AuthorizationRequestResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.wallet.authorization.model.response.AuthorizationRequestResponse.adoc[]

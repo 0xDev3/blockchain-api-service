@@ -4,6 +4,7 @@ import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.JsonConfig
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.abi.model.BoolType
 import dev3.blockchainapiservice.features.contract.abi.model.StringType
 import dev3.blockchainapiservice.features.contract.abi.model.UintType
@@ -18,7 +19,6 @@ import dev3.blockchainapiservice.features.contract.readcall.service.ContractRead
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.ChainId

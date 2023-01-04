@@ -1,6 +1,7 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.features.wallet.authorization.service.EthereumSignatureCheckerService
 import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.WalletAddress
 import org.junit.jupiter.api.Test

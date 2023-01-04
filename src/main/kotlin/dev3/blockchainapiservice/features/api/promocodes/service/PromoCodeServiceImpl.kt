@@ -6,6 +6,8 @@ import dev3.blockchainapiservice.exception.PromoCodeAlreadyUsedException
 import dev3.blockchainapiservice.exception.PromoCodeExpiredException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.exception.SubscriptionAlreadyActiveException
+import dev3.blockchainapiservice.features.api.access.model.result.UserIdentifier
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.features.api.billing.service.StripeBillingService
 import dev3.blockchainapiservice.features.api.promocodes.model.result.PromoCode
 import dev3.blockchainapiservice.features.api.promocodes.model.result.PromoCodeAlreadyUsed
@@ -14,8 +16,6 @@ import dev3.blockchainapiservice.features.api.promocodes.model.result.PromoCodeE
 import dev3.blockchainapiservice.features.api.promocodes.repository.PromoCodeRepository
 import dev3.blockchainapiservice.features.api.usage.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.features.api.usage.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.model.result.UserIdentifier
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.service.RandomProvider
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime

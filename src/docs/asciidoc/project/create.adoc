@@ -7,7 +7,7 @@ Creates project with specified parameters.
 include::{snippets}/ProjectControllerApiTest/mustCorrectlyCreateProject/http-request.adoc[]
 ====
 .Request Schema
-include::{snippets}/dev3.blockchainapiservice.model.request.CreateProjectRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.api.access.model.request.CreateProjectRequest.adoc[]
 
 .Response Example
 [%collapsible]
@@ -15,4 +15,4 @@ include::{snippets}/dev3.blockchainapiservice.model.request.CreateProjectRequest
 include::{snippets}/ProjectControllerApiTest/mustCorrectlyCreateProject/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.ProjectResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.api.access.model.response.ProjectResponse.adoc[]
