@@ -2,10 +2,10 @@ package dev3.blockchainapiservice.features.contract.deployment.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
 import dev3.blockchainapiservice.features.contract.deployment.model.request.CreateContractDeploymentRequest
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ContractId
-import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.WalletAddress
 
 data class CreateContractDeploymentRequestParams(

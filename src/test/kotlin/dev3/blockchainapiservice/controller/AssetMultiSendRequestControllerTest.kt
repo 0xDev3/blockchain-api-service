@@ -6,6 +6,7 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.features.asset.multisend.controller.AssetMultiSendRequestController
 import dev3.blockchainapiservice.features.asset.multisend.model.params.CreateAssetMultiSendRequestParams
 import dev3.blockchainapiservice.features.asset.multisend.model.request.CreateAssetMultiSendRequest
+import dev3.blockchainapiservice.features.asset.multisend.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.features.asset.multisend.model.response.AssetMultiSendRequestResponse
 import dev3.blockchainapiservice.features.asset.multisend.model.response.AssetMultiSendRequestsResponse
 import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiSendItemResponse
@@ -16,7 +17,6 @@ import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
-import dev3.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.AssetType

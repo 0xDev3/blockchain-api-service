@@ -2,6 +2,12 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.contract.deployment.model.filters.ContractDecoratorFilters
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
+import dev3.blockchainapiservice.features.contract.deployment.repository.JooqImportedContractDecoratorRepository
 import dev3.blockchainapiservice.features.contract.interfaces.model.filters.ContractInterfaceFilters
 import dev3.blockchainapiservice.features.contract.interfaces.repository.InMemoryContractInterfacesRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -12,12 +18,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ImportedContractD
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.filters.AndList
-import dev3.blockchainapiservice.model.filters.ContractDecoratorFilters
 import dev3.blockchainapiservice.model.filters.OrList
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.ManifestJson
-import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId

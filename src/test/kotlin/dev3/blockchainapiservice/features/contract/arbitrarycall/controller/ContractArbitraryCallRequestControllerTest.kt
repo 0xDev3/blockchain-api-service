@@ -10,12 +10,12 @@ import dev3.blockchainapiservice.features.contract.arbitrarycall.model.response.
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.response.ContractArbitraryCallRequestsResponse
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.result.ContractArbitraryCallRequest
 import dev3.blockchainapiservice.features.contract.arbitrarycall.service.ContractArbitraryCallRequestService
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.Project

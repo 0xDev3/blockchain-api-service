@@ -2,6 +2,11 @@ package dev3.blockchainapiservice.model.params
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.exception.InvalidRequestBodyException
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractAddressIdentifier
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractAliasIdentifier
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdIdentifier
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdentifier
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdentifierRequestBody
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.util.ContractAddress
 import org.junit.jupiter.api.Test

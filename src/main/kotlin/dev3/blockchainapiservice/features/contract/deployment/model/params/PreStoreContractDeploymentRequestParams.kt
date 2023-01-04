@@ -1,6 +1,6 @@
 package dev3.blockchainapiservice.features.contract.deployment.model.params
 
-import dev3.blockchainapiservice.model.result.ContractDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
 import dev3.blockchainapiservice.util.FunctionData
 
 data class PreStoreContractDeploymentRequestParams(

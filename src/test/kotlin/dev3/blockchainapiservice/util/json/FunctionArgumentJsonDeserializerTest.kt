@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.JsonConfig
-import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
 import dev3.blockchainapiservice.util.SizedStaticArray
 import org.junit.jupiter.api.Test
 import org.web3j.abi.datatypes.Address

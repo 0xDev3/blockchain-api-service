@@ -2,12 +2,12 @@ package dev3.blockchainapiservice.features.contract.readcall.service
 
 import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.features.contract.deployment.service.DeployedContractIdentifierResolverService
 import dev3.blockchainapiservice.features.contract.readcall.model.params.CreateReadonlyFunctionCallParams
 import dev3.blockchainapiservice.features.contract.readcall.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.features.contract.readcall.model.result.ReadonlyFunctionCallResult
+import dev3.blockchainapiservice.features.functions.encoding.service.FunctionEncoderService
 import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.service.DeployedContractIdentifierResolverService
-import dev3.blockchainapiservice.service.FunctionEncoderService
 import dev3.blockchainapiservice.util.BlockName
 import dev3.blockchainapiservice.util.WithDeployedContractIdAndAddress
 import mu.KLogging

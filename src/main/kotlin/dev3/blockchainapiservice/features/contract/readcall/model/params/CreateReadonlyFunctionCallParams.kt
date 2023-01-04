@@ -1,9 +1,9 @@
 package dev3.blockchainapiservice.features.contract.readcall.model.params
 
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdentifier
 import dev3.blockchainapiservice.features.contract.readcall.model.request.ReadonlyFunctionCallRequest
-import dev3.blockchainapiservice.model.params.DeployedContractIdentifier
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
 import dev3.blockchainapiservice.util.BlockNumber
-import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.WalletAddress
 
 data class CreateReadonlyFunctionCallParams(

@@ -5,6 +5,8 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.ApiRateProperties
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.api.usage.model.response.ApiUsagePeriodResponse
+import dev3.blockchainapiservice.features.api.usage.model.result.RequestUsage
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
@@ -12,9 +14,7 @@ import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
-import dev3.blockchainapiservice.model.response.ApiUsagePeriodResponse
 import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.model.result.RequestUsage
 import dev3.blockchainapiservice.security.WithMockUser
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.BaseUrl

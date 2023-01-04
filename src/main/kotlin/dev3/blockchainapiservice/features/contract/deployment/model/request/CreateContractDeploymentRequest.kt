@@ -8,9 +8,9 @@ import dev3.blockchainapiservice.config.validation.MaxStringSize
 import dev3.blockchainapiservice.config.validation.ValidAlias
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
 import dev3.blockchainapiservice.config.validation.ValidUint256
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgumentSchema
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.util.FunctionArgument
-import dev3.blockchainapiservice.util.FunctionArgumentSchema
 import dev3.blockchainapiservice.util.annotation.SchemaIgnore
 import dev3.blockchainapiservice.util.annotation.SchemaName
 import java.math.BigInteger

@@ -15,4 +15,4 @@ include::{snippets}/ApiUsageControllerApiTest/mustCorrectlyFetchApiUsageForApiKe
 include::{snippets}/ApiUsageControllerApiTest/mustCorrectlyFetchApiUsageForApiKey/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.ApiUsagePeriodResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.api.usage.model.response.ApiUsagePeriodResponse.adoc[]

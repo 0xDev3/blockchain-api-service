@@ -7,6 +7,8 @@ import dev3.blockchainapiservice.exception.AbiDecodingException
 import dev3.blockchainapiservice.exception.BlockchainEventReadException
 import dev3.blockchainapiservice.exception.BlockchainReadException
 import dev3.blockchainapiservice.exception.TemporaryBlockchainReadException
+import dev3.blockchainapiservice.features.contract.abi.model.StaticBytesType
+import dev3.blockchainapiservice.features.contract.abi.service.AbiDecoderService
 import dev3.blockchainapiservice.features.contract.readcall.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.features.contract.readcall.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.features.payout.model.params.GetPayoutsForInvestorParams
@@ -26,7 +28,6 @@ import dev3.blockchainapiservice.model.result.EventArgumentValue
 import dev3.blockchainapiservice.model.result.EventInfo
 import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.repository.Web3jBlockchainServiceCacheRepository
-import dev3.blockchainapiservice.service.AbiDecoderService
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.util.AccountBalance
@@ -39,7 +40,6 @@ import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.EthStorageSlot
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.Keccak256Hash
-import dev3.blockchainapiservice.util.StaticBytesType
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress

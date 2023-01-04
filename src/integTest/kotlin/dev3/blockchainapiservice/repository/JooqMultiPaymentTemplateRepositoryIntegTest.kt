@@ -2,14 +2,15 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.asset.multisend.model.result.MultiPaymentTemplate
+import dev3.blockchainapiservice.features.asset.multisend.model.result.MultiPaymentTemplateItem
+import dev3.blockchainapiservice.features.asset.multisend.model.result.WithItems
+import dev3.blockchainapiservice.features.asset.multisend.repository.JooqMultiPaymentTemplateRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
 import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
-import dev3.blockchainapiservice.model.result.MultiPaymentTemplate
-import dev3.blockchainapiservice.model.result.MultiPaymentTemplateItem
-import dev3.blockchainapiservice.model.result.WithItems
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId

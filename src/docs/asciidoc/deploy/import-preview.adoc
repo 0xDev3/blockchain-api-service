@@ -26,4 +26,4 @@ include::{snippets}/ImportContractControllerApiTest/mustCorrectlyPreviewSmartCon
 include::{snippets}/ImportContractControllerApiTest/mustCorrectlyPreviewSmartContractImport/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.ImportPreviewResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.contract.importing.model.response.ImportPreviewResponse.adoc[]

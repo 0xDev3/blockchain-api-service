@@ -2,12 +2,12 @@ package dev3.blockchainapiservice.features.contract.interfaces.controller
 
 import dev3.blockchainapiservice.config.validation.MaxStringSize
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.contract.deployment.model.response.InfoMarkdownsResponse
 import dev3.blockchainapiservice.features.contract.interfaces.model.filters.ContractInterfaceFilters
 import dev3.blockchainapiservice.features.contract.interfaces.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.features.contract.interfaces.model.response.ContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.model.filters.parseOrListWithNestedAndLists
-import dev3.blockchainapiservice.model.response.InfoMarkdownsResponse
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId
 import org.springframework.http.MediaType

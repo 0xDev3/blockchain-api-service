@@ -1,8 +1,9 @@
 package dev3.blockchainapiservice.service
 
 import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
+import dev3.blockchainapiservice.features.functions.encoding.service.EthereumFunctionEncoderService
 import dev3.blockchainapiservice.util.Balance
-import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.WalletAddress
 import org.junit.jupiter.api.Test

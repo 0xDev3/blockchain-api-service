@@ -4,7 +4,11 @@ import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
 import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestResponse
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.features.contract.deployment.service.ContractDeploymentRequestService
 import dev3.blockchainapiservice.features.contract.importing.controller.ImportContractController
@@ -21,11 +25,7 @@ import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
-import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl

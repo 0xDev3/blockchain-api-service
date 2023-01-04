@@ -5,6 +5,11 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.SimpleLockManager
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.asset.lock.model.params.StoreErc20LockRequestParams
+import dev3.blockchainapiservice.features.asset.lock.model.response.Erc20LockRequestResponse
+import dev3.blockchainapiservice.features.asset.lock.model.response.Erc20LockRequestsResponse
+import dev3.blockchainapiservice.features.asset.lock.model.result.Erc20LockRequest
+import dev3.blockchainapiservice.features.asset.lock.repository.Erc20LockRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
 import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
@@ -14,13 +19,8 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreErc20LockRequestParams
-import dev3.blockchainapiservice.model.response.Erc20LockRequestResponse
-import dev3.blockchainapiservice.model.response.Erc20LockRequestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.Erc20LockRequest
 import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.Erc20LockRequestRepository
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl

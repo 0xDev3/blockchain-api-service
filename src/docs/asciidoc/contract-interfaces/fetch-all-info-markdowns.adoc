@@ -30,4 +30,4 @@ include::{snippets}/ContractInterfacesControllerApiTest/mustCorrectlyFetchContra
 include::{snippets}/ContractInterfacesControllerApiTest/mustCorrectlyFetchContractInterfaceInfoMarkdowns/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.InfoMarkdownsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.contract.deployment.model.response.InfoMarkdownsResponse.adoc[]

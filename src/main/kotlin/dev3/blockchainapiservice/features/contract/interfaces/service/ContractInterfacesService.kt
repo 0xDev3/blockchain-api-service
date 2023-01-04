@@ -1,9 +1,9 @@
 package dev3.blockchainapiservice.features.contract.interfaces.service
 
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
 import dev3.blockchainapiservice.features.contract.interfaces.model.result.MatchingContractInterfaces
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
-import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.util.InterfaceId
 
 interface ContractInterfacesService {

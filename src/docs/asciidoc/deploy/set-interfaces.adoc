@@ -10,7 +10,7 @@ the contract decorator was not specified during the import process.
 include::{snippets}/ImportContractControllerApiTest/mustCorrectlySetInterfacesForImportedSmartContractWhenContractDecoratorIsNotSpecified/http-request.adoc[]
 ====
 .Request Schema
-include::{snippets}/dev3.blockchainapiservice.model.request.ImportedContractInterfacesRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.contract.interfaces.model.request.ImportedContractInterfacesRequest.adoc[]
 
 .Response Example
 [%collapsible]
