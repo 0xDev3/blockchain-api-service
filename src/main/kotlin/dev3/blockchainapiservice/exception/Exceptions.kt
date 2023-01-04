@@ -1,12 +1,13 @@
 package dev3.blockchainapiservice.exception
 
-import dev3.blockchainapiservice.util.AbiType
+import dev3.blockchainapiservice.features.contract.abi.model.AbiType
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.InterfaceId
 import org.springframework.http.HttpStatus
-import java.util.UUID
 
 abstract class ServiceException(
     val errorCode: ErrorCode,
@@ -111,10 +112,10 @@ class BadAuthenticationException : ServiceException(
     }
 }
 
-class ApiKeyAlreadyExistsException(projectId: UUID) : ServiceException(
+class ApiKeyAlreadyExistsException(projectId: ProjectId) : ServiceException(
     errorCode = ErrorCode.API_KEY_ALREADY_EXISTS,
     httpStatus = HttpStatus.BAD_REQUEST,
-    message = "API key already exists for project with ID: $projectId"
+    message = "API key already exists for project with ID: ${projectId.value}"
 ) {
     companion object {
         private const val serialVersionUID: Long = 6676987534485377215L
@@ -171,10 +172,10 @@ class AliasAlreadyInUseException(alias: String) : ServiceException(
     }
 }
 
-class ContractNotYetDeployedException(id: UUID, alias: String) : ServiceException(
+class ContractNotYetDeployedException(id: ContractDeploymentRequestId, alias: String) : ServiceException(
     errorCode = ErrorCode.CONTRACT_NOT_DEPLOYED,
     httpStatus = HttpStatus.BAD_REQUEST,
-    message = "Contract with ID: $id and alias: $alias is not yet deployed"
+    message = "Contract with ID: ${id.value} and alias: $alias is not yet deployed"
 ) {
     companion object {
         private const val serialVersionUID: Long = 4421635315803726161L

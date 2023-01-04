@@ -3,6 +3,10 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentTransactionCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchAccountBalanceCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchErc20AccountBalanceCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchTransactionInfoCacheId
 import dev3.blockchainapiservice.model.EventLog
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
@@ -87,7 +91,7 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyCacheFetchAccountBalance() {
-        val id = UUID.randomUUID()
+        val id = FetchAccountBalanceCacheId(UUID.randomUUID())
 
         suppose("fetchAccountBalance call will be cached") {
             repository.cacheFetchAccountBalance(
@@ -110,7 +114,7 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyCacheFetchErc20AccountBalance() {
-        val id = UUID.randomUUID()
+        val id = FetchErc20AccountBalanceCacheId(UUID.randomUUID())
 
         suppose("fetchErc20AccountBalance call will be cached") {
             repository.cacheFetchErc20AccountBalance(
@@ -135,7 +139,7 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyCacheFetchTransactionInfo() {
-        val id = UUID.randomUUID()
+        val id = FetchTransactionInfoCacheId(UUID.randomUUID())
 
         suppose("fetchTransactionInfo call will be cached") {
             repository.cacheFetchTransactionInfo(
@@ -166,7 +170,7 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyCacheContractDeploymentTransaction() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentTransactionCacheId(UUID.randomUUID())
 
         suppose("findContractDeploymentTransaction call will be cached") {
             repository.cacheContractDeploymentTransaction(

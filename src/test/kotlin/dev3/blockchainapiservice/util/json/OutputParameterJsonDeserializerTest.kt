@@ -4,17 +4,17 @@ import com.fasterxml.jackson.core.JsonParseException
 import com.fasterxml.jackson.databind.JsonMappingException
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.JsonConfig
-import dev3.blockchainapiservice.model.params.OutputParameter
-import dev3.blockchainapiservice.util.AddressType
-import dev3.blockchainapiservice.util.BoolType
-import dev3.blockchainapiservice.util.DynamicArrayType
-import dev3.blockchainapiservice.util.DynamicBytesType
-import dev3.blockchainapiservice.util.IntType
-import dev3.blockchainapiservice.util.StaticArrayType
-import dev3.blockchainapiservice.util.StaticBytesType
-import dev3.blockchainapiservice.util.StringType
-import dev3.blockchainapiservice.util.TupleType
-import dev3.blockchainapiservice.util.UintType
+import dev3.blockchainapiservice.features.contract.abi.model.AddressType
+import dev3.blockchainapiservice.features.contract.abi.model.BoolType
+import dev3.blockchainapiservice.features.contract.abi.model.DynamicArrayType
+import dev3.blockchainapiservice.features.contract.abi.model.DynamicBytesType
+import dev3.blockchainapiservice.features.contract.abi.model.IntType
+import dev3.blockchainapiservice.features.contract.abi.model.StaticArrayType
+import dev3.blockchainapiservice.features.contract.abi.model.StaticBytesType
+import dev3.blockchainapiservice.features.contract.abi.model.StringType
+import dev3.blockchainapiservice.features.contract.abi.model.TupleType
+import dev3.blockchainapiservice.features.contract.abi.model.UintType
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
 import org.junit.jupiter.api.Test
 
 class OutputParameterJsonDeserializerTest : TestBase() {

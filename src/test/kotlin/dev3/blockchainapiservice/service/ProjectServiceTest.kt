@@ -3,19 +3,22 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
-import dev3.blockchainapiservice.model.params.CreateProjectParams
-import dev3.blockchainapiservice.model.result.ApiKey
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import dev3.blockchainapiservice.repository.ApiKeyRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
+import dev3.blockchainapiservice.features.api.access.model.params.CreateProjectParams
+import dev3.blockchainapiservice.features.api.access.model.result.ApiKey
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.api.access.repository.ApiKeyRepository
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
+import dev3.blockchainapiservice.features.api.access.service.ProjectServiceImpl
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import java.time.OffsetDateTime
 import java.util.UUID
@@ -29,11 +32,11 @@ class ProjectServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyCreateProject() {
-        val uuid = UUID.randomUUID()
+        val uuid = ProjectId(UUID.randomUUID())
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
+            call(uuidProvider.getUuid(ProjectId))
                 .willReturn(uuid)
         }
 
@@ -51,12 +54,12 @@ class ProjectServiceTest : TestBase() {
             customRpcUrl = "custom-rpc-url"
         )
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
         val project = Project(
-            id = uuidProvider.getUuid(),
+            id = uuid,
             ownerId = userIdentifier.id,
             issuerContractAddress = params.issuerContractAddress,
             baseRedirectUrl = params.baseRedirectUrl,
@@ -88,8 +91,8 @@ class ProjectServiceTest : TestBase() {
     @Test
     fun mustCorrectlyFetchProjectById() {
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -128,12 +131,12 @@ class ProjectServiceTest : TestBase() {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("null will be returned for any project ID") {
-            call(projectRepository.getById(any()))
+            call(projectRepository.getById(anyValueClass(ProjectId(UUID.randomUUID()))))
                 .willReturn(null)
         }
 
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
@@ -148,7 +151,7 @@ class ProjectServiceTest : TestBase() {
 
         verify("ResourceNotFoundException is thrown") {
             expectThrows<ResourceNotFoundException> {
-                service.getProjectById(userIdentifier, UUID.randomUUID())
+                service.getProjectById(userIdentifier, ProjectId(UUID.randomUUID()))
             }
         }
     }
@@ -156,8 +159,8 @@ class ProjectServiceTest : TestBase() {
     @Test
     fun mustThrowResourceNotFoundExceptionUserIsFetchingNonOwnedProjectById() {
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -172,7 +175,7 @@ class ProjectServiceTest : TestBase() {
         }
 
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
@@ -195,8 +198,8 @@ class ProjectServiceTest : TestBase() {
     @Test
     fun mustCorrectlyFetchProjectByIssuerAddress() {
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -242,7 +245,7 @@ class ProjectServiceTest : TestBase() {
         }
 
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
@@ -265,8 +268,8 @@ class ProjectServiceTest : TestBase() {
     @Test
     fun mustThrowResourceNotFoundExceptionUserIsFetchingNonOwnedProjectByIssuerAddress() {
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -281,7 +284,7 @@ class ProjectServiceTest : TestBase() {
         }
 
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
@@ -304,13 +307,13 @@ class ProjectServiceTest : TestBase() {
     @Test
     fun mustCorrectlyFetchAllProjectsForUser() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
         val projects = listOf(
             Project(
-                id = UUID.randomUUID(),
+                id = ProjectId(UUID.randomUUID()),
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("a1"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-1"),
@@ -319,7 +322,7 @@ class ProjectServiceTest : TestBase() {
                 createdAt = CREATED_AT
             ),
             Project(
-                id = UUID.randomUUID(),
+                id = ProjectId(UUID.randomUUID()),
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("a2"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-2"),
@@ -352,8 +355,8 @@ class ProjectServiceTest : TestBase() {
     @Test
     fun mustCorrectlyFetchProjectApiKeys() {
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -375,13 +378,13 @@ class ProjectServiceTest : TestBase() {
 
         val apiKeys = listOf(
             ApiKey(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = project.id,
                 apiKey = "api-key-1",
                 createdAt = CREATED_AT
             ),
             ApiKey(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = project.id,
                 apiKey = "api-key-2",
                 createdAt = CREATED_AT
@@ -412,8 +415,8 @@ class ProjectServiceTest : TestBase() {
     @Test
     fun mustThrowResourceNotFoundExceptionWhenUserIsFetchingProjectApiKeysForNonOwnedProject() {
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -428,7 +431,7 @@ class ProjectServiceTest : TestBase() {
         }
 
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("b")
         )
@@ -451,8 +454,8 @@ class ProjectServiceTest : TestBase() {
     @Test
     fun mustCorrectlyCreateApiKey() {
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -473,11 +476,11 @@ class ProjectServiceTest : TestBase() {
                 .willReturn(ByteArray(API_KEY_BYTES))
         }
 
-        val uuid = UUID.randomUUID()
+        val uuid = ApiKeyId(UUID.randomUUID())
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
+            call(uuidProvider.getUuid(ApiKeyId))
                 .willReturn(uuid)
         }
 
@@ -524,8 +527,8 @@ class ProjectServiceTest : TestBase() {
     @Test
     fun mustThrowResourceNotFoundExceptionWhenUserCreatesApiKeyForNonOwnedProject() {
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = TestData.CHAIN_ID,
@@ -540,7 +543,7 @@ class ProjectServiceTest : TestBase() {
         }
 
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("b")
         )

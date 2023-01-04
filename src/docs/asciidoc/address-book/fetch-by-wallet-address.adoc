@@ -13,4 +13,4 @@ include::{snippets}/AddressBookControllerApiTest/mustCorrectlyFetchAddressBookEn
 include::{snippets}/AddressBookControllerApiTest/mustCorrectlyFetchAddressBookEntriesForWalletAddress/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.AddressBookEntriesResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.wallet.addressbook.model.response.AddressBookEntriesResponse.adoc[]

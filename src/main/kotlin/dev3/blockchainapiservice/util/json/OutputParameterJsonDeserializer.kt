@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
-import dev3.blockchainapiservice.model.params.OutputParameter
-import dev3.blockchainapiservice.util.AbiType
-import dev3.blockchainapiservice.util.DynamicArrayType
-import dev3.blockchainapiservice.util.StaticArrayType
-import dev3.blockchainapiservice.util.TupleType
+import dev3.blockchainapiservice.features.contract.abi.model.AbiType
+import dev3.blockchainapiservice.features.contract.abi.model.DynamicArrayType
+import dev3.blockchainapiservice.features.contract.abi.model.StaticArrayType
+import dev3.blockchainapiservice.features.contract.abi.model.TupleType
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
 
 typealias TypeResolver = (String) -> AbiType
 

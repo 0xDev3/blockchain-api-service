@@ -1,6 +1,10 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentTransactionCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchAccountBalanceCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchErc20AccountBalanceCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchTransactionInfoCacheId
 import dev3.blockchainapiservice.generated.jooq.tables.ContractDeploymentTransactionCacheTable
 import dev3.blockchainapiservice.generated.jooq.tables.FetchAccountBalanceCacheTable
 import dev3.blockchainapiservice.generated.jooq.tables.FetchErc20AccountBalanceCacheTable
@@ -27,7 +31,6 @@ import org.jooq.impl.DSL
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Repository
 import java.math.BigInteger
-import java.util.UUID
 
 @Repository
 class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLContext) :
@@ -35,7 +38,11 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
 
     companion object : KLogging()
 
-    override fun cacheFetchAccountBalance(id: UUID, chainSpec: ChainSpec, accountBalance: AccountBalance) {
+    override fun cacheFetchAccountBalance(
+        id: FetchAccountBalanceCacheId,
+        chainSpec: ChainSpec,
+        accountBalance: AccountBalance
+    ) {
         logger.info {
             "Caching fetchAccountBalance call, id: $id, chainSpec: $chainSpec, accountBalance: $accountBalance"
         }
@@ -61,7 +68,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
     }
 
     override fun cacheFetchErc20AccountBalance(
-        id: UUID,
+        id: FetchErc20AccountBalanceCacheId,
         chainSpec: ChainSpec,
         contractAddress: ContractAddress,
         accountBalance: AccountBalance
@@ -93,7 +100,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
     }
 
     override fun cacheFetchTransactionInfo(
-        id: UUID,
+        id: FetchTransactionInfoCacheId,
         chainSpec: ChainSpec,
         txHash: TransactionHash,
         blockNumber: BlockNumber,
@@ -137,7 +144,7 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
     }
 
     override fun cacheContractDeploymentTransaction(
-        id: UUID,
+        id: ContractDeploymentTransactionCacheId,
         chainSpec: ChainSpec,
         contractAddress: ContractAddress,
         contractDeploymentTransactionInfo: ContractDeploymentTransactionInfo,

@@ -4,25 +4,29 @@ import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestResponse
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.service.ContractDeploymentRequestService
+import dev3.blockchainapiservice.features.contract.importing.controller.ImportContractController
+import dev3.blockchainapiservice.features.contract.importing.model.params.ImportContractParams
+import dev3.blockchainapiservice.features.contract.importing.model.request.ImportContractRequest
+import dev3.blockchainapiservice.features.contract.importing.model.response.ImportPreviewResponse
+import dev3.blockchainapiservice.features.contract.importing.service.ContractImportService
+import dev3.blockchainapiservice.features.contract.interfaces.model.request.ImportedContractInterfacesRequest
+import dev3.blockchainapiservice.features.contract.interfaces.model.response.ContractInterfaceManifestResponse
+import dev3.blockchainapiservice.features.contract.interfaces.model.response.SuggestedContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.features.contract.interfaces.model.result.MatchingContractInterfaces
+import dev3.blockchainapiservice.features.contract.interfaces.service.ContractInterfacesService
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
-import dev3.blockchainapiservice.model.json.ManifestJson
-import dev3.blockchainapiservice.model.params.ImportContractParams
-import dev3.blockchainapiservice.model.request.ImportContractRequest
-import dev3.blockchainapiservice.model.request.ImportedContractInterfacesRequest
-import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
-import dev3.blockchainapiservice.model.response.ImportPreviewResponse
-import dev3.blockchainapiservice.model.response.SuggestedContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.ContractDecorator
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
-import dev3.blockchainapiservice.model.result.MatchingContractInterfaces
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.service.ContractDeploymentRequestService
-import dev3.blockchainapiservice.service.ContractImportService
-import dev3.blockchainapiservice.service.ContractInterfacesService
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
@@ -92,7 +96,7 @@ class ImportContractControllerTest : TestBase() {
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -104,7 +108,7 @@ class ImportContractControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -140,10 +144,10 @@ class ImportContractControllerTest : TestBase() {
             arbitraryData = result.value.arbitraryData,
             screenConfig = result.value.screenConfig
         )
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val project = Project(
             id = projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("abc123"),
             baseRedirectUrl = BaseUrl("base-url"),
             chainId = ChainId(1337L),
@@ -231,7 +235,7 @@ class ImportContractControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlySuggestInterfacesForSmartContract() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val result = InterfaceManifestJsonWithId(
             id = InterfaceId("interface-id"),
             name = "name",
@@ -277,7 +281,7 @@ class ImportContractControllerTest : TestBase() {
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -289,7 +293,7 @@ class ImportContractControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -317,7 +321,7 @@ class ImportContractControllerTest : TestBase() {
         )
         val project = Project(
             id = result.value.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("abc123"),
             baseRedirectUrl = BaseUrl("base-url"),
             chainId = ChainId(1337L),
@@ -397,7 +401,7 @@ class ImportContractControllerTest : TestBase() {
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -409,7 +413,7 @@ class ImportContractControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -437,7 +441,7 @@ class ImportContractControllerTest : TestBase() {
         )
         val project = Project(
             id = result.value.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("abc123"),
             baseRedirectUrl = BaseUrl("base-url"),
             chainId = ChainId(1337L),
@@ -517,7 +521,7 @@ class ImportContractControllerTest : TestBase() {
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -529,7 +533,7 @@ class ImportContractControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -557,7 +561,7 @@ class ImportContractControllerTest : TestBase() {
         )
         val project = Project(
             id = result.value.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("abc123"),
             baseRedirectUrl = BaseUrl("base-url"),
             chainId = ChainId(1337L),

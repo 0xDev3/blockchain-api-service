@@ -3,13 +3,14 @@ package dev3.blockchainapiservice.features.promocode.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.features.promocodes.controller.PromoCodeController
-import dev3.blockchainapiservice.features.promocodes.model.request.GeneratePromoCodeRequest
-import dev3.blockchainapiservice.features.promocodes.model.response.PromoCodeResponse
-import dev3.blockchainapiservice.features.promocodes.model.response.PromoCodesResponse
-import dev3.blockchainapiservice.features.promocodes.model.result.PromoCode
-import dev3.blockchainapiservice.features.promocodes.service.PromoCodeService
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.api.promocodes.controller.PromoCodeController
+import dev3.blockchainapiservice.features.api.promocodes.model.request.GeneratePromoCodeRequest
+import dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCodeResponse
+import dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCodesResponse
+import dev3.blockchainapiservice.features.api.promocodes.model.result.PromoCode
+import dev3.blockchainapiservice.features.api.promocodes.service.PromoCodeService
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
@@ -25,7 +26,7 @@ class PromoCodeControllerTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("abc")
         )

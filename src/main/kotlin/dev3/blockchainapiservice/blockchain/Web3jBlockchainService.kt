@@ -7,12 +7,19 @@ import dev3.blockchainapiservice.exception.AbiDecodingException
 import dev3.blockchainapiservice.exception.BlockchainEventReadException
 import dev3.blockchainapiservice.exception.BlockchainReadException
 import dev3.blockchainapiservice.exception.TemporaryBlockchainReadException
+import dev3.blockchainapiservice.features.contract.abi.model.StaticBytesType
+import dev3.blockchainapiservice.features.contract.abi.service.AbiDecoderService
+import dev3.blockchainapiservice.features.contract.readcall.model.params.ExecuteReadonlyFunctionCallParams
+import dev3.blockchainapiservice.features.contract.readcall.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.features.payout.model.params.GetPayoutsForInvestorParams
 import dev3.blockchainapiservice.features.payout.model.result.PayoutForInvestor
 import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentTransactionCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchAccountBalanceCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchErc20AccountBalanceCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchTransactionInfoCacheId
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.EventLog
-import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractBinaryInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
@@ -20,9 +27,7 @@ import dev3.blockchainapiservice.model.result.EventArgumentHash
 import dev3.blockchainapiservice.model.result.EventArgumentValue
 import dev3.blockchainapiservice.model.result.EventInfo
 import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
-import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.repository.Web3jBlockchainServiceCacheRepository
-import dev3.blockchainapiservice.service.AbiDecoderService
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.util.AccountBalance
@@ -35,7 +40,6 @@ import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.EthStorageSlot
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.Keccak256Hash
-import dev3.blockchainapiservice.util.StaticBytesType
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
@@ -146,7 +150,7 @@ class Web3jBlockchainService(
 
             if (blockchainProperties.shouldCache(blockDescriptor.blockConfirmations)) {
                 web3jBlockchainServiceCacheRepository.cacheFetchAccountBalance(
-                    id = uuidProvider.getUuid(),
+                    id = uuidProvider.getUuid(FetchAccountBalanceCacheId),
                     chainSpec = chainSpec,
                     accountBalance = accountBalance
                 )
@@ -203,7 +207,7 @@ class Web3jBlockchainService(
 
             if (blockchainProperties.shouldCache(blockDescriptor.blockConfirmations)) {
                 web3jBlockchainServiceCacheRepository.cacheFetchErc20AccountBalance(
-                    id = uuidProvider.getUuid(),
+                    id = uuidProvider.getUuid(FetchErc20AccountBalanceCacheId),
                     chainSpec = chainSpec,
                     contractAddress = contractAddress,
                     accountBalance = accountBalance
@@ -255,7 +259,7 @@ class Web3jBlockchainService(
 
                 if (blockchainProperties.shouldCache(blockConfirmations)) {
                     web3jBlockchainServiceCacheRepository.cacheFetchTransactionInfo(
-                        id = uuidProvider.getUuid(),
+                        id = uuidProvider.getUuid(FetchTransactionInfoCacheId),
                         chainSpec = chainSpec,
                         txHash = txHash,
                         blockNumber = BlockNumber(txBlockNumber),
@@ -379,7 +383,7 @@ class Web3jBlockchainService(
 
             if (result != null) {
                 web3jBlockchainServiceCacheRepository.cacheContractDeploymentTransaction(
-                    id = uuidProvider.getUuid(),
+                    id = uuidProvider.getUuid(ContractDeploymentTransactionCacheId),
                     chainSpec = chainSpec,
                     contractAddress = contractAddress,
                     contractDeploymentTransactionInfo = result.first,

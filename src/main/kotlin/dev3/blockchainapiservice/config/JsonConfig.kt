@@ -9,12 +9,14 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.addDeserializer
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
+import dev3.blockchainapiservice.features.contract.abi.model.Tuple
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
 import dev3.blockchainapiservice.features.payout.util.MerkleTree
 import dev3.blockchainapiservice.features.payout.util.json.MerkleTreeJsonSerializer
 import dev3.blockchainapiservice.features.payout.util.json.PathSegmentJsonSerializer
-import dev3.blockchainapiservice.model.params.OutputParameter
-import dev3.blockchainapiservice.util.FunctionArgument
-import dev3.blockchainapiservice.util.Tuple
+import dev3.blockchainapiservice.generated.jooq.id.GeneratedIdsJacksonModule
 import dev3.blockchainapiservice.util.json.FunctionArgumentJsonDeserializer
 import dev3.blockchainapiservice.util.json.OutputParameterJsonDeserializer
 import dev3.blockchainapiservice.util.json.TupleSerializer
@@ -34,6 +36,8 @@ class JsonConfig {
 
         mapper.propertyNamingStrategy = PropertyNamingStrategies.SnakeCaseStrategy()
         mapper.registerModule(JavaTimeModule())
+        mapper.registerModule(GeneratedIdsJacksonModule)
+        mapper.registerModule(ParameterNamesModule())
         mapper.registerModule(
             SimpleModule().apply {
                 addDeserializer(FunctionArgument::class, FunctionArgumentJsonDeserializer())

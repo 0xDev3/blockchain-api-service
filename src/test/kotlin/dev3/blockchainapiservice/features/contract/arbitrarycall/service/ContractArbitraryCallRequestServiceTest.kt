@@ -7,23 +7,28 @@ import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
 import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.filters.ContractArbitraryCallRequestFilters
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.CreateContractArbitraryCallRequestParams
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.StoreContractArbitraryCallRequestParams
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.result.ContractArbitraryCallRequest
 import dev3.blockchainapiservice.features.contract.arbitrarycall.repository.ContractArbitraryCallRequestRepository
-import dev3.blockchainapiservice.features.functions.model.EthFunction
-import dev3.blockchainapiservice.features.functions.service.FunctionDecoderService
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdIdentifier
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.service.DeployedContractIdentifierResolverServiceImpl
+import dev3.blockchainapiservice.features.functions.decoding.model.EthFunction
+import dev3.blockchainapiservice.features.functions.decoding.service.FunctionDecoderService
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
+import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
-import dev3.blockchainapiservice.service.DeployedContractIdentifierResolverServiceImpl
 import dev3.blockchainapiservice.service.EthCommonServiceImpl
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
@@ -33,7 +38,6 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
-import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.JsonNodeConverter
 import dev3.blockchainapiservice.util.Status
@@ -49,8 +53,8 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -58,7 +62,7 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
             createdAt = TestData.TIMESTAMP
         )
         private val OBJECT_MAPPER = JsonConfig().objectMapper()
-        private val DEPLOYED_CONTRACT_ID = UUID.randomUUID()
+        private val DEPLOYED_CONTRACT_ID = ContractDeploymentRequestId(UUID.randomUUID())
         private val ENCODED_FUNCTION_DATA = FunctionData("0x1234")
         private val DEPLOYED_CONTRACT_ID_CREATE_PARAMS = CreateContractArbitraryCallRequestParams(
             identifier = DeployedContractIdIdentifier(DEPLOYED_CONTRACT_ID),
@@ -80,7 +84,7 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
             RAW_FUNCTION_PARAMS, Array<FunctionArgument>::class.java
         ).toList()
         private val CONTRACT_ADDRESS = ContractAddress("abc123")
-        private val ID = UUID.randomUUID()
+        private val ID = ContractArbitraryCallRequestId(UUID.randomUUID())
         private val STORE_PARAMS = StoreContractArbitraryCallRequestParams(
             id = ID,
             deployedContractId = DEPLOYED_CONTRACT_ID,
@@ -90,7 +94,7 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
             functionParams = RAW_FUNCTION_PARAMS,
             ethAmount = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.ethAmount,
             chainId = PROJECT.chainId,
-            redirectUrl = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.redirectUrl!!.replace("\${id}", ID.toString()),
+            redirectUrl = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.redirectUrl!!.replace("\${id}", ID.value.toString()),
             projectId = PROJECT.id,
             createdAt = TestData.TIMESTAMP,
             arbitraryData = DEPLOYED_CONTRACT_ID_CREATE_PARAMS.arbitraryData,
@@ -160,8 +164,8 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(ID)
+            call(uuidProvider.getRawUuid())
+                .willReturn(ID.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -175,9 +179,7 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
         val createParams = DEPLOYED_CONTRACT_ID_CREATE_PARAMS
 
         suppose("function will be decoded") {
-            call(
-                functionDecoderService.decode(ENCODED_FUNCTION_DATA)
-            )
+            call(functionDecoderService.decode(ENCODED_FUNCTION_DATA))
                 .willReturn(EthFunction(FUNCTION_NAME, FUNCTION_PARAMS))
         }
 
@@ -234,8 +236,8 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(ID)
+            call(uuidProvider.getRawUuid())
+                .willReturn(ID.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -793,7 +795,7 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
     fun mustCorrectlyReturnListOfContractArbitraryCallRequestsByProjectId() {
         val contractArbitraryCallRequestRepository = mock<ContractArbitraryCallRequestRepository>()
         val filters = ContractArbitraryCallRequestFilters(
-            deployedContractId = UUID.randomUUID(),
+            deployedContractId = ContractDeploymentRequestId(UUID.randomUUID()),
             contractAddress = ContractAddress("cafebabe")
         )
 
@@ -836,9 +838,9 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnEmptyListOfContractArbitraryCallRequestsForNonExistentProject() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val filters = ContractArbitraryCallRequestFilters(
-            deployedContractId = UUID.randomUUID(),
+            deployedContractId = ContractDeploymentRequestId(UUID.randomUUID()),
             contractAddress = ContractAddress("cafebabe")
         )
 
@@ -939,7 +941,7 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
         }
     }
 
-    private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
+    private fun projectRepositoryMock(projectId: ProjectId): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("some project will be returned") {
@@ -947,7 +949,7 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
                 .willReturn(
                     Project(
                         id = projectId,
-                        ownerId = UUID.randomUUID(),
+                        ownerId = UserId(UUID.randomUUID()),
                         issuerContractAddress = ContractAddress("dead"),
                         baseRedirectUrl = BaseUrl(""),
                         chainId = ChainId(0L),

@@ -1,6 +1,6 @@
 package dev3.blockchainapiservice.model
 
-import dev3.blockchainapiservice.util.AbiType
+import dev3.blockchainapiservice.features.contract.abi.model.AbiType
 
 data class DeserializableEvent(
     val signature: String,

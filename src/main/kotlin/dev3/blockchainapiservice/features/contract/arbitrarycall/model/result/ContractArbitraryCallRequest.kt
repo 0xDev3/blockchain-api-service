@@ -1,6 +1,9 @@
 package dev3.blockchainapiservice.features.contract.arbitrarycall.model.result
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.util.Balance
@@ -13,11 +16,10 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithTransactionData
-import java.util.UUID
 
 data class ContractArbitraryCallRequest(
-    val id: UUID,
-    val deployedContractId: UUID?,
+    val id: ContractArbitraryCallRequestId,
+    val deployedContractId: ContractDeploymentRequestId?,
     val contractAddress: ContractAddress,
     val functionData: FunctionData,
     val functionName: String?,
@@ -25,7 +27,7 @@ data class ContractArbitraryCallRequest(
     val ethAmount: Balance,
     val chainId: ChainId,
     val redirectUrl: String,
-    val projectId: UUID,
+    val projectId: ProjectId,
     val createdAt: UtcDateTime,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig,

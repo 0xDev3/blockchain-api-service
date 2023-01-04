@@ -1,9 +1,9 @@
 package dev3.blockchainapiservice.util
 
-import java.util.UUID
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 
 data class WithDeployedContractIdAndAddress<T>(
     val value: T,
-    val deployedContractId: UUID?,
+    val deployedContractId: ContractDeploymentRequestId?,
     val contractAddress: ContractAddress
 )

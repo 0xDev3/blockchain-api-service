@@ -4,22 +4,25 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ContractInterfaceNotFoundException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.contract.deployment.model.json.AbiInputOutput
+import dev3.blockchainapiservice.features.contract.deployment.model.json.AbiObject
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.EventDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.FunctionDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ImportedContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.interfaces.model.result.MatchingContractInterfaces
+import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
+import dev3.blockchainapiservice.features.contract.interfaces.service.ContractInterfacesServiceImpl
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.json.AbiInputOutput
-import dev3.blockchainapiservice.model.json.AbiObject
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.EventDecorator
-import dev3.blockchainapiservice.model.json.FunctionDecorator
-import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
-import dev3.blockchainapiservice.model.json.ManifestJson
-import dev3.blockchainapiservice.model.result.ContractDecorator
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
-import dev3.blockchainapiservice.model.result.MatchingContractInterfaces
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
-import dev3.blockchainapiservice.repository.ContractInterfacesRepository
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
-import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
@@ -34,8 +37,8 @@ import java.util.UUID
 class ContractInterfacesServiceTest : TestBase() {
 
     companion object {
-        private val ID = UUID.randomUUID()
-        private val PROJECT_ID = UUID.randomUUID()
+        private val ID = ContractDeploymentRequestId(UUID.randomUUID())
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
         private val CONTRACT_ID = ContractId("contract-id")
         private val CONTRACT_DEPLOYMENT_REQUEST = ContractDeploymentRequest(
             id = ID,
@@ -729,7 +732,7 @@ class ContractInterfacesServiceTest : TestBase() {
 
         suppose("some non-owned contract deployment request will be returned") {
             call(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = UUID.randomUUID()))
+                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = ProjectId(UUID.randomUUID())))
         }
 
         val service = ContractInterfacesServiceImpl(
@@ -930,7 +933,7 @@ class ContractInterfacesServiceTest : TestBase() {
 
         suppose("some non-owned contract deployment request will be returned") {
             call(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = UUID.randomUUID()))
+                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = ProjectId(UUID.randomUUID())))
         }
 
         val service = ContractInterfacesServiceImpl(
@@ -1094,7 +1097,7 @@ class ContractInterfacesServiceTest : TestBase() {
 
         suppose("some non-owned contract deployment request will be returned") {
             call(contractDeploymentRequestRepository.getById(ID))
-                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = UUID.randomUUID()))
+                .willReturn(CONTRACT_DEPLOYMENT_REQUEST.copy(projectId = ProjectId(UUID.randomUUID())))
         }
 
         val service = ContractInterfacesServiceImpl(

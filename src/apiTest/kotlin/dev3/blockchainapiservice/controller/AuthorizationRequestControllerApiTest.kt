@@ -4,18 +4,22 @@ import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.wallet.authorization.model.params.StoreAuthorizationRequestParams
+import dev3.blockchainapiservice.features.wallet.authorization.model.response.AuthorizationRequestResponse
+import dev3.blockchainapiservice.features.wallet.authorization.model.response.AuthorizationRequestsResponse
+import dev3.blockchainapiservice.features.wallet.authorization.model.result.AuthorizationRequest
+import dev3.blockchainapiservice.features.wallet.authorization.repository.AuthorizationRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreAuthorizationRequestParams
-import dev3.blockchainapiservice.model.response.AuthorizationRequestResponse
-import dev3.blockchainapiservice.model.response.AuthorizationRequestsResponse
-import dev3.blockchainapiservice.model.result.AuthorizationRequest
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.AuthorizationRequestRepository
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.SignedMessage
@@ -33,8 +37,8 @@ import java.util.UUID
 class AuthorizationRequestControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val PROJECT = Project(
             id = PROJECT_ID,
             ownerId = OWNER_ID,
@@ -80,7 +84,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 apiKey = API_KEY,
                 createdAt = TestData.TIMESTAMP
@@ -125,14 +129,15 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         status = Status.PENDING,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-authorization/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-authorization/${response.id.value}/action",
                         walletAddress = walletAddress.rawValue,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        messageToSign = "Authorization message ID to sign: ${response.id}",
+                        messageToSign = "Authorization message ID to sign: ${response.id.value}",
                         signedMessage = null,
                         createdAt = response.createdAt
                     )
@@ -150,7 +155,8 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                     AuthorizationRequest(
                         id = response.id,
                         projectId = PROJECT_ID,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-authorization/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-authorization/${response.id.value}/action",
                         messageToSignOverride = null,
                         storeIndefinitely = true,
                         requestedWalletAddress = walletAddress,
@@ -209,14 +215,14 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         status = Status.PENDING,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         walletAddress = walletAddress.rawValue,
                         arbitraryData = response.arbitraryData,
                         screenConfig = ScreenConfig(
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        messageToSign = "Authorization message ID to sign: ${response.id}",
+                        messageToSign = "Authorization message ID to sign: ${response.id.value}",
                         signedMessage = null,
                         createdAt = response.createdAt
                     )
@@ -234,7 +240,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                     AuthorizationRequest(
                         id = response.id,
                         projectId = PROJECT_ID,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         messageToSignOverride = null,
                         storeIndefinitely = true,
                         requestedWalletAddress = walletAddress,
@@ -315,12 +321,12 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, AuthorizationRequestResponse::class.java)
         }
 
-        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+        val id = AuthorizationRequestId(UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73"))
 
         suppose("ID from pre-signed message is used in database") {
             dslContext.update(AuthorizationRequestTable)
                 .set(AuthorizationRequestTable.ID, id)
-                .set(AuthorizationRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .set(AuthorizationRequestTable.REDIRECT_URL, "https://example.com/${id.value}")
                 .where(AuthorizationRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
@@ -336,7 +342,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch authorization request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/wallet-authorization/$id")
+                MockMvcRequestBuilders.get("/v1/wallet-authorization/${id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -351,14 +357,14 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                         id = id,
                         projectId = PROJECT_ID,
                         status = Status.SUCCESS,
-                        redirectUrl = "https://example.com/$id",
+                        redirectUrl = "https://example.com/${id.value}",
                         walletAddress = walletAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
                         screenConfig = ScreenConfig(
                             beforeActionMessage = "before-action-message",
                             afterActionMessage = "after-action-message"
                         ),
-                        messageToSign = "Authorization message ID to sign: $id",
+                        messageToSign = "Authorization message ID to sign: ${id.value}",
                         signedMessage = signedMessage.value,
                         createdAt = fetchResponse.createdAt
                     )
@@ -399,12 +405,12 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
             objectMapper.readValue(createResponse.response.contentAsString, AuthorizationRequestResponse::class.java)
         }
 
-        val id = UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73")
+        val id = AuthorizationRequestId(UUID.fromString("7d86b0ac-a9a6-40fc-ac6d-2a29ca687f73"))
 
         suppose("ID from pre-signed message is used in database") {
             dslContext.update(AuthorizationRequestTable)
                 .set(AuthorizationRequestTable.ID, id)
-                .set(AuthorizationRequestTable.REDIRECT_URL, "https://example.com/$id")
+                .set(AuthorizationRequestTable.REDIRECT_URL, "https://example.com/${id.value}")
                 .where(AuthorizationRequestTable.ID.eq(createResponse.id))
                 .execute()
         }
@@ -420,7 +426,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch authorization requests by project ID is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/wallet-authorization/by-project/$PROJECT_ID")
+                MockMvcRequestBuilders.get("/v1/wallet-authorization/by-project/${PROJECT_ID.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -437,14 +443,14 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                                 id = id,
                                 projectId = PROJECT_ID,
                                 status = Status.SUCCESS,
-                                redirectUrl = "https://example.com/$id",
+                                redirectUrl = "https://example.com/${id.value}",
                                 walletAddress = walletAddress.rawValue,
                                 arbitraryData = createResponse.arbitraryData,
                                 screenConfig = ScreenConfig(
                                     beforeActionMessage = "before-action-message",
                                     afterActionMessage = "after-action-message"
                                 ),
-                                messageToSign = "Authorization message ID to sign: $id",
+                                messageToSign = "Authorization message ID to sign: ${id.value}",
                                 signedMessage = signedMessage.value,
                                 createdAt = fetchResponse.requests[0].createdAt
                             )
@@ -472,14 +478,14 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyAttachSignedMessage() {
-        val id = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
 
         suppose("some authorization request without signed message exists in database") {
             authorizationRequestRepository.store(
                 StoreAuthorizationRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     messageToSignOverride = null,
                     storeIndefinitely = true,
                     requestedWalletAddress = WalletAddress("b"),
@@ -498,7 +504,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach signed message to authorization request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/wallet-authorization/$id")
+                MockMvcRequestBuilders.put("/v1/wallet-authorization/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -525,7 +531,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustReturn400BadRequestWhenSignedMessageIsNotAttached() {
-        val id = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
         val walletAddress = WalletAddress("c")
         val signedMessage = SignedMessage("signed-message")
 
@@ -534,7 +540,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
                 StoreAuthorizationRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     messageToSignOverride = null,
                     storeIndefinitely = true,
                     requestedWalletAddress = WalletAddress("b"),
@@ -551,7 +557,7 @@ class AuthorizationRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned when attaching signed message") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/wallet-authorization/$id")
+                MockMvcRequestBuilders.put("/v1/wallet-authorization/${id.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """

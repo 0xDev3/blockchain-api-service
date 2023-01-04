@@ -28,4 +28,4 @@ include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyGetPromoCodesForAllo
 include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyGetPromoCodesForAllowedUser/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.features.promocodes.model.response.PromoCodesResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCodesResponse.adoc[]

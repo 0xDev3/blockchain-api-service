@@ -6,19 +6,24 @@ import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
+import dev3.blockchainapiservice.features.asset.multisend.model.params.CreateAssetMultiSendRequestParams
+import dev3.blockchainapiservice.features.asset.multisend.model.params.StoreAssetMultiSendRequestParams
+import dev3.blockchainapiservice.features.asset.multisend.model.result.AssetMultiSendRequest
+import dev3.blockchainapiservice.features.asset.multisend.repository.AssetMultiSendRequestRepository
+import dev3.blockchainapiservice.features.asset.multisend.service.AssetMultiSendRequestServiceImpl
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
+import dev3.blockchainapiservice.features.functions.encoding.service.FunctionEncoderService
+import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.CreateAssetMultiSendRequestParams
-import dev3.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
-import dev3.blockchainapiservice.model.result.AssetMultiSendRequest
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.AssetMultiSendRequestRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
-import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.PredefinedEvents
 import dev3.blockchainapiservice.util.Status
@@ -26,7 +31,6 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import java.math.BigInteger
 import java.util.UUID
@@ -35,8 +39,8 @@ class AssetMultiSendRequestServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -64,12 +68,12 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         private val TOTAL_TOKEN_AMOUNT = Balance(CREATE_PARAMS.assetAmounts.sumOf { it.rawValue })
         private val APPROVE_TX_HASH = TransactionHash("approve-tx-hash")
         private val DISPERSE_TX_HASH = TransactionHash("disperse-tx-hash")
-        private val ID = UUID.randomUUID()
+        private val ID = AssetMultiSendRequestId(UUID.randomUUID())
         private val STORE_PARAMS = StoreAssetMultiSendRequestParams(
             id = ID,
             projectId = PROJECT.id,
             chainId = PROJECT.chainId,
-            redirectUrl = CREATE_PARAMS.redirectUrl!!.replace("\${id}", ID.toString()),
+            redirectUrl = CREATE_PARAMS.redirectUrl!!.replace("\${id}", ID.value.toString()),
             tokenAddress = CREATE_PARAMS.tokenAddress,
             disperseContractAddress = CREATE_PARAMS.disperseContractAddress,
             assetAmounts = CREATE_PARAMS.assetAmounts,
@@ -139,8 +143,8 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(ID)
+            call(uuidProvider.getRawUuid())
+                .willReturn(ID.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -198,8 +202,8 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            call(uuidProvider.getUuid())
-                .willReturn(ID)
+            call(uuidProvider.getRawUuid())
+                .willReturn(ID.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -260,7 +264,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
 
         suppose("asset multi-send request does not exist in database") {
-            call(assetMultiSendRequestRepository.getById(any()))
+            call(assetMultiSendRequestRepository.getById(anyValueClass(AssetMultiSendRequestId(UUID.randomUUID()))))
                 .willReturn(null)
         }
 
@@ -277,7 +281,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
 
         verify("ResourceNotFoundException is thrown") {
             expectThrows<ResourceNotFoundException> {
-                service.getAssetMultiSendRequest(id = UUID.randomUUID())
+                service.getAssetMultiSendRequest(id = AssetMultiSendRequestId(UUID.randomUUID()))
             }
         }
     }
@@ -1772,7 +1776,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnEmptyListOfAssetMultiSendRequestsForNonExistentProject() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val service = AssetMultiSendRequestServiceImpl(
             functionEncoderService = mock(),
             assetMultiSendRequestRepository = mock(),
@@ -1848,7 +1852,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyAttachApproveTxInfo() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("approve txInfo will be successfully attached to the request") {
@@ -1879,7 +1883,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
     @Test
     fun mustThrowCannotAttachTxInfoExceptionWhenAttachingApproveTxInfoFails() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching approve txInfo will fail") {
@@ -1912,7 +1916,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
     @Test
     fun mustSuccessfullyDisperseApproveTxInfo() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("disperse txInfo will be successfully attached to the request") {
@@ -1943,7 +1947,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
     @Test
     fun mustThrowCannotAttachTxInfoExceptionWhenAttachingDisperseTxInfoFails() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching disperse txInfo will fail") {
@@ -1973,7 +1977,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         }
     }
 
-    private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
+    private fun projectRepositoryMock(projectId: ProjectId): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("some project will be returned") {
@@ -1981,7 +1985,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
                 .willReturn(
                     Project(
                         id = projectId,
-                        ownerId = UUID.randomUUID(),
+                        ownerId = UserId(UUID.randomUUID()),
                         issuerContractAddress = ContractAddress("dead"),
                         baseRedirectUrl = BaseUrl(""),
                         chainId = ChainId(0L),

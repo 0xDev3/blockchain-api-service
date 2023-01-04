@@ -2,11 +2,15 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.asset.multisend.model.result.MultiPaymentTemplate
+import dev3.blockchainapiservice.features.asset.multisend.model.result.MultiPaymentTemplateItem
+import dev3.blockchainapiservice.features.asset.multisend.model.result.WithItems
+import dev3.blockchainapiservice.features.asset.multisend.repository.JooqMultiPaymentTemplateRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
-import dev3.blockchainapiservice.model.result.MultiPaymentTemplate
-import dev3.blockchainapiservice.model.result.MultiPaymentTemplateItem
-import dev3.blockchainapiservice.model.result.WithItems
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
@@ -31,21 +35,21 @@ import kotlin.time.Duration.Companion.seconds
 class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
 
     companion object {
-        private val TEMPLATE_ID = UUID.randomUUID()
+        private val TEMPLATE_ID = MultiPaymentTemplateId(UUID.randomUUID())
         private const val TEMPLATE_NAME = "templateName"
         private val CHAIN_ID = ChainId(1337L)
         private val WALLET_ADDRESS = WalletAddress("a")
         private const val ITEM_NAME = "itemName"
         private val TOKEN_ADDRESS = ContractAddress("b")
         private val ASSET_AMOUNT = Balance(BigInteger.TEN)
-        private val OWNER_ID = UUID.randomUUID()
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val OWNER_ADDRESS = WalletAddress("cafebabe")
         private val TEMPLATE = MultiPaymentTemplate(
             id = TEMPLATE_ID,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = TEMPLATE_ID,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -199,7 +203,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         val newItem = MultiPaymentTemplateItem(
-            id = UUID.randomUUID(),
+            id = MultiPaymentTemplateItemId(UUID.randomUUID()),
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("abc"),
             itemName = "newItemName",
@@ -230,7 +234,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenAddingItemToNonExistentMultiPaymentTemplate() {
         val item = MultiPaymentTemplateItem(
-            id = UUID.randomUUID(),
+            id = MultiPaymentTemplateItemId(UUID.randomUUID()),
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("abc"),
             itemName = "newItemName",
@@ -319,7 +323,13 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenDeletingItemFromNonExistentMultiPaymentTemplate() {
         verify("null is returned when deleting item from non-existent multi-payment template") {
-            expectThat(repository.deleteItem(UUID.randomUUID(), UUID.randomUUID(), TestData.TIMESTAMP))
+            expectThat(
+                repository.deleteItem(
+                    templateId = MultiPaymentTemplateId(UUID.randomUUID()),
+                    itemId = MultiPaymentTemplateItemId(UUID.randomUUID()),
+                    updatedAt = TestData.TIMESTAMP
+                )
+            )
                 .isNull()
         }
     }

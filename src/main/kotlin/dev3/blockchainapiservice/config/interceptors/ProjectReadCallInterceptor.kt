@@ -4,14 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.exception.ErrorResponse
-import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.UserIdResolverRepository
+import dev3.blockchainapiservice.features.api.usage.repository.ApiRateLimitRepository
+import dev3.blockchainapiservice.features.api.usage.repository.UserIdResolverRepository
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import mu.KLogging
 import org.springframework.http.HttpStatus
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
-import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -72,7 +72,7 @@ class ProjectReadCallInterceptor(
     private fun handleAnnotatedMethod(
         request: HttpServletRequest,
         handler: Any,
-        handle: (UUID, ApiReadLimitedMapping) -> Boolean
+        handle: (UserId, ApiReadLimitedMapping) -> Boolean
     ): Boolean {
         val annotation = (handler as? HandlerMethod)?.method?.getAnnotation(ApiReadLimitedMapping::class.java)
 

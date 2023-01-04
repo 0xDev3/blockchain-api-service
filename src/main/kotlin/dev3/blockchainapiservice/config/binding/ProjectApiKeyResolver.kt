@@ -3,9 +3,9 @@ package dev3.blockchainapiservice.config.binding
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.exception.NonExistentApiKeyException
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ApiKeyRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ApiKeyRepository
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
 import org.springframework.core.MethodParameter
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest

@@ -31,7 +31,7 @@ All request body parameters are optional and their default values are:
 include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyGeneratePromoCodeForAllowedUserWithSomeParameters/http-request.adoc[]
 ====
 .Request Schema
-include::{snippets}/dev3.blockchainapiservice.features.promocodes.model.request.GeneratePromoCodeRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.api.promocodes.model.request.GeneratePromoCodeRequest.adoc[]
 
 .Response Example
 [%collapsible]
@@ -39,4 +39,4 @@ include::{snippets}/dev3.blockchainapiservice.features.promocodes.model.request.
 include::{snippets}/PromoCodeControllerApiTest/mustCorrectlyGeneratePromoCodeForAllowedUserWithSomeParameters/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.features.promocodes.model.response.PromoCodeResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCodeResponse.adoc[]

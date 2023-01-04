@@ -3,15 +3,19 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.wallet.authorization.controller.AuthorizationRequestController
+import dev3.blockchainapiservice.features.wallet.authorization.model.params.CreateAuthorizationRequestParams
+import dev3.blockchainapiservice.features.wallet.authorization.model.request.CreateAuthorizationRequest
+import dev3.blockchainapiservice.features.wallet.authorization.model.response.AuthorizationRequestResponse
+import dev3.blockchainapiservice.features.wallet.authorization.model.response.AuthorizationRequestsResponse
+import dev3.blockchainapiservice.features.wallet.authorization.model.result.AuthorizationRequest
+import dev3.blockchainapiservice.features.wallet.authorization.service.AuthorizationRequestService
+import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.CreateAuthorizationRequestParams
 import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
-import dev3.blockchainapiservice.model.request.CreateAuthorizationRequest
-import dev3.blockchainapiservice.model.response.AuthorizationRequestResponse
-import dev3.blockchainapiservice.model.response.AuthorizationRequestsResponse
-import dev3.blockchainapiservice.model.result.AuthorizationRequest
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.service.AuthorizationRequestService
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
@@ -40,8 +44,8 @@ class AuthorizationRequestControllerTest : TestBase() {
             )
         )
         val result = AuthorizationRequest(
-            id = UUID.randomUUID(),
-            projectId = UUID.randomUUID(),
+            id = AuthorizationRequestId(UUID.randomUUID()),
+            projectId = ProjectId(UUID.randomUUID()),
             redirectUrl = params.redirectUrl!!,
             messageToSignOverride = params.messageToSign,
             storeIndefinitely = params.storeIndefinitely,
@@ -54,7 +58,7 @@ class AuthorizationRequestControllerTest : TestBase() {
         )
         val project = Project(
             id = result.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -106,12 +110,12 @@ class AuthorizationRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAuthorizationRequest() {
-        val id = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
         val service = mock<AuthorizationRequestService>()
         val result = WithStatus(
             value = AuthorizationRequest(
                 id = id,
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 redirectUrl = "redirect-url",
                 messageToSignOverride = "message-to-sign-override",
                 storeIndefinitely = true,
@@ -162,8 +166,8 @@ class AuthorizationRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAuthorizationRequestsByProjectId() {
-        val id = UUID.randomUUID()
-        val projectId = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
+        val projectId = ProjectId(UUID.randomUUID())
         val service = mock<AuthorizationRequestService>()
         val result =
             WithStatus(
@@ -227,7 +231,7 @@ class AuthorizationRequestControllerTest : TestBase() {
         val service = mock<AuthorizationRequestService>()
         val controller = AuthorizationRequestController(service)
 
-        val id = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
         val walletAddress = WalletAddress("abc")
         val signedMessage = SignedMessage("signed-message")
 

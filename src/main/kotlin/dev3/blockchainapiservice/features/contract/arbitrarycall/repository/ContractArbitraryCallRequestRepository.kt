@@ -3,17 +3,18 @@ package dev3.blockchainapiservice.features.contract.arbitrarycall.repository
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.filters.ContractArbitraryCallRequestFilters
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.StoreContractArbitraryCallRequestParams
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.result.ContractArbitraryCallRequest
+import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import java.util.UUID
 
 interface ContractArbitraryCallRequestRepository {
     fun store(params: StoreContractArbitraryCallRequestParams): ContractArbitraryCallRequest
-    fun getById(id: UUID): ContractArbitraryCallRequest?
+    fun getById(id: ContractArbitraryCallRequestId): ContractArbitraryCallRequest?
     fun getAllByProjectId(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractArbitraryCallRequestFilters
     ): List<ContractArbitraryCallRequest>
 
-    fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean
+    fun setTxInfo(id: ContractArbitraryCallRequestId, txHash: TransactionHash, caller: WalletAddress): Boolean
 }

@@ -1,6 +1,10 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentTransactionCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchAccountBalanceCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchErc20AccountBalanceCacheId
+import dev3.blockchainapiservice.generated.jooq.id.FetchTransactionInfoCacheId
 import dev3.blockchainapiservice.model.EventLog
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
@@ -9,12 +13,11 @@ import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import java.util.UUID
 
 interface Web3jBlockchainServiceCacheRepository {
-    fun cacheFetchAccountBalance(id: UUID, chainSpec: ChainSpec, accountBalance: AccountBalance)
+    fun cacheFetchAccountBalance(id: FetchAccountBalanceCacheId, chainSpec: ChainSpec, accountBalance: AccountBalance)
     fun cacheFetchErc20AccountBalance(
-        id: UUID,
+        id: FetchErc20AccountBalanceCacheId,
         chainSpec: ChainSpec,
         contractAddress: ContractAddress,
         accountBalance: AccountBalance
@@ -22,7 +25,7 @@ interface Web3jBlockchainServiceCacheRepository {
 
     @Suppress("LongParameterList")
     fun cacheFetchTransactionInfo(
-        id: UUID,
+        id: FetchTransactionInfoCacheId,
         chainSpec: ChainSpec,
         txHash: TransactionHash,
         blockNumber: BlockNumber,
@@ -31,7 +34,7 @@ interface Web3jBlockchainServiceCacheRepository {
     )
 
     fun cacheContractDeploymentTransaction(
-        id: UUID,
+        id: ContractDeploymentTransactionCacheId,
         chainSpec: ChainSpec,
         contractAddress: ContractAddress,
         contractDeploymentTransactionInfo: ContractDeploymentTransactionInfo,
