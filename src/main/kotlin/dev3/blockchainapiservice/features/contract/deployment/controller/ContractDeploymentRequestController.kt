@@ -5,6 +5,7 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMa
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.MaxStringSize
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.deployment.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.features.contract.deployment.model.params.CreateContractDeploymentRequestParams
 import dev3.blockchainapiservice.features.contract.deployment.model.request.CreateContractDeploymentRequest
@@ -16,7 +17,6 @@ import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.filters.OrList
 import dev3.blockchainapiservice.model.filters.parseOrListWithNestedAndLists
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
 import dev3.blockchainapiservice.util.InterfaceId

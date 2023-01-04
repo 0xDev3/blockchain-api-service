@@ -15,6 +15,7 @@ import dev3.blockchainapiservice.features.contract.deployment.model.json.Manifes
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.features.contract.deployment.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.features.contract.interfaces.model.result.MatchingContractInterfaces
 import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
@@ -22,7 +23,6 @@ import dev3.blockchainapiservice.features.contract.interfaces.service.ContractIn
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData

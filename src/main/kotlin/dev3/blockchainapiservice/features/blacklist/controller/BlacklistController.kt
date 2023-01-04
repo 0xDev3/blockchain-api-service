@@ -2,9 +2,9 @@ package dev3.blockchainapiservice.features.blacklist.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.features.api.access.model.result.UserIdentifier
 import dev3.blockchainapiservice.features.blacklist.model.response.BlacklistedAddressesResponse
 import dev3.blockchainapiservice.features.blacklist.service.BlacklistService
-import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated

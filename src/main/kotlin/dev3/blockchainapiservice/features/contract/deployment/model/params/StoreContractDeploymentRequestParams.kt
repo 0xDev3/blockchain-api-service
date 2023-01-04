@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.features.contract.deployment.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.features.contract.importing.model.params.ImportContractParams
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
@@ -11,7 +12,6 @@ import dev3.blockchainapiservice.model.params.ParamsFactory
 import dev3.blockchainapiservice.model.result.ContractBinaryInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress

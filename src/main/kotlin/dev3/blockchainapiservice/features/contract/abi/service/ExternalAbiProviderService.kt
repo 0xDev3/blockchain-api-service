@@ -17,7 +17,7 @@ import dev3.blockchainapiservice.features.contract.deployment.model.json.Functio
 import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
 import dev3.blockchainapiservice.features.contract.deployment.model.json.ReturnTypeDecorator
 import dev3.blockchainapiservice.features.contract.deployment.model.json.TypeDecorator
-import dev3.blockchainapiservice.model.json.DecompiledContractJson
+import dev3.blockchainapiservice.features.contract.importing.model.json.DecompiledContractJson
 import dev3.blockchainapiservice.util.ContractAddress
 import mu.KLogging
 import org.springframework.stereotype.Service

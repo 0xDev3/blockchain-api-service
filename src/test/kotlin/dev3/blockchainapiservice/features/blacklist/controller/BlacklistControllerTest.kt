@@ -2,10 +2,10 @@ package dev3.blockchainapiservice.features.blacklist.controller
 
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.features.blacklist.model.response.BlacklistedAddressesResponse
 import dev3.blockchainapiservice.features.blacklist.service.BlacklistService
 import dev3.blockchainapiservice.generated.jooq.id.UserId
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.util.WalletAddress
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock

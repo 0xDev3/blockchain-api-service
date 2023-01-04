@@ -2,8 +2,8 @@ package dev3.blockchainapiservice.config.interceptors
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
+import dev3.blockchainapiservice.features.api.usage.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.generated.jooq.id.UserId
-import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.springframework.web.servlet.HandlerMapping

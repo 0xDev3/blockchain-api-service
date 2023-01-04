@@ -3,6 +3,8 @@ package dev3.blockchainapiservice.features.contract.deployment.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
 import dev3.blockchainapiservice.features.contract.deployment.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.features.contract.deployment.model.params.CreateContractDeploymentRequestParams
 import dev3.blockchainapiservice.features.contract.deployment.model.params.PreStoreContractDeploymentRequestParams
@@ -10,14 +12,12 @@ import dev3.blockchainapiservice.features.contract.deployment.model.params.Store
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.features.contract.deployment.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.features.functions.encoding.service.FunctionEncoderService
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.service.EthCommonService
 import dev3.blockchainapiservice.util.Constants
 import dev3.blockchainapiservice.util.ContractAddress

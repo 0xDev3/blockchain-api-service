@@ -5,6 +5,7 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.ReadonlyFunctionCallsContract
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.deployment.model.params.StoreContractDeploymentRequestParams
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.features.contract.readcall.model.response.ReadonlyFunctionCallResponse
@@ -19,7 +20,6 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataR
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl

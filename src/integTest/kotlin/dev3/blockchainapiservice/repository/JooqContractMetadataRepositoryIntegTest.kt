@@ -1,6 +1,7 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.features.contract.deployment.repository.JooqContractMetadataRepository
 import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.ContractMetadataTable

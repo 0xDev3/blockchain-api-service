@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.features.contract.deployment.service
 
 import dev3.blockchainapiservice.exception.ContractNotYetDeployedException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractAddressIdentifier
 import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractAliasIdentifier
 import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdIdentifier
@@ -9,7 +10,6 @@ import dev3.blockchainapiservice.features.contract.deployment.model.params.Deplo
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.service.EthCommonService
 import dev3.blockchainapiservice.util.ContractAddress
 import mu.KLogging

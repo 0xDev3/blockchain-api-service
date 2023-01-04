@@ -6,6 +6,7 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMa
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.features.contract.deployment.service.ContractDeploymentRequestService
 import dev3.blockchainapiservice.features.contract.importing.model.params.ImportContractParams
@@ -16,7 +17,6 @@ import dev3.blockchainapiservice.features.contract.interfaces.model.request.Impo
 import dev3.blockchainapiservice.features.contract.interfaces.model.response.SuggestedContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.features.contract.interfaces.service.ContractInterfacesService
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.InterfaceId

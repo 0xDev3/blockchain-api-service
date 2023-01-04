@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.features.contract.arbitrarycall.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
 import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.filters.ContractArbitraryCallRequestFilters
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.CreateContractArbitraryCallRequestParams
@@ -17,8 +19,6 @@ import dev3.blockchainapiservice.features.functions.decoding.service.FunctionDec
 import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.service.EthCommonService
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash

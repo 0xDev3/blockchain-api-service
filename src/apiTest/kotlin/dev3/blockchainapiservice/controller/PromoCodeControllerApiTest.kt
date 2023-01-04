@@ -3,6 +3,8 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.api.access.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCodeResponse
 import dev3.blockchainapiservice.features.api.promocodes.model.response.PromoCodesResponse
 import dev3.blockchainapiservice.features.api.promocodes.model.result.PromoCode
@@ -11,8 +13,6 @@ import dev3.blockchainapiservice.features.api.usage.model.result.ApiUsagePeriod
 import dev3.blockchainapiservice.features.api.usage.model.result.RequestUsage
 import dev3.blockchainapiservice.features.api.usage.repository.ApiRateLimitRepository
 import dev3.blockchainapiservice.generated.jooq.id.UserId
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import dev3.blockchainapiservice.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.security.WithMockUser
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.UtcDateTime

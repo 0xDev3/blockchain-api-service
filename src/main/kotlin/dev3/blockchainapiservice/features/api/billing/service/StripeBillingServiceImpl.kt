@@ -21,6 +21,8 @@ import dev3.blockchainapiservice.exception.CustomerNotYetCreatedException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.exception.SubscriptionAlreadyActiveException
 import dev3.blockchainapiservice.exception.WebhookException
+import dev3.blockchainapiservice.features.api.access.model.result.UserIdentifier
+import dev3.blockchainapiservice.features.api.access.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.features.api.billing.model.request.CreateSubscriptionRequest
 import dev3.blockchainapiservice.features.api.billing.model.response.AvailableSubscriptionResponse
 import dev3.blockchainapiservice.features.api.billing.model.response.IntervalType
@@ -30,8 +32,6 @@ import dev3.blockchainapiservice.features.api.billing.model.response.Subscriptio
 import dev3.blockchainapiservice.features.api.usage.model.result.ApiUsageLimit
 import dev3.blockchainapiservice.features.api.usage.repository.ApiRateLimitRepository
 import dev3.blockchainapiservice.generated.jooq.id.UserId
-import dev3.blockchainapiservice.model.result.UserIdentifier
-import dev3.blockchainapiservice.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.UtcDateTime
 import mu.KLogging

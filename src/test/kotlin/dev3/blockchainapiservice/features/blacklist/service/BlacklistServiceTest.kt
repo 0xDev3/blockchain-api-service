@@ -3,9 +3,9 @@ package dev3.blockchainapiservice.features.blacklist.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.AdminProperties
 import dev3.blockchainapiservice.exception.AccessForbiddenException
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
 import dev3.blockchainapiservice.generated.jooq.id.UserId
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.util.WalletAddress
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock

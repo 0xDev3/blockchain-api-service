@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.asset.balance.controller.AssetBalanceRequestController
 import dev3.blockchainapiservice.features.asset.balance.model.params.CreateAssetBalanceRequestParams
 import dev3.blockchainapiservice.features.asset.balance.model.request.CreateAssetBalanceRequest
@@ -17,7 +18,6 @@ import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.AccountBalance
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.Balance

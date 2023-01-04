@@ -4,6 +4,7 @@ import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
 import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
@@ -26,7 +27,6 @@ import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId

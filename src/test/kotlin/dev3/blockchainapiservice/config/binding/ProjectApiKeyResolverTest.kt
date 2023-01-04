@@ -5,13 +5,13 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.exception.NonExistentApiKeyException
+import dev3.blockchainapiservice.features.api.access.model.result.ApiKey
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ApiKeyRepository
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
 import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
-import dev3.blockchainapiservice.model.result.ApiKey
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ApiKeyRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress

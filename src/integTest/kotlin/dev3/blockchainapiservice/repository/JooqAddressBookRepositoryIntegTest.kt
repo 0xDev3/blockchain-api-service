@@ -3,12 +3,13 @@ package dev3.blockchainapiservice.repository
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.AliasAlreadyInUseException
+import dev3.blockchainapiservice.features.wallet.addressbook.model.result.AddressBookEntry
+import dev3.blockchainapiservice.features.wallet.addressbook.repository.JooqAddressBookRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.AddressBookRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
-import dev3.blockchainapiservice.model.result.AddressBookEntry
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.WalletAddress
 import org.jooq.DSLContext

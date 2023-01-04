@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.readcall.model.params.CreateReadonlyFunctionCallParams
 import dev3.blockchainapiservice.features.contract.readcall.model.request.ReadonlyFunctionCallRequest
 import dev3.blockchainapiservice.features.contract.readcall.model.response.ReadonlyFunctionCallResponse
 import dev3.blockchainapiservice.features.contract.readcall.service.ContractReadonlyFunctionCallService
-import dev3.blockchainapiservice.model.result.Project
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.RequestBody

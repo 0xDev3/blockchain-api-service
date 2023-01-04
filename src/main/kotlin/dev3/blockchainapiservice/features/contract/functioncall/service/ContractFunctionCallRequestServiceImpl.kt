@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.features.contract.functioncall.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
 import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
@@ -18,8 +20,6 @@ import dev3.blockchainapiservice.features.functions.encoding.service.FunctionEnc
 import dev3.blockchainapiservice.generated.jooq.id.ContractFunctionCallRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.service.EthCommonService
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.Status

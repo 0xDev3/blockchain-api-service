@@ -3,12 +3,13 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.wallet.addressbook.model.request.CreateOrUpdateAddressBookEntryRequest
+import dev3.blockchainapiservice.features.wallet.addressbook.model.result.AddressBookEntry
+import dev3.blockchainapiservice.features.wallet.addressbook.repository.AddressBookRepository
+import dev3.blockchainapiservice.features.wallet.addressbook.service.AddressBookServiceImpl
 import dev3.blockchainapiservice.generated.jooq.id.AddressBookId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
-import dev3.blockchainapiservice.model.request.CreateOrUpdateAddressBookEntryRequest
-import dev3.blockchainapiservice.model.result.AddressBookEntry
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import dev3.blockchainapiservice.repository.AddressBookRepository
 import dev3.blockchainapiservice.util.WalletAddress
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock

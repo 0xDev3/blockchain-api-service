@@ -4,6 +4,7 @@ import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.asset.lock.model.params.CreateErc20LockRequestParams
 import dev3.blockchainapiservice.features.asset.lock.model.request.CreateErc20LockRequest
 import dev3.blockchainapiservice.features.asset.lock.model.response.Erc20LockRequestResponse
@@ -12,7 +13,6 @@ import dev3.blockchainapiservice.features.asset.lock.service.Erc20LockRequestSer
 import dev3.blockchainapiservice.generated.jooq.id.Erc20LockRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity

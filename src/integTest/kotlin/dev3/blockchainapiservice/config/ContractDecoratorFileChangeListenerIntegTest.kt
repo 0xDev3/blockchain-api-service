@@ -10,11 +10,11 @@ import dev3.blockchainapiservice.features.contract.deployment.model.result.Contr
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractFunction
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractParameter
 import dev3.blockchainapiservice.features.contract.deployment.model.result.EventParameter
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.features.contract.deployment.repository.InMemoryContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.JooqContractMetadataRepository
 import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.features.contract.interfaces.repository.InMemoryContractInterfacesRepository
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
-import dev3.blockchainapiservice.repository.JooqContractMetadataRepository
 import dev3.blockchainapiservice.service.RandomUuidProvider
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Constants

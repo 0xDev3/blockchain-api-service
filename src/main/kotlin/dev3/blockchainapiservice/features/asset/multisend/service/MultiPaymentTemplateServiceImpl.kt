@@ -1,6 +1,7 @@
 package dev3.blockchainapiservice.features.asset.multisend.service
 
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.api.access.model.result.UserIdentifier
 import dev3.blockchainapiservice.features.asset.multisend.model.request.CreateMultiPaymentTemplateRequest
 import dev3.blockchainapiservice.features.asset.multisend.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.features.asset.multisend.model.request.UpdateMultiPaymentTemplateRequest
@@ -11,7 +12,6 @@ import dev3.blockchainapiservice.features.asset.multisend.model.result.WithItems
 import dev3.blockchainapiservice.features.asset.multisend.repository.MultiPaymentTemplateRepository
 import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
 import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
-import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.util.Balance

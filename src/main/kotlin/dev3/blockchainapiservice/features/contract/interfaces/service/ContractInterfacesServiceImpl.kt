@@ -5,12 +5,12 @@ import dev3.blockchainapiservice.features.contract.deployment.model.json.Interfa
 import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
 import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.features.contract.deployment.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.features.contract.interfaces.model.result.MatchingContractInterfaces
 import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.util.InterfaceId
 import mu.KLogging
 import org.springframework.stereotype.Service

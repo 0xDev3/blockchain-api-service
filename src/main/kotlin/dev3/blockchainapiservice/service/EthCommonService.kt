@@ -1,9 +1,9 @@
 package dev3.blockchainapiservice.service
 
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.params.ParamsFactory
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.TransactionHash
 
