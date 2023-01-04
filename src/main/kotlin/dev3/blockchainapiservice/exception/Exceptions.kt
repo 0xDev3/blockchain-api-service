@@ -1,8 +1,8 @@
 package dev3.blockchainapiservice.exception
 
+import dev3.blockchainapiservice.features.contract.abi.model.AbiType
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
-import dev3.blockchainapiservice.util.AbiType
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractId

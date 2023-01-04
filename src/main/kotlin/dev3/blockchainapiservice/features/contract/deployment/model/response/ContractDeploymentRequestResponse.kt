@@ -3,12 +3,12 @@ package dev3.blockchainapiservice.features.contract.deployment.model.response
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.JsonNode
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgumentSchema
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.util.FunctionArgumentSchema
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.WithTransactionData

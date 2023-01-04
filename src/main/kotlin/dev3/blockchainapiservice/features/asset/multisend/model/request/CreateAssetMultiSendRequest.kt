@@ -7,7 +7,6 @@ import dev3.blockchainapiservice.config.validation.ValidEthAddress
 import dev3.blockchainapiservice.exception.MissingTokenAddressException
 import dev3.blockchainapiservice.exception.TokenAddressNotAllowedException
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest
 import dev3.blockchainapiservice.util.AssetType
 import javax.validation.Valid
 import javax.validation.constraints.NotNull

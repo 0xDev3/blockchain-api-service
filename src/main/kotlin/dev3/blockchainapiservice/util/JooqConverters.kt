@@ -3,12 +3,12 @@
 package dev3.blockchainapiservice.util
 
 import dev3.blockchainapiservice.config.JsonConfig
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
 import dev3.blockchainapiservice.features.payout.util.HashFunction
 import dev3.blockchainapiservice.features.payout.util.SnapshotFailureCause
 import dev3.blockchainapiservice.features.payout.util.SnapshotStatus
 import dev3.blockchainapiservice.generated.jooq.converters.converter
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.ManifestJson
 import org.jooq.JSON
 import java.math.BigInteger
 import java.time.OffsetDateTime

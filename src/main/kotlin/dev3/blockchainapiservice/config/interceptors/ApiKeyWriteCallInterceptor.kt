@@ -6,9 +6,9 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedM
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.exception.ErrorResponse
+import dev3.blockchainapiservice.features.api.usage.repository.ApiRateLimitRepository
 import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.repository.ApiKeyRepository
-import dev3.blockchainapiservice.repository.ApiRateLimitRepository
 import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import mu.KLogging

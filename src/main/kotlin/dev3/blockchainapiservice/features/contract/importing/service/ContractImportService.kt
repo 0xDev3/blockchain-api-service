@@ -1,9 +1,9 @@
 package dev3.blockchainapiservice.features.contract.importing.service
 
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
 import dev3.blockchainapiservice.features.contract.importing.model.params.ImportContractParams
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
-import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.ContractAddress
 

@@ -1,8 +1,8 @@
 package dev3.blockchainapiservice.features.contract.interfaces.repository
 
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.features.contract.interfaces.model.filters.ContractInterfaceFilters
-import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.util.InterfaceId
 
 interface ContractInterfacesRepository {

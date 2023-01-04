@@ -11,6 +11,7 @@ import dev3.blockchainapiservice.features.contract.deployment.model.response.Con
 import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestsResponse
 import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.features.contract.deployment.service.ContractDeploymentRequestService
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.id.UserId
@@ -27,7 +28,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
-import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.InterfaceId
 import dev3.blockchainapiservice.util.Status

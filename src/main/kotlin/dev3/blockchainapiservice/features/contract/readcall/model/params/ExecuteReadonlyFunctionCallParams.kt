@@ -3,7 +3,7 @@ package dev3.blockchainapiservice.features.contract.readcall.model.params
 import com.fasterxml.jackson.databind.JsonNode
 import dev3.blockchainapiservice.config.validation.MaxJsonNodeChars
 import dev3.blockchainapiservice.config.validation.ValidationConstants
-import dev3.blockchainapiservice.util.AbiType
+import dev3.blockchainapiservice.features.contract.abi.model.AbiType
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.WalletAddress

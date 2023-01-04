@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
 import dev3.blockchainapiservice.util.SizedStaticArray
 import org.web3j.abi.datatypes.Bytes
 import org.web3j.abi.datatypes.DynamicArray

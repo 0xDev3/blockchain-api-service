@@ -3,7 +3,7 @@ package dev3.blockchainapiservice.util.json
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.JsonSerializer
 import com.fasterxml.jackson.databind.SerializerProvider
-import dev3.blockchainapiservice.util.Tuple
+import dev3.blockchainapiservice.features.contract.abi.model.Tuple
 
 class TupleSerializer : JsonSerializer<Tuple>() {
     override fun serialize(value: Tuple, gen: JsonGenerator, serializers: SerializerProvider) {

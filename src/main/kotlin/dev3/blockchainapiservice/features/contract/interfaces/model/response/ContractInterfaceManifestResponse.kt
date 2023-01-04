@@ -1,9 +1,9 @@
 package dev3.blockchainapiservice.features.contract.interfaces.model.response
 
-import dev3.blockchainapiservice.model.json.EventDecorator
-import dev3.blockchainapiservice.model.json.FunctionDecorator
-import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.features.contract.deployment.model.json.EventDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.FunctionDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.util.InterfaceId
 
 data class ContractInterfaceManifestResponse(

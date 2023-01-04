@@ -11,9 +11,9 @@ import dev3.blockchainapiservice.config.ContractManifestServiceProperties
 import dev3.blockchainapiservice.config.IpfsProperties
 import dev3.blockchainapiservice.config.WebConfig
 import dev3.blockchainapiservice.exception.IpfsUploadFailedException
+import dev3.blockchainapiservice.features.api.usage.repository.ApiRateLimitRepository
 import dev3.blockchainapiservice.features.payout.util.IpfsHash
 import dev3.blockchainapiservice.repository.ApiKeyRepository
-import dev3.blockchainapiservice.repository.ApiRateLimitRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.repository.UserIdentifierRepository

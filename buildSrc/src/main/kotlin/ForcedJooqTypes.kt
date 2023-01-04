@@ -69,13 +69,13 @@ object ForcedJooqTypes {
             includeTypes = "VARCHAR"
         ),
         JooqType(
-            userType = "dev3.blockchainapiservice.model.json.ManifestJson",
+            userType = "dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson",
             converter = "dev3.blockchainapiservice.util.ManifestJsonConverter",
             includeExpression = "manifest_json",
             includeTypes = "JSON"
         ),
         JooqType(
-            userType = "dev3.blockchainapiservice.model.json.ArtifactJson",
+            userType = "dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson",
             converter = "dev3.blockchainapiservice.util.ArtifactJsonConverter",
             includeExpression = "artifact_json",
             includeTypes = "JSON"

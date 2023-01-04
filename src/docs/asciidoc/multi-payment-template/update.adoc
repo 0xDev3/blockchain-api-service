@@ -18,6 +18,6 @@ include::{snippets}/MultiPaymentTemplateControllerApiTest/mustCorrectlyUpdateMul
 Schemas:
 
 .Request Schema
-include::{snippets}/dev3.blockchainapiservice.model.request.UpdateMultiPaymentTemplateRequest.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.asset.multisend.model.request.UpdateMultiPaymentTemplateRequest.adoc[]
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.features.asset.multisend.model.response.MultiPaymentTemplateWithItemsResponse.adoc[]

@@ -2,8 +2,8 @@ package dev3.blockchainapiservice.bugfixes
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.JsonConfig
-import dev3.blockchainapiservice.service.EthereumFunctionEncoderService
-import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
+import dev3.blockchainapiservice.features.functions.encoding.service.EthereumFunctionEncoderService
 import org.junit.jupiter.api.Test
 
 class FunctionArgumentEncodingBugfixes : TestBase() {

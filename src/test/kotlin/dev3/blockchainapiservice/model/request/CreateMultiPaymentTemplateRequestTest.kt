@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.model.request
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.validation.ValidationConstants
+import dev3.blockchainapiservice.features.asset.multisend.model.request.CreateMultiPaymentTemplateRequest
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.WalletAddress
 import org.junit.jupiter.api.AfterAll

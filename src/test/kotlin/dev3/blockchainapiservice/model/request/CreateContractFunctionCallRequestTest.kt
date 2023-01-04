@@ -6,8 +6,8 @@ import dev3.blockchainapiservice.config.validation.ValidationConstants
 import dev3.blockchainapiservice.config.validation.ValidationConstants.FUNCTION_ARGUMENT_MAX_JSON_CHARS
 import dev3.blockchainapiservice.config.validation.ValidationConstants.REQUEST_BODY_MAX_JSON_CHARS
 import dev3.blockchainapiservice.features.contract.functioncall.model.request.CreateContractFunctionCallRequest
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.JsonNodeConverter
 import dev3.blockchainapiservice.util.WalletAddress
 import org.jooq.JSON
