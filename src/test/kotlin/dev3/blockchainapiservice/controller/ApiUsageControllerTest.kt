@@ -3,12 +3,15 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.model.response.ApiUsagePeriodResponse
-import dev3.blockchainapiservice.model.result.ApiUsagePeriod
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.model.result.RequestUsage
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import dev3.blockchainapiservice.repository.ApiRateLimitRepository
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.api.usage.controller.ApiUsageController
+import dev3.blockchainapiservice.features.api.usage.model.response.ApiUsagePeriodResponse
+import dev3.blockchainapiservice.features.api.usage.model.result.ApiUsagePeriod
+import dev3.blockchainapiservice.features.api.usage.model.result.RequestUsage
+import dev3.blockchainapiservice.features.api.usage.repository.ApiRateLimitRepository
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ContractAddress
@@ -23,12 +26,12 @@ class ApiUsageControllerTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = USER_IDENTIFIER.id,
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),

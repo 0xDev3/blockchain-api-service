@@ -3,44 +3,18 @@
 package dev3.blockchainapiservice.util
 
 import dev3.blockchainapiservice.config.JsonConfig
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
 import dev3.blockchainapiservice.features.payout.util.HashFunction
 import dev3.blockchainapiservice.features.payout.util.SnapshotFailureCause
 import dev3.blockchainapiservice.features.payout.util.SnapshotStatus
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.ManifestJson
-import org.jooq.Converter
+import dev3.blockchainapiservice.generated.jooq.converters.converter
 import org.jooq.JSON
 import java.math.BigInteger
 import java.time.OffsetDateTime
 import dev3.blockchainapiservice.generated.jooq.enums.HashFunction as DbHashFunction
 import dev3.blockchainapiservice.generated.jooq.enums.SnapshotFailureCause as DbSnapshotFailureCause
 import dev3.blockchainapiservice.generated.jooq.enums.SnapshotStatus as DbSnapshotStatus
-
-private class KotlinConverter<T : Any, U : Any>(
-    val from: Class<T>,
-    val to: Class<U>,
-    val fromMapping: (T) -> U?,
-    val toMapping: (U) -> T?
-) : Converter<T, U> {
-    override fun from(value: T?): U? = value?.let { fromMapping(it) }
-    override fun to(value: U?): T? = value?.let { toMapping(it) }
-    override fun fromType(): Class<T> = from
-    override fun toType(): Class<U> = to
-
-    companion object {
-        private const val serialVersionUID: Long = 7668375669351902507L
-    }
-}
-
-private inline fun <reified T : Any, reified U : Any> converter(
-    noinline fromMapping: (T) -> U?,
-    noinline toMapping: (U) -> T?
-): Converter<T, U> = KotlinConverter(
-    from = T::class.java,
-    to = U::class.java,
-    fromMapping = fromMapping,
-    toMapping = toMapping
-)
 
 private val objectMapper = JsonConfig().objectMapper()
 

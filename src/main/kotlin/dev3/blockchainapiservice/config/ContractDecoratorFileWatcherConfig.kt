@@ -1,9 +1,9 @@
 package dev3.blockchainapiservice.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import dev3.blockchainapiservice.repository.ContractDecoratorRepository
-import dev3.blockchainapiservice.repository.ContractInterfacesRepository
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
+import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.service.UuidProvider
 import mu.KLogging
 import org.springframework.boot.devtools.filewatch.FileSystemWatcher

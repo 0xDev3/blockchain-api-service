@@ -3,15 +3,18 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ErrorCode
-import dev3.blockchainapiservice.model.response.ApiKeyResponse
-import dev3.blockchainapiservice.model.response.ProjectResponse
-import dev3.blockchainapiservice.model.response.ProjectsResponse
-import dev3.blockchainapiservice.model.result.ApiKey
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import dev3.blockchainapiservice.repository.ApiKeyRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
-import dev3.blockchainapiservice.repository.UserIdentifierRepository
+import dev3.blockchainapiservice.features.api.access.model.response.ApiKeyResponse
+import dev3.blockchainapiservice.features.api.access.model.response.ProjectResponse
+import dev3.blockchainapiservice.features.api.access.model.response.ProjectsResponse
+import dev3.blockchainapiservice.features.api.access.model.result.ApiKey
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.api.access.repository.ApiKeyRepository
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
+import dev3.blockchainapiservice.features.api.access.repository.UserIdentifierRepository
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.security.WithMockUser
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.BaseUrl
@@ -129,7 +132,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser
     fun mustCorrectlyReturnProjectById() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
@@ -139,7 +142,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -154,7 +157,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch project is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/projects/${project.id}")
+                MockMvcRequestBuilders.get("/v1/projects/${project.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -201,7 +204,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser
     fun mustReturn404NotFoundForNonOwnedProjectId() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("0cafe0babe")
         )
@@ -211,7 +214,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -226,7 +229,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-existent project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/projects/${project.id}")
+                MockMvcRequestBuilders.get("/v1/projects/${project.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -239,7 +242,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser
     fun mustCorrectlyReturnProjectByIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
@@ -249,7 +252,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -313,7 +316,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser
     fun mustReturn404NotFoundForNonOwnedProjectIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("0cafe0babe")
         )
@@ -323,7 +326,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -353,7 +356,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser
     fun mustCorrectlyReturnAllProjectsForSomeUser() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
@@ -363,7 +366,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project1 = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -372,7 +375,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
         val project2 = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -438,7 +441,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser
     fun mustCorrectlyReturnProjectApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
@@ -448,7 +451,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -462,7 +465,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val apiKey = ApiKey(
-            id = UUID.randomUUID(),
+            id = ApiKeyId(UUID.randomUUID()),
             projectId = project.id,
             apiKey = "api-key",
             createdAt = UtcDateTime(OffsetDateTime.now())
@@ -474,7 +477,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch API key is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.get("/v1/projects/${project.id.value}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -504,7 +507,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser
     fun mustReturn404NotFoundForProjectWithoutApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
@@ -514,7 +517,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -529,7 +532,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-existent project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.get("/v1/projects/${project.id.value}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -542,7 +545,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser
     fun mustCorrectlyCreateApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
@@ -552,7 +555,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -567,7 +570,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create API key is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.post("/v1/projects/${project.id.value}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -611,7 +614,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser
     fun mustReturn400BadRequestWhenCreatingAnotherApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
@@ -621,7 +624,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -635,7 +638,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val apiKey = ApiKey(
-            id = UUID.randomUUID(),
+            id = ApiKeyId(UUID.randomUUID()),
             projectId = project.id,
             apiKey = "api-key",
             createdAt = UtcDateTime(OffsetDateTime.now())
@@ -647,7 +650,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for project which already has API key") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.post("/v1/projects/${project.id.value}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
@@ -660,7 +663,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     @WithMockUser(address = HardhatTestContainer.ACCOUNT_ADDRESS_2)
     fun mustReturn404NotFoundWhenCreatingApiKeyByNonProjectOwner() {
         val userIdentifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
@@ -670,7 +673,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
@@ -685,7 +688,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-owned project") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/projects/${project.id}/api-key")
+                MockMvcRequestBuilders.post("/v1/projects/${project.id.value}/api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()

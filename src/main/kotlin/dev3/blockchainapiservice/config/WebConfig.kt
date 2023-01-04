@@ -5,11 +5,11 @@ import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import dev3.blockchainapiservice.config.binding.UserIdentifierResolver
 import dev3.blockchainapiservice.config.interceptors.ApiKeyWriteCallInterceptor
 import dev3.blockchainapiservice.config.interceptors.ProjectReadCallInterceptor
-import dev3.blockchainapiservice.repository.ApiKeyRepository
-import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
-import dev3.blockchainapiservice.repository.UserIdResolverRepository
-import dev3.blockchainapiservice.repository.UserIdentifierRepository
+import dev3.blockchainapiservice.features.api.access.repository.ApiKeyRepository
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
+import dev3.blockchainapiservice.features.api.access.repository.UserIdentifierRepository
+import dev3.blockchainapiservice.features.api.usage.repository.ApiRateLimitRepository
+import dev3.blockchainapiservice.features.api.usage.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import dev3.blockchainapiservice.service.UuidProvider
 import org.springframework.beans.factory.BeanCreationException

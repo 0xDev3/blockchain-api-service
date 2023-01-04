@@ -166,122 +166,14 @@ jooq {
                     database.apply {
                         inputSchema = Configurations.Database.schema
                         excludes = "flyway_schema_history"
-                        forcedTypes = listOf(
+                        forcedTypes = ForcedJooqTypes.types.map {
                             ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.ChainId"
-                                converter = "dev3.blockchainapiservice.util.ChainIdConverter"
-                                includeExpression = "chain_id"
-                                includeTypes = "BIGINT"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.ContractAddress"
-                                converter = "dev3.blockchainapiservice.util.ContractAddressConverter"
-                                includeExpression = "token_address|.*_contract_address|contract_address"
-                                includeTypes = "VARCHAR"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.WalletAddress"
-                                converter = "dev3.blockchainapiservice.util.WalletAddressConverter"
-                                includeExpression = ".*_address"
-                                includeTypes = "VARCHAR"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.Balance"
-                                converter = "dev3.blockchainapiservice.util.BalanceConverter"
-                                includeExpression = ".*_amount"
-                                includeTypes = "NUMERIC"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.BlockNumber"
-                                converter = "dev3.blockchainapiservice.util.BlockNumberConverter"
-                                includeExpression = "block_number"
-                                includeTypes = "NUMERIC"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.TransactionHash"
-                                converter = "dev3.blockchainapiservice.util.TransactionHashConverter"
-                                includeExpression = ".*tx_hash"
-                                includeTypes = "VARCHAR"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.model.json.ManifestJson"
-                                converter = "dev3.blockchainapiservice.util.ManifestJsonConverter"
-                                includeExpression = "manifest_json"
-                                includeTypes = "JSON"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.model.json.ArtifactJson"
-                                converter = "dev3.blockchainapiservice.util.ArtifactJsonConverter"
-                                includeExpression = "artifact_json"
-                                includeTypes = "JSON"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.SignedMessage"
-                                converter = "dev3.blockchainapiservice.util.SignedMessageConverter"
-                                includeExpression = "signed_message"
-                                includeTypes = "VARCHAR"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.DurationSeconds"
-                                converter = "dev3.blockchainapiservice.util.DurationSecondsConverter"
-                                includeExpression = ".*_duration_seconds"
-                                includeTypes = "NUMERIC"
-                            },
-                            ForcedType().apply {
-                                userType = "com.fasterxml.jackson.databind.JsonNode"
-                                converter = "dev3.blockchainapiservice.util.JsonNodeConverter"
-                                includeExpression = ".*"
-                                includeTypes = "JSON"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.UtcDateTime"
-                                converter = "dev3.blockchainapiservice.util.UtcDateTimeConverter"
-                                includeExpression = ".*"
-                                includeTypes = "TIMESTAMPTZ"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.BaseUrl"
-                                converter = "dev3.blockchainapiservice.util.BaseUrlConverter"
-                                includeExpression = "base_redirect_url"
-                                includeTypes = "VARCHAR"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.ContractId"
-                                converter = "dev3.blockchainapiservice.util.ContractIdConverter"
-                                includeExpression = "contract_id"
-                                includeTypes = "VARCHAR"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.ContractBinaryData"
-                                converter = "dev3.blockchainapiservice.util.ContractBinaryDataConverter"
-                                includeExpression = "contract_data"
-                                includeTypes = "BYTEA"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.util.FunctionData"
-                                converter = "dev3.blockchainapiservice.util.FunctionDataConverter"
-                                includeExpression = "tx_data|function_data"
-                                includeTypes = "BYTEA"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.features.payout.util.HashFunction"
-                                converter = "dev3.blockchainapiservice.util.HashFunctionConverter"
-                                includeExpression = ".*"
-                                includeTypes = "HASH_FUNCTION"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.features.payout.util.SnapshotStatus"
-                                converter = "dev3.blockchainapiservice.util.SnapshotStatusConverter"
-                                includeExpression = ".*"
-                                includeTypes = "SNAPSHOT_STATUS"
-                            },
-                            ForcedType().apply {
-                                userType = "dev3.blockchainapiservice.features.payout.util.SnapshotFailureCause"
-                                converter = "dev3.blockchainapiservice.util.SnapshotFailureCauseConverter"
-                                includeExpression = ".*"
-                                includeTypes = "SNAPSHOT_FAILURE_CAUSE"
+                                userType = it.userType
+                                converter = it.converter
+                                includeExpression = it.includeExpression
+                                includeTypes = it.includeTypes
                             }
-                        )
+                        }
                     }
                     generate.apply {
                         isDeprecated = false
@@ -299,7 +191,7 @@ jooq {
                         withNonnullAnnotationType("NotNull")
                     }
                     target.apply {
-                        packageName = "dev3.blockchainapiservice.generated.jooq"
+                        packageName = Configurations.Jooq.packageName
                         directory = "$buildDir/generated/sources/jooq/main/kotlin"
                     }
                     strategy.apply {
@@ -330,7 +222,7 @@ tasks.withType<JooqGenerate> {
 }
 
 tasks.register<TransformJooqClassesTask>("transformJooqClasses") {
-    jooqClassesPath.set("$buildDir/generated/sources/jooq/main/kotlin/dev3/blockchainapiservice/generated/jooq")
+    jooqClassesPath.set("$buildDir/generated/sources/jooq/main/kotlin/${Configurations.Jooq.packageDir}")
     dependsOn(tasks["generateJooq"])
 }
 

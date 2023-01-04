@@ -2,8 +2,8 @@ package dev3.blockchainapiservice.features.contract.arbitrarycall.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.request.CreateContractArbitraryCallRequest
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdentifier
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.DeployedContractIdentifier
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.WalletAddress

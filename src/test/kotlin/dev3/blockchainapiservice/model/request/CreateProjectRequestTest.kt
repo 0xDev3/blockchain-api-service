@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.model.request
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.validation.ValidationConstants
+import dev3.blockchainapiservice.features.api.access.model.request.CreateProjectRequest
 import dev3.blockchainapiservice.util.WalletAddress
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll

@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.features.contract.arbitrarycall.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
 import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.filters.ContractArbitraryCallRequestFilters
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.CreateContractArbitraryCallRequestParams
@@ -9,14 +11,14 @@ import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.Pr
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.StoreContractArbitraryCallRequestParams
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.result.ContractArbitraryCallRequest
 import dev3.blockchainapiservice.features.contract.arbitrarycall.repository.ContractArbitraryCallRequestRepository
-import dev3.blockchainapiservice.features.functions.service.FunctionDecoderService
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ImportedContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.deployment.service.DeployedContractIdentifierResolverService
+import dev3.blockchainapiservice.features.functions.decoding.service.FunctionDecoderService
+import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ContractDecoratorRepository
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
-import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
-import dev3.blockchainapiservice.service.DeployedContractIdentifierResolverService
 import dev3.blockchainapiservice.service.EthCommonService
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
@@ -24,7 +26,6 @@ import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithTransactionData
 import mu.KLogging
 import org.springframework.stereotype.Service
-import java.util.UUID
 
 @Service
 @Suppress("LongParameterList")
@@ -71,7 +72,9 @@ class ContractArbitraryCallRequestServiceImpl(
         return contractArbitraryCallRequestRepository.store(databaseParams)
     }
 
-    override fun getContractArbitraryCallRequest(id: UUID): WithTransactionData<ContractArbitraryCallRequest> {
+    override fun getContractArbitraryCallRequest(
+        id: ContractArbitraryCallRequestId
+    ): WithTransactionData<ContractArbitraryCallRequest> {
         logger.debug { "Fetching contract arbitrary call request, id: $id" }
 
         val contractArbitraryCallRequest = ethCommonService.fetchResource(
@@ -84,7 +87,7 @@ class ContractArbitraryCallRequestServiceImpl(
     }
 
     override fun getContractArbitraryCallRequestsByProjectIdAndFilters(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractArbitraryCallRequestFilters
     ): List<WithTransactionData<ContractArbitraryCallRequest>> {
         logger.debug { "Fetching contract arbitrary call requests for projectId: $projectId, filters: $filters" }
@@ -94,7 +97,7 @@ class ContractArbitraryCallRequestServiceImpl(
         } ?: emptyList()
     }
 
-    override fun attachTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress) {
+    override fun attachTxInfo(id: ContractArbitraryCallRequestId, txHash: TransactionHash, caller: WalletAddress) {
         logger.info { "Attach txInfo to contract arbitrary call request, id: $id, txHash: $txHash, caller: $caller" }
 
         val txInfoAttached = contractArbitraryCallRequestRepository.setTxInfo(id, txHash, caller)

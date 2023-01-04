@@ -2,13 +2,17 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.asset.multisend.model.params.StoreAssetMultiSendRequestParams
+import dev3.blockchainapiservice.features.asset.multisend.model.result.AssetMultiSendRequest
+import dev3.blockchainapiservice.features.asset.multisend.repository.JooqAssetMultiSendRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetMultiSendRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
-import dev3.blockchainapiservice.model.result.AssetMultiSendRequest
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
@@ -49,8 +53,8 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         private const val DISPERSE_SCREEN_AFTER_ACTION_MESSAGE = "disperse-screen-after-action-message"
         private val APPROVE_TX_HASH = TransactionHash("approve-tx-hash")
         private val DISPERSE_TX_HASH = TransactionHash("disperse-tx-hash")
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
     }
 
     @Suppress("unused")
@@ -91,7 +95,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun mustCorrectlyFetchAssetMultiSendRequestById() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
 
         suppose("some asset multi-send request exists in database") {
             dslContext.executeInsert(
@@ -154,7 +158,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentAssetMultiSendRequestById() {
         verify("null is returned when fetching non-existent asset multi-send request") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(AssetMultiSendRequestId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -164,7 +168,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     @Test
     @Suppress("UNCHECKED_CAST")
     fun mustCorrectlyFetchAssetMultiSendRequestsByProject() {
-        val otherProjectId = UUID.randomUUID()
+        val otherProjectId = ProjectId(UUID.randomUUID())
 
         suppose("some other project is in database") {
             dslContext.executeInsert(
@@ -182,7 +186,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
         val projectRequests = listOf(
             AssetMultiSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetMultiSendRequestId(UUID.randomUUID()),
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -202,7 +206,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetMultiSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetMultiSendRequestId(UUID.randomUUID()),
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -224,7 +228,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         )
         val otherRequests = listOf(
             AssetMultiSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetMultiSendRequestId(UUID.randomUUID()),
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -244,7 +248,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetMultiSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetMultiSendRequestId(UUID.randomUUID()),
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -309,7 +313,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
     fun mustCorrectlyFetchAssetMultiSendRequestsBySender() {
         val senderRequests = listOf(
             AssetMultiSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetMultiSendRequestId(UUID.randomUUID()),
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -329,7 +333,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetMultiSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetMultiSendRequestId(UUID.randomUUID()),
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -351,7 +355,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
         )
         val otherRequests = listOf(
             AssetMultiSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetMultiSendRequestId(UUID.randomUUID()),
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -371,7 +375,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetMultiSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetMultiSendRequestId(UUID.randomUUID()),
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
                 tokenAddress = TOKEN_ADDRESS,
@@ -433,7 +437,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreAssetMultiSendRequest() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val params = StoreAssetMultiSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -501,7 +505,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetApproveTxInfoForAssetMultiSendRequestWithNullApproveTxHash() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val params = StoreAssetMultiSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -569,7 +573,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotUpdateTokenSenderAddressForAssetMultiSendRequestWhenTokenSenderIsAlreadySetForApproveTxHash() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val params = StoreAssetMultiSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -638,7 +642,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetApproveTxHashForAssetMultiSendRequestWhenApproveTxHashIsAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val params = StoreAssetMultiSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -716,7 +720,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetApproveTxHashForAssetMultiSendRequestWhenTokenAddressIsNull() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val params = StoreAssetMultiSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -789,7 +793,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetDisperseTxInfoForAssetMultiSendRequestWithNullDisperseTxHash() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val params = StoreAssetMultiSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -862,7 +866,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotUpdateTokenSenderAddressForAssetMultiSendRequestWhenTokenSenderIsAlreadySetForDisperseTxHash() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val params = StoreAssetMultiSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -931,7 +935,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetDisperseTxHashForAssetMultiSendRequestWhenDisperseTxHashIsAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val params = StoreAssetMultiSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -1014,7 +1018,7 @@ class JooqAssetMultiSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetDisperseTxHashForAssetMultiSendRequestWhenTokenAddressIsNotNullWithNullApproveHash() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val params = StoreAssetMultiSendRequestParams(
             id = id,
             projectId = PROJECT_ID,

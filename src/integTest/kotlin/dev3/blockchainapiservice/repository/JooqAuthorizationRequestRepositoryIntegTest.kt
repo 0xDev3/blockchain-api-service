@@ -2,13 +2,17 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.wallet.authorization.model.params.StoreAuthorizationRequestParams
+import dev3.blockchainapiservice.features.wallet.authorization.model.result.AuthorizationRequest
+import dev3.blockchainapiservice.features.wallet.authorization.repository.JooqAuthorizationRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.AuthorizationRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreAuthorizationRequestParams
-import dev3.blockchainapiservice.model.result.AuthorizationRequest
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
@@ -41,8 +45,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
         private const val SCREEN_AFTER_ACTION_MESSAGE = "after-action-message"
         private val ACTUAL_WALLET_ADDRESS = WalletAddress("c")
         private val SIGNED_MESSAGE = SignedMessage("signed-message")
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
     }
 
     @Suppress("unused")
@@ -82,7 +86,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAuthorizationRequestById() {
-        val id = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
 
         suppose("some authorization request exists in database") {
             dslContext.executeInsert(
@@ -131,7 +135,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentAuthorizationById() {
         verify("null is returned when fetching non-existent authorization request") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(AuthorizationRequestId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -140,7 +144,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyDeleteAuthorizationRequestById() {
-        val id = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
 
         suppose("some authorization request exists in database") {
             dslContext.executeInsert(
@@ -175,7 +179,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAuthorizationRequestsByProject() {
-        val otherProjectId = UUID.randomUUID()
+        val otherProjectId = ProjectId(UUID.randomUUID())
 
         suppose("some other project is in database") {
             dslContext.executeInsert(
@@ -193,7 +197,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
 
         val projectRequests = listOf(
             AuthorizationRequestRecord(
-                id = UUID.randomUUID(),
+                id = AuthorizationRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 redirectUrl = REDIRECT_URL,
                 messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
@@ -207,7 +211,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AuthorizationRequestRecord(
-                id = UUID.randomUUID(),
+                id = AuthorizationRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 redirectUrl = REDIRECT_URL,
                 messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
@@ -223,7 +227,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
         )
         val otherRequests = listOf(
             AuthorizationRequestRecord(
-                id = UUID.randomUUID(),
+                id = AuthorizationRequestId(UUID.randomUUID()),
                 projectId = otherProjectId,
                 redirectUrl = REDIRECT_URL,
                 messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
@@ -237,7 +241,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AuthorizationRequestRecord(
-                id = UUID.randomUUID(),
+                id = AuthorizationRequestId(UUID.randomUUID()),
                 projectId = otherProjectId,
                 redirectUrl = REDIRECT_URL,
                 messageToSignOverride = MESSAGE_TO_SIGN_OVERRIDE,
@@ -285,7 +289,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreAuthorizationRequest() {
-        val id = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
         val params = StoreAuthorizationRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -337,7 +341,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetSignedMessageForAuthorizationRequestWithNullWalletAddressAndSignedMessage() {
-        val id = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
         val params = StoreAuthorizationRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -389,7 +393,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetWalletAddressAndSignedMessageForAuthorizationRequestWhenWalletAddressAndSignedMessageAreAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = AuthorizationRequestId(UUID.randomUUID())
         val params = StoreAuthorizationRequestParams(
             id = id,
             projectId = PROJECT_ID,

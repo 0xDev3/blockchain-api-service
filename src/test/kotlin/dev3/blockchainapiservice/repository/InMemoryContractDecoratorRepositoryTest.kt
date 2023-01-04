@@ -1,12 +1,13 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
+import dev3.blockchainapiservice.features.contract.deployment.model.filters.ContractDecoratorFilters
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
+import dev3.blockchainapiservice.features.contract.deployment.repository.InMemoryContractDecoratorRepository
 import dev3.blockchainapiservice.model.filters.AndList
-import dev3.blockchainapiservice.model.filters.ContractDecoratorFilters
 import dev3.blockchainapiservice.model.filters.OrList
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.ManifestJson
-import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag

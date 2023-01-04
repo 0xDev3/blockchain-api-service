@@ -1,9 +1,12 @@
 package dev3.blockchainapiservice.features.contract.arbitrarycall.model.params
 
 import com.fasterxml.jackson.databind.JsonNode
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.ParamsFactory
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
@@ -14,8 +17,8 @@ import java.util.UUID
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.PreStoreContractArbitraryCallRequestParams as PreStoreParams
 
 data class StoreContractArbitraryCallRequestParams(
-    val id: UUID,
-    val deployedContractId: UUID?,
+    val id: ContractArbitraryCallRequestId,
+    val deployedContractId: ContractDeploymentRequestId?,
     val contractAddress: ContractAddress,
     val functionData: FunctionData,
     val functionName: String?,
@@ -23,7 +26,7 @@ data class StoreContractArbitraryCallRequestParams(
     val ethAmount: Balance,
     val chainId: ChainId,
     val redirectUrl: String,
-    val projectId: UUID,
+    val projectId: ProjectId,
     val createdAt: UtcDateTime,
     val arbitraryData: JsonNode?,
     val screenConfig: ScreenConfig,
@@ -38,7 +41,7 @@ data class StoreContractArbitraryCallRequestParams(
             project: Project,
             createdAt: UtcDateTime
         ) = StoreContractArbitraryCallRequestParams(
-            id = id,
+            id = ContractArbitraryCallRequestId(id),
             deployedContractId = params.deployedContractId,
             contractAddress = params.contractAddress,
             functionData = params.createParams.functionData,

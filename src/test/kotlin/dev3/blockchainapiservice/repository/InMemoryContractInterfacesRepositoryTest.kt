@@ -1,12 +1,13 @@
 package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.features.contract.deployment.model.json.EventDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.FunctionDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJsonWithId
+import dev3.blockchainapiservice.features.contract.interfaces.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.features.contract.interfaces.repository.InMemoryContractInterfacesRepository
 import dev3.blockchainapiservice.model.filters.OrList
-import dev3.blockchainapiservice.model.json.EventDecorator
-import dev3.blockchainapiservice.model.json.FunctionDecorator
-import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.util.InterfaceId
 import org.junit.jupiter.api.Test
 

@@ -1,20 +1,20 @@
 package dev3.blockchainapiservice.config
 
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.ManifestJson
-import dev3.blockchainapiservice.model.result.ContractConstructor
-import dev3.blockchainapiservice.model.result.ContractDecorator
-import dev3.blockchainapiservice.model.result.ContractEvent
-import dev3.blockchainapiservice.model.result.ContractFunction
-import dev3.blockchainapiservice.model.result.ContractParameter
-import dev3.blockchainapiservice.model.result.EventParameter
-import dev3.blockchainapiservice.repository.ContractInterfacesRepository
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
-import dev3.blockchainapiservice.repository.InMemoryContractDecoratorRepository
-import dev3.blockchainapiservice.repository.InMemoryContractInterfacesRepository
-import dev3.blockchainapiservice.repository.JooqContractMetadataRepository
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractConstructor
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractEvent
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractFunction
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractParameter
+import dev3.blockchainapiservice.features.contract.deployment.model.result.EventParameter
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.InMemoryContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.JooqContractMetadataRepository
+import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
+import dev3.blockchainapiservice.features.contract.interfaces.repository.InMemoryContractInterfacesRepository
 import dev3.blockchainapiservice.service.RandomUuidProvider
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Constants
@@ -332,18 +332,18 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         }
 
         verify("correct contract metadata exists in the database") {
-            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
-            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
-            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
 
-            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
         }
     }
@@ -547,18 +547,18 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         }
 
         verify("correct contract metadata exists in the database") {
-            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(dummyContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
-            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(deeplyNestedContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
-            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(anotherContractId, Constants.NIL_PROJECT_ID))
                 .isTrue()
 
-            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(contractWithoutArtifactId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(contractWithoutManifestId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(ignoredContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
         }
     }
@@ -604,17 +604,22 @@ class ContractDecoratorFileChangeListenerIntegTest : TestBase() {
         }
 
         verify("correct contract metadata exists in the database") {
-            expectThat(contractMetadataRepository.exists(unparsableArtifactContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(unparsableArtifactContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(unparsableManifestContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(unparsableManifestContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(missingConstructorSignatureContractId, Constants.NIL_UUID))
+            expectThat(
+                contractMetadataRepository.exists(
+                    missingConstructorSignatureContractId,
+                    Constants.NIL_PROJECT_ID
+                )
+            )
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(missingEventNameContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(missingEventNameContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(missingFunctionNameContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(missingFunctionNameContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
-            expectThat(contractMetadataRepository.exists(missingFunctionOutputsContractId, Constants.NIL_UUID))
+            expectThat(contractMetadataRepository.exists(missingFunctionOutputsContractId, Constants.NIL_PROJECT_ID))
                 .isFalse()
         }
     }

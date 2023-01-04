@@ -4,11 +4,12 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.validation.ValidationConstants
 import dev3.blockchainapiservice.config.validation.ValidationConstants.FUNCTION_ARGUMENT_MAX_JSON_CHARS
-import dev3.blockchainapiservice.model.params.OutputParameter
-import dev3.blockchainapiservice.util.BoolType
-import dev3.blockchainapiservice.util.FunctionArgument
+import dev3.blockchainapiservice.features.contract.abi.model.BoolType
+import dev3.blockchainapiservice.features.contract.abi.model.UintType
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
+import dev3.blockchainapiservice.features.contract.readcall.model.request.ReadonlyFunctionCallRequest
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
 import dev3.blockchainapiservice.util.JsonNodeConverter
-import dev3.blockchainapiservice.util.UintType
 import dev3.blockchainapiservice.util.WalletAddress
 import org.jooq.JSON
 import org.junit.jupiter.api.AfterAll

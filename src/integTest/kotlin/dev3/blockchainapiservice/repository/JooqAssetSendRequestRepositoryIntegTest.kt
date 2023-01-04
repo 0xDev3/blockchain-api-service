@@ -2,13 +2,17 @@ package dev3.blockchainapiservice.repository
 
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.asset.send.model.params.StoreAssetSendRequestParams
+import dev3.blockchainapiservice.features.asset.send.model.result.AssetSendRequest
+import dev3.blockchainapiservice.features.asset.send.repository.JooqAssetSendRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetSendRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreAssetSendRequestParams
-import dev3.blockchainapiservice.model.result.AssetSendRequest
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
@@ -44,8 +48,8 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         private const val SEND_SCREEN_BEFORE_ACTION_MESSAGE = "send-screen-before-action-message"
         private const val SEND_SCREEN_AFTER_ACTION_MESSAGE = "send-screen-after-action-message"
         private val TX_HASH = TransactionHash("tx-hash")
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
     }
 
     @Suppress("unused")
@@ -85,7 +89,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetSendRequestById() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
 
         suppose("some asset send request exists in database") {
             dslContext.executeInsert(
@@ -136,7 +140,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentAssetSendRequestById() {
         verify("null is returned when fetching non-existent asset send request") {
-            val result = repository.getById(UUID.randomUUID())
+            val result = repository.getById(AssetSendRequestId(UUID.randomUUID()))
 
             expectThat(result)
                 .isNull()
@@ -145,7 +149,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetSendRequestsByProject() {
-        val otherProjectId = UUID.randomUUID()
+        val otherProjectId = ProjectId(UUID.randomUUID())
 
         suppose("some other project is in database") {
             dslContext.executeInsert(
@@ -163,7 +167,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
 
         val projectRequests = listOf(
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -178,7 +182,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -195,7 +199,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         )
         val otherRequests = listOf(
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = otherProjectId,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -210,7 +214,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = otherProjectId,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -262,7 +266,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
     fun mustCorrectlyFetchAssetSendRequestsBySender() {
         val senderRequests = listOf(
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -277,7 +281,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -294,7 +298,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         )
         val otherRequests = listOf(
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -309,7 +313,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -361,7 +365,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
     fun mustCorrectlyFetchAssetSendRequestsByRecipient() {
         val recipientRequests = listOf(
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -376,7 +380,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
                 createdAt = TestData.TIMESTAMP
             ),
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -393,7 +397,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
         )
         val otherRequests = listOf(
             AssetSendRequestRecord(
-                id = UUID.randomUUID(),
+                id = AssetSendRequestId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 chainId = CHAIN_ID,
                 redirectUrl = REDIRECT_URL,
@@ -443,7 +447,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlyStoreAssetSendRequest() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val params = StoreAssetSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -498,7 +502,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustCorrectlySetTxInfoForAssetSendRequestWithNullTxHash() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val params = StoreAssetSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -553,7 +557,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotUpdateTokenSenderAddressForAssetSendRequestWhenTokenSenderIsAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val params = StoreAssetSendRequestParams(
             id = id,
             projectId = PROJECT_ID,
@@ -609,7 +613,7 @@ class JooqAssetSendRequestRepositoryIntegTest : TestBase() {
 
     @Test
     fun mustNotSetTxHashForAssetSendRequestWhenTxHashIsAlreadySet() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val params = StoreAssetSendRequestParams(
             id = id,
             chainId = CHAIN_ID,

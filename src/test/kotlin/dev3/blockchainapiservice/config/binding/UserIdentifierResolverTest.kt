@@ -3,9 +3,10 @@ package dev3.blockchainapiservice.config.binding
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
 import dev3.blockchainapiservice.exception.BadAuthenticationException
-import dev3.blockchainapiservice.model.result.UserIdentifier
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import dev3.blockchainapiservice.repository.UserIdentifierRepository
+import dev3.blockchainapiservice.features.api.access.model.result.UserIdentifier
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.api.access.repository.UserIdentifierRepository
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.util.WalletAddress
 import org.junit.jupiter.api.Test
@@ -88,7 +89,7 @@ class UserIdentifierResolverTest : TestBase() {
 
         val repository = mock<UserIdentifierRepository>()
         val identifier = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = walletAddress
         )
@@ -132,10 +133,10 @@ class UserIdentifierResolverTest : TestBase() {
         }
 
         val uuidProvider = mock<UuidProvider>()
-        val uuid = UUID.randomUUID()
+        val uuid = UserId(UUID.randomUUID())
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
+            call(uuidProvider.getUuid(UserId))
                 .willReturn(uuid)
         }
 

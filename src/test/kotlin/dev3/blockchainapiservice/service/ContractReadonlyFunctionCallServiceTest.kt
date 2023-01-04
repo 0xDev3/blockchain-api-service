@@ -4,15 +4,23 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.contract.abi.model.UintType
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdIdentifier
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.service.DeployedContractIdentifierResolverServiceImpl
+import dev3.blockchainapiservice.features.contract.readcall.model.params.CreateReadonlyFunctionCallParams
+import dev3.blockchainapiservice.features.contract.readcall.model.params.ExecuteReadonlyFunctionCallParams
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
+import dev3.blockchainapiservice.features.contract.readcall.model.result.ReadonlyFunctionCallResult
+import dev3.blockchainapiservice.features.contract.readcall.service.ContractReadonlyFunctionCallServiceImpl
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
+import dev3.blockchainapiservice.features.functions.encoding.service.FunctionEncoderService
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
-import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
-import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
-import dev3.blockchainapiservice.model.params.OutputParameter
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.BlockName
@@ -21,10 +29,8 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
-import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
-import dev3.blockchainapiservice.util.UintType
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithDeployedContractIdAndAddress
 import org.junit.jupiter.api.Test
@@ -37,15 +43,15 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
 
     companion object {
         private val PROJECT = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
             customRpcUrl = "custom-rpc-url",
             createdAt = TestData.TIMESTAMP
         )
-        private val DEPLOYED_CONTRACT_ID = UUID.randomUUID()
+        private val DEPLOYED_CONTRACT_ID = ContractDeploymentRequestId(UUID.randomUUID())
         private val CONTRACT_ADDRESS = ContractAddress("abc123")
         private val CALLER_ADDRESS = WalletAddress("a")
         private val CREATE_PARAMS = CreateReadonlyFunctionCallParams(

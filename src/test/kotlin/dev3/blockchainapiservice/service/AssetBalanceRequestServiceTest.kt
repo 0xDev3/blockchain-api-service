@@ -6,14 +6,19 @@ import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachSignedMessageException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
+import dev3.blockchainapiservice.features.asset.balance.model.params.CreateAssetBalanceRequestParams
+import dev3.blockchainapiservice.features.asset.balance.model.params.StoreAssetBalanceRequestParams
+import dev3.blockchainapiservice.features.asset.balance.model.result.AssetBalanceRequest
+import dev3.blockchainapiservice.features.asset.balance.model.result.FullAssetBalanceRequest
+import dev3.blockchainapiservice.features.asset.balance.repository.AssetBalanceRequestRepository
+import dev3.blockchainapiservice.features.asset.balance.service.AssetBalanceRequestServiceImpl
+import dev3.blockchainapiservice.features.wallet.authorization.service.SignatureCheckerService
+import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
-import dev3.blockchainapiservice.model.params.StoreAssetBalanceRequestParams
-import dev3.blockchainapiservice.model.result.AssetBalanceRequest
-import dev3.blockchainapiservice.model.result.FullAssetBalanceRequest
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.AssetBalanceRequestRepository
-import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.util.AccountBalance
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
@@ -33,12 +38,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustSuccessfullyCreateAssetBalanceRequest() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            call(uuidProvider.getUuid())
-                .willReturn(uuid)
+            call(uuidProvider.getRawUuid())
+                .willReturn(uuid.value)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
@@ -49,8 +54,8 @@ class AssetBalanceRequestServiceTest : TestBase() {
         }
 
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -71,7 +76,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
                 afterActionMessage = "after-action-message"
             )
         )
-        val fullRedirectUrl = redirectUrl.replace("\${id}", uuid.toString())
+        val fullRedirectUrl = redirectUrl.replace("\${id}", uuid.value.toString())
         val databaseParams = StoreAssetBalanceRequestParams(
             id = uuid,
             projectId = project.id,
@@ -129,7 +134,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustThrowResourceNotFoundExceptionForNonExistentAssetBalanceRequest() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is not in database") {
@@ -158,12 +163,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetBalanceRequestWithPendingStatusWhenActualWalletAddressIsNull() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = TestData.CHAIN_ID,
-            redirectUrl = "redirect-url/$uuid",
+            redirectUrl = "redirect-url/${uuid.value}",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
@@ -222,12 +227,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetBalanceRequestWithPendingStatusWhenSignedMessageIsNull() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = TestData.CHAIN_ID,
-            redirectUrl = "redirect-url/$uuid",
+            redirectUrl = "redirect-url/${uuid.value}",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
@@ -309,12 +314,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetBalanceRequestWithFailedStatusWhenRequestedAndActualWalletAddressesDontMatch() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = TestData.CHAIN_ID,
-            redirectUrl = "redirect-url/$uuid",
+            redirectUrl = "redirect-url/${uuid.value}",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
@@ -396,12 +401,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetBalanceRequestWithFailedStatusWhenSignatureDoesntMatch() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = TestData.CHAIN_ID,
-            redirectUrl = "redirect-url/$uuid",
+            redirectUrl = "redirect-url/${uuid.value}",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
@@ -495,12 +500,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetBalanceRequestWithSuccessfulStatusWhenRequestedWalletAddressIsNull() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = TestData.CHAIN_ID,
-            redirectUrl = "redirect-url/$uuid",
+            redirectUrl = "redirect-url/${uuid.value}",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = null,
@@ -594,12 +599,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetBalanceRequestWithSuccessfulStatusWhenRequestedWalletAddressIsSpecified() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = TestData.CHAIN_ID,
-            redirectUrl = "redirect-url/$uuid",
+            redirectUrl = "redirect-url/${uuid.value}",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
@@ -693,12 +698,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetBalanceRequestWithSuccessfulStatusWhenRequestedWalletAddressIsNullForNativeToken() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = TestData.CHAIN_ID,
-            redirectUrl = "redirect-url/$uuid",
+            redirectUrl = "redirect-url/${uuid.value}",
             tokenAddress = null,
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = null,
@@ -791,12 +796,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustReturnAssetBalanceRequestWithSuccessfulStatusWhenRequestedWalletAddressIsSpecifiedForNativeToken() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = TestData.CHAIN_ID,
-            redirectUrl = "redirect-url/$uuid",
+            redirectUrl = "redirect-url/${uuid.value}",
             tokenAddress = null,
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
@@ -889,12 +894,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnListOfAssetBalanceRequestsByProjectId() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = TestData.CHAIN_ID,
-            redirectUrl = "redirect-url/$uuid",
+            redirectUrl = "redirect-url/${uuid.value}",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
             requestedWalletAddress = WalletAddress("def"),
@@ -990,7 +995,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustCorrectlyReturnEmptyListOfAssetBalanceRequestsForNonExistentProject() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val service = AssetBalanceRequestServiceImpl(
             signatureCheckerService = mock(),
             blockchainService = mock(),
@@ -1013,7 +1018,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustAttachWalletAddressAndSignedMessage() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val walletAddress = WalletAddress("a")
         val signedMessage = SignedMessage("signed-message")
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
@@ -1046,7 +1051,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
 
     @Test
     fun mustThrowCannotAttachSignedMessageExceptionWhenAttachingWalletAddressAndSignedMessageFails() {
-        val uuid = UUID.randomUUID()
+        val uuid = AssetBalanceRequestId(UUID.randomUUID())
         val walletAddress = WalletAddress("a")
         val signedMessage = SignedMessage("signed-message")
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
@@ -1079,7 +1084,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         }
     }
 
-    private fun projectRepositoryMockWithCustomRpcUrl(projectId: UUID, customRpcUrl: String?): ProjectRepository {
+    private fun projectRepositoryMockWithCustomRpcUrl(projectId: ProjectId, customRpcUrl: String?): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
         suppose("some project will be returned") {
@@ -1087,7 +1092,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
                 .willReturn(
                     Project(
                         id = projectId,
-                        ownerId = UUID.randomUUID(),
+                        ownerId = UserId(UUID.randomUUID()),
                         issuerContractAddress = ContractAddress("dead"),
                         baseRedirectUrl = BaseUrl(""),
                         chainId = ChainId(0L),

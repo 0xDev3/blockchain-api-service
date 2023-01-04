@@ -3,6 +3,7 @@ package dev3.blockchainapiservice.features.contract.arbitrarycall.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.filters.ContractArbitraryCallRequestFilters
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.CreateContractArbitraryCallRequestParams
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.request.CreateContractArbitraryCallRequest
@@ -10,11 +11,14 @@ import dev3.blockchainapiservice.features.contract.arbitrarycall.model.response.
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.response.ContractArbitraryCallRequestsResponse
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.result.ContractArbitraryCallRequest
 import dev3.blockchainapiservice.features.contract.arbitrarycall.service.ContractArbitraryCallRequestService
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdIdentifier
+import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
@@ -35,7 +39,7 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyCreateContractArbitraryCallRequest() {
-        val deployedContractId = UUID.randomUUID()
+        val deployedContractId = ContractDeploymentRequestId(UUID.randomUUID())
         val params = CreateContractArbitraryCallRequestParams(
             identifier = DeployedContractIdIdentifier(deployedContractId),
             functionData = FunctionData("00"),
@@ -49,11 +53,11 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
             callerAddress = WalletAddress("a")
         )
         val result = ContractArbitraryCallRequest(
-            id = UUID.randomUUID(),
+            id = ContractArbitraryCallRequestId(UUID.randomUUID()),
             deployedContractId = deployedContractId,
             chainId = ChainId(1337),
             redirectUrl = "redirect-url",
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             createdAt = TestData.TIMESTAMP,
             arbitraryData = TestData.EMPTY_JSON_OBJECT,
             screenConfig = ScreenConfig(
@@ -70,7 +74,7 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
         )
         val project = Project(
             id = result.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = result.chainId,
@@ -140,16 +144,16 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractArbitraryCallRequest() {
-        val id = UUID.randomUUID()
+        val id = ContractArbitraryCallRequestId(UUID.randomUUID())
         val service = mock<ContractArbitraryCallRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractArbitraryCallRequest(
                 id = id,
-                deployedContractId = UUID.randomUUID(),
+                deployedContractId = ContractDeploymentRequestId(UUID.randomUUID()),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -226,16 +230,16 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractArbitraryCallRequestsByProjectIdAndFilters() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val service = mock<ContractArbitraryCallRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractArbitraryCallRequest(
-                id = UUID.randomUUID(),
-                deployedContractId = UUID.randomUUID(),
+                id = ContractArbitraryCallRequestId(UUID.randomUUID()),
+                deployedContractId = ContractDeploymentRequestId(UUID.randomUUID()),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -328,7 +332,7 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
         val service = mock<ContractArbitraryCallRequestService>()
         val controller = ContractArbitraryCallRequestController(service)
 
-        val id = UUID.randomUUID()
+        val id = ContractArbitraryCallRequestId(UUID.randomUUID())
         val txHash = "tx-hash"
         val caller = "c"
 

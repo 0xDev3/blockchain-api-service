@@ -3,17 +3,21 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.model.request.CreateMultiPaymentTemplateRequest
-import dev3.blockchainapiservice.model.request.MultiPaymentTemplateItemRequest
-import dev3.blockchainapiservice.model.request.UpdateMultiPaymentTemplateRequest
-import dev3.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse
-import dev3.blockchainapiservice.model.response.MultiPaymentTemplateWithoutItemsResponse
-import dev3.blockchainapiservice.model.response.MultiPaymentTemplatesResponse
-import dev3.blockchainapiservice.model.result.MultiPaymentTemplate
-import dev3.blockchainapiservice.model.result.MultiPaymentTemplateItem
-import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
-import dev3.blockchainapiservice.model.result.WithItems
-import dev3.blockchainapiservice.service.MultiPaymentTemplateService
+import dev3.blockchainapiservice.features.api.access.model.result.UserWalletAddressIdentifier
+import dev3.blockchainapiservice.features.asset.multisend.controller.MultiPaymentTemplateController
+import dev3.blockchainapiservice.features.asset.multisend.model.request.CreateMultiPaymentTemplateRequest
+import dev3.blockchainapiservice.features.asset.multisend.model.request.MultiPaymentTemplateItemRequest
+import dev3.blockchainapiservice.features.asset.multisend.model.request.UpdateMultiPaymentTemplateRequest
+import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiPaymentTemplateWithItemsResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiPaymentTemplateWithoutItemsResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiPaymentTemplatesResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.result.MultiPaymentTemplate
+import dev3.blockchainapiservice.features.asset.multisend.model.result.MultiPaymentTemplateItem
+import dev3.blockchainapiservice.features.asset.multisend.model.result.WithItems
+import dev3.blockchainapiservice.features.asset.multisend.service.MultiPaymentTemplateService
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
@@ -29,13 +33,13 @@ class MultiPaymentTemplateControllerTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
-            id = UUID.randomUUID(),
+            id = UserId(UUID.randomUUID()),
             stripeClientId = null,
             walletAddress = WalletAddress("cafebabe")
         )
-        private val TEMPLATE_ID = UUID.randomUUID()
+        private val TEMPLATE_ID = MultiPaymentTemplateId(UUID.randomUUID())
         private val ITEM = MultiPaymentTemplateItem(
-            id = UUID.randomUUID(),
+            id = MultiPaymentTemplateItemId(UUID.randomUUID()),
             templateId = TEMPLATE_ID,
             walletAddress = WalletAddress("a"),
             itemName = "itemName",

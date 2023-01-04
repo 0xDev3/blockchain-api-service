@@ -3,19 +3,24 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.contract.deployment.controller.ContractDeploymentRequestController
+import dev3.blockchainapiservice.features.contract.deployment.model.filters.ContractDeploymentRequestFilters
+import dev3.blockchainapiservice.features.contract.deployment.model.params.CreateContractDeploymentRequestParams
+import dev3.blockchainapiservice.features.contract.deployment.model.request.CreateContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestResponse
+import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestsResponse
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.service.ContractDeploymentRequestService
+import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.filters.AndList
-import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.model.filters.OrList
-import dev3.blockchainapiservice.model.params.CreateContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
-import dev3.blockchainapiservice.model.request.CreateContractDeploymentRequest
-import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
-import dev3.blockchainapiservice.model.response.ContractDeploymentRequestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.service.ContractDeploymentRequestService
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
@@ -23,7 +28,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.ContractTag
-import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.InterfaceId
 import dev3.blockchainapiservice.util.Status
@@ -56,7 +60,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             )
         )
         val result = ContractDeploymentRequest(
-            id = UUID.randomUUID(),
+            id = ContractDeploymentRequestId(UUID.randomUUID()),
             alias = params.alias,
             name = "name",
             description = "description",
@@ -68,7 +72,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             initialEthAmount = params.initialEthAmount,
             chainId = ChainId(1337),
             redirectUrl = params.redirectUrl!!,
-            projectId = UUID.randomUUID(),
+            projectId = ProjectId(UUID.randomUUID()),
             createdAt = TestData.TIMESTAMP,
             arbitraryData = params.arbitraryData,
             screenConfig = params.screenConfig,
@@ -81,7 +85,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         )
         val project = Project(
             id = result.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = result.chainId,
@@ -157,10 +161,10 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyMarkContractDeploymentRequestAsDeleted() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -182,12 +186,12 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequest() {
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val service = mock<ContractDeploymentRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = id,
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -199,7 +203,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -282,12 +286,12 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestsByProjectIdAndFilters() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val service = mock<ContractDeploymentRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = "alias",
                 name = "name",
                 description = "description",
@@ -299,7 +303,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 initialEthAmount = Balance(BigInteger.TEN),
                 chainId = ChainId(1337),
                 redirectUrl = "redirect-url",
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 createdAt = TestData.TIMESTAMP,
                 arbitraryData = TestData.EMPTY_JSON_OBJECT,
                 screenConfig = ScreenConfig(
@@ -399,13 +403,13 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchContractDeploymentRequestByProjectIdAndAlias() {
-        val projectId = UUID.randomUUID()
+        val projectId = ProjectId(UUID.randomUUID())
         val alias = "alias"
         val service = mock<ContractDeploymentRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = ContractDeploymentRequest(
-                id = UUID.randomUUID(),
+                id = ContractDeploymentRequestId(UUID.randomUUID()),
                 alias = alias,
                 name = "name",
                 description = "description",
@@ -503,7 +507,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         val service = mock<ContractDeploymentRequestService>()
         val controller = ContractDeploymentRequestController(service)
 
-        val id = UUID.randomUUID()
+        val id = ContractDeploymentRequestId(UUID.randomUUID())
         val txHash = "tx-hash"
         val caller = "c"
 

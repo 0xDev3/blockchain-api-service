@@ -1,5 +1,7 @@
 package dev3.blockchainapiservice.util
 
+import dev3.blockchainapiservice.features.contract.abi.model.AddressType
+import dev3.blockchainapiservice.features.contract.abi.model.UintType
 import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.DeserializableEventInput
 

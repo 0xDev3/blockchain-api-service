@@ -6,22 +6,26 @@ import dev3.blockchainapiservice.blockchain.SimpleDisperse
 import dev3.blockchainapiservice.blockchain.SimpleERC20
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.asset.multisend.model.params.StoreAssetMultiSendRequestParams
+import dev3.blockchainapiservice.features.asset.multisend.model.response.AssetMultiSendRequestResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.response.AssetMultiSendRequestsResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiSendItemResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.result.AssetMultiSendRequest
+import dev3.blockchainapiservice.features.asset.multisend.repository.AssetMultiSendRequestRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
-import dev3.blockchainapiservice.model.response.AssetMultiSendRequestResponse
-import dev3.blockchainapiservice.model.response.AssetMultiSendRequestsResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponseType
 import dev3.blockchainapiservice.model.response.EventInfoResponse
-import dev3.blockchainapiservice.model.response.MultiSendItemResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.AssetMultiSendRequest
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.AssetMultiSendRequestRepository
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.Balance
@@ -46,8 +50,8 @@ import java.util.UUID
 class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val PROJECT = Project(
             id = PROJECT_ID,
             ownerId = OWNER_ID,
@@ -168,7 +172,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 apiKey = API_KEY,
                 createdAt = TestData.TIMESTAMP
@@ -253,7 +257,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "disperse-before-action-message",
                             afterActionMessage = "disperse-after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${response.id.value}/action",
                         approveTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -283,7 +287,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${response.id.value}/action",
                         tokenAddress = tokenAddress,
                         disperseContractAddress = disperseContractAddress,
                         assetAmounts = listOf(amount),
@@ -389,7 +393,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "disperse-before-action-message",
                             afterActionMessage = "disperse-after-action-message"
                         ),
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         approveTx = TransactionResponse(
                             txHash = null,
                             from = senderAddress.rawValue,
@@ -419,7 +423,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         tokenAddress = tokenAddress,
                         disperseContractAddress = disperseContractAddress,
                         assetAmounts = listOf(amount),
@@ -521,7 +525,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "disperse-before-action-message",
                             afterActionMessage = "disperse-after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${response.id.value}/action",
                         approveTx = null,
                         disperseTx = TransactionResponse(
                             txHash = null,
@@ -551,7 +555,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${response.id.value}/action",
                         tokenAddress = null,
                         disperseContractAddress = disperseContractAddress,
                         assetAmounts = listOf(amount),
@@ -655,7 +659,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "disperse-before-action-message",
                             afterActionMessage = "disperse-after-action-message"
                         ),
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         approveTx = null,
                         disperseTx = TransactionResponse(
                             txHash = null,
@@ -685,7 +689,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                         id = response.id,
                         projectId = PROJECT_ID,
                         chainId = PROJECT.chainId,
-                        redirectUrl = "https://custom-url/${response.id}",
+                        redirectUrl = "https://custom-url/${response.id.value}",
                         tokenAddress = null,
                         disperseContractAddress = disperseContractAddress,
                         assetAmounts = listOf(amount),
@@ -958,7 +962,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset multi-send request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/multi-send/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/multi-send/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -995,7 +999,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "disperse-before-action-message",
                             afterActionMessage = "disperse-after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${fetchResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-multi-send/${fetchResponse.id.value}/action",
                         approveTx = TransactionResponse(
                             txHash = approveTxHash.value,
                             from = senderAddress.rawValue,
@@ -1143,7 +1148,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset multi-send request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/multi-send/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/multi-send/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1180,7 +1185,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "disperse-before-action-message",
                             afterActionMessage = "disperse-after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${fetchResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-multi-send/${fetchResponse.id.value}/action",
                         approveTx = TransactionResponse(
                             txHash = approveTxHash.value,
                             from = senderAddress.rawValue,
@@ -1303,7 +1309,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset multi-send request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/multi-send/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/multi-send/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1340,7 +1346,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "disperse-before-action-message",
                             afterActionMessage = "disperse-after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${fetchResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-multi-send/${fetchResponse.id.value}/action",
                         approveTx = null,
                         disperseTx = TransactionResponse(
                             txHash = disperseTxHash.value,
@@ -1460,7 +1467,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset multi-send request is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/multi-send/${createResponse.id}")
+                MockMvcRequestBuilders.get("/v1/multi-send/${createResponse.id.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1497,7 +1504,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             beforeActionMessage = "disperse-before-action-message",
                             afterActionMessage = "disperse-after-action-message"
                         ),
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-multi-send/${fetchResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-multi-send/${fetchResponse.id.value}/action",
                         approveTx = null,
                         disperseTx = TransactionResponse(
                             txHash = disperseTxHash.value,
@@ -1647,7 +1655,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset multi-send requests is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/multi-send/by-project/${createResponse.projectId}")
+                MockMvcRequestBuilders.get("/v1/multi-send/by-project/${createResponse.projectId.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1687,7 +1695,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     afterActionMessage = "disperse-after-action-message"
                                 ),
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-multi-send/${fetchResponse.requests[0].id}/action",
+                                    "/request-multi-send/${fetchResponse.requests[0].id.value}/action",
                                 approveTx = TransactionResponse(
                                     txHash = approveTxHash.value,
                                     from = senderAddress.rawValue,
@@ -1832,7 +1840,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         val fetchResponse = suppose("request to fetch asset multi-send requests is made") {
             val fetchResponse = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/multi-send/by-project/${createResponse.projectId}")
+                MockMvcRequestBuilders.get("/v1/multi-send/by-project/${createResponse.projectId.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1872,7 +1880,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     afterActionMessage = "disperse-after-action-message"
                                 ),
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-multi-send/${fetchResponse.requests[0].id}/action",
+                                    "/request-multi-send/${fetchResponse.requests[0].id.value}/action",
                                 approveTx = TransactionResponse(
                                     txHash = approveTxHash.value,
                                     from = senderAddress.rawValue,
@@ -2053,7 +2061,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     afterActionMessage = "disperse-after-action-message"
                                 ),
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-multi-send/${fetchResponse.requests[0].id}/action",
+                                    "/request-multi-send/${fetchResponse.requests[0].id.value}/action",
                                 approveTx = TransactionResponse(
                                     txHash = approveTxHash.value,
                                     from = senderAddress.rawValue,
@@ -2238,7 +2246,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     afterActionMessage = "disperse-after-action-message"
                                 ),
                                 redirectUrl = PROJECT.baseRedirectUrl.value +
-                                    "/request-multi-send/${fetchResponse.requests[0].id}/action",
+                                    "/request-multi-send/${fetchResponse.requests[0].id.value}/action",
                                 approveTx = TransactionResponse(
                                     txHash = approveTxHash.value,
                                     from = senderAddress.rawValue,
@@ -2280,7 +2288,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyAttachApproveTransactionInfo() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val tokenSender = WalletAddress("d")
 
         suppose("some asset multi-send request without approve transaction info exists in database") {
@@ -2289,7 +2297,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     tokenAddress = ContractAddress("a"),
                     disperseContractAddress = ContractAddress("b"),
                     assetAmounts = listOf(Balance(BigInteger.TEN)),
@@ -2314,7 +2322,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach approve transaction info to asset multi-send request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/multi-send/$id/approve")
+                MockMvcRequestBuilders.put("/v1/multi-send/${id.value}/approve")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -2339,7 +2347,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustReturn400BadRequestWhenApproveTransactionInfoIsNotAttached() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val approveTxHash = TransactionHash("0x1")
         val tokenSender = WalletAddress("b")
 
@@ -2349,7 +2357,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     tokenAddress = ContractAddress("a"),
                     disperseContractAddress = ContractAddress("b"),
                     assetAmounts = listOf(Balance(BigInteger.TEN)),
@@ -2373,7 +2381,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned when attaching approve transaction info") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/multi-send/$id/approve")
+                MockMvcRequestBuilders.put("/v1/multi-send/${id.value}/approve")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -2400,7 +2408,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyAttachDisperseTransactionInfo() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val tokenSender = WalletAddress("d")
 
         suppose("some asset multi-send request without disperse transaction info exists in database") {
@@ -2409,7 +2417,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     tokenAddress = null,
                     disperseContractAddress = ContractAddress("b"),
                     assetAmounts = listOf(Balance(BigInteger.TEN)),
@@ -2434,7 +2442,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         suppose("request to attach disperse transaction info to asset multi-send request is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/multi-send/$id/disperse")
+                MockMvcRequestBuilders.put("/v1/multi-send/${id.value}/disperse")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -2459,7 +2467,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustReturn400BadRequestWhenDisperseTransactionInfoIsNotAttached() {
-        val id = UUID.randomUUID()
+        val id = AssetMultiSendRequestId(UUID.randomUUID())
         val disperseTxHash = TransactionHash("0x1")
         val tokenSender = WalletAddress("b")
 
@@ -2469,7 +2477,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                     id = id,
                     projectId = PROJECT_ID,
                     chainId = TestData.CHAIN_ID,
-                    redirectUrl = "https://example.com/$id",
+                    redirectUrl = "https://example.com/${id.value}",
                     tokenAddress = null,
                     disperseContractAddress = ContractAddress("b"),
                     assetAmounts = listOf(Balance(BigInteger.TEN)),
@@ -2493,7 +2501,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned when attaching disperse transaction info") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.put("/v1/multi-send/$id/disperse")
+                MockMvcRequestBuilders.put("/v1/multi-send/${id.value}/disperse")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -2518,8 +2526,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
     }
 
-    private fun insertProjectWithCustomRpcUrl(): Triple<UUID, ChainId, String> {
-        val projectId = UUID.randomUUID()
+    private fun insertProjectWithCustomRpcUrl(): Triple<ProjectId, ChainId, String> {
+        val projectId = ProjectId(UUID.randomUUID())
         val chainId = ChainId(1337L)
 
         dslContext.executeInsert(
@@ -2538,7 +2546,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = projectId,
                 apiKey = apiKey,
                 createdAt = TestData.TIMESTAMP

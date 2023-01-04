@@ -3,6 +3,8 @@ package dev3.blockchainapiservice.features.contract.arbitrarycall.repository
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.filters.ContractArbitraryCallRequestFilters
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.StoreContractArbitraryCallRequestParams
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.result.ContractArbitraryCallRequest
+import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
 import dev3.blockchainapiservice.generated.jooq.tables.ContractArbitraryCallRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractArbitraryCallRequestRecord
 import dev3.blockchainapiservice.model.ScreenConfig
@@ -13,7 +15,6 @@ import org.jooq.DSLContext
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.coalesce
 import org.springframework.stereotype.Repository
-import java.util.UUID
 
 @Repository
 class JooqContractArbitraryCallRequestRepository(
@@ -46,7 +47,7 @@ class JooqContractArbitraryCallRequestRepository(
         return record.toModel()
     }
 
-    override fun getById(id: UUID): ContractArbitraryCallRequest? {
+    override fun getById(id: ContractArbitraryCallRequestId): ContractArbitraryCallRequest? {
         logger.debug { "Get contract arbitrary call request by id: $id" }
         return dslContext.selectFrom(ContractArbitraryCallRequestTable)
             .where(ContractArbitraryCallRequestTable.ID.eq(id))
@@ -54,7 +55,7 @@ class JooqContractArbitraryCallRequestRepository(
     }
 
     override fun getAllByProjectId(
-        projectId: UUID,
+        projectId: ProjectId,
         filters: ContractArbitraryCallRequestFilters
     ): List<ContractArbitraryCallRequest> {
         logger.debug { "Get contract arbitrary call requests by projectId: $projectId, filters: $filters" }
@@ -71,7 +72,11 @@ class JooqContractArbitraryCallRequestRepository(
             .fetch { it.toModel() }
     }
 
-    override fun setTxInfo(id: UUID, txHash: TransactionHash, caller: WalletAddress): Boolean {
+    override fun setTxInfo(
+        id: ContractArbitraryCallRequestId,
+        txHash: TransactionHash,
+        caller: WalletAddress
+    ): Boolean {
         logger.info { "Set txInfo for contract arbitrary call request, id: $id, txHash: $txHash, caller: $caller" }
         return dslContext.update(ContractArbitraryCallRequestTable)
             .set(ContractArbitraryCallRequestTable.TX_HASH, txHash)

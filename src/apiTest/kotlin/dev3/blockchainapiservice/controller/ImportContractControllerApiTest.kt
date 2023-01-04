@@ -6,41 +6,45 @@ import dev3.blockchainapiservice.blockchain.DummyProxy
 import dev3.blockchainapiservice.blockchain.ExampleContract
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.FunctionDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ReturnTypeDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.TypeDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDecoratorResponse
+import dev3.blockchainapiservice.features.contract.deployment.model.response.ContractDeploymentRequestResponse
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractConstructor
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractEvent
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractFunction
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractParameter
+import dev3.blockchainapiservice.features.contract.deployment.model.result.EventParameter
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDeploymentRequestRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ImportedContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.importing.model.response.ImportPreviewResponse
+import dev3.blockchainapiservice.features.contract.importing.service.ContractImportServiceImpl.Companion.TypeAndValue
+import dev3.blockchainapiservice.features.contract.interfaces.model.response.ContractInterfaceManifestResponse
+import dev3.blockchainapiservice.features.contract.interfaces.model.response.SuggestedContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.ApiKeyId
+import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.FunctionDecorator
-import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.ManifestJson
-import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
-import dev3.blockchainapiservice.model.json.TypeDecorator
-import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
-import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponse
 import dev3.blockchainapiservice.model.response.EventArgumentResponseType
 import dev3.blockchainapiservice.model.response.EventInfoResponse
-import dev3.blockchainapiservice.model.response.ImportPreviewResponse
-import dev3.blockchainapiservice.model.response.SuggestedContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.ContractConstructor
-import dev3.blockchainapiservice.model.result.ContractDecorator
-import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
-import dev3.blockchainapiservice.model.result.ContractEvent
-import dev3.blockchainapiservice.model.result.ContractFunction
-import dev3.blockchainapiservice.model.result.ContractParameter
-import dev3.blockchainapiservice.model.result.EventParameter
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.repository.ContractDecoratorRepository
-import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
-import dev3.blockchainapiservice.repository.ContractInterfacesRepository
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
-import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
-import dev3.blockchainapiservice.service.ContractImportServiceImpl.Companion.TypeAndValue
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.Balance
@@ -69,8 +73,8 @@ import java.util.UUID
 class ImportContractControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val PROJECT_ID = UUID.randomUUID()
-        private val OWNER_ID = UUID.randomUUID()
+        private val PROJECT_ID = ProjectId(UUID.randomUUID())
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private val PROJECT = Project(
             id = PROJECT_ID,
             ownerId = OWNER_ID,
@@ -309,13 +313,13 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ContractMetadataRecord(
-                id = UUID.randomUUID(),
+                id = ContractMetadataId(UUID.randomUUID()),
                 name = CONTRACT_DECORATOR.name,
                 description = CONTRACT_DECORATOR.description,
                 contractId = CONTRACT_DECORATOR.id,
                 contractTags = CONTRACT_DECORATOR.tags.map { it.value }.toTypedArray(),
                 contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray(),
-                projectId = Constants.NIL_UUID
+                projectId = Constants.NIL_PROJECT_ID
             )
         )
 
@@ -342,7 +346,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         dslContext.executeInsert(
             ApiKeyRecord(
-                id = UUID.randomUUID(),
+                id = ApiKeyId(UUID.randomUUID()),
                 projectId = PROJECT_ID,
                 apiKey = API_KEY,
                 createdAt = TestData.TIMESTAMP
@@ -454,7 +458,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         verify("imported contract decorator is not stored in database") {
             val importedContractDecorator = importedContractDecoratorRepository.getByContractIdAndProjectId(
                 contractId = importedContractId,
-                projectId = Constants.NIL_UUID
+                projectId = Constants.NIL_PROJECT_ID
             )
 
             expectThat(importedContractDecorator)
@@ -583,7 +587,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = BigInteger.ZERO,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${importResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-deploy/${importResponse.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = importResponse.createdAt,
                         arbitraryData = importResponse.arbitraryData,
@@ -626,7 +631,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements,
                         initialEthAmount = Balance.ZERO,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${importResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-deploy/${importResponse.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = importResponse.arbitraryData,
@@ -715,7 +721,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements.map { it.value },
                         initialEthAmount = BigInteger.ZERO,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = response.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -762,7 +768,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = CONTRACT_DECORATOR.implements,
                         initialEthAmount = Balance.ZERO,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -853,7 +859,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = emptyList(),
                         initialEthAmount = BigInteger.ZERO,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = response.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -900,7 +906,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = emptyList(),
                         initialEthAmount = Balance.ZERO,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -1054,7 +1060,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = emptyList(),
                         initialEthAmount = BigInteger.ZERO,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = response.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -1101,7 +1107,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = emptyList(),
                         initialEthAmount = Balance.ZERO,
                         chainId = PROJECT.chainId,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${response.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = storedRequest!!.createdAt,
                         arbitraryData = response.arbitraryData,
@@ -1352,7 +1358,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         val suggestedInterfacesResponse = suppose("suggested imported smart contract interfaces are fetched") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/import-smart-contract/${importResponse.id}/suggested-interfaces")
+                MockMvcRequestBuilders.get("/v1/import-smart-contract/${importResponse.id.value}/suggested-interfaces")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -1425,7 +1431,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         val interfacesResponse = suppose("interface is added to imported smart contract") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/add-interfaces")
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id.value}/add-interfaces")
                     .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
@@ -1468,7 +1474,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = listOf(interfaceId.value),
                         initialEthAmount = BigInteger.ZERO,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${interfacesResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-deploy/${interfacesResponse.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = interfacesResponse.createdAt,
                         arbitraryData = interfacesResponse.arbitraryData,
@@ -1543,7 +1550,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for non-existent smart contract interface") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/add-interfaces")
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id.value}/add-interfaces")
                     .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
@@ -1612,7 +1619,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for incompatible smart contract interface") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/add-interfaces")
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id.value}/add-interfaces")
                     .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
@@ -1699,7 +1706,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         val interfacesResponse = suppose("interface is removed from imported smart contract") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/remove-interfaces")
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id.value}/remove-interfaces")
                     .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
@@ -1742,7 +1749,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = emptyList(),
                         initialEthAmount = BigInteger.ZERO,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${interfacesResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-deploy/${interfacesResponse.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = interfacesResponse.createdAt,
                         arbitraryData = interfacesResponse.arbitraryData,
@@ -1821,7 +1829,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         val interfacesResponse = suppose("interface is added to imported smart contract") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/set-interfaces")
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id.value}/set-interfaces")
                     .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
@@ -1864,7 +1872,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         contractImplements = listOf(interfaceId.value),
                         initialEthAmount = BigInteger.ZERO,
                         chainId = PROJECT.chainId.value,
-                        redirectUrl = PROJECT.baseRedirectUrl.value + "/request-deploy/${interfacesResponse.id}/action",
+                        redirectUrl = PROJECT.baseRedirectUrl.value +
+                            "/request-deploy/${interfacesResponse.id.value}/action",
                         projectId = PROJECT_ID,
                         createdAt = interfacesResponse.createdAt,
                         arbitraryData = interfacesResponse.arbitraryData,
@@ -1939,7 +1948,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for non-existent smart contract interface") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/set-interfaces")
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id.value}/set-interfaces")
                     .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
@@ -2008,7 +2017,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
 
         verify("400 is returned for incompatible smart contract interface") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/set-interfaces")
+                MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id.value}/set-interfaces")
                     .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(

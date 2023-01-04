@@ -2,15 +2,15 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.exception.ErrorCode
-import dev3.blockchainapiservice.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.features.contract.deployment.model.json.FunctionDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ReturnTypeDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.response.InfoMarkdownsResponse
+import dev3.blockchainapiservice.features.contract.interfaces.model.filters.ContractInterfaceFilters
+import dev3.blockchainapiservice.features.contract.interfaces.model.response.ContractInterfaceManifestResponse
+import dev3.blockchainapiservice.features.contract.interfaces.model.response.ContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.model.filters.OrList
-import dev3.blockchainapiservice.model.json.FunctionDecorator
-import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.ReturnTypeDecorator
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
-import dev3.blockchainapiservice.model.response.InfoMarkdownsResponse
-import dev3.blockchainapiservice.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.util.InterfaceId
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach

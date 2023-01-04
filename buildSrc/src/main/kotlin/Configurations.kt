@@ -25,4 +25,9 @@ object Configurations {
         val testSets = listOf("integTest", "apiTest")
         val minimumCoverage = BigDecimal("0.90")
     }
+
+    object Jooq {
+        const val packageDir = "dev3/blockchainapiservice/generated/jooq"
+        const val packageName = "dev3.blockchainapiservice.generated.jooq"
+    }
 }

@@ -4,21 +4,25 @@ import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.JsonConfig
-import dev3.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
-import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
-import dev3.blockchainapiservice.model.params.OutputParameter
-import dev3.blockchainapiservice.model.request.ReadonlyFunctionCallRequest
-import dev3.blockchainapiservice.model.response.ReadonlyFunctionCallResponse
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
-import dev3.blockchainapiservice.service.ContractReadonlyFunctionCallService
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.contract.abi.model.BoolType
+import dev3.blockchainapiservice.features.contract.abi.model.StringType
+import dev3.blockchainapiservice.features.contract.abi.model.UintType
+import dev3.blockchainapiservice.features.contract.deployment.model.params.DeployedContractIdIdentifier
+import dev3.blockchainapiservice.features.contract.readcall.controller.ContractReadonlyFunctionCallController
+import dev3.blockchainapiservice.features.contract.readcall.model.params.CreateReadonlyFunctionCallParams
+import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
+import dev3.blockchainapiservice.features.contract.readcall.model.request.ReadonlyFunctionCallRequest
+import dev3.blockchainapiservice.features.contract.readcall.model.response.ReadonlyFunctionCallResponse
+import dev3.blockchainapiservice.features.contract.readcall.model.result.ReadonlyFunctionCallResult
+import dev3.blockchainapiservice.features.contract.readcall.service.ContractReadonlyFunctionCallService
+import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.BlockNumber
-import dev3.blockchainapiservice.util.BoolType
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
-import dev3.blockchainapiservice.util.StringType
-import dev3.blockchainapiservice.util.UintType
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithDeployedContractIdAndAddress
 import org.junit.jupiter.api.Test
@@ -31,7 +35,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyCallContractReadonlyFunction() {
-        val deployedContractId = UUID.randomUUID()
+        val deployedContractId = ContractDeploymentRequestId(UUID.randomUUID())
         val params = CreateReadonlyFunctionCallParams(
             identifier = DeployedContractIdIdentifier(deployedContractId),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -55,8 +59,8 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
             contractAddress = ContractAddress("cafebafe")
         )
         val project = Project(
-            id = UUID.randomUUID(),
-            ownerId = UUID.randomUUID(),
+            id = ProjectId(UUID.randomUUID()),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),

@@ -3,16 +3,19 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ErrorCode
+import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiPaymentTemplateItemResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiPaymentTemplateWithItemsResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiPaymentTemplateWithoutItemsResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.response.MultiPaymentTemplatesResponse
+import dev3.blockchainapiservice.features.asset.multisend.model.result.MultiPaymentTemplate
+import dev3.blockchainapiservice.features.asset.multisend.model.result.MultiPaymentTemplateItem
+import dev3.blockchainapiservice.features.asset.multisend.model.result.WithItems
+import dev3.blockchainapiservice.features.asset.multisend.repository.MultiPaymentTemplateRepository
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateId
+import dev3.blockchainapiservice.generated.jooq.id.MultiPaymentTemplateItemId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
-import dev3.blockchainapiservice.model.response.MultiPaymentTemplateItemResponse
-import dev3.blockchainapiservice.model.response.MultiPaymentTemplateWithItemsResponse
-import dev3.blockchainapiservice.model.response.MultiPaymentTemplateWithoutItemsResponse
-import dev3.blockchainapiservice.model.response.MultiPaymentTemplatesResponse
-import dev3.blockchainapiservice.model.result.MultiPaymentTemplate
-import dev3.blockchainapiservice.model.result.MultiPaymentTemplateItem
-import dev3.blockchainapiservice.model.result.WithItems
-import dev3.blockchainapiservice.repository.MultiPaymentTemplateRepository
 import dev3.blockchainapiservice.security.WithMockUser
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.Balance
@@ -31,9 +34,9 @@ import java.util.UUID
 class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
     companion object {
-        private val OWNER_ID = UUID.randomUUID()
+        private val OWNER_ID = UserId(UUID.randomUUID())
         private const val OWNER_ADDRESS = "abc123"
-        private val OTHER_OWNER_ID = UUID.randomUUID()
+        private val OTHER_OWNER_ID = UserId(UUID.randomUUID())
         private const val OTHER_OWNER_ADDRESS = "def456"
         private const val TEMPLATE_NAME = "templateName"
         private val CHAIN_ID = TestData.CHAIN_ID
@@ -175,13 +178,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyUpdateMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -207,7 +210,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to update multi-payment template is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/multi-payment-template/$templateId")
+                MockMvcRequestBuilders.patch("/v1/multi-payment-template/${templateId.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -265,13 +268,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OTHER_OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenUpdatingNonOwnedMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -297,7 +300,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-owned multi-payment template") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.patch("/v1/multi-payment-template/$templateId")
+                MockMvcRequestBuilders.patch("/v1/multi-payment-template/${templateId.value}")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -348,13 +351,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyDeleteMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -377,7 +380,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
         suppose("request to delete multi-payment template is made") {
             mockMvc.perform(
-                MockMvcRequestBuilders.delete("/v1/multi-payment-template/$templateId")
+                MockMvcRequestBuilders.delete("/v1/multi-payment-template/${templateId.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
         }
@@ -391,13 +394,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OTHER_OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenDeletingNonOwnedMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -420,7 +423,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-owned multi-payment template") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/v1/multi-payment-template/$templateId")
+                MockMvcRequestBuilders.delete("/v1/multi-payment-template/${templateId.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
@@ -445,13 +448,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyFetchMultiPaymentTemplateById() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -474,7 +477,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to fetch multi-payment template is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.get("/v1/multi-payment-template/$templateId")
+                MockMvcRequestBuilders.get("/v1/multi-payment-template/${templateId.value}")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
@@ -503,13 +506,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
     @Test
     fun mustCorrectlyFetchAllMultiPaymentTemplatesForWalletAddress() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -555,13 +558,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyCreateItemForMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -588,7 +591,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
         val response = suppose("request to create multi-payment template item is made") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/multi-payment-template/$templateId/items")
+                MockMvcRequestBuilders.post("/v1/multi-payment-template/${templateId.value}/items")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -668,13 +671,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OTHER_OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenCreatingItemForNonOwnedMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -701,7 +704,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
 
         verify("404 is returned for non-owned multi-payment template") {
             val response = mockMvc.perform(
-                MockMvcRequestBuilders.post("/v1/multi-payment-template/$templateId/items")
+                MockMvcRequestBuilders.post("/v1/multi-payment-template/${templateId.value}/items")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -751,13 +754,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyUpdateItemForMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -785,7 +788,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         val response = suppose("request to update multi-payment template item is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch(
-                    "/v1/multi-payment-template/$templateId/items/${template.items.value[0].id}"
+                    "/v1/multi-payment-template/${templateId.value}/items/${template.items.value[0].id.value}"
                 )
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
@@ -858,13 +861,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OTHER_OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenUpdatingItemForNonOwnedMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -892,7 +895,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-owned multi-payment template") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch(
-                    "/v1/multi-payment-template/$templateId/items/${template.items.value[0].id}"
+                    "/v1/multi-payment-template/${templateId.value}/items/${template.items.value[0].id.value}"
                 )
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
@@ -945,13 +948,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OWNER_ADDRESS)
     fun mustCorrectlyDeleteItemForMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -975,7 +978,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         val response = suppose("request to delete multi-payment template item is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.delete(
-                    "/v1/multi-payment-template/$templateId/items/${template.items.value[0].id}"
+                    "/v1/multi-payment-template/${templateId.value}/items/${template.items.value[0].id.value}"
                 )
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
@@ -1018,13 +1021,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @Test
     @WithMockUser(OTHER_OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenDeletingItemForNonOwnedMultiPaymentTemplate() {
-        val templateId = UUID.randomUUID()
+        val templateId = MultiPaymentTemplateId(UUID.randomUUID())
         val template = MultiPaymentTemplate(
             id = templateId,
             items = WithItems(
                 listOf(
                     MultiPaymentTemplateItem(
-                        id = UUID.randomUUID(),
+                        id = MultiPaymentTemplateItemId(UUID.randomUUID()),
                         templateId = templateId,
                         walletAddress = WALLET_ADDRESS,
                         itemName = ITEM_NAME,
@@ -1048,7 +1051,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-owned multi-payment template") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.delete(
-                    "/v1/multi-payment-template/$templateId/items/${template.items.value[0].id}"
+                    "/v1/multi-payment-template/${templateId.value}/items/${template.items.value[0].id.value}"
                 )
             )
                 .andExpect(MockMvcResultMatchers.status().isNotFound)

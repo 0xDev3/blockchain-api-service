@@ -3,16 +3,20 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
+import dev3.blockchainapiservice.features.api.access.model.result.Project
+import dev3.blockchainapiservice.features.asset.send.controller.AssetSendRequestController
+import dev3.blockchainapiservice.features.asset.send.model.params.CreateAssetSendRequestParams
+import dev3.blockchainapiservice.features.asset.send.model.request.CreateAssetSendRequest
+import dev3.blockchainapiservice.features.asset.send.model.response.AssetSendRequestResponse
+import dev3.blockchainapiservice.features.asset.send.model.response.AssetSendRequestsResponse
+import dev3.blockchainapiservice.features.asset.send.model.result.AssetSendRequest
+import dev3.blockchainapiservice.features.asset.send.service.AssetSendRequestService
+import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.ProjectId
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.model.ScreenConfig
-import dev3.blockchainapiservice.model.params.CreateAssetSendRequestParams
 import dev3.blockchainapiservice.model.request.AttachTransactionInfoRequest
-import dev3.blockchainapiservice.model.request.CreateAssetSendRequest
-import dev3.blockchainapiservice.model.response.AssetSendRequestResponse
-import dev3.blockchainapiservice.model.response.AssetSendRequestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
-import dev3.blockchainapiservice.model.result.AssetSendRequest
-import dev3.blockchainapiservice.model.result.Project
-import dev3.blockchainapiservice.service.AssetSendRequestService
 import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BaseUrl
@@ -48,8 +52,8 @@ class AssetSendRequestControllerTest : TestBase() {
             )
         )
         val result = AssetSendRequest(
-            id = UUID.randomUUID(),
-            projectId = UUID.randomUUID(),
+            id = AssetSendRequestId(UUID.randomUUID()),
+            projectId = ProjectId(UUID.randomUUID()),
             chainId = ChainId(1337L),
             redirectUrl = params.redirectUrl!!,
             tokenAddress = params.tokenAddress,
@@ -63,7 +67,7 @@ class AssetSendRequestControllerTest : TestBase() {
         )
         val project = Project(
             id = result.projectId,
-            ownerId = UUID.randomUUID(),
+            ownerId = UserId(UUID.randomUUID()),
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
             chainId = ChainId(1337L),
@@ -131,13 +135,13 @@ class AssetSendRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetSendRequest() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val service = mock<AssetSendRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = AssetSendRequest(
                 id = id,
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 chainId = ChainId(123L),
                 redirectUrl = "redirect-url",
                 tokenAddress = ContractAddress("a"),
@@ -212,8 +216,8 @@ class AssetSendRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetSendRequestsByProjectId() {
-        val id = UUID.randomUUID()
-        val projectId = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
+        val projectId = ProjectId(UUID.randomUUID())
         val service = mock<AssetSendRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
@@ -298,14 +302,14 @@ class AssetSendRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetSendRequestsBySender() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val sender = WalletAddress("b")
         val service = mock<AssetSendRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = AssetSendRequest(
                 id = id,
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 chainId = ChainId(123L),
                 redirectUrl = "redirect-url",
                 tokenAddress = ContractAddress("a"),
@@ -384,14 +388,14 @@ class AssetSendRequestControllerTest : TestBase() {
 
     @Test
     fun mustCorrectlyFetchAssetSendRequestsByRecipient() {
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val recipient = WalletAddress("c")
         val service = mock<AssetSendRequestService>()
         val txHash = TransactionHash("tx-hash")
         val result = WithTransactionData(
             value = AssetSendRequest(
                 id = id,
-                projectId = UUID.randomUUID(),
+                projectId = ProjectId(UUID.randomUUID()),
                 chainId = ChainId(123L),
                 redirectUrl = "redirect-url",
                 tokenAddress = ContractAddress("a"),
@@ -473,7 +477,7 @@ class AssetSendRequestControllerTest : TestBase() {
         val service = mock<AssetSendRequestService>()
         val controller = AssetSendRequestController(service)
 
-        val id = UUID.randomUUID()
+        val id = AssetSendRequestId(UUID.randomUUID())
         val txHash = "tx-hash"
         val caller = "c"
 

@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.DatabindException
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.ContractDecoratorException
 import dev3.blockchainapiservice.exception.ContractInterfaceNotFoundException
-import dev3.blockchainapiservice.model.json.ArtifactJson
-import dev3.blockchainapiservice.model.json.InterfaceManifestJson
-import dev3.blockchainapiservice.model.json.ManifestJson
-import dev3.blockchainapiservice.model.result.ContractDecorator
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.InterfaceManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
+import dev3.blockchainapiservice.features.contract.deployment.model.result.ContractDecorator
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractDecoratorRepository
+import dev3.blockchainapiservice.features.contract.deployment.repository.ContractMetadataRepository
+import dev3.blockchainapiservice.features.contract.interfaces.repository.ContractInterfacesRepository
+import dev3.blockchainapiservice.generated.jooq.id.ContractMetadataId
 import dev3.blockchainapiservice.model.result.ContractMetadata
-import dev3.blockchainapiservice.repository.ContractDecoratorRepository
-import dev3.blockchainapiservice.repository.ContractInterfacesRepository
-import dev3.blockchainapiservice.repository.ContractMetadataRepository
 import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.util.Constants
 import dev3.blockchainapiservice.util.ContractId
@@ -170,13 +171,13 @@ class ContractDecoratorFileChangeListener(
                 contractDecoratorRepository.store(decorator.id, infoMarkdown)
                 contractMetadataRepository.createOrUpdate(
                     ContractMetadata(
-                        id = uuidProvider.getUuid(),
+                        id = uuidProvider.getUuid(ContractMetadataId),
                         name = decorator.name,
                         description = decorator.description,
                         contractId = decorator.id,
                         contractTags = decorator.tags,
                         contractImplements = decorator.implements,
-                        projectId = Constants.NIL_UUID
+                        projectId = Constants.NIL_PROJECT_ID
                     )
                 )
             } catch (e: ContractDecoratorException) {

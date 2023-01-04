@@ -6,15 +6,15 @@ import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedM
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.exception.ErrorResponse
-import dev3.blockchainapiservice.repository.ApiKeyRepository
-import dev3.blockchainapiservice.repository.ApiRateLimitRepository
-import dev3.blockchainapiservice.repository.UserIdResolverRepository
+import dev3.blockchainapiservice.features.api.access.repository.ApiKeyRepository
+import dev3.blockchainapiservice.features.api.usage.repository.ApiRateLimitRepository
+import dev3.blockchainapiservice.features.api.usage.repository.UserIdResolverRepository
+import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
 import mu.KLogging
 import org.springframework.http.HttpStatus
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
-import java.util.UUID
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -77,7 +77,7 @@ class ApiKeyWriteCallInterceptor(
     private fun handleAnnotatedMethod(
         request: HttpServletRequest,
         handler: Any,
-        handle: (UUID, ApiWriteLimitedMapping) -> Boolean
+        handle: (UserId, ApiWriteLimitedMapping) -> Boolean
     ): Boolean {
         val annotation = (handler as? HandlerMethod)?.method?.getAnnotation(ApiWriteLimitedMapping::class.java)
 
@@ -88,11 +88,11 @@ class ApiKeyWriteCallInterceptor(
         } else true
     }
 
-    private fun ApiWriteLimitedMapping.resolveUserId(request: HttpServletRequest): UUID? =
+    private fun ApiWriteLimitedMapping.resolveUserId(request: HttpServletRequest): UserId? =
         if (idType == IdType.PROJECT_ID) {
             request.getHeader(CustomHeaders.API_KEY_HEADER)
                 ?.let { apiKeyRepository.getByValue(it)?.projectId }
-                ?.let { userIdResolverRepository.getUserId(idType, it) }
+                ?.let { userIdResolverRepository.getByProjectId(it) }
         } else {
             UserIdResolver.resolve(
                 userIdResolverRepository = userIdResolverRepository,
