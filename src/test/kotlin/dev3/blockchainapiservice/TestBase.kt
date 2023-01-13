@@ -2,6 +2,7 @@ package dev3.blockchainapiservice
 
 import org.assertj.core.api.AbstractBigIntegerAssert
 import org.assertj.core.api.AbstractBooleanAssert
+import org.assertj.core.api.AbstractCollectionAssert
 import org.assertj.core.api.AbstractIntegerAssert
 import org.assertj.core.api.AbstractLongAssert
 import org.assertj.core.api.AbstractOffsetDateTimeAssert
@@ -67,6 +68,11 @@ abstract class TestBase {
             fun expectThat(value: OffsetDateTime?): AbstractOffsetDateTimeAssert<*> = assertThat(value).withMessage()
             fun <K, V> expectThat(value: Map<K, V>?): MapAssert<K, V> = assertThat(value).withMessage()
             fun <T> expectThat(value: List<T>?): ListAssert<T> = assertThat(value).withMessage()
+            fun <T> expectThat(
+                value: Set<T>?
+            ): AbstractCollectionAssert<*, MutableCollection<out T>, T, ObjectAssert<T>> =
+                assertThat(value).withMessage()
+
             fun <T> expectThat(value: T): ObjectAssert<T> = assertThat(value).withMessage()
 
             private fun <A : Assert<A, B>, B> Assert<A, B>.withMessage(): A = this.`as`(message)

@@ -13,9 +13,10 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule
 import dev3.blockchainapiservice.features.contract.abi.model.Tuple
 import dev3.blockchainapiservice.features.contract.readcall.model.params.OutputParameter
 import dev3.blockchainapiservice.features.functions.encoding.model.FunctionArgument
+import dev3.blockchainapiservice.features.payout.util.MerkleHash
 import dev3.blockchainapiservice.features.payout.util.MerkleTree
+import dev3.blockchainapiservice.features.payout.util.json.MerkleHashJsonSerializer
 import dev3.blockchainapiservice.features.payout.util.json.MerkleTreeJsonSerializer
-import dev3.blockchainapiservice.features.payout.util.json.PathSegmentJsonSerializer
 import dev3.blockchainapiservice.generated.jooq.id.GeneratedIdsJacksonModule
 import dev3.blockchainapiservice.util.json.FunctionArgumentJsonDeserializer
 import dev3.blockchainapiservice.util.json.OutputParameterJsonDeserializer
@@ -43,7 +44,7 @@ class JsonConfig {
                 addDeserializer(FunctionArgument::class, FunctionArgumentJsonDeserializer())
                 addDeserializer(OutputParameter::class, OutputParameterJsonDeserializer())
                 addSerializer(MerkleTree::class.java, MerkleTreeJsonSerializer())
-                addSerializer(MerkleTree.Companion.PathSegment::class.java, PathSegmentJsonSerializer())
+                addSerializer(MerkleHash::class.java, MerkleHashJsonSerializer())
             }
         )
         mapper.registerModule(

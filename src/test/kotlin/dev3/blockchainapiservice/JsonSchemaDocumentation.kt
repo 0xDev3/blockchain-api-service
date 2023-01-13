@@ -16,6 +16,7 @@ import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.util.annotation.SchemaAnyOf
 import dev3.blockchainapiservice.util.annotation.SchemaIgnore
 import dev3.blockchainapiservice.util.annotation.SchemaName
+import dev3.blockchainapiservice.util.annotation.SchemaNotNull
 import java.lang.reflect.Type
 import java.math.BigInteger
 import java.nio.file.Files
@@ -64,7 +65,7 @@ object JsonSchemaDocumentation {
                 nameOverride ?: namingStrategy.translate(field.name)
             }
             withNullableCheck { field ->
-                field.isNullable()
+                field.getAnnotation(SchemaNotNull::class.java)?.let { false } ?: field.isNullable()
             }
             withIgnoreCheck { field ->
                 field.getAnnotation(SchemaIgnore::class.java) != null

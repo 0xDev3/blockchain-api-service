@@ -4,6 +4,7 @@ import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
 import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
 import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.AssetSnapshotId
 import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
@@ -15,6 +16,7 @@ import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
+import dev3.blockchainapiservice.generated.jooq.tables.AssetSnapshotTable
 import dev3.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractArbitraryCallRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractDeploymentRequestTable
@@ -67,6 +69,9 @@ class JooqUserIdResolverRepository(private val dslContext: DSLContext) : UserIdR
 
             IdType.ERC20_LOCK_REQUEST_ID ->
                 Erc20LockRequestTable.run { ID.select(Erc20LockRequestId(id), PROJECT_ID) }
+
+            IdType.ASSET_SNAPSHOT_ID ->
+                AssetSnapshotTable.run { ID.select(AssetSnapshotId(id), PROJECT_ID) }
         }
 
         return projectId?.let {

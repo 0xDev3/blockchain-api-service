@@ -1413,16 +1413,6 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         hardhatContainer.mine()
 
-        val service = suppose("simple payout service contract is deployed") {
-            SimplePayoutService.deploy(
-                hardhatContainer.web3j,
-                mainAccount,
-                DefaultGasProvider()
-            ).send()
-        }
-
-        hardhatContainer.mine()
-
         suppose("some investments are claimed") {
             payoutsAndInvestments.forEach {
                 manager.setClaim(it.second.payoutId, it.second.investor, it.second.amountClaimed).send()
@@ -1431,7 +1421,6 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         }
 
         val investor1NullParams = GetPayoutsForInvestorParams(
-            payoutService = ContractAddress(service.contractAddress),
             payoutManager = ContractAddress(manager.contractAddress),
             investor = investor1
         )
@@ -1453,7 +1442,6 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
     @Test
     fun mustThrowBlockchainReadExceptionWhenFetchingPayoutsForInvestorFails() {
         val nullParams = GetPayoutsForInvestorParams(
-            payoutService = ContractAddress("0"),
             payoutManager = ContractAddress("0"),
             investor = WalletAddress("1")
         )
