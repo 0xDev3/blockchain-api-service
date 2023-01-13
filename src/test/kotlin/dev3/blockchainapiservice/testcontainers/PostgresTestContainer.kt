@@ -8,6 +8,7 @@ import dev3.blockchainapiservice.generated.jooq.tables.ApiWriteCallTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
+import dev3.blockchainapiservice.generated.jooq.tables.AssetSnapshotTable
 import dev3.blockchainapiservice.generated.jooq.tables.AuthorizationRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.BlacklistedAddressTable
 import dev3.blockchainapiservice.generated.jooq.tables.ContractArbitraryCallRequestTable
@@ -20,6 +21,8 @@ import dev3.blockchainapiservice.generated.jooq.tables.FetchAccountBalanceCacheT
 import dev3.blockchainapiservice.generated.jooq.tables.FetchErc20AccountBalanceCacheTable
 import dev3.blockchainapiservice.generated.jooq.tables.FetchTransactionInfoCacheTable
 import dev3.blockchainapiservice.generated.jooq.tables.ImportedContractDecoratorTable
+import dev3.blockchainapiservice.generated.jooq.tables.MerkleTreeLeafNodeTable
+import dev3.blockchainapiservice.generated.jooq.tables.MerkleTreeRootTable
 import dev3.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateItemTable
 import dev3.blockchainapiservice.generated.jooq.tables.MultiPaymentTemplateTable
 import dev3.blockchainapiservice.generated.jooq.tables.ProjectTable
@@ -60,13 +63,13 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
             deleteFrom(ContractDeploymentTransactionCacheTable).execute()
             deleteFrom(PromoCodeUsageTable).execute()
             deleteFrom(PromoCodeTable).execute()
+            deleteFrom(AssetSnapshotTable).execute()
+            deleteFrom(MerkleTreeLeafNodeTable).execute()
+            deleteFrom(MerkleTreeRootTable).execute()
             deleteFrom(ApiKeyTable).execute()
             deleteFrom(ProjectTable).execute()
             deleteFrom(UserIdentifierTable).execute()
             deleteFrom(BlacklistedAddressTable).execute()
-            // TODO deleteFrom(SnapshotTable).execute()
-            // TODO deleteFrom(MerkleTreeLeafNodeTable).execute()
-            // TODO deleteFrom(MerkleTreeRootTable).execute()
         }
     }
 }

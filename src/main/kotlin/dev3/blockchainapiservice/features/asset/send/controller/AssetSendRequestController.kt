@@ -77,9 +77,9 @@ class AssetSendRequestController(private val assetSendRequestService: AssetSendR
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest
     ) {
         assetSendRequestService.attachTxInfo(
-            id,
-            TransactionHash(requestBody.txHash),
-            WalletAddress(requestBody.callerAddress)
+            id = id,
+            txHash = TransactionHash(requestBody.txHash),
+            caller = WalletAddress(requestBody.callerAddress)
         )
     }
 }

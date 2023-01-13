@@ -9,5 +9,6 @@ enum class IdType(val idVariableName: String) {
     CONTRACT_DEPLOYMENT_REQUEST_ID("id"),
     FUNCTION_CALL_REQUEST_ID("id"),
     ARBITRARY_CALL_REQUEST_ID("id"),
-    ERC20_LOCK_REQUEST_ID("id")
+    ERC20_LOCK_REQUEST_ID("id"),
+    ASSET_SNAPSHOT_ID("id")
 }

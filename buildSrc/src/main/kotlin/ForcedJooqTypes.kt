@@ -34,7 +34,10 @@ object ForcedJooqTypes {
         "MULTI_PAYMENT_TEMPLATE_ID",
         "MULTI_PAYMENT_TEMPLATE_ITEM_ID",
         "PROJECT_ID",
-        "USER_ID"
+        "USER_ID",
+        "MERKLE_TREE_ROOT_ID",
+        "MERKLE_TREE_LEAF_ID",
+        "ASSET_SNAPSHOT_ID"
     )
 
     val types = listOf(
@@ -123,18 +126,33 @@ object ForcedJooqTypes {
         ),
         JooqType(
             userType = "dev3.blockchainapiservice.features.payout.util.HashFunction",
+            converter = "dev3.blockchainapiservice.util.HashFunctionConverter",
             includeExpression = ".*",
             includeTypes = "HASH_FUNCTION"
         ),
         JooqType(
-            userType = "dev3.blockchainapiservice.features.payout.util.SnapshotStatus",
+            userType = "dev3.blockchainapiservice.features.payout.util.AssetSnapshotStatus",
+            converter = "dev3.blockchainapiservice.util.AssetSnapshotStatusConverter",
             includeExpression = ".*",
-            includeTypes = "SNAPSHOT_STATUS"
+            includeTypes = "ASSET_SNAPSHOT_STATUS"
         ),
         JooqType(
-            userType = "dev3.blockchainapiservice.features.payout.util.SnapshotFailureCause",
+            userType = "dev3.blockchainapiservice.features.payout.util.AssetSnapshotFailureCause",
+            converter = "dev3.blockchainapiservice.util.AssetSnapshotFailureCauseConverter",
             includeExpression = ".*",
-            includeTypes = "SNAPSHOT_FAILURE_CAUSE"
+            includeTypes = "ASSET_SNAPSHOT_FAILURE_CAUSE"
+        ),
+        JooqType(
+            userType = "dev3.blockchainapiservice.features.payout.util.MerkleHash",
+            converter = "dev3.blockchainapiservice.util.MerkleHashConverter",
+            includeExpression = "merkle_hash",
+            includeTypes = "VARCHAR"
+        ),
+        JooqType(
+            userType = "dev3.blockchainapiservice.features.payout.util.IpfsHash",
+            converter = "dev3.blockchainapiservice.util.IpfsHashConverter",
+            includeExpression = ".*_ipfs_hash",
+            includeTypes = "VARCHAR"
         )
     ) + domainIdTypes.map {
         val typeName = it.split("_").joinToString("") { it.toLowerCase().capitalized() }

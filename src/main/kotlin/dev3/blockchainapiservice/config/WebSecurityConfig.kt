@@ -87,6 +87,7 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) {
             .antMatchers("/v1/promo-codes").authenticated()
             .antMatchers("/v1/use-promo-code/**").authenticated()
             .antMatchers("/v1/blacklist/**").authenticated()
+            .antMatchers("/v1/claimable-payouts").authenticated()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling().authenticationEntryPoint(authenticationHandler).and()

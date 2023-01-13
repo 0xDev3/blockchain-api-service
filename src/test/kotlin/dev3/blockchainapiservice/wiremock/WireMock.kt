@@ -7,9 +7,9 @@ object WireMock {
 
     val server = WireMockServer(WireMockConfiguration.wireMockConfig().port(8090))
 
-    fun start() {
-        server.start()
-    }
+    fun start() = server.start()
 
     fun stop() = server.stop()
+
+    fun reset() = server.resetAll()
 }

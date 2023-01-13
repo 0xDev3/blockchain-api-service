@@ -4,10 +4,12 @@ import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.features.api.usage.repository.JooqUserIdResolverRepository
+import dev3.blockchainapiservice.features.payout.util.AssetSnapshotStatus
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.id.AssetBalanceRequestId
 import dev3.blockchainapiservice.generated.jooq.id.AssetMultiSendRequestId
 import dev3.blockchainapiservice.generated.jooq.id.AssetSendRequestId
+import dev3.blockchainapiservice.generated.jooq.id.AssetSnapshotId
 import dev3.blockchainapiservice.generated.jooq.id.AuthorizationRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ContractArbitraryCallRequestId
 import dev3.blockchainapiservice.generated.jooq.id.ContractDeploymentRequestId
@@ -19,6 +21,7 @@ import dev3.blockchainapiservice.generated.jooq.id.UserId
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetBalanceRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetMultiSendRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.AssetSendRequestRecord
+import dev3.blockchainapiservice.generated.jooq.tables.records.AssetSnapshotRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.AuthorizationRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractArbitraryCallRequestRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.ContractDeploymentRequestRecord
@@ -426,6 +429,35 @@ class JooqProjectIdResolverRepositoryIntegTest : TestBase() {
 
         verify("correct userId is returned") {
             expectThat(repository.getUserId(IdType.ERC20_LOCK_REQUEST_ID, id.value))
+                .isEqualTo(USER_ID)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReturnUserIdForAssetSnapshot() {
+        val id = AssetSnapshotId(UUID.randomUUID())
+
+        suppose("asset snapshot exists in database") {
+            dslContext.executeInsert(
+                AssetSnapshotRecord(
+                    id = id,
+                    projectId = PROJECT_ID,
+                    name = NAME,
+                    chainId = CHAIN_ID,
+                    assetContractAddress = CONTRACT_ADDRESS,
+                    blockNumber = BLOCK_NUMBER,
+                    ignoredHolderAddresses = emptyArray(),
+                    status = AssetSnapshotStatus.SUCCESS,
+                    resultTree = null,
+                    treeIpfsHash = null,
+                    totalAssetAmount = null,
+                    failureCause = null
+                )
+            )
+        }
+
+        verify("correct userId is returned") {
+            expectThat(repository.getUserId(IdType.ASSET_SNAPSHOT_ID, id.value))
                 .isEqualTo(USER_ID)
         }
     }
