@@ -5,16 +5,18 @@ package dev3.blockchainapiservice.util
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.features.contract.deployment.model.json.ArtifactJson
 import dev3.blockchainapiservice.features.contract.deployment.model.json.ManifestJson
+import dev3.blockchainapiservice.features.payout.util.AssetSnapshotFailureCause
+import dev3.blockchainapiservice.features.payout.util.AssetSnapshotStatus
 import dev3.blockchainapiservice.features.payout.util.HashFunction
-import dev3.blockchainapiservice.features.payout.util.SnapshotFailureCause
-import dev3.blockchainapiservice.features.payout.util.SnapshotStatus
+import dev3.blockchainapiservice.features.payout.util.IpfsHash
+import dev3.blockchainapiservice.features.payout.util.MerkleHash
 import dev3.blockchainapiservice.generated.jooq.converters.converter
 import org.jooq.JSON
 import java.math.BigInteger
 import java.time.OffsetDateTime
+import dev3.blockchainapiservice.generated.jooq.enums.AssetSnapshotFailureCause as DbAssetSnapshotFailureCause
+import dev3.blockchainapiservice.generated.jooq.enums.AssetSnapshotStatus as DbAssetSnapshotStatus
 import dev3.blockchainapiservice.generated.jooq.enums.HashFunction as DbHashFunction
-import dev3.blockchainapiservice.generated.jooq.enums.SnapshotFailureCause as DbSnapshotFailureCause
-import dev3.blockchainapiservice.generated.jooq.enums.SnapshotStatus as DbSnapshotStatus
 
 private val objectMapper = JsonConfig().objectMapper()
 
@@ -59,11 +61,18 @@ fun ArtifactJsonConverter() = converter(
     { JSON.valueOf(objectMapper.writeValueAsString(it)) }
 )
 
+fun MerkleHashConverter() = converter({ it: String -> MerkleHash(it) }, { it.value })
+
+fun IpfsHashConverter() = converter({ it: String -> IpfsHash(it) }, { it.value })
+
 fun HashFunctionConverter() = converter({ it: DbHashFunction -> HashFunction.fromDbEnum(it) }, { it.toDbEnum })
 
-fun SnapshotStatusConverter() = converter({ it: DbSnapshotStatus -> SnapshotStatus.fromDbEnum(it) }, { it.toDbEnum })
+fun AssetSnapshotStatusConverter() = converter(
+    { it: DbAssetSnapshotStatus -> AssetSnapshotStatus.fromDbEnum(it) },
+    { it.toDbEnum }
+)
 
-fun SnapshotFailureCauseConverter() = converter(
-    { it: DbSnapshotFailureCause -> SnapshotFailureCause.fromDbEnum(it) },
+fun AssetSnapshotFailureCauseConverter() = converter(
+    { it: DbAssetSnapshotFailureCause -> AssetSnapshotFailureCause.fromDbEnum(it) },
     { it.toDbEnum }
 )

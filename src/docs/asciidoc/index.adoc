@@ -51,6 +51,21 @@ include::src/docs/asciidoc/multi-send/fetch-by-sender.adoc[]
 include::src/docs/asciidoc/multi-send/attach-approve.adoc[]
 include::src/docs/asciidoc/multi-send/attach-disperse.adoc[]
 
+== Asset Snapshot Request API
+All endpoints are public and do not require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/asset-snapshot/create.adoc[]
+include::src/docs/asciidoc/asset-snapshot/fetch.adoc[]
+include::src/docs/asciidoc/asset-snapshot/fetch-by-project-id.adoc[]
+
+== Claimable Payouts API
+Payout info endpoints are public and do not require `Authorization: Bearer JWT` header. Claimable payouts endpoint
+requires `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/payout-info/fetch-merkle-tree.adoc[]
+include::src/docs/asciidoc/payout-info/fetch-merkle-path.adoc[]
+include::src/docs/asciidoc/claimable-payouts/fetch.adoc[]
+
 == ERC20 Lock Request API
 All endpoints are public and do not require `Authorization: Bearer JWT` header.
 
