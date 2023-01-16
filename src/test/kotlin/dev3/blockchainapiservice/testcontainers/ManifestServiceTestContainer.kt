@@ -6,7 +6,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
 class ManifestServiceTestContainer : GenericContainer<ManifestServiceTestContainer>(
-    "ampnet/contracts-manifest-service:0.6.0"
+    "ampnet/contracts-manifest-service:0.7.0"
 ) {
 
     @Suppress("unused")

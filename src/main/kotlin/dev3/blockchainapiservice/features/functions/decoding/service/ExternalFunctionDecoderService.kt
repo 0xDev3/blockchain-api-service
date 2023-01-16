@@ -84,7 +84,7 @@ class ExternalFunctionDecoderService(
     private fun AbiInputOutput.toSolidityTypeJson(): String =
         if (type.startsWith("tuple")) {
             val elems = components.orEmpty().joinToString(separator = ",") { it.toSolidityTypeJson() }
-            "{\"type\":$type,\"elems\":[$elems]}"
+            "{\"type\":\"$type\",\"elems\":[$elems]}"
         } else {
             "\"$type\""
         }

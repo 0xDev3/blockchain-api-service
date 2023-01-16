@@ -11,6 +11,6 @@ services:
       - "5432:5432"
   contract-manifest-service:
     container_name: contract-manifest-service
-    image: "ampnet/contracts-manifest-service:0.6.0"
+    image: "ampnet/contracts-manifest-service:0.7.0"
     ports:
       - "42070:42070"

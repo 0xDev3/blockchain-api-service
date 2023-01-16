@@ -558,14 +558,13 @@ class ContractImportServiceImpl(
                 deployer = contractDeploymentTransactionInfo.from
             )
         }
-
         return id
     }
 
     private fun ContractParameter.toSolidityTypeJson(): String =
         if (solidityType.startsWith("tuple")) {
             val elems = parameters.orEmpty().joinToString(separator = ",") { it.toSolidityTypeJson() }
-            "{\"type\":$solidityType,\"elems\":[$elems]}"
+            "{\"type\":\"$solidityType\",\"elems\":[$elems]}"
         } else {
             "\"$solidityType\""
         }
