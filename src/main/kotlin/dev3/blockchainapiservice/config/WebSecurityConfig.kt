@@ -49,7 +49,8 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) {
                 HttpHeaders.CACHE_CONTROL,
                 HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
                 CustomHeaders.API_KEY_HEADER,
-                CustomHeaders.PROJECT_ID_HEADER
+                CustomHeaders.PROJECT_ID_HEADER,
+                CustomHeaders.CORRELATION_ID_HEADER
             )
         }
 

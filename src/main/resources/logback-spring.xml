@@ -4,7 +4,7 @@
     <property name="LOG_FILE_PREFIX" value="blockchain-api-service" />
     <property name="LOG_ERROR_FILE_PREFIX" value="blockchain-api-service-error" />
     <property name="MAX_HISTORY" value="7" />
-    <property name="PATTERN_COLOR" value="%cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %green([%-40thread]) %highlight(%-5level) %magenta(%logger{100}) - %msg%n%rEx{full,
+    <property name="PATTERN_COLOR" value="%cyan(%d{yyyy-MM-dd HH:mm:ss.SSS}) %green([%-40thread]) %highlight(%-5level) %yellow([%X{CID}]) %magenta(%logger{100}) - %msg%n%rEx{full,
           java.lang.reflect.Method,
           org.apache.catalina,
           org.springframework.aop,

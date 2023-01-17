@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import dev3.blockchainapiservice.config.binding.UserIdentifierResolver
 import dev3.blockchainapiservice.config.interceptors.ApiKeyWriteCallInterceptor
+import dev3.blockchainapiservice.config.interceptors.CorrelationIdInterceptor
 import dev3.blockchainapiservice.config.interceptors.ProjectReadCallInterceptor
 import dev3.blockchainapiservice.features.api.access.repository.ApiKeyRepository
 import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
@@ -69,6 +70,7 @@ class WebConfig(
     }
 
     override fun addInterceptors(registry: InterceptorRegistry) {
+        registry.addInterceptor(CorrelationIdInterceptor(uuidProvider))
         registry.addInterceptor(
             ApiKeyWriteCallInterceptor(
                 apiKeyRepository = apiKeyRepository,
