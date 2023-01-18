@@ -115,7 +115,7 @@ class ExternalAbiProviderService(
                         )
                     }
                     ?.withGeneratedManifest()
-            }
+            }?.cleanupManifestSignatures()
         } else {
             logger.debug { "Chain explorer not set for chainSpec: $chainSpec" }
             null
@@ -228,4 +228,24 @@ class ExternalAbiProviderService(
             parameters = components?.map { it.toReturnTypeDecorator() },
             hints = emptyList()
         )
+
+    private fun DecompiledContractJson.cleanupManifestSignatures(): DecompiledContractJson {
+        val constructors = manifest.constructorDecorators.map { it.copy(signature = it.signature.cleanupSignature()) }
+        val functions = manifest.functionDecorators.map { it.copy(signature = it.signature.cleanupSignature()) }
+        val events = manifest.eventDecorators.map { it.copy(signature = it.signature.cleanupSignature()) }
+
+        return copy(
+            manifest = manifest.copy(
+                constructorDecorators = constructors,
+                functionDecorators = functions,
+                eventDecorators = events
+            )
+        )
+    }
+
+    private fun String.cleanupSignature(): String {
+        val (name, rest) = split('(', limit = 2)
+        val params = rest.removeSuffix(")")
+        return "$name(${params.replace("(", "tuple(")})"
+    }
 }
