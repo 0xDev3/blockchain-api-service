@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.features.api.access.model.result.Project
 import dev3.blockchainapiservice.features.api.access.repository.ProjectRepository
-import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
+import dev3.blockchainapiservice.features.blacklist.service.BlacklistCheckService
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.filters.ContractArbitraryCallRequestFilters
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.CreateContractArbitraryCallRequestParams
 import dev3.blockchainapiservice.features.contract.arbitrarycall.model.params.PreStoreContractArbitraryCallRequestParams
@@ -36,7 +36,7 @@ class ContractArbitraryCallRequestServiceImpl(
     private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,
     private val contractDecoratorRepository: ContractDecoratorRepository,
     private val importedContractDecoratorRepository: ImportedContractDecoratorRepository,
-    private val blacklistedAddressRepository: BlacklistedAddressRepository,
+    private val blacklistCheckService: BlacklistCheckService,
     private val ethCommonService: EthCommonService,
     private val projectRepository: ProjectRepository,
     private val objectMapper: ObjectMapper
@@ -110,7 +110,7 @@ class ContractArbitraryCallRequestServiceImpl(
     }
 
     private fun StoreContractArbitraryCallRequestParams.addCautionIfNeeded() =
-        if (blacklistedAddressRepository.exists(contractAddress)) copy(redirectUrl = "$redirectUrl/caution") else this
+        if (blacklistCheckService.exists(contractAddress)) copy(redirectUrl = "$redirectUrl/caution") else this
 
     private fun ContractArbitraryCallRequest.appendTransactionData(
         project: Project

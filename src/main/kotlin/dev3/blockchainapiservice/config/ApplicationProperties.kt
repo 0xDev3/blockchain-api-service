@@ -103,3 +103,10 @@ data class StripeProperties(
 data class AdminProperties(
     val wallets: Set<WalletAddress> = emptySet()
 )
+
+@ConstructorBinding
+@ConfigurationProperties(prefix = "blockchain-api-service.blacklist-api")
+data class BlacklistApiProperties(
+    val url: String = "https://app.hoptrail.io/api/eth/check/",
+    val timeout: Duration = 1.seconds.toJavaDuration()
+)
