@@ -118,6 +118,24 @@ enum class Chain(
         "https://alfajores-forno.celo-testnet.org",
         null,
         { it.chainCeloAlfajoresTestnet }
+    ),
+    ARBITRUM_GOERLI_TESTNET(
+        ChainId(421613),
+        "https://arbitrum-goerli.publicnode.com",
+        null,
+        { it.chainArbitrumGoerliTestnet }
+    ),
+    OPTIMISM_GOERLI_TESTNET(
+        ChainId(420),
+        "https://optimism-goerli.public.blastapi.io",
+        null,
+        { it.chainOptimismGoerliTestnet }
+    ),
+    SEPOLIA_TESTNET(
+        ChainId(11155111),
+        "https://endpoints.omniatech.io/v1/eth/sepolia/public",
+        null,
+        { it.chainSepoliaTestnet }
     );
 
     companion object {
