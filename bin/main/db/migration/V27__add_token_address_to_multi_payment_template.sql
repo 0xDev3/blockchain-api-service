@@ -1,0 +1,2 @@
+ALTER TABLE blockchain_api_service.multi_payment_template_item DROP COLUMN token_address;
+ALTER TABLE blockchain_api_service.multi_payment_template ADD COLUMN token_address VARCHAR;
