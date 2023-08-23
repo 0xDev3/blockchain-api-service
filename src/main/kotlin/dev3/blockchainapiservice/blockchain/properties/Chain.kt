@@ -136,6 +136,12 @@ enum class Chain(
         "https://endpoints.omniatech.io/v1/eth/sepolia/public",
         null,
         { it.chainSepoliaTestnet }
+    ),
+    AVAX_FUJI_TESTNET(
+        ChainId(43113),
+        "https://api.avax-test.network/ext/bc/C/rpc",
+        null,
+        { it.chainAvaxFujiTestnet }
     );
 
     companion object {
