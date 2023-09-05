@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.model.response.ApiKeyResponse
 import dev3.blockchainapiservice.model.response.ProjectResponse
@@ -121,6 +122,75 @@ class ProjectControllerApiTest : ControllerTestBase() {
             assertThat(storedProject.createdAt.value)
                 .isCloseTo(response.createdAt, WITHIN_TIME_TOLERANCE)
             assertThat(storedProject.createdAt.value)
+                .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
+        }
+    }
+
+    @Test
+    @WithMockUser
+    fun mustCorrectlyReturnProjectByApiKey() {
+        val userIdentifier = UserWalletAddressIdentifier(
+            id = UUID.randomUUID(),
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
+        )
+
+        suppose("some user identifier exists in database") {
+            userIdentifierRepository.store(userIdentifier)
+        }
+
+        val project = Project(
+            id = UUID.randomUUID(),
+            ownerId = userIdentifier.id,
+            issuerContractAddress = ContractAddress("a"),
+            baseRedirectUrl = BaseUrl("base-redirect-url"),
+            chainId = Chain.HARDHAT_TESTNET.id,
+            customRpcUrl = "custom-rpc-url",
+            createdAt = UtcDateTime(OffsetDateTime.now())
+        )
+
+        suppose("some project exists in database") {
+            projectRepository.store(project)
+        }
+
+        val apiKey = ApiKey(
+            id = UUID.randomUUID(),
+            projectId = project.id,
+            apiKey = "api-key",
+            createdAt = UtcDateTime(OffsetDateTime.now())
+        )
+
+        suppose("some API key exists in database") {
+            apiKeyRepository.store(apiKey)
+        }
+
+        val response = suppose("request to fetch project by api key is made") {
+            val response = mockMvc.perform(
+                MockMvcRequestBuilders.get("/v1/projects/by-api-key")
+                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "api-key")
+            )
+                .andExpect(MockMvcResultMatchers.status().isOk)
+                .andReturn()
+
+            objectMapper.readValue(response.response.contentAsString, ProjectResponse::class.java)
+        }
+
+        verify("correct response is returned") {
+            assertThat(response).withMessage()
+                .isEqualTo(
+                    ProjectResponse(
+                        id = project.id,
+                        ownerId = project.ownerId,
+                        issuerContractAddress = project.issuerContractAddress.rawValue,
+                        baseRedirectUrl = project.baseRedirectUrl.value,
+                        chainId = project.chainId.value,
+                        customRpcUrl = project.customRpcUrl,
+                        createdAt = response.createdAt
+                    )
+                )
+
+            assertThat(response.createdAt)
+                .isCloseTo(project.createdAt.value, WITHIN_TIME_TOLERANCE)
+            assertThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }

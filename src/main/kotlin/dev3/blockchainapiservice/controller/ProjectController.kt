@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.controller
 
+import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.config.binding.annotation.UserIdentifierBinding
 import dev3.blockchainapiservice.config.validation.ValidEthAddress
 import dev3.blockchainapiservice.exception.ApiKeyAlreadyExistsException
@@ -9,6 +10,7 @@ import dev3.blockchainapiservice.model.request.CreateProjectRequest
 import dev3.blockchainapiservice.model.response.ApiKeyResponse
 import dev3.blockchainapiservice.model.response.ProjectResponse
 import dev3.blockchainapiservice.model.response.ProjectsResponse
+import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.model.result.UserIdentifier
 import dev3.blockchainapiservice.service.AnalyticsService
 import dev3.blockchainapiservice.service.ProjectService
@@ -47,6 +49,13 @@ class ProjectController(
 
         val project = projectService.createProject(userIdentifier, params)
 
+        return ResponseEntity.ok(ProjectResponse(project))
+    }
+
+    @GetMapping("/v1/projects/by-api-key")
+    fun getByApiKey(
+        @ApiKeyBinding project: Project
+    ): ResponseEntity<ProjectResponse> {
         return ResponseEntity.ok(ProjectResponse(project))
     }
 
