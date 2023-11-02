@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice
 
+import dev3.blockchainapiservice.util.WalletAddress
 import org.assertj.core.api.Assert
 import org.assertj.core.api.Assertions.within
 import org.assertj.core.data.TemporalUnitOffset
@@ -19,6 +20,7 @@ abstract class TestBase {
         }
 
         val WITHIN_TIME_TOLERANCE: TemporalUnitOffset = within(5, ChronoUnit.MINUTES)
+        val USER_IDENTIFIER = WalletAddress("053401de411f1e4").rawValue
     }
 
     protected fun <R> suppose(description: String, function: SupposeMessage.() -> R): R {

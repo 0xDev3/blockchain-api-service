@@ -40,6 +40,9 @@ enum class ErrorCode {
     @Description("The provided API key does not exist and is therefore invalid")
     NON_EXISTENT_API_KEY,
 
+    @Description("API rate limit has been exceeded for the project")
+    API_RATE_LIMIT_EXCEEDED,
+
     @Description("The request body is missing `token_address` value")
     MISSING_TOKEN_ADDRESS,
 

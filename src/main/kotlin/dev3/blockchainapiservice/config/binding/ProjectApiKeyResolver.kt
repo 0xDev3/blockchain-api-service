@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.config.binding
 
+import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
 import dev3.blockchainapiservice.exception.NonExistentApiKeyException
 import dev3.blockchainapiservice.model.result.Project
@@ -17,10 +18,6 @@ class ProjectApiKeyResolver(
     private val projectRepository: ProjectRepository
 ) : HandlerMethodArgumentResolver {
 
-    companion object {
-        const val API_KEY_HEADER = "X-API-KEY"
-    }
-
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.parameterType == Project::class.java &&
             parameter.hasParameterAnnotation(ApiKeyBinding::class.java)
@@ -34,7 +31,8 @@ class ProjectApiKeyResolver(
     ): Project {
         val httpServletRequest = nativeWebRequest.getNativeRequest(HttpServletRequest::class.java)
         // TODO check if API has expired/used up/etc. - out of scope for MVP
-        val apiKey = httpServletRequest?.getHeader(API_KEY_HEADER)?.let { apiKeyRepository.getByValue(it) }
+        val apiKey = httpServletRequest?.getHeader(CustomHeaders.API_KEY_HEADER)
+            ?.let { apiKeyRepository.getByValue(it) }
             ?: throw NonExistentApiKeyException()
         return projectRepository.getById(apiKey.projectId)!! // non-null enforced by foreign key constraint in DB
     }

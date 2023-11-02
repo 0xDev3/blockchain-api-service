@@ -1,6 +1,9 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.config.validation.MaxStringSize
 import dev3.blockchainapiservice.model.filters.ContractDeploymentRequestFilters
 import dev3.blockchainapiservice.model.filters.OrList
@@ -20,11 +23,9 @@ import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
@@ -36,7 +37,7 @@ class ContractDeploymentRequestController(
     private val contractDeploymentRequestService: ContractDeploymentRequestService
 ) {
 
-    @PostMapping("/v1/deploy")
+    @ApiWriteLimitedMapping(IdType.PROJECT_ID, RequestMethod.POST, "/v1/deploy")
     fun createContractDeploymentRequest(
         @ApiKeyBinding project: Project,
         @Valid @RequestBody requestBody: CreateContractDeploymentRequest
@@ -54,7 +55,7 @@ class ContractDeploymentRequestController(
         contractDeploymentRequestService.markContractDeploymentRequestAsDeleted(id, project.id)
     }
 
-    @GetMapping("/v1/deploy/{id}")
+    @ApiReadLimitedMapping(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, "/v1/deploy/{id}")
     fun getContractDeploymentRequest(
         @PathVariable("id") id: UUID
     ): ResponseEntity<ContractDeploymentRequestResponse> {
@@ -62,7 +63,7 @@ class ContractDeploymentRequestController(
         return ResponseEntity.ok(ContractDeploymentRequestResponse(contractDeploymentRequest))
     }
 
-    @GetMapping("/v1/deploy/by-project/{projectId}/by-alias/{alias}")
+    @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/deploy/by-project/{projectId}/by-alias/{alias}")
     fun getContractDeploymentRequestByProjectIdAndAlias(
         @PathVariable("projectId") projectId: UUID,
         @PathVariable("alias") alias: String
@@ -75,7 +76,7 @@ class ContractDeploymentRequestController(
         return ResponseEntity.ok(ContractDeploymentRequestResponse(contractDeploymentRequest))
     }
 
-    @GetMapping("/v1/deploy/by-project/{projectId}")
+    @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/deploy/by-project/{projectId}")
     fun getContractDeploymentRequestsByProjectIdAndFilters(
         @PathVariable("projectId") projectId: UUID,
         @Valid @RequestParam("contractIds", required = false) contractIds: List<@MaxStringSize String>?,
@@ -98,7 +99,7 @@ class ContractDeploymentRequestController(
         )
     }
 
-    @PutMapping("/v1/deploy/{id}")
+    @ApiWriteLimitedMapping(IdType.CONTRACT_DEPLOYMENT_REQUEST_ID, RequestMethod.PUT, "/v1/deploy/{id}")
     fun attachTransactionInfo(
         @PathVariable("id") id: UUID,
         @Valid @RequestBody requestBody: AttachTransactionInfoRequest

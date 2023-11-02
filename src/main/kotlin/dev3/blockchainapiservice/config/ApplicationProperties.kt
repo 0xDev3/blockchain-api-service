@@ -38,6 +38,7 @@ class ApplicationProperties {
     val contractDecorators = ContractDecoratorProperties()
     val metaPixelProperties = MetaPixelProperties()
     val contractManifestService = ContractManifestServiceProperties()
+    val apiUsage = ApiUsageProperties()
 }
 
 class JwtProperties {
@@ -81,4 +82,10 @@ class ContractManifestServiceProperties {
 class QueueProperties {
     var polling: Long = 5_000L
     var initialDelay: Long = 15_000L
+}
+
+class ApiUsageProperties {
+    var prepaidBalanceContractAddress: String = ""
+    var prepaidBalanceContractChainId: Long = 0L
+    var freeWriteRequests: Long = 0L
 }

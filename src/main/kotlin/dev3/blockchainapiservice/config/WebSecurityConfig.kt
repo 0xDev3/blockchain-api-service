@@ -4,7 +4,6 @@ import com.ampnet.core.jwt.AuthenticationEntryPointExceptionHandler
 import com.ampnet.core.jwt.filter.JwtAuthenticationFilter
 import com.ampnet.core.jwt.provider.JwtAuthenticationProvider
 import com.fasterxml.jackson.databind.ObjectMapper
-import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -49,7 +48,7 @@ class WebSecurityConfig(private val objectMapper: ObjectMapper) {
                 HttpHeaders.CONTENT_TYPE,
                 HttpHeaders.CACHE_CONTROL,
                 HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
-                ProjectApiKeyResolver.API_KEY_HEADER
+                CustomHeaders.API_KEY_HEADER
             )
         }
 

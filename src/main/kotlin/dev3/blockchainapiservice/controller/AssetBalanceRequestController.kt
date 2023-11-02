@@ -1,6 +1,9 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.config.binding.annotation.ApiKeyBinding
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiReadLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.ApiWriteLimitedMapping
+import dev3.blockchainapiservice.config.interceptors.annotation.IdType
 import dev3.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
 import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
 import dev3.blockchainapiservice.model.request.CreateAssetBalanceRequest
@@ -12,11 +15,9 @@ import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 import javax.validation.Valid
@@ -25,7 +26,7 @@ import javax.validation.Valid
 @RestController
 class AssetBalanceRequestController(private val assetBalanceRequestService: AssetBalanceRequestService) {
 
-    @PostMapping("/v1/balance")
+    @ApiWriteLimitedMapping(IdType.PROJECT_ID, RequestMethod.POST, "/v1/balance")
     fun createAssetBalanceRequest(
         @ApiKeyBinding project: Project,
         @Valid @RequestBody requestBody: CreateAssetBalanceRequest
@@ -35,7 +36,7 @@ class AssetBalanceRequestController(private val assetBalanceRequestService: Asse
         return ResponseEntity.ok(AssetBalanceRequestResponse(createdRequest))
     }
 
-    @GetMapping("/v1/balance/{id}")
+    @ApiReadLimitedMapping(IdType.ASSET_BALANCE_REQUEST_ID, "/v1/balance/{id}")
     fun getAssetBalanceRequest(
         @PathVariable("id") id: UUID
     ): ResponseEntity<AssetBalanceRequestResponse> {
@@ -43,7 +44,7 @@ class AssetBalanceRequestController(private val assetBalanceRequestService: Asse
         return ResponseEntity.ok(AssetBalanceRequestResponse(balanceRequest))
     }
 
-    @GetMapping("/v1/balance/by-project/{projectId}")
+    @ApiReadLimitedMapping(IdType.PROJECT_ID, "/v1/balance/by-project/{projectId}")
     fun getAssetBalanceRequestsByProjectId(
         @PathVariable("projectId") projectId: UUID
     ): ResponseEntity<AssetBalanceRequestsResponse> {
@@ -51,7 +52,7 @@ class AssetBalanceRequestController(private val assetBalanceRequestService: Asse
         return ResponseEntity.ok(AssetBalanceRequestsResponse(balanceRequests.map { AssetBalanceRequestResponse(it) }))
     }
 
-    @PutMapping("/v1/balance/{id}")
+    @ApiWriteLimitedMapping(IdType.ASSET_BALANCE_REQUEST_ID, RequestMethod.PUT, "/v1/balance/{id}")
     fun attachSignedMessage(
         @PathVariable("id") id: UUID,
         @Valid @RequestBody requestBody: AttachSignedMessageRequest

@@ -5,7 +5,7 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.DummyProxy
 import dev3.blockchainapiservice.blockchain.ExampleContract
 import dev3.blockchainapiservice.blockchain.properties.Chain
-import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
+import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
@@ -232,7 +232,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         dslContext.executeInsert(
             UserIdentifierRecord(
                 id = OWNER_ID,
-                userIdentifier = "user-identifier",
+                userIdentifier = USER_IDENTIFIER,
                 identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
             )
         )
@@ -396,7 +396,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create contract deployment request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/deploy")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -452,7 +452,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importResponse = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -579,7 +579,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val response = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -710,7 +710,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val response = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -910,7 +910,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val response = suppose("request to import proxy smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1098,7 +1098,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-existent contract decorator") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1133,7 +1133,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         verify("404 is returned for non-existent smart contract") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1180,7 +1180,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         verify("400 is returned for mismatching smart contract binary") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1225,7 +1225,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importResponse = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1296,7 +1296,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importResponse = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1329,7 +1329,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val interfacesResponse = suppose("interface is added to imported smart contract") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/add-interfaces")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1417,7 +1417,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importResponse = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1446,7 +1446,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         verify("400 is returned for non-existent smart contract interface") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/add-interfaces")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1482,7 +1482,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importResponse = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1515,7 +1515,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         verify("400 is returned for incompatible smart contract interface") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/add-interfaces")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1551,7 +1551,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importResponse = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1602,7 +1602,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val interfacesResponse = suppose("interface is removed from imported smart contract") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/remove-interfaces")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1690,7 +1690,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importResponse = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1723,7 +1723,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val interfacesResponse = suppose("interface is added to imported smart contract") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/set-interfaces")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1811,7 +1811,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importResponse = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1840,7 +1840,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         verify("400 is returned for non-existent smart contract interface") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/set-interfaces")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1876,7 +1876,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importResponse = suppose("request to import smart contract is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/import-smart-contract")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1909,7 +1909,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         verify("400 is returned for incompatible smart contract interface") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.patch("/v1/import-smart-contract/${importResponse.id}/set-interfaces")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """

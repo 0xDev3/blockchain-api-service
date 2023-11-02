@@ -5,7 +5,7 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.SimpleDisperse
 import dev3.blockchainapiservice.blockchain.SimpleERC20
 import dev3.blockchainapiservice.blockchain.properties.Chain
-import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
+import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.records.ApiKeyRecord
@@ -74,7 +74,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         dslContext.executeInsert(
             UserIdentifierRecord(
                 id = OWNER_ID,
-                userIdentifier = "user-identifier",
+                userIdentifier = USER_IDENTIFIER,
                 identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
             )
         )
@@ -112,7 +112,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create asset multi-send request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -245,7 +245,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create asset multi-send request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -377,7 +377,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create asset multi-send request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -508,7 +508,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val response = suppose("request to create asset multi-send request is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -639,7 +639,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         verify("400 is returned for missing token address") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -687,7 +687,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         verify("400 is returned for non-allowed token address") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -736,7 +736,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         verify("401 is returned for invalid API key") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "invalid-api-key")
+                    .header(CustomHeaders.API_KEY_HEADER, "invalid-api-key")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -806,7 +806,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create asset multi-send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -989,7 +989,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create asset multi-send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1161,7 +1161,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create asset multi-send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1316,7 +1316,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create asset multi-send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1487,7 +1487,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create asset multi-send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1670,7 +1670,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create asset multi-send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -1849,7 +1849,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create asset multi-send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, API_KEY)
+                    .header(CustomHeaders.API_KEY_HEADER, API_KEY)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """
@@ -2032,7 +2032,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         val createResponse = suppose("request to create asset multi-send request is made") {
             val createResponse = mockMvc.perform(
                 MockMvcRequestBuilders.post("/v1/multi-send")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, apiKey)
+                    .header(CustomHeaders.API_KEY_HEADER, apiKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
                         """

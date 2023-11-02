@@ -2,7 +2,7 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.blockchain.properties.Chain
-import dev3.blockchainapiservice.config.binding.ProjectApiKeyResolver
+import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.model.response.ApiKeyResponse
 import dev3.blockchainapiservice.model.response.ProjectResponse
@@ -166,7 +166,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         val response = suppose("request to fetch project by api key is made") {
             val response = mockMvc.perform(
                 MockMvcRequestBuilders.get("/v1/projects/by-api-key")
-                    .header(ProjectApiKeyResolver.API_KEY_HEADER, "api-key")
+                    .header(CustomHeaders.API_KEY_HEADER, "api-key")
             )
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()

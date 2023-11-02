@@ -2,6 +2,8 @@ package dev3.blockchainapiservice.testcontainers
 
 import dev3.blockchainapiservice.generated.jooq.tables.AddressBookTable
 import dev3.blockchainapiservice.generated.jooq.tables.ApiKeyTable
+import dev3.blockchainapiservice.generated.jooq.tables.ApiReadCallTable
+import dev3.blockchainapiservice.generated.jooq.tables.ApiWriteCallTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetBalanceRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetMultiSendRequestTable
 import dev3.blockchainapiservice.generated.jooq.tables.AssetSendRequestTable
@@ -41,6 +43,8 @@ class PostgresTestContainer : PostgreSQLContainer<PostgresTestContainer>("postgr
         dslContext.deleteFrom(MultiPaymentTemplateItemTable).execute()
         dslContext.deleteFrom(MultiPaymentTemplateTable).execute()
         dslContext.deleteFrom(ImportedContractDecoratorTable).execute()
+        dslContext.deleteFrom(ApiWriteCallTable).execute()
+        dslContext.deleteFrom(ApiReadCallTable).execute()
         dslContext.deleteFrom(ApiKeyTable).execute()
         dslContext.deleteFrom(ProjectTable).execute()
         dslContext.deleteFrom(UserIdentifierTable).execute()

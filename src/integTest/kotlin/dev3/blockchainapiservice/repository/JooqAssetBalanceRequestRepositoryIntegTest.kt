@@ -65,7 +65,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
         dslContext.executeInsert(
             UserIdentifierRecord(
                 id = OWNER_ID,
-                userIdentifier = "user-identifier",
+                userIdentifier = USER_IDENTIFIER,
                 identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
             )
         )
