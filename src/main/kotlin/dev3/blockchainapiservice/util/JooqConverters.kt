@@ -1,6 +1,7 @@
+@file:Suppress("FunctionName", "TooManyFunctions")
+
 package dev3.blockchainapiservice.util
 
-import com.fasterxml.jackson.databind.JsonNode
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.features.payout.util.HashFunction
 import dev3.blockchainapiservice.features.payout.util.SnapshotFailureCause
@@ -15,228 +16,80 @@ import dev3.blockchainapiservice.generated.jooq.enums.HashFunction as DbHashFunc
 import dev3.blockchainapiservice.generated.jooq.enums.SnapshotFailureCause as DbSnapshotFailureCause
 import dev3.blockchainapiservice.generated.jooq.enums.SnapshotStatus as DbSnapshotStatus
 
-class ChainIdConverter : Converter<Long, ChainId> {
-    override fun from(value: Long?): ChainId? = value?.let { ChainId(it) }
-    override fun to(value: ChainId?): Long? = value?.value
-    override fun fromType(): Class<Long> = Long::class.java
-    override fun toType(): Class<ChainId> = ChainId::class.java
+private class KotlinConverter<T : Any, U : Any>(
+    val from: Class<T>,
+    val to: Class<U>,
+    val fromMapping: (T) -> U?,
+    val toMapping: (U) -> T?
+) : Converter<T, U> {
+    override fun from(value: T?): U? = value?.let { fromMapping(it) }
+    override fun to(value: U?): T? = value?.let { toMapping(it) }
+    override fun fromType(): Class<T> = from
+    override fun toType(): Class<U> = to
 
     companion object {
-        private const val serialVersionUID: Long = -7367190641407949448L
+        private const val serialVersionUID: Long = 7668375669351902507L
     }
 }
 
-class ContractAddressConverter : Converter<String, ContractAddress> {
-    override fun from(value: String?): ContractAddress? = value?.let { ContractAddress(it) }
-    override fun to(value: ContractAddress?): String? = value?.rawValue
-    override fun fromType(): Class<String> = String::class.java
-    override fun toType(): Class<ContractAddress> = ContractAddress::class.java
+private inline fun <reified T : Any, reified U : Any> converter(
+    noinline fromMapping: (T) -> U?,
+    noinline toMapping: (U) -> T?
+): Converter<T, U> = KotlinConverter(
+    from = T::class.java,
+    to = U::class.java,
+    fromMapping = fromMapping,
+    toMapping = toMapping
+)
 
-    companion object {
-        private const val serialVersionUID: Long = 5587113562689277144L
-    }
-}
+private val objectMapper = JsonConfig().objectMapper()
 
-class WalletAddressConverter : Converter<String, WalletAddress> {
-    override fun from(value: String?): WalletAddress? = value?.let { WalletAddress(it) }
-    override fun to(value: WalletAddress?): String? = value?.rawValue
-    override fun fromType(): Class<String> = String::class.java
-    override fun toType(): Class<WalletAddress> = WalletAddress::class.java
+fun ChainIdConverter() = converter({ it: Long -> ChainId(it) }, { it.value })
 
-    companion object {
-        private const val serialVersionUID: Long = 4048003464768439754L
-    }
-}
+fun ContractAddressConverter() = converter({ it: String -> ContractAddress(it) }, { it.rawValue })
 
-class BalanceConverter : Converter<BigInteger, Balance> {
-    override fun from(value: BigInteger?): Balance? = value?.let { Balance(it) }
-    override fun to(value: Balance?): BigInteger? = value?.rawValue
-    override fun fromType(): Class<BigInteger> = BigInteger::class.java
-    override fun toType(): Class<Balance> = Balance::class.java
+fun WalletAddressConverter() = converter({ it: String -> WalletAddress(it) }, { it.rawValue })
 
-    companion object {
-        private const val serialVersionUID: Long = 6133349110900653628L
-    }
-}
+fun BalanceConverter() = converter({ it: BigInteger -> Balance(it) }, { it.rawValue })
 
-class BlockNumberConverter : Converter<BigInteger, BlockNumber> {
-    override fun from(value: BigInteger?): BlockNumber? = value?.let { BlockNumber(it) }
-    override fun to(value: BlockNumber?): BigInteger? = value?.value
-    override fun fromType(): Class<BigInteger> = BigInteger::class.java
-    override fun toType(): Class<BlockNumber> = BlockNumber::class.java
+fun BlockNumberConverter() = converter({ it: BigInteger -> BlockNumber(it) }, { it.value })
 
-    companion object {
-        private const val serialVersionUID: Long = 154324798075521810L
-    }
-}
+fun TransactionHashConverter() = converter({ it: String -> TransactionHash(it) }, { it.value })
 
-class TransactionHashConverter : Converter<String, TransactionHash> {
-    override fun from(value: String?): TransactionHash? = value?.let { TransactionHash(it) }
-    override fun to(value: TransactionHash?): String? = value?.value
-    override fun fromType(): Class<String> = String::class.java
-    override fun toType(): Class<TransactionHash> = TransactionHash::class.java
+fun SignedMessageConverter() = converter({ it: String -> SignedMessage(it) }, { it.value })
 
-    companion object {
-        private const val serialVersionUID: Long = -4101282162822045477L
-    }
-}
+fun DurationSecondsConverter() = converter({ it: BigInteger -> DurationSeconds(it) }, { it.rawValue })
 
-class SignedMessageConverter : Converter<String, SignedMessage> {
-    override fun from(value: String?): SignedMessage? = value?.let { SignedMessage(it) }
-    override fun to(value: SignedMessage?): String? = value?.value
-    override fun fromType(): Class<String> = String::class.java
-    override fun toType(): Class<SignedMessage> = SignedMessage::class.java
+fun UtcDateTimeConverter() = converter({ it: OffsetDateTime -> UtcDateTime(it) }, { it.value })
 
-    companion object {
-        private const val serialVersionUID: Long = 8287866421855372066L
-    }
-}
+fun BaseUrlConverter() = converter({ it: String -> BaseUrl(it) }, { it.value })
 
-class DurationSecondsConverter : Converter<BigInteger, DurationSeconds> {
-    override fun from(value: BigInteger?): DurationSeconds? = value?.let { DurationSeconds(it) }
-    override fun to(value: DurationSeconds?): BigInteger? = value?.rawValue
-    override fun fromType(): Class<BigInteger> = BigInteger::class.java
-    override fun toType(): Class<DurationSeconds> = DurationSeconds::class.java
+fun ContractIdConverter() = converter({ it: String -> ContractId(it) }, { it.value })
 
-    companion object {
-        private const val serialVersionUID: Long = 442010490221114533L
-    }
-}
+fun ContractBinaryDataConverter() = converter({ it: ByteArray -> ContractBinaryData(it) }, { it.binary })
 
-class JsonNodeConverter : Converter<JSON, JsonNode> {
+fun FunctionDataConverter() = converter({ it: ByteArray -> FunctionData(it) }, { it.binary })
 
-    private val objectMapper = JsonConfig().objectMapper()
+fun JsonNodeConverter() = converter(
+    { it: JSON -> objectMapper.readTree(it.data()) },
+    { JSON.valueOf(objectMapper.writeValueAsString(it)) }
+)
 
-    override fun from(value: JSON?): JsonNode? = value?.let { objectMapper.readTree(it.data()) }
-    override fun to(value: JsonNode?): JSON? = value?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) }
-    override fun fromType(): Class<JSON> = JSON::class.java
-    override fun toType(): Class<JsonNode> = JsonNode::class.java
+fun ManifestJsonConverter() = converter(
+    { it: JSON -> objectMapper.readValue(it.data(), ManifestJson::class.java) },
+    { JSON.valueOf(objectMapper.writeValueAsString(it)) }
+)
 
-    companion object {
-        private const val serialVersionUID: Long = 912286490023352427L
-    }
-}
+fun ArtifactJsonConverter() = converter(
+    { it: JSON -> objectMapper.readValue(it.data(), ArtifactJson::class.java) },
+    { JSON.valueOf(objectMapper.writeValueAsString(it)) }
+)
 
-class UtcDateTimeConverter : Converter<OffsetDateTime, UtcDateTime> {
-    override fun from(value: OffsetDateTime?): UtcDateTime? = value?.let { UtcDateTime(it) }
-    override fun to(value: UtcDateTime?): OffsetDateTime? = value?.value
-    override fun fromType(): Class<OffsetDateTime> = OffsetDateTime::class.java
-    override fun toType(): Class<UtcDateTime> = UtcDateTime::class.java
+fun HashFunctionConverter() = converter({ it: DbHashFunction -> HashFunction.fromDbEnum(it) }, { it.toDbEnum })
 
-    companion object {
-        private const val serialVersionUID: Long = -8529019904691898554L
-    }
-}
+fun SnapshotStatusConverter() = converter({ it: DbSnapshotStatus -> SnapshotStatus.fromDbEnum(it) }, { it.toDbEnum })
 
-class BaseUrlConverter : Converter<String, BaseUrl> {
-    override fun from(value: String?): BaseUrl? = value?.let { BaseUrl(it) }
-    override fun to(value: BaseUrl?): String? = value?.value
-    override fun fromType(): Class<String> = String::class.java
-    override fun toType(): Class<BaseUrl> = BaseUrl::class.java
-
-    companion object {
-        private const val serialVersionUID: Long = -593346707327357156L
-    }
-}
-
-class ContractIdConverter : Converter<String, ContractId> {
-    override fun from(value: String?): ContractId? = value?.let { ContractId(it) }
-    override fun to(value: ContractId?): String? = value?.value
-    override fun fromType(): Class<String> = String::class.java
-    override fun toType(): Class<ContractId> = ContractId::class.java
-
-    companion object {
-        private const val serialVersionUID: Long = -3208788163001411967L
-    }
-}
-
-class ContractBinaryDataConverter : Converter<ByteArray, ContractBinaryData> {
-    override fun from(value: ByteArray?): ContractBinaryData? = value?.let { ContractBinaryData(it) }
-    override fun to(value: ContractBinaryData?): ByteArray? = value?.binary
-    override fun fromType(): Class<ByteArray> = ByteArray::class.java
-    override fun toType(): Class<ContractBinaryData> = ContractBinaryData::class.java
-
-    companion object {
-        private const val serialVersionUID: Long = -1908613704199073695L
-    }
-}
-
-class FunctionDataConverter : Converter<ByteArray, FunctionData> {
-    override fun from(value: ByteArray?): FunctionData? = value?.let { FunctionData(it) }
-    override fun to(value: FunctionData?): ByteArray? = value?.binary
-    override fun fromType(): Class<ByteArray> = ByteArray::class.java
-    override fun toType(): Class<FunctionData> = FunctionData::class.java
-
-    companion object {
-        private const val serialVersionUID: Long = -5671993772596790084L
-    }
-}
-
-class ManifestJsonConverter : Converter<JSON, ManifestJson> {
-
-    private val objectMapper = JsonConfig().objectMapper()
-
-    override fun from(value: JSON?): ManifestJson? = value?.let {
-        objectMapper.readValue(it.data(), ManifestJson::class.java)
-    }
-
-    override fun to(value: ManifestJson?): JSON? = value?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) }
-    override fun fromType(): Class<JSON> = JSON::class.java
-    override fun toType(): Class<ManifestJson> = ManifestJson::class.java
-
-    companion object {
-        private const val serialVersionUID: Long = -1324416320471064842L
-    }
-}
-
-class ArtifactJsonConverter : Converter<JSON, ArtifactJson> {
-
-    private val objectMapper = JsonConfig().objectMapper()
-
-    override fun from(value: JSON?): ArtifactJson? = value?.let {
-        objectMapper.readValue(it.data(), ArtifactJson::class.java)
-    }
-
-    override fun to(value: ArtifactJson?): JSON? = value?.let { JSON.valueOf(objectMapper.writeValueAsString(it)) }
-    override fun fromType(): Class<JSON> = JSON::class.java
-    override fun toType(): Class<ArtifactJson> = ArtifactJson::class.java
-
-    companion object {
-        private const val serialVersionUID: Long = 2789587672933464251L
-    }
-}
-
-class HashFunctionConverter : Converter<DbHashFunction, HashFunction> {
-    override fun from(value: DbHashFunction?): HashFunction? = value?.let { HashFunction.fromDbEnum(it) }
-    override fun to(value: HashFunction?): DbHashFunction? = value?.toDbEnum
-    override fun fromType(): Class<DbHashFunction> = DbHashFunction::class.java
-    override fun toType(): Class<HashFunction> = HashFunction::class.java
-
-    companion object {
-        private const val serialVersionUID: Long = -1278554981366510795L
-    }
-}
-
-class SnapshotStatusConverter : Converter<DbSnapshotStatus, SnapshotStatus> {
-    override fun from(value: DbSnapshotStatus?): SnapshotStatus? = value?.let { SnapshotStatus.fromDbEnum(it) }
-    override fun to(value: SnapshotStatus?): DbSnapshotStatus? = value?.toDbEnum
-    override fun fromType(): Class<DbSnapshotStatus> = DbSnapshotStatus::class.java
-    override fun toType(): Class<SnapshotStatus> = SnapshotStatus::class.java
-
-    companion object {
-        private const val serialVersionUID: Long = 2689706619411255540L
-    }
-}
-
-class SnapshotFailureCauseConverter : Converter<DbSnapshotFailureCause, SnapshotFailureCause> {
-    override fun from(value: DbSnapshotFailureCause?): SnapshotFailureCause? =
-        value?.let { SnapshotFailureCause.fromDbEnum(it) }
-
-    override fun to(value: SnapshotFailureCause?): DbSnapshotFailureCause? = value?.toDbEnum
-    override fun fromType(): Class<DbSnapshotFailureCause> = DbSnapshotFailureCause::class.java
-    override fun toType(): Class<SnapshotFailureCause> = SnapshotFailureCause::class.java
-
-    companion object {
-        private const val serialVersionUID: Long = -1586298250144589782L
-    }
-}
+fun SnapshotFailureCauseConverter() = converter(
+    { it: DbSnapshotFailureCause -> SnapshotFailureCause.fromDbEnum(it) },
+    { it.toDbEnum }
+)

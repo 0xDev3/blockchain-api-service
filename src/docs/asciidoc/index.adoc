@@ -111,6 +111,14 @@ include::src/docs/asciidoc/function-call/fetch.adoc[]
 include::src/docs/asciidoc/function-call/fetch-by-project-id.adoc[]
 include::src/docs/asciidoc/function-call/attach.adoc[]
 
+== Contract Arbitrary Call Request API
+All endpoints are public and do not require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/arbitrary-call/create.adoc[]
+include::src/docs/asciidoc/arbitrary-call/fetch.adoc[]
+include::src/docs/asciidoc/arbitrary-call/fetch-by-project-id.adoc[]
+include::src/docs/asciidoc/arbitrary-call/attach.adoc[]
+
 == Public Address Book API
 All endpoints are public and do not require `Authorization: Bearer JWT` header. Endpoints to modify address book entries
 can be found in the internal API documentation.

@@ -26,7 +26,8 @@ data class AssetSendRequestResponse(
     val screenConfig: ScreenConfig?,
     val redirectUrl: String,
     val sendTx: TransactionResponse,
-    val createdAt: OffsetDateTime
+    val createdAt: OffsetDateTime,
+    val events: List<EventInfoResponse>?
 ) {
     constructor(sendRequest: WithFunctionDataOrEthValue<AssetSendRequest>) : this(
         id = sendRequest.value.id,
@@ -47,7 +48,8 @@ data class AssetSendRequestResponse(
             data = sendRequest.data,
             value = sendRequest.ethValue ?: Balance.ZERO
         ),
-        createdAt = sendRequest.value.createdAt.value
+        createdAt = sendRequest.value.createdAt.value,
+        events = null
     )
 
     constructor(sendRequest: WithTransactionData<AssetSendRequest>) : this(
@@ -64,6 +66,7 @@ data class AssetSendRequestResponse(
         screenConfig = sendRequest.value.screenConfig.orEmpty(),
         redirectUrl = sendRequest.value.redirectUrl,
         sendTx = TransactionResponse(sendRequest.transactionData),
-        createdAt = sendRequest.value.createdAt.value
+        createdAt = sendRequest.value.createdAt.value,
+        events = sendRequest.transactionData.events?.map { EventInfoResponse(it) }
     )
 }

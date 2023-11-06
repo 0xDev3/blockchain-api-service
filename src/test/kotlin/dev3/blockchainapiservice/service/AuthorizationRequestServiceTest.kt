@@ -17,14 +17,9 @@ import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithStatus
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AuthorizationRequestServiceTest : TestBase() {
 
@@ -46,14 +41,14 @@ class AuthorizationRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(uuid)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -97,7 +92,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is stored in database") {
-            given(authorizationRequestRepository.store(databaseParams))
+            call(authorizationRequestRepository.store(databaseParams))
                 .willReturn(databaseResponse)
         }
 
@@ -112,12 +107,12 @@ class AuthorizationRequestServiceTest : TestBase() {
         )
 
         verify("authorization request is correctly created") {
-            assertThat(service.createAuthorizationRequest(createParams, PROJECT)).withMessage()
+            expectThat(service.createAuthorizationRequest(createParams, PROJECT))
                 .isEqualTo(databaseResponse)
 
-            verifyMock(authorizationRequestRepository)
-                .store(databaseParams)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.store(databaseParams)
+            }
         }
     }
 
@@ -127,7 +122,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is not in database") {
-            given(authorizationRequestRepository.getById(uuid))
+            call(authorizationRequestRepository.getById(uuid))
                 .willReturn(null)
         }
 
@@ -142,7 +137,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getAuthorizationRequest(uuid)
             }
         }
@@ -170,7 +165,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is returned from database") {
-            given(authorizationRequestRepository.getById(uuid))
+            call(authorizationRequestRepository.getById(uuid))
                 .willReturn(authorizationRequest)
         }
 
@@ -187,7 +182,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         verify("authorization request with pending status is returned") {
             val result = service.getAuthorizationRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     WithStatus(
                         value = AuthorizationRequest(
@@ -207,9 +202,9 @@ class AuthorizationRequestServiceTest : TestBase() {
                     )
                 )
 
-            verifyMock(authorizationRequestRepository)
-                .getById(uuid)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.getById(uuid)
+            }
         }
     }
 
@@ -235,7 +230,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is returned from database") {
-            given(authorizationRequestRepository.getById(uuid))
+            call(authorizationRequestRepository.getById(uuid))
                 .willReturn(authorizationRequest)
         }
 
@@ -252,7 +247,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         verify("authorization request with pending status is returned") {
             val result = service.getAuthorizationRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     WithStatus(
                         value =
@@ -273,9 +268,9 @@ class AuthorizationRequestServiceTest : TestBase() {
                     )
                 )
 
-            verifyMock(authorizationRequestRepository)
-                .getById(uuid)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.getById(uuid)
+            }
         }
     }
 
@@ -301,7 +296,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is returned from database") {
-            given(authorizationRequestRepository.getById(uuid))
+            call(authorizationRequestRepository.getById(uuid))
                 .willReturn(authorizationRequest)
         }
 
@@ -318,7 +313,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         verify("authorization request with failed status is returned") {
             val result = service.getAuthorizationRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     WithStatus(
                         value =
@@ -339,9 +334,9 @@ class AuthorizationRequestServiceTest : TestBase() {
                     )
                 )
 
-            verifyMock(authorizationRequestRepository)
-                .getById(uuid)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.getById(uuid)
+            }
         }
     }
 
@@ -367,14 +362,14 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is returned from database") {
-            given(authorizationRequestRepository.getById(uuid))
+            call(authorizationRequestRepository.getById(uuid))
                 .willReturn(authorizationRequest)
         }
 
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return false") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = authorizationRequest.messageToSign,
                     signedMessage = authorizationRequest.signedMessage!!,
@@ -396,7 +391,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         verify("authorization request with failed status is returned") {
             val result = service.getAuthorizationRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     WithStatus(
                         value = AuthorizationRequest(
@@ -416,9 +411,9 @@ class AuthorizationRequestServiceTest : TestBase() {
                     )
                 )
 
-            verifyMock(authorizationRequestRepository)
-                .getById(uuid)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.getById(uuid)
+            }
         }
     }
 
@@ -444,14 +439,14 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is returned from database") {
-            given(authorizationRequestRepository.getById(uuid))
+            call(authorizationRequestRepository.getById(uuid))
                 .willReturn(authorizationRequest)
         }
 
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return true") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = authorizationRequest.messageToSign,
                     signedMessage = authorizationRequest.signedMessage!!,
@@ -473,7 +468,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         verify("authorization request with successful status is returned") {
             val result = service.getAuthorizationRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     WithStatus(
                         value = AuthorizationRequest(
@@ -493,9 +488,9 @@ class AuthorizationRequestServiceTest : TestBase() {
                     )
                 )
 
-            verifyMock(authorizationRequestRepository)
-                .getById(uuid)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.getById(uuid)
+            }
         }
     }
 
@@ -521,14 +516,14 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is returned from database") {
-            given(authorizationRequestRepository.getById(uuid))
+            call(authorizationRequestRepository.getById(uuid))
                 .willReturn(authorizationRequest)
         }
 
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return true") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = authorizationRequest.messageToSign,
                     signedMessage = authorizationRequest.signedMessage!!,
@@ -550,7 +545,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         verify("authorization request with successful status is returned") {
             val result = service.getAuthorizationRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     WithStatus(
                         value = AuthorizationRequest(
@@ -570,9 +565,9 @@ class AuthorizationRequestServiceTest : TestBase() {
                     )
                 )
 
-            verifyMock(authorizationRequestRepository)
-                .getById(uuid)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.getById(uuid)
+            }
         }
     }
 
@@ -598,14 +593,14 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is returned from database") {
-            given(authorizationRequestRepository.getById(uuid))
+            call(authorizationRequestRepository.getById(uuid))
                 .willReturn(authorizationRequest)
         }
 
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return true") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = authorizationRequest.messageToSign,
                     signedMessage = authorizationRequest.signedMessage!!,
@@ -627,7 +622,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         verify("authorization request with successful status is returned") {
             val result = service.getAuthorizationRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     WithStatus(
                         value = AuthorizationRequest(
@@ -647,11 +642,10 @@ class AuthorizationRequestServiceTest : TestBase() {
                     )
                 )
 
-            verifyMock(authorizationRequestRepository)
-                .getById(uuid)
-            verifyMock(authorizationRequestRepository)
-                .delete(uuid)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.getById(uuid)
+                once.delete(uuid)
+            }
         }
     }
 
@@ -677,14 +671,14 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("authorization request is returned from database") {
-            given(authorizationRequestRepository.getAllByProjectId(authorizationRequest.projectId))
+            call(authorizationRequestRepository.getAllByProjectId(authorizationRequest.projectId))
                 .willReturn(listOf(authorizationRequest))
         }
 
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return true") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = authorizationRequest.messageToSign,
                     signedMessage = authorizationRequest.signedMessage!!,
@@ -706,7 +700,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         verify("authorization request with successful status is returned") {
             val result = service.getAuthorizationRequestsByProjectId(authorizationRequest.projectId)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         WithStatus(
@@ -738,7 +732,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("signed message will be attached") {
-            given(authorizationRequestRepository.setSignedMessage(uuid, walletAddress, signedMessage))
+            call(authorizationRequestRepository.setSignedMessage(uuid, walletAddress, signedMessage))
                 .willReturn(true)
         }
 
@@ -755,9 +749,9 @@ class AuthorizationRequestServiceTest : TestBase() {
         verify("wallet address and signed message are successfully attached") {
             service.attachWalletAddressAndSignedMessage(uuid, walletAddress, signedMessage)
 
-            verifyMock(authorizationRequestRepository)
-                .setSignedMessage(uuid, walletAddress, signedMessage)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.setSignedMessage(uuid, walletAddress, signedMessage)
+            }
         }
     }
 
@@ -769,7 +763,7 @@ class AuthorizationRequestServiceTest : TestBase() {
         val authorizationRequestRepository = mock<AuthorizationRequestRepository>()
 
         suppose("signed message will be attached") {
-            given(authorizationRequestRepository.setSignedMessage(uuid, walletAddress, signedMessage))
+            call(authorizationRequestRepository.setSignedMessage(uuid, walletAddress, signedMessage))
                 .willReturn(false)
         }
 
@@ -784,13 +778,13 @@ class AuthorizationRequestServiceTest : TestBase() {
         )
 
         verify("CannotAttachSignedMessageException is thrown") {
-            assertThrows<CannotAttachSignedMessageException>(message) {
+            expectThrows<CannotAttachSignedMessageException> {
                 service.attachWalletAddressAndSignedMessage(uuid, walletAddress, signedMessage)
             }
 
-            verifyMock(authorizationRequestRepository)
-                .setSignedMessage(uuid, walletAddress, signedMessage)
-            verifyNoMoreInteractions(authorizationRequestRepository)
+            expectInteractions(authorizationRequestRepository) {
+                once.setSignedMessage(uuid, walletAddress, signedMessage)
+            }
         }
     }
 }

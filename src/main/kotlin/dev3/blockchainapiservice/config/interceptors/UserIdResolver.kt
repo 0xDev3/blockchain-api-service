@@ -26,6 +26,8 @@ object UserIdResolver : KLogging() {
             ?.let { userIdResolverRepository.getUserId(idType, it) }
     }
 
+    fun parseUuid(uuid: String?): UUID? = uuid?.parseId()
+
     private fun String.parseId(): UUID? =
         try {
             UUID.fromString(this)

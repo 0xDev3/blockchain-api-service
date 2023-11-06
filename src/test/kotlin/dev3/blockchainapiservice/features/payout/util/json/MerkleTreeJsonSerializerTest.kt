@@ -9,7 +9,6 @@ import dev3.blockchainapiservice.features.payout.util.MerkleTree.Companion.NilNo
 import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.math.BigInteger
 
@@ -32,7 +31,7 @@ class MerkleTreeJsonSerializerTest : TestBase() {
         }
 
         verify("simple Merkle tree is correctly serialized") {
-            assertThat(serializedTree).withMessage().isEqualTo(
+            expectThat(serializedTree).isEqualTo(
                 objectMapper.readTree(
                     """
                     {
@@ -76,7 +75,7 @@ class MerkleTreeJsonSerializerTest : TestBase() {
         }
 
         verify("multi-node Merkle tree is correctly serialized") {
-            assertThat(serializedTree).withMessage().isEqualTo(
+            expectThat(serializedTree).isEqualTo(
                 objectMapper.readTree(
                     """
                     {

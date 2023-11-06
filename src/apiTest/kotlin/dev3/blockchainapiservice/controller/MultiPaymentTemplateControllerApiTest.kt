@@ -2,7 +2,6 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
@@ -19,7 +18,6 @@ import dev3.blockchainapiservice.util.AssetType
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -38,7 +36,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         private val OTHER_OWNER_ID = UUID.randomUUID()
         private const val OTHER_OWNER_ADDRESS = "def456"
         private const val TEMPLATE_NAME = "templateName"
-        private val CHAIN_ID = Chain.HARDHAT_TESTNET.id
+        private val CHAIN_ID = TestData.CHAIN_ID
         private val WALLET_ADDRESS = WalletAddress("a")
         private const val ITEM_NAME = "itemName"
         private val TOKEN_ADDRESS = ContractAddress("b")
@@ -59,7 +57,8 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = WalletAddress(OWNER_ADDRESS).rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -67,7 +66,8 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OTHER_OWNER_ID,
                 userIdentifier = WalletAddress(OTHER_OWNER_ADDRESS).rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
     }
@@ -104,7 +104,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     MultiPaymentTemplateWithItemsResponse(
                         id = response.id,
@@ -127,16 +127,16 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(response.items[0].createdAt)
+            expectThat(response.items[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("multi-payment template is correctly stored into the database") {
             val storedTemplate = multiPaymentTemplateRepository.getById(response.id)!!
 
-            assertThat(storedTemplate).withMessage()
+            expectThat(storedTemplate)
                 .isEqualTo(
                     MultiPaymentTemplate(
                         id = response.id,
@@ -161,13 +161,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedTemplate.createdAt.value)
+            expectThat(storedTemplate.createdAt.value)
                 .isCloseTo(response.createdAt, WITHIN_TIME_TOLERANCE)
-            assertThat(storedTemplate.createdAt.value)
+            expectThat(storedTemplate.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(storedTemplate.items.value[0].createdAt.value)
+            expectThat(storedTemplate.items.value[0].createdAt.value)
                 .isCloseTo(response.items[0].createdAt, WITHIN_TIME_TOLERANCE)
-            assertThat(storedTemplate.items.value[0].createdAt.value)
+            expectThat(storedTemplate.items.value[0].createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -203,7 +203,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         val newTemplateName = "newTemplateName"
-        val newChainId = Chain.ETHEREUM_MAIN.id
+        val newChainId = TestData.CHAIN_ID
 
         val response = suppose("request to update multi-payment template is made") {
             val response = mockMvc.perform(
@@ -227,7 +227,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     MultiPaymentTemplateWithItemsResponse(template).copy(
                         templateName = newTemplateName,
@@ -238,14 +238,14 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.updatedAt)
+            expectThat(response.updatedAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("multi-payment template is correctly updated in the database") {
             val storedTemplate = multiPaymentTemplateRepository.getById(response.id)!!
 
-            assertThat(storedTemplate).withMessage()
+            expectThat(storedTemplate)
                 .isEqualTo(
                     template.copy(
                         templateName = newTemplateName,
@@ -255,9 +255,9 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedTemplate.updatedAt?.value)
+            expectThat(storedTemplate.updatedAt?.value)
                 .isCloseTo(response.updatedAt, WITHIN_TIME_TOLERANCE)
-            assertThat(storedTemplate.updatedAt?.value)
+            expectThat(storedTemplate.updatedAt?.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -293,7 +293,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         val newTemplateName = "newTemplateName"
-        val newChainId = Chain.ETHEREUM_MAIN.id
+        val newChainId = TestData.CHAIN_ID
 
         verify("404 is returned for non-owned multi-payment template") {
             val response = mockMvc.perform(
@@ -313,7 +313,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -321,7 +321,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
     @WithMockUser(OWNER_ADDRESS)
     fun mustReturn404NotFoundWhenUpdatingNonExistentMultiPaymentTemplate() {
         val newTemplateName = "newTemplateName"
-        val newChainId = Chain.ETHEREUM_MAIN.id
+        val newChainId = TestData.CHAIN_ID
 
         verify("404 is returned for non-existent multi-payment template") {
             val response = mockMvc.perform(
@@ -341,7 +341,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -383,7 +383,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         verify("multi-payment template is deleted from database") {
-            assertThat(multiPaymentTemplateRepository.getById(templateId)).withMessage()
+            expectThat(multiPaymentTemplateRepository.getById(templateId))
                 .isNull()
         }
     }
@@ -425,7 +425,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -439,7 +439,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -483,7 +483,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(MultiPaymentTemplateWithItemsResponse(template))
         }
     }
@@ -497,7 +497,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -541,7 +541,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     MultiPaymentTemplatesResponse(
                         listOf(
@@ -607,7 +607,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     MultiPaymentTemplateWithItemsResponse(template).copy(
                         items = listOf(
@@ -625,16 +625,16 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.updatedAt)
+            expectThat(response.updatedAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(response.items[1].createdAt)
+            expectThat(response.items[1].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("multi-payment template item is correctly created in the database") {
             val storedTemplate = multiPaymentTemplateRepository.getById(response.id)!!
 
-            assertThat(storedTemplate).withMessage()
+            expectThat(storedTemplate)
                 .isEqualTo(
                     template.copy(
                         items = WithItems(
@@ -654,13 +654,13 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedTemplate.updatedAt?.value)
+            expectThat(storedTemplate.updatedAt?.value)
                 .isCloseTo(response.updatedAt, WITHIN_TIME_TOLERANCE)
-            assertThat(storedTemplate.updatedAt?.value)
+            expectThat(storedTemplate.updatedAt?.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(storedTemplate.items.value[1].createdAt.value)
+            expectThat(storedTemplate.items.value[1].createdAt.value)
                 .isCloseTo(response.items[1].createdAt, WITHIN_TIME_TOLERANCE)
-            assertThat(storedTemplate.items.value[1].createdAt.value)
+            expectThat(storedTemplate.items.value[1].createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -716,7 +716,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -744,7 +744,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -805,7 +805,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     MultiPaymentTemplateWithItemsResponse(template).copy(
                         items = listOf(
@@ -822,14 +822,14 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.updatedAt)
+            expectThat(response.updatedAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("multi-payment template item is correctly updated in the database") {
             val storedTemplate = multiPaymentTemplateRepository.getById(response.id)!!
 
-            assertThat(storedTemplate).withMessage()
+            expectThat(storedTemplate)
                 .isEqualTo(
                     template.copy(
                         items = WithItems(
@@ -848,9 +848,9 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedTemplate.updatedAt?.value)
+            expectThat(storedTemplate.updatedAt?.value)
                 .isCloseTo(response.updatedAt, WITHIN_TIME_TOLERANCE)
-            assertThat(storedTemplate.updatedAt?.value)
+            expectThat(storedTemplate.updatedAt?.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -908,7 +908,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -938,7 +938,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -985,7 +985,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     MultiPaymentTemplateWithItemsResponse(template).copy(
                         items = emptyList(),
@@ -993,14 +993,14 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.updatedAt)
+            expectThat(response.updatedAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("multi-payment template item is correctly deleted from database") {
             val storedTemplate = multiPaymentTemplateRepository.getById(response.id)!!
 
-            assertThat(storedTemplate).withMessage()
+            expectThat(storedTemplate)
                 .isEqualTo(
                     template.copy(
                         items = WithItems(emptyList()),
@@ -1008,9 +1008,9 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedTemplate.updatedAt?.value)
+            expectThat(storedTemplate.updatedAt?.value)
                 .isCloseTo(response.updatedAt, WITHIN_TIME_TOLERANCE)
-            assertThat(storedTemplate.updatedAt?.value)
+            expectThat(storedTemplate.updatedAt?.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1054,7 +1054,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -1070,7 +1070,7 @@ class MultiPaymentTemplateControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 }

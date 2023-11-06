@@ -18,7 +18,8 @@ data class BlockchainTransactionInfo(
     val value: Balance,
     val blockConfirmations: BigInteger,
     val timestamp: UtcDateTime,
-    val success: Boolean
+    val success: Boolean,
+    val events: List<EventInfo>
 ) {
     fun hashMatches(expectedHash: TransactionHash?): Boolean =
         hash == expectedHash

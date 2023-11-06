@@ -1,91 +1,94 @@
 package dev3.blockchainapiservice.config
 
+import dev3.blockchainapiservice.util.ChainId
+import dev3.blockchainapiservice.util.WalletAddress
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Configuration
 import java.math.BigInteger
 import java.nio.file.Path
 import java.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 @Configuration
+@ConfigurationPropertiesScan
 @ConfigurationProperties(prefix = "blockchain-api-service")
 class ApplicationProperties {
-    val jwt = JwtProperties()
-    val ipfs = IpfsProperties()
-    val createPayoutQueue = QueueProperties()
-    val chainEthereum = ChainProperties()
-    val chainGoerli = ChainProperties()
-    val chainMatic = ChainProperties()
-    val chainMumbai = ChainProperties()
-    val chainHardhatTestnet = ChainProperties()
-    val chainBsc = ChainProperties()
-    val chainXdai = ChainProperties()
-    val chainFantom = ChainProperties()
-    val chainMoonriver = ChainProperties()
-    val chainAvalanche = ChainProperties()
-    val chainAurora = ChainProperties()
-    val chainArbitrum = ChainProperties()
-    val chainOptimism = ChainProperties()
-    val chainCelo = ChainProperties()
-    val chainParaTime = ChainProperties()
-    val chainMoonbeam = ChainProperties()
-    val chainPolygonZkEvmTestnet = ChainProperties()
-    val chainCeloAlfajoresTestnet = ChainProperties()
-    val chainArbitrumGoerliTestnet = ChainProperties()
-    val chainOptimismGoerliTestnet = ChainProperties()
-    val chainSepoliaTestnet = ChainProperties()
-    val chainAvaxFujiTestnet = ChainProperties()
+    var chain: Map<ChainId, ChainProperties> = emptyMap()
     var infuraId: String = ""
-    val contractDecorators = ContractDecoratorProperties()
-    val metaPixelProperties = MetaPixelProperties()
-    val contractManifestService = ContractManifestServiceProperties()
-    val apiUsage = ApiUsageProperties()
 }
 
-class JwtProperties {
-    lateinit var publicKey: String
-}
+@ConstructorBinding
+@ConfigurationProperties(prefix = "blockchain-api-service.jwt")
+data class JwtProperties(
+    val publicKey: String
+)
 
-class IpfsProperties {
-    var url = "https://api.pinata.cloud/"
-    var apiKey = ""
-    var secretApiKey = ""
-}
+@ConstructorBinding
+@ConfigurationProperties(prefix = "blockchain-api-service.ipfs")
+data class IpfsProperties(
+    val url: String = "https://api.pinata.cloud/",
+    val apiKey: String = "",
+    val secretApiKey: String = ""
+)
 
-@Suppress("MagicNumber")
-class ChainProperties {
-    var minBlockConfirmationsForCaching: BigInteger? = null
-    var latestBlockCacheDuration: Duration = Duration.ofSeconds(5L)
-    var rpcUrlOverride: String? = null
-    var startBlockNumber: BigInteger? = null
-}
+@ConstructorBinding
+data class ChainProperties(
+    val name: String,
+    val rpcUrl: String,
+    val infuraUrl: String?,
+    val startBlockNumber: BigInteger?,
+    val minBlockConfirmationsForCaching: BigInteger?,
+    val chainExplorerApiUrl: String?,
+    val chainExplorerApiKey: String?,
+    val latestBlockCacheDuration: Duration = 5.seconds.toJavaDuration()
+)
 
-@Suppress("MagicNumber")
-class ContractDecoratorProperties {
-    var contractsDirectory: Path? = null
-    var interfacesDirectory: Path? = null
-    var ignoredDirs: List<String> = listOf(".git")
-    var fillChangePollInterval: Duration = Duration.ofMinutes(1L)
-    var fileChangeQuietInterval: Duration = Duration.ofSeconds(30L)
-}
+@ConstructorBinding
+@ConfigurationProperties(prefix = "blockchain-api-service.contract-decorators")
+data class ContractDecoratorProperties(
+    val contractsDirectory: Path?,
+    val interfacesDirectory: Path?,
+    val ignoredDirs: List<String> = listOf(".git"),
+    val fillChangePollInterval: Duration = 1.minutes.toJavaDuration(),
+    val fileChangeQuietInterval: Duration = 30.seconds.toJavaDuration()
+)
 
-class MetaPixelProperties {
-    var accessToken: String? = null
-    var pixelId: String? = null
-}
+@ConstructorBinding
+@ConfigurationProperties(prefix = "blockchain-api-service.meta-pixel-properties")
+data class MetaPixelProperties(
+    val accessToken: String?,
+    val pixelId: String?
+)
 
-class ContractManifestServiceProperties {
-    var baseUrl: String? = null
-    var decompileContractPath = "/decompile-contract"
-}
+@ConstructorBinding
+@ConfigurationProperties(prefix = "blockchain-api-service.contract-manifest-service")
+data class ContractManifestServiceProperties(
+    val baseUrl: String?,
+    val decompileContractPath: String = "/decompile-contract",
+    val functionSignaturePath: String = "/function-signature/{signature}"
+)
 
-@Suppress("MagicNumber")
-class QueueProperties {
-    var polling: Long = 5_000L
-    var initialDelay: Long = 15_000L
-}
+@ConstructorBinding
+@ConfigurationProperties(prefix = "blockchain-api-service.create-payout-queue")
+data class PayoutQueueProperties(
+    val polling: Long = 5_000L,
+    val initialDelay: Long = 15_000L
+)
 
-class ApiUsageProperties {
-    var prepaidBalanceContractAddress: String = ""
-    var prepaidBalanceContractChainId: Long = 0L
-    var freeWriteRequests: Long = 0L
-}
+@ConstructorBinding
+@ConfigurationProperties(prefix = "blockchain-api-service.api-usage")
+data class ApiUsageProperties(
+    val prepaidBalanceContractAddress: String = "",
+    val prepaidBalanceContractChainId: Long = 0L,
+    val freeWriteRequests: Long = 0L
+)
+
+@ConstructorBinding
+@ConfigurationProperties(prefix = "blockchain-api-service.admin")
+data class AdminProperties(
+    val wallets: Set<WalletAddress> = emptySet()
+)

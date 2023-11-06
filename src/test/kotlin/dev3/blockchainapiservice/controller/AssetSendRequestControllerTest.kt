@@ -25,15 +25,11 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue
 import dev3.blockchainapiservice.util.WithTransactionData
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AssetSendRequestControllerTest : TestBase() {
 
@@ -78,7 +74,7 @@ class AssetSendRequestControllerTest : TestBase() {
         val service = mock<AssetSendRequestService>()
 
         suppose("asset send request will be created") {
-            given(service.createAssetSendRequest(params, project))
+            call(service.createAssetSendRequest(params, project))
                 .willReturn(WithFunctionDataOrEthValue(result, data, null))
         }
 
@@ -100,7 +96,7 @@ class AssetSendRequestControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetSendRequestResponse(
@@ -125,7 +121,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                 blockConfirmations = null,
                                 timestamp = null
                             ),
-                            createdAt = TestData.TIMESTAMP.value
+                            createdAt = TestData.TIMESTAMP.value,
+                            events = null
                         )
                     )
                 )
@@ -163,12 +160,13 @@ class AssetSendRequestControllerTest : TestBase() {
                 data = FunctionData("data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
         suppose("some asset send request will be fetched") {
-            given(service.getAssetSendRequest(id))
+            call(service.getAssetSendRequest(id))
                 .willReturn(result)
         }
 
@@ -179,7 +177,7 @@ class AssetSendRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetSendRequestResponse(
@@ -204,7 +202,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                 blockConfirmations = result.transactionData.blockConfirmations,
                                 timestamp = TestData.TIMESTAMP.value
                             ),
-                            createdAt = result.value.createdAt.value
+                            createdAt = result.value.createdAt.value,
+                            events = emptyList()
                         )
                     )
                 )
@@ -243,12 +242,13 @@ class AssetSendRequestControllerTest : TestBase() {
                 data = FunctionData("data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
         suppose("some asset send requests will be fetched by project ID") {
-            given(service.getAssetSendRequestsByProjectId(projectId))
+            call(service.getAssetSendRequestsByProjectId(projectId))
                 .willReturn(listOf(result))
         }
 
@@ -259,7 +259,7 @@ class AssetSendRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetSendRequestsResponse(
@@ -286,7 +286,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
-                                    createdAt = result.value.createdAt.value
+                                    createdAt = result.value.createdAt.value,
+                                    events = emptyList()
                                 )
                             )
                         )
@@ -327,12 +328,13 @@ class AssetSendRequestControllerTest : TestBase() {
                 data = FunctionData("data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
         suppose("some asset send requests will be fetched by sender") {
-            given(service.getAssetSendRequestsBySender(sender))
+            call(service.getAssetSendRequestsBySender(sender))
                 .willReturn(listOf(result))
         }
 
@@ -343,7 +345,7 @@ class AssetSendRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetSendRequestsResponse(
@@ -370,7 +372,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
-                                    createdAt = result.value.createdAt.value
+                                    createdAt = result.value.createdAt.value,
+                                    events = emptyList()
                                 )
                             )
                         )
@@ -411,12 +414,13 @@ class AssetSendRequestControllerTest : TestBase() {
                 data = FunctionData("data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
         suppose("some asset send requests will be fetched by recipient") {
-            given(service.getAssetSendRequestsByRecipient(recipient))
+            call(service.getAssetSendRequestsByRecipient(recipient))
                 .willReturn(listOf(result))
         }
 
@@ -427,7 +431,7 @@ class AssetSendRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetSendRequestsResponse(
@@ -454,7 +458,8 @@ class AssetSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.transactionData.blockConfirmations,
                                         timestamp = TestData.TIMESTAMP.value
                                     ),
-                                    createdAt = result.value.createdAt.value
+                                    createdAt = result.value.createdAt.value,
+                                    events = emptyList()
                                 )
                             )
                         )
@@ -479,10 +484,9 @@ class AssetSendRequestControllerTest : TestBase() {
         }
 
         verify("transaction info is correctly attached") {
-            verifyMock(service)
-                .attachTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
-
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.attachTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
+            }
         }
     }
 }

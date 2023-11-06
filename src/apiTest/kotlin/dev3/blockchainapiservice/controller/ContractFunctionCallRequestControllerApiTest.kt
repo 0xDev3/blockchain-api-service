@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.ExampleContract
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -12,13 +11,25 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.ContractMetadataR
 import dev3.blockchainapiservice.generated.jooq.tables.records.ProjectRecord
 import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRecord
 import dev3.blockchainapiservice.model.ScreenConfig
+import dev3.blockchainapiservice.model.json.ArtifactJson
+import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.params.StoreContractFunctionCallRequestParams
 import dev3.blockchainapiservice.model.response.ContractFunctionCallRequestResponse
 import dev3.blockchainapiservice.model.response.ContractFunctionCallRequestsResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponseType
+import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
+import dev3.blockchainapiservice.model.result.ContractConstructor
+import dev3.blockchainapiservice.model.result.ContractDecorator
+import dev3.blockchainapiservice.model.result.ContractEvent
+import dev3.blockchainapiservice.model.result.ContractFunction
 import dev3.blockchainapiservice.model.result.ContractFunctionCallRequest
+import dev3.blockchainapiservice.model.result.ContractParameter
+import dev3.blockchainapiservice.model.result.EventParameter
 import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractFunctionCallRequestRepository
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
@@ -29,10 +40,11 @@ import dev3.blockchainapiservice.util.Constants
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
+import dev3.blockchainapiservice.util.ContractTag
+import dev3.blockchainapiservice.util.InterfaceId
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -54,12 +66,12 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             ownerId = OWNER_ID,
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
         private const val API_KEY = "api-key"
-        private val CONTRACT_DECORATOR_ID = ContractId("decorator.id")
+        private val CONTRACT_DECORATOR_ID = ContractId("examples.exampleContract")
         private val DEPLOYED_CONTRACT = StoreContractDeploymentRequestParams(
             id = UUID.randomUUID(),
             alias = "contract-alias",
@@ -68,7 +80,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             constructorParams = TestData.EMPTY_JSON_ARRAY,
             deployerAddress = null,
             initialEthAmount = Balance.ZERO,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url",
             projectId = PROJECT_ID,
             createdAt = TestData.TIMESTAMP,
@@ -77,6 +89,124 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             imported = false,
             proxy = false,
             implementationContractAddress = null
+        )
+        private val CONTRACT_DECORATOR = ContractDecorator(
+            id = CONTRACT_DECORATOR_ID,
+            name = "name",
+            description = "description",
+            binary = ContractBinaryData(ExampleContract.BINARY),
+            tags = listOf(ContractTag("example"), ContractTag("simple")),
+            implements = listOf(InterfaceId("traits.example"), InterfaceId("traits.exampleOwnable")),
+            constructors = listOf(
+                ContractConstructor(
+                    inputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "owner",
+                            solidityType = "address",
+                            recommendedTypes = listOf(),
+                            parameters = null,
+                            hints = null
+                        )
+                    ),
+                    description = "Main constructor",
+                    payable = true
+                )
+            ),
+            functions = listOf(
+                ContractFunction(
+                    name = "Get contract owner",
+                    description = "Fetches contract owner",
+                    solidityName = "getOwner",
+                    signature = "getOwner()",
+                    inputs = listOf(),
+                    outputs = listOf(
+                        ContractParameter(
+                            name = "Owner address",
+                            description = "Contract owner address",
+                            solidityName = "",
+                            solidityType = "address",
+                            recommendedTypes = listOf(),
+                            parameters = null,
+                            hints = null
+                        )
+                    ),
+                    emittableEvents = emptyList(),
+                    readOnly = true
+                )
+            ),
+            events = listOf(
+                ContractEvent(
+                    name = "Example event",
+                    description = "Example event",
+                    solidityName = "ExampleEvent",
+                    signature = "ExampleEvent(tuple(address),tuple(address))",
+                    inputs = listOf(
+                        EventParameter(
+                            name = "Non-indexed struct",
+                            description = "Non-indexed struct",
+                            indexed = false,
+                            solidityName = "nonIndexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        ),
+                        EventParameter(
+                            name = "Indexed struct",
+                            description = "Indexed struct",
+                            indexed = true,
+                            solidityName = "indexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        )
+                    )
+                )
+            ),
+            manifest = ManifestJson.EMPTY,
+            artifact = ArtifactJson.EMPTY
+        )
+        private val EVENTS = listOf(
+            EventInfoResponse(
+                signature = "ExampleEvent(tuple(address),tuple(address))",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "nonIndexedStruct",
+                        type = EventArgumentResponseType.VALUE,
+                        value = listOf(HardhatTestContainer.ACCOUNT_ADDRESS_1),
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "indexedStruct",
+                        type = EventArgumentResponseType.HASH,
+                        value = null,
+                        hash = "0xb3ab459503754d7ffbceb026c9a12971f082734e588c5e09df0875237fd918a2"
+                    )
+                )
+            )
         )
     }
 
@@ -89,6 +219,9 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
     private lateinit var contractDeploymentRequestRepository: ContractDeploymentRequestRepository
 
     @Autowired
+    private lateinit var contractDecoratorRepository: ContractDecoratorRepository
+
+    @Autowired
     private lateinit var dslContext: DSLContext
 
     @BeforeEach
@@ -98,11 +231,11 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         dslContext.executeInsert(
             ContractMetadataRecord(
                 id = UUID.randomUUID(),
-                contractId = CONTRACT_DECORATOR_ID,
-                contractTags = emptyArray(),
-                contractImplements = emptyArray(),
-                name = null,
-                description = null,
+                name = CONTRACT_DECORATOR.name,
+                description = CONTRACT_DECORATOR.description,
+                contractId = CONTRACT_DECORATOR.id,
+                contractTags = CONTRACT_DECORATOR.tags.map { it.value }.toTypedArray(),
+                contractImplements = CONTRACT_DECORATOR.implements.map { it.value }.toTypedArray(),
                 projectId = Constants.NIL_UUID
             )
         )
@@ -111,7 +244,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -191,7 +325,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = response.id,
@@ -220,18 +354,19 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
                             timestamp = null
-                        )
+                        ),
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract function call request is correctly stored in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = response.id,
@@ -254,7 +389,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -313,7 +448,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = response.id,
@@ -342,18 +477,19 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
                             timestamp = null
-                        )
+                        ),
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract function call request is correctly stored in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = response.id,
@@ -376,7 +512,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -430,7 +566,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = response.id,
@@ -459,18 +595,19 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
                             timestamp = null
-                        )
+                        ),
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract function call request is correctly stored in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = response.id,
@@ -493,7 +630,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -554,7 +691,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = response.id,
@@ -583,18 +720,19 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
                             timestamp = null
-                        )
+                        ),
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract function call request is correctly stored in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractFunctionCallRequest(
                         id = response.id,
@@ -617,7 +755,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -661,7 +799,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INVALID_REQUEST_BODY)
+            expectResponseErrorCode(response, ErrorCode.INVALID_REQUEST_BODY)
         }
     }
 
@@ -699,7 +837,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INVALID_REQUEST_BODY)
+            expectResponseErrorCode(response, ErrorCode.INVALID_REQUEST_BODY)
         }
     }
 
@@ -734,7 +872,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -769,7 +907,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -808,7 +946,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_NOT_DEPLOYED)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_NOT_DEPLOYED)
         }
     }
 
@@ -847,7 +985,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_NOT_DEPLOYED)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_NOT_DEPLOYED)
         }
     }
 
@@ -882,12 +1020,16 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
+            expectResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 
     @Test
     fun mustCorrectlyFetchContractFunctionCallRequest() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
 
@@ -904,6 +1046,12 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         val contractAddress = ContractAddress(contract.contractAddress)
         val functionName = "setOwner"
         val ethAmount = Balance.ZERO
+
+        suppose("some deployed contract exists in the database") {
+            contractDeploymentRequestRepository.store(DEPLOYED_CONTRACT, Constants.NIL_UUID).apply {
+                contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
+            }
+        }
 
         val paramsJson =
             """
@@ -974,12 +1122,12 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = createResponse.id,
                         status = Status.SUCCESS,
-                        deployedContractId = null,
+                        deployedContractId = DEPLOYED_CONTRACT.id,
                         contractAddress = contractAddress.rawValue,
                         functionName = functionName,
                         functionParams = objectMapper.readTree(paramsJson),
@@ -1004,21 +1152,26 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             value = ethAmount.rawValue,
                             blockConfirmations = fetchResponse.functionCallTx.blockConfirmations,
                             timestamp = fetchResponse.functionCallTx.timestamp
-                        )
+                        ),
+                        events = EVENTS
                     )
                 )
 
-            assertThat(fetchResponse.functionCallTx.blockConfirmations)
+            expectThat(fetchResponse.functionCallTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.functionCallTx.timestamp)
+            expectThat(fetchResponse.functionCallTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
     @Test
     fun mustCorrectlyFetchContractFunctionCallRequestWhenCustomRpcUrlIsSpecified() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
 
@@ -1038,6 +1191,18 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
 
         val (projectId, chainId, apiKey) = suppose("project with customRpcUrl is inserted into database") {
             insertProjectWithCustomRpcUrl()
+        }
+
+        suppose("some deployed contract exists in the database") {
+            contractDeploymentRequestRepository.store(
+                params = DEPLOYED_CONTRACT.copy(
+                    projectId = projectId,
+                    chainId = chainId
+                ),
+                metadataProjectId = Constants.NIL_UUID
+            ).apply {
+                contractDeploymentRequestRepository.setContractAddress(DEPLOYED_CONTRACT.id, contractAddress)
+            }
         }
 
         val paramsJson =
@@ -1109,12 +1274,12 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractFunctionCallRequestResponse(
                         id = createResponse.id,
                         status = Status.SUCCESS,
-                        deployedContractId = null,
+                        deployedContractId = DEPLOYED_CONTRACT.id,
                         contractAddress = contractAddress.rawValue,
                         functionName = functionName,
                         functionParams = objectMapper.readTree(paramsJson),
@@ -1139,15 +1304,16 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             value = ethAmount.rawValue,
                             blockConfirmations = fetchResponse.functionCallTx.blockConfirmations,
                             timestamp = fetchResponse.functionCallTx.timestamp
-                        )
+                        ),
+                        events = EVENTS
                     )
                 )
 
-            assertThat(fetchResponse.functionCallTx.blockConfirmations)
+            expectThat(fetchResponse.functionCallTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.functionCallTx.timestamp)
+            expectThat(fetchResponse.functionCallTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1161,12 +1327,16 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
     @Test
     fun mustCorrectlyFetchContractFunctionCallRequestsByProjectIdAndFilters() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
 
@@ -1262,7 +1432,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractFunctionCallRequestsResponse(
                         listOf(
@@ -1294,23 +1464,28 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                                     value = ethAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].functionCallTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].functionCallTx.timestamp
-                                )
+                                ),
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].functionCallTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].functionCallTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].functionCallTx.timestamp)
+            expectThat(fetchResponse.requests[0].functionCallTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
 
     @Test
     fun mustCorrectlyFetchContractFunctionCallRequestsByProjectIdAndFiltersWhenCustomRpcUrlIsSpecified() {
+        suppose("some contract decorator exists in the database") {
+            contractDecoratorRepository.store(CONTRACT_DECORATOR)
+        }
+
         val ownerAddress = WalletAddress("a")
         val mainAccount = accounts[0]
 
@@ -1410,7 +1585,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractFunctionCallRequestsResponse(
                         listOf(
@@ -1442,17 +1617,18 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                                     value = ethAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].functionCallTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].functionCallTx.timestamp
-                                )
+                                ),
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].functionCallTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].functionCallTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].functionCallTx.timestamp)
+            expectThat(fetchResponse.requests[0].functionCallTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1471,7 +1647,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     functionName = "test",
                     functionParams = TestData.EMPTY_JSON_ARRAY,
                     ethAmount = Balance(BigInteger.TEN),
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,
@@ -1507,7 +1683,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
         verify("transaction info is correctly attached to contract deployment request") {
             val storedRequest = contractFunctionCallRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }
@@ -1527,7 +1703,7 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                     functionName = "test",
                     functionParams = TestData.EMPTY_JSON_ARRAY,
                     ethAmount = Balance(BigInteger.TEN),
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,
@@ -1558,13 +1734,13 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
+            expectResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
         verify("transaction info is not changed in database") {
             val storedRequest = contractFunctionCallRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }

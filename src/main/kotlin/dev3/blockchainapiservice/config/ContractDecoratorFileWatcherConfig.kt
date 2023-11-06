@@ -23,9 +23,9 @@ class ContractDecoratorFileWatcherConfig {
         contractInterfacesRepository: ContractInterfacesRepository,
         contractMetadataRepository: ContractMetadataRepository,
         objectMapper: ObjectMapper,
-        properties: ApplicationProperties,
+        contractDecoratorProperties: ContractDecoratorProperties
     ): FileSystemWatcher? {
-        val interfacesDir = properties.contractDecorators.interfacesDirectory
+        val interfacesDir = contractDecoratorProperties.interfacesDirectory
 
         if (interfacesDir == null) {
             logger.warn { "Contract interfaces directory not set, no contract interfaces will be loaded" }
@@ -33,7 +33,7 @@ class ContractDecoratorFileWatcherConfig {
 
         logger.info { "Watching for contract interface changes in $interfacesDir" }
 
-        val contractsDir = properties.contractDecorators.contractsDirectory
+        val contractsDir = contractDecoratorProperties.contractsDirectory
 
         if (contractsDir == null) {
             logger.warn { "Contract decorator contracts directory not set, no contract decorators will be loaded" }
@@ -50,13 +50,13 @@ class ContractDecoratorFileWatcherConfig {
             objectMapper = objectMapper,
             contractsDir = contractsDir,
             interfacesDir = interfacesDir,
-            ignoredDirs = properties.contractDecorators.ignoredDirs
+            ignoredDirs = contractDecoratorProperties.ignoredDirs
         )
 
         return FileSystemWatcher(
             true,
-            properties.contractDecorators.fillChangePollInterval,
-            properties.contractDecorators.fileChangeQuietInterval
+            contractDecoratorProperties.fillChangePollInterval,
+            contractDecoratorProperties.fileChangeQuietInterval
         ).apply {
             addSourceDirectories(listOfNotNull(interfacesDir?.toFile(), contractsDir.toFile()))
             addListener(listener)

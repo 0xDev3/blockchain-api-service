@@ -4,7 +4,6 @@ import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.SimpleDisperse
 import dev3.blockchainapiservice.blockchain.SimpleERC20
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -15,6 +14,9 @@ import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.StoreAssetMultiSendRequestParams
 import dev3.blockchainapiservice.model.response.AssetMultiSendRequestResponse
 import dev3.blockchainapiservice.model.response.AssetMultiSendRequestsResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponseType
+import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.MultiSendItemResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.AssetMultiSendRequest
@@ -29,7 +31,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -52,11 +53,84 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
             ownerId = OWNER_ID,
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
         private const val API_KEY = "api-key"
+        private val APPROVE_EVENTS = listOf(
+            EventInfoResponse(
+                signature = "Approval(address,address,uint256)",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "owner",
+                        type = EventArgumentResponseType.VALUE,
+                        value = HardhatTestContainer.ACCOUNT_ADDRESS_1,
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "spender",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "{disperseContractAddress}",
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "value",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "10",
+                        hash = null
+                    )
+                )
+            )
+        )
+        private val DISPERSE_EVENTS = listOf(
+            EventInfoResponse(
+                signature = "Transfer(address,address,uint256)",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "from",
+                        type = EventArgumentResponseType.VALUE,
+                        value = HardhatTestContainer.ACCOUNT_ADDRESS_1,
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "to",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "{disperseContractAddress}",
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "value",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "10",
+                        hash = null
+                    )
+                )
+            ),
+            EventInfoResponse(
+                signature = "Transfer(address,address,uint256)",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "from",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "{disperseContractAddress}",
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "to",
+                        type = EventArgumentResponseType.VALUE,
+                        value = HardhatTestContainer.ACCOUNT_ADDRESS_2,
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "value",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "10",
+                        hash = null
+                    )
+                )
+            )
+        )
     }
 
     private val accounts = HardhatTestContainer.ACCOUNTS
@@ -75,7 +149,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -150,7 +225,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetMultiSendRequestResponse(
                         id = response.id,
@@ -189,18 +264,20 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             timestamp = null
                         ),
                         disperseTx = null,
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        approveEvents = null,
+                        disperseEvents = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset multi-send request is correctly stored in database") {
             val storedRequest = assetMultiSendRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = response.id,
@@ -228,7 +305,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -284,7 +361,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetMultiSendRequestResponse(
                         id = response.id,
@@ -323,18 +400,20 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             timestamp = null
                         ),
                         disperseTx = null,
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        approveEvents = null,
+                        disperseEvents = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset multi-send request is correctly stored in database") {
             val storedRequest = assetMultiSendRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = response.id,
@@ -362,7 +441,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -414,7 +493,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetMultiSendRequestResponse(
                         id = response.id,
@@ -453,18 +532,20 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        approveEvents = null,
+                        disperseEvents = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset multi-send request is correctly stored in database") {
             val storedRequest = assetMultiSendRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = response.id,
@@ -492,7 +573,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -546,7 +627,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetMultiSendRequestResponse(
                         id = response.id,
@@ -585,18 +666,20 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        approveEvents = null,
+                        disperseEvents = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset multi-send request is correctly stored in database") {
             val storedRequest = assetMultiSendRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetMultiSendRequest(
                         id = response.id,
@@ -624,7 +707,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -672,7 +755,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.MISSING_TOKEN_ADDRESS)
+            expectResponseErrorCode(response, ErrorCode.MISSING_TOKEN_ADDRESS)
         }
     }
 
@@ -721,7 +804,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TOKEN_ADDRESS_NOT_ALLOWED)
+            expectResponseErrorCode(response, ErrorCode.TOKEN_ADDRESS_NOT_ALLOWED)
         }
     }
 
@@ -770,7 +853,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
+            expectResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 
@@ -884,7 +967,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetMultiSendRequestResponse(
                         id = fetchResponse.id,
@@ -931,24 +1014,26 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
                             timestamp = fetchResponse.disperseTx!!.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                        disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                     )
                 )
 
-            assertThat(fetchResponse.approveTx!!.blockConfirmations)
+            expectThat(fetchResponse.approveTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.disperseTx!!.blockConfirmations)
+            expectThat(fetchResponse.disperseTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.approveTx!!.timestamp)
+            expectThat(fetchResponse.approveTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.disperseTx!!.timestamp)
+            expectThat(fetchResponse.disperseTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("recipient has some balance of distributed token") {
-            assertThat(tokenContract.balanceOf(recipientAddress.rawValue).send()).withMessage()
+            expectThat(tokenContract.balanceOf(recipientAddress.rawValue).send())
                 .isEqualTo(amount.rawValue)
         }
     }
@@ -1067,7 +1152,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetMultiSendRequestResponse(
                         id = fetchResponse.id,
@@ -1114,24 +1199,26 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
                             timestamp = fetchResponse.disperseTx!!.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                        disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                     )
                 )
 
-            assertThat(fetchResponse.approveTx!!.blockConfirmations)
+            expectThat(fetchResponse.approveTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.disperseTx!!.blockConfirmations)
+            expectThat(fetchResponse.disperseTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.approveTx!!.timestamp)
+            expectThat(fetchResponse.approveTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.disperseTx!!.timestamp)
+            expectThat(fetchResponse.disperseTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("recipient has some balance of distributed token") {
-            assertThat(tokenContract.balanceOf(recipientAddress.rawValue).send()).withMessage()
+            expectThat(tokenContract.balanceOf(recipientAddress.rawValue).send())
                 .isEqualTo(amount.rawValue)
         }
     }
@@ -1225,7 +1312,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetMultiSendRequestResponse(
                         id = fetchResponse.id,
@@ -1264,15 +1351,17 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
                             timestamp = fetchResponse.disperseTx!!.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        approveEvents = null,
+                        disperseEvents = emptyList()
                     )
                 )
 
-            assertThat(fetchResponse.disperseTx!!.blockConfirmations)
+            expectThat(fetchResponse.disperseTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.disperseTx!!.timestamp)
+            expectThat(fetchResponse.disperseTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -1282,7 +1371,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 DefaultBlockParameterName.LATEST
             ).send().balance
 
-            assertThat(balance).withMessage()
+            expectThat(balance)
                 .isEqualTo(initialEthBalance + amount.rawValue)
         }
     }
@@ -1380,7 +1469,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetMultiSendRequestResponse(
                         id = fetchResponse.id,
@@ -1419,15 +1508,17 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
                             timestamp = fetchResponse.disperseTx!!.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        approveEvents = null,
+                        disperseEvents = emptyList()
                     )
                 )
 
-            assertThat(fetchResponse.disperseTx!!.blockConfirmations)
+            expectThat(fetchResponse.disperseTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.disperseTx!!.timestamp)
+            expectThat(fetchResponse.disperseTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -1437,7 +1528,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 DefaultBlockParameterName.LATEST
             ).send().balance
 
-            assertThat(balance).withMessage()
+            expectThat(balance)
                 .isEqualTo(initialEthBalance + amount.rawValue)
         }
     }
@@ -1451,7 +1542,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -1565,7 +1656,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetMultiSendRequestsResponse(
                         listOf(
@@ -1615,21 +1706,23 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                                disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].approveTx!!.blockConfirmations)
+            expectThat(fetchResponse.requests[0].approveTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].disperseTx!!.blockConfirmations)
+            expectThat(fetchResponse.requests[0].disperseTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].approveTx!!.timestamp)
+            expectThat(fetchResponse.requests[0].approveTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].disperseTx!!.timestamp)
+            expectThat(fetchResponse.requests[0].disperseTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1748,7 +1841,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetMultiSendRequestsResponse(
                         listOf(
@@ -1798,21 +1891,23 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                                disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].approveTx!!.blockConfirmations)
+            expectThat(fetchResponse.requests[0].approveTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].disperseTx!!.blockConfirmations)
+            expectThat(fetchResponse.requests[0].disperseTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].approveTx!!.timestamp)
+            expectThat(fetchResponse.requests[0].approveTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].disperseTx!!.timestamp)
+            expectThat(fetchResponse.requests[0].disperseTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1927,7 +2022,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetMultiSendRequestsResponse(
                         listOf(
@@ -1977,21 +2072,23 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                                disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].approveTx!!.blockConfirmations)
+            expectThat(fetchResponse.requests[0].approveTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].disperseTx!!.blockConfirmations)
+            expectThat(fetchResponse.requests[0].disperseTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].approveTx!!.timestamp)
+            expectThat(fetchResponse.requests[0].approveTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].disperseTx!!.timestamp)
+            expectThat(fetchResponse.requests[0].disperseTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -2110,7 +2207,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetMultiSendRequestsResponse(
                         listOf(
@@ -2160,21 +2257,23 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
+                                disperseEvents = DISPERSE_EVENTS.withDisperseContractAddress(disperseContractAddress)
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].approveTx!!.blockConfirmations)
+            expectThat(fetchResponse.requests[0].approveTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].disperseTx!!.blockConfirmations)
+            expectThat(fetchResponse.requests[0].disperseTx!!.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].approveTx!!.timestamp)
+            expectThat(fetchResponse.requests[0].approveTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].disperseTx!!.timestamp)
+            expectThat(fetchResponse.requests[0].disperseTx!!.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -2189,7 +2288,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 StoreAssetMultiSendRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     disperseContractAddress = ContractAddress("b"),
@@ -2233,7 +2332,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         verify("approve transaction info is correctly attached to asset multi-send request") {
             val storedRequest = assetMultiSendRequestRepository.getById(id)
 
-            assertThat(storedRequest?.approveTxHash)
+            expectThat(storedRequest?.approveTxHash)
                 .isEqualTo(approveTxHash)
         }
     }
@@ -2249,7 +2348,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 StoreAssetMultiSendRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     disperseContractAddress = ContractAddress("b"),
@@ -2288,13 +2387,13 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
+            expectResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
         verify("approve transaction info is not changed in database") {
             val storedRequest = assetMultiSendRequestRepository.getById(id)
 
-            assertThat(storedRequest?.approveTxHash)
+            expectThat(storedRequest?.approveTxHash)
                 .isEqualTo(approveTxHash)
         }
     }
@@ -2309,7 +2408,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 StoreAssetMultiSendRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = null,
                     disperseContractAddress = ContractAddress("b"),
@@ -2353,7 +2452,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
         verify("disperse transaction info is correctly attached to asset multi-send request") {
             val storedRequest = assetMultiSendRequestRepository.getById(id)
 
-            assertThat(storedRequest?.disperseTxHash)
+            expectThat(storedRequest?.disperseTxHash)
                 .isEqualTo(disperseTxHash)
         }
     }
@@ -2369,7 +2468,7 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 StoreAssetMultiSendRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = null,
                     disperseContractAddress = ContractAddress("b"),
@@ -2408,13 +2507,13 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
+            expectResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
         verify("disperse transaction info is not changed in database") {
             val storedRequest = assetMultiSendRequestRepository.getById(id)
 
-            assertThat(storedRequest?.disperseTxHash)
+            expectThat(storedRequest?.disperseTxHash)
                 .isEqualTo(disperseTxHash)
         }
     }
@@ -2448,4 +2547,16 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
 
         return Triple(projectId, chainId, apiKey)
     }
+
+    private fun List<EventInfoResponse>.withDisperseContractAddress(disperseContractAddress: ContractAddress) =
+        map { event ->
+            event.copy(
+                arguments = event.arguments.map { arg ->
+                    arg.copy(
+                        value = arg.value?.toString()
+                            ?.replace("{disperseContractAddress}", disperseContractAddress.rawValue)
+                    )
+                }
+            )
+        }
 }

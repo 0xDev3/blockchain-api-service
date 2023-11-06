@@ -2,7 +2,7 @@ package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.exception.ApiKeyAlreadyExistsException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.params.CreateProjectParams
@@ -19,10 +19,7 @@ import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.http.ResponseEntity
 import org.springframework.mock.web.MockHttpServletRequest
@@ -40,7 +37,7 @@ class ProjectControllerTest : TestBase() {
         val params = CreateProjectParams(
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url"
         )
         val result = Project(
@@ -54,6 +51,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = result.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -61,7 +59,7 @@ class ProjectControllerTest : TestBase() {
         val analyticsService = mock<AnalyticsService>()
 
         suppose("project will be created") {
-            given(service.createProject(userIdentifier, params))
+            call(service.createProject(userIdentifier, params))
                 .willReturn(result)
         }
 
@@ -79,7 +77,7 @@ class ProjectControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ProjectResponse(result)))
         }
     }
@@ -91,7 +89,7 @@ class ProjectControllerTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
@@ -106,7 +104,7 @@ class ProjectControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ProjectResponse(result)))
         }
     }
@@ -118,12 +116,13 @@ class ProjectControllerTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = result.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -131,7 +130,7 @@ class ProjectControllerTest : TestBase() {
         val analyticsService = mock<AnalyticsService>()
 
         suppose("project will be returned") {
-            given(service.getProjectById(userIdentifier, result.id))
+            call(service.getProjectById(userIdentifier, result.id))
                 .willReturn(result)
         }
 
@@ -142,7 +141,7 @@ class ProjectControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ProjectResponse(result)))
         }
     }
@@ -154,12 +153,13 @@ class ProjectControllerTest : TestBase() {
             ownerId = UUID.randomUUID(),
             issuerContractAddress = ContractAddress("155034"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = CREATED_AT
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = result.ownerId,
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -167,7 +167,7 @@ class ProjectControllerTest : TestBase() {
         val analyticsService = mock<AnalyticsService>()
 
         suppose("project will be returned") {
-            given(service.getProjectByIssuer(userIdentifier, result.issuerContractAddress, result.chainId))
+            call(service.getProjectByIssuer(userIdentifier, result.issuerContractAddress, result.chainId))
                 .willReturn(result)
         }
 
@@ -182,7 +182,7 @@ class ProjectControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ProjectResponse(result)))
         }
     }
@@ -191,6 +191,7 @@ class ProjectControllerTest : TestBase() {
     fun mustCorrectlyGetAllProjectsForUser() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
         val result = listOf(
@@ -199,7 +200,7 @@ class ProjectControllerTest : TestBase() {
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("155034a"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-1"),
-                chainId = Chain.HARDHAT_TESTNET.id,
+                chainId = TestData.CHAIN_ID,
                 customRpcUrl = "custom-rpc-url-1",
                 createdAt = CREATED_AT
             ),
@@ -208,7 +209,7 @@ class ProjectControllerTest : TestBase() {
                 ownerId = userIdentifier.id,
                 issuerContractAddress = ContractAddress("155034b"),
                 baseRedirectUrl = BaseUrl("base-redirect-url-2"),
-                chainId = Chain.HARDHAT_TESTNET.id,
+                chainId = TestData.CHAIN_ID,
                 customRpcUrl = "custom-rpc-url-2",
                 createdAt = CREATED_AT
             )
@@ -218,7 +219,7 @@ class ProjectControllerTest : TestBase() {
         val analyticsService = mock<AnalyticsService>()
 
         suppose("projects will be returned") {
-            given(service.getAllProjectsForUser(userIdentifier))
+            call(service.getAllProjectsForUser(userIdentifier))
                 .willReturn(result)
         }
 
@@ -229,7 +230,7 @@ class ProjectControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ProjectsResponse(result.map { ProjectResponse(it) })))
         }
     }
@@ -244,6 +245,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -251,7 +253,7 @@ class ProjectControllerTest : TestBase() {
         val analyticsService = mock<AnalyticsService>()
 
         suppose("API key will be returned") {
-            given(service.getProjectApiKeys(userIdentifier, result.projectId))
+            call(service.getProjectApiKeys(userIdentifier, result.projectId))
                 .willReturn(listOf(result))
         }
 
@@ -262,7 +264,7 @@ class ProjectControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ApiKeyResponse(result)))
         }
     }
@@ -272,6 +274,7 @@ class ProjectControllerTest : TestBase() {
         val projectId = UUID.randomUUID()
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -279,14 +282,14 @@ class ProjectControllerTest : TestBase() {
         val analyticsService = mock<AnalyticsService>()
 
         suppose("empty list will be returned") {
-            given(service.getProjectApiKeys(userIdentifier, projectId))
+            call(service.getProjectApiKeys(userIdentifier, projectId))
                 .willReturn(listOf())
         }
 
         val controller = ProjectController(service, analyticsService)
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 controller.getApiKey(userIdentifier, projectId)
             }
         }
@@ -302,6 +305,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -309,12 +313,12 @@ class ProjectControllerTest : TestBase() {
         val analyticsService = mock<AnalyticsService>()
 
         suppose("no API keys exist") {
-            given(service.getProjectApiKeys(userIdentifier, result.projectId))
+            call(service.getProjectApiKeys(userIdentifier, result.projectId))
                 .willReturn(emptyList())
         }
 
         suppose("API key will be created") {
-            given(service.createApiKey(userIdentifier, result.projectId))
+            call(service.createApiKey(userIdentifier, result.projectId))
                 .willReturn(result)
         }
 
@@ -325,7 +329,7 @@ class ProjectControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(ApiKeyResponse(result)))
         }
     }
@@ -340,6 +344,7 @@ class ProjectControllerTest : TestBase() {
         )
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("a")
         )
 
@@ -347,14 +352,14 @@ class ProjectControllerTest : TestBase() {
         val analyticsService = mock<AnalyticsService>()
 
         suppose("single API keys exist") {
-            given(service.getProjectApiKeys(userIdentifier, result.projectId))
+            call(service.getProjectApiKeys(userIdentifier, result.projectId))
                 .willReturn(listOf(result))
         }
 
         val controller = ProjectController(service, analyticsService)
 
         verify("ApiKeyAlreadyExistsException is thrown") {
-            assertThrows<ApiKeyAlreadyExistsException>(message) {
+            expectThrows<ApiKeyAlreadyExistsException> {
                 controller.createApiKey(userIdentifier, result.projectId, MockHttpServletRequest())
             }
         }

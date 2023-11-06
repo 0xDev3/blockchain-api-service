@@ -3,10 +3,10 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateErc20LockRequestParams
 import dev3.blockchainapiservice.model.params.StoreErc20LockRequestParams
@@ -27,16 +27,11 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionData
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class Erc20LockRequestServiceTest : TestBase() {
 
@@ -64,6 +59,7 @@ class Erc20LockRequestServiceTest : TestBase() {
             )
         )
         private val TX_HASH = TransactionHash("tx-hash")
+        private val EVENTS = listOf<DeserializableEvent>()
     }
 
     @Test
@@ -72,14 +68,14 @@ class Erc20LockRequestServiceTest : TestBase() {
         val id = UUID.randomUUID()
 
         suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(id)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -87,7 +83,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -137,7 +133,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         suppose("ERC20 lock request is stored in database") {
-            given(erc20LockRequestRepository.store(storeParams))
+            call(erc20LockRequestRepository.store(storeParams))
                 .willReturn(storedRequest)
         }
 
@@ -153,12 +149,12 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request is correctly created") {
-            assertThat(service.createErc20LockRequest(CREATE_PARAMS, PROJECT)).withMessage()
+            expectThat(service.createErc20LockRequest(CREATE_PARAMS, PROJECT))
                 .isEqualTo(WithFunctionData(storedRequest, encodedData))
 
-            verifyMock(erc20LockRequestRepository)
-                .store(storeParams)
-            verifyNoMoreInteractions(erc20LockRequestRepository)
+            expectInteractions(erc20LockRequestRepository) {
+                once.store(storeParams)
+            }
         }
     }
 
@@ -167,7 +163,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request does not exist in database") {
-            given(erc20LockRequestRepository.getById(any()))
+            call(erc20LockRequestRepository.getById(any()))
                 .willReturn(null)
         }
 
@@ -183,7 +179,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getErc20LockRequest(id = UUID.randomUUID())
             }
         }
@@ -195,7 +191,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -213,7 +209,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getById(id))
+            call(erc20LockRequestRepository.getById(id))
                 .willReturn(lockRequest)
         }
 
@@ -221,7 +217,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -248,7 +244,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with pending status is returned") {
-            assertThat(service.getErc20LockRequest(id)).withMessage()
+            expectThat(service.getErc20LockRequest(id))
                 .isEqualTo(
                     lockRequest.withTransactionData(
                         status = Status.PENDING,
@@ -265,7 +261,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -283,7 +279,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getById(id))
+            call(erc20LockRequestRepository.getById(id))
                 .willReturn(lockRequest)
         }
 
@@ -291,7 +287,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(lockRequest.chainId, null)
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(null)
         }
 
@@ -299,7 +295,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val encodedData = FunctionData("encoded")
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -326,7 +322,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with pending status is returned") {
-            assertThat(service.getErc20LockRequest(id)).withMessage()
+            expectThat(service.getErc20LockRequest(id))
                 .isEqualTo(
                     lockRequest.withTransactionData(
                         status = Status.PENDING,
@@ -343,7 +339,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -361,7 +357,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getById(id))
+            call(erc20LockRequestRepository.getById(id))
                 .willReturn(lockRequest)
         }
 
@@ -377,18 +373,19 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = false
+            success = false,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -415,7 +412,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with failed status is returned") {
-            assertThat(service.getErc20LockRequest(id)).withMessage()
+            expectThat(service.getErc20LockRequest(id))
                 .isEqualTo(
                     lockRequest.withTransactionData(
                         status = Status.FAILED,
@@ -432,7 +429,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -450,7 +447,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getById(id))
+            call(erc20LockRequestRepository.getById(id))
                 .willReturn(lockRequest)
         }
 
@@ -466,18 +463,19 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -504,7 +502,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with failed status is returned") {
-            assertThat(service.getErc20LockRequest(id)).withMessage()
+            expectThat(service.getErc20LockRequest(id))
                 .isEqualTo(
                     lockRequest.withTransactionData(
                         status = Status.FAILED,
@@ -521,7 +519,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -539,7 +537,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getById(id))
+            call(erc20LockRequestRepository.getById(id))
                 .willReturn(lockRequest)
         }
 
@@ -555,18 +553,19 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -593,7 +592,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with failed status is returned") {
-            assertThat(service.getErc20LockRequest(id)).withMessage()
+            expectThat(service.getErc20LockRequest(id))
                 .isEqualTo(
                     lockRequest.withTransactionData(
                         status = Status.FAILED,
@@ -610,7 +609,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -628,7 +627,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getById(id))
+            call(erc20LockRequestRepository.getById(id))
                 .willReturn(lockRequest)
         }
 
@@ -644,18 +643,19 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -682,7 +682,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with failed status is returned") {
-            assertThat(service.getErc20LockRequest(id)).withMessage()
+            expectThat(service.getErc20LockRequest(id))
                 .isEqualTo(
                     lockRequest.withTransactionData(
                         status = Status.FAILED,
@@ -699,7 +699,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -717,7 +717,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getById(id))
+            call(erc20LockRequestRepository.getById(id))
                 .willReturn(lockRequest)
         }
 
@@ -733,18 +733,19 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -771,7 +772,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with failed status is returned") {
-            assertThat(service.getErc20LockRequest(id)).withMessage()
+            expectThat(service.getErc20LockRequest(id))
                 .isEqualTo(
                     lockRequest.withTransactionData(
                         status = Status.FAILED,
@@ -788,7 +789,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -806,7 +807,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getById(id))
+            call(erc20LockRequestRepository.getById(id))
                 .willReturn(lockRequest)
         }
 
@@ -822,18 +823,19 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -860,7 +862,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with successful status is returned") {
-            assertThat(service.getErc20LockRequest(id)).withMessage()
+            expectThat(service.getErc20LockRequest(id))
                 .isEqualTo(
                     lockRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -877,7 +879,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -895,7 +897,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getById(id))
+            call(erc20LockRequestRepository.getById(id))
                 .willReturn(lockRequest)
         }
 
@@ -911,18 +913,19 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -949,7 +952,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with successful status is returned") {
-            assertThat(service.getErc20LockRequest(id)).withMessage()
+            expectThat(service.getErc20LockRequest(id))
                 .isEqualTo(
                     lockRequest.withTransactionData(
                         status = Status.SUCCESS,
@@ -966,7 +969,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val lockRequest = Erc20LockRequest(
             id = id,
             projectId = PROJECT.id,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "test",
             tokenAddress = ContractAddress("a"),
             tokenAmount = Balance(BigInteger.TEN),
@@ -984,7 +987,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val erc20LockRequestRepository = mock<Erc20LockRequestRepository>()
 
         suppose("ERC20 lock request exists in database") {
-            given(erc20LockRequestRepository.getAllByProjectId(PROJECT.id))
+            call(erc20LockRequestRepository.getAllByProjectId(PROJECT.id))
                 .willReturn(listOf(lockRequest))
         }
 
@@ -1000,18 +1003,19 @@ class Erc20LockRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         suppose("transaction is mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, TX_HASH, EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "lock",
                     arguments = listOf(
@@ -1038,8 +1042,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("ERC20 lock request with successful status is returned") {
-            assertThat(service.getErc20LockRequestsByProjectId(PROJECT.id))
-                .withMessage()
+            expectThat(service.getErc20LockRequestsByProjectId(PROJECT.id))
                 .isEqualTo(
                     listOf(
                         lockRequest.withTransactionData(
@@ -1069,7 +1072,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         verify("empty list is returned") {
             val result = service.getErc20LockRequestsByProjectId(projectId)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEmpty()
         }
     }
@@ -1081,7 +1084,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("txInfo will be successfully attached to the request") {
-            given(erc20LockRequestRepository.setTxInfo(id, TX_HASH, caller))
+            call(erc20LockRequestRepository.setTxInfo(id, TX_HASH, caller))
                 .willReturn(true)
         }
 
@@ -1099,9 +1102,9 @@ class Erc20LockRequestServiceTest : TestBase() {
         verify("txInfo was successfully attached") {
             service.attachTxInfo(id, TX_HASH, caller)
 
-            verifyMock(erc20LockRequestRepository)
-                .setTxInfo(id, TX_HASH, caller)
-            verifyNoMoreInteractions(erc20LockRequestRepository)
+            expectInteractions(erc20LockRequestRepository) {
+                once.setTxInfo(id, TX_HASH, caller)
+            }
         }
     }
 
@@ -1112,7 +1115,7 @@ class Erc20LockRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching txInfo will fail") {
-            given(erc20LockRequestRepository.setTxInfo(id, TX_HASH, caller))
+            call(erc20LockRequestRepository.setTxInfo(id, TX_HASH, caller))
                 .willReturn(false)
         }
 
@@ -1128,31 +1131,33 @@ class Erc20LockRequestServiceTest : TestBase() {
         )
 
         verify("CannotAttachTxInfoException is thrown") {
-            assertThrows<CannotAttachTxInfoException>(message) {
+            expectThrows<CannotAttachTxInfoException> {
                 service.attachTxInfo(id, TX_HASH, caller)
             }
 
-            verifyMock(erc20LockRequestRepository)
-                .setTxInfo(id, TX_HASH, caller)
-            verifyNoMoreInteractions(erc20LockRequestRepository)
+            expectInteractions(erc20LockRequestRepository) {
+                once.setTxInfo(id, TX_HASH, caller)
+            }
         }
     }
 
     private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
-        given(projectRepository.getById(projectId))
-            .willReturn(
-                Project(
-                    id = projectId,
-                    ownerId = UUID.randomUUID(),
-                    issuerContractAddress = ContractAddress("dead"),
-                    baseRedirectUrl = BaseUrl(""),
-                    chainId = ChainId(0L),
-                    customRpcUrl = null,
-                    createdAt = TestData.TIMESTAMP
+        suppose("some project will be returned") {
+            call(projectRepository.getById(projectId))
+                .willReturn(
+                    Project(
+                        id = projectId,
+                        ownerId = UUID.randomUUID(),
+                        issuerContractAddress = ContractAddress("dead"),
+                        baseRedirectUrl = BaseUrl(""),
+                        chainId = ChainId(0L),
+                        customRpcUrl = null,
+                        createdAt = TestData.TIMESTAMP
+                    )
                 )
-            )
+        }
 
         return projectRepository
     }

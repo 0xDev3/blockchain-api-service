@@ -6,7 +6,6 @@ import dev3.blockchainapiservice.TestBase.Companion.VerifyMessage
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.exception.ErrorResponse
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.extension.ExtendWith
@@ -58,10 +57,10 @@ class ControllerTestBase : TestBase() {
             .build()
     }
 
-    protected fun VerifyMessage.verifyResponseErrorCode(result: MvcResult, expectedErrorCode: ErrorCode) {
+    protected fun VerifyMessage.expectResponseErrorCode(result: MvcResult, expectedErrorCode: ErrorCode) {
         val response: ErrorResponse = objectMapper.readValue(result.response.contentAsString)
 
-        assertThat(response.errorCode).withMessage()
+        expectThat(response.errorCode)
             .isEqualTo(expectedErrorCode)
     }
 }

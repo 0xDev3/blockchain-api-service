@@ -21,9 +21,7 @@ import dev3.blockchainapiservice.util.StringType
 import dev3.blockchainapiservice.util.UintType
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithDeployedContractIdAndAddress
-import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
@@ -68,7 +66,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
         val service = mock<ContractReadonlyFunctionCallService>()
 
         suppose("contract readonly function call request executed") {
-            given(service.callReadonlyContractFunction(params, project))
+            call(service.callReadonlyContractFunction(params, project))
                 .willReturn(result)
         }
 
@@ -90,7 +88,7 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            Assertions.assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ReadonlyFunctionCallResponse(

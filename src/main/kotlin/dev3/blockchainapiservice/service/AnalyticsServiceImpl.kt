@@ -6,7 +6,7 @@ import com.facebook.ads.sdk.serverside.CustomData
 import com.facebook.ads.sdk.serverside.Event
 import com.facebook.ads.sdk.serverside.EventRequest
 import com.facebook.ads.sdk.serverside.UserData
-import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.MetaPixelProperties
 import dev3.blockchainapiservice.model.result.UserIdentifier
 import mu.KLogging
 import org.springframework.stereotype.Service
@@ -14,14 +14,14 @@ import java.util.UUID
 
 @Service
 class AnalyticsServiceImpl(
-    private val applicationProperties: ApplicationProperties
+    private val metaPixelProperties: MetaPixelProperties
 ) : AnalyticsService {
 
     companion object : KLogging() {
         private const val SECONDS_IN_MILLISECOND = 1_000L
     }
 
-    private val context: APIContext? = createApiContext(applicationProperties)
+    private val context: APIContext? = createApiContext(metaPixelProperties)
 
     override fun postApiKeyCreatedEvent(
         userIdentifier: UserIdentifier,
@@ -35,7 +35,7 @@ class AnalyticsServiceImpl(
             return
         }
 
-        val pixelId = applicationProperties.metaPixelProperties.pixelId
+        val pixelId = metaPixelProperties.pixelId
 
         if (pixelId === null) {
             logger.warn { "Failed to post 'API Key Created' event to Meta Pixel. Missing pixelId configuration!" }
@@ -74,7 +74,7 @@ class AnalyticsServiceImpl(
         }
     }
 
-    private fun createApiContext(applicationProperties: ApplicationProperties): APIContext? {
-        return applicationProperties.metaPixelProperties.accessToken?.let { APIContext(it) }
+    private fun createApiContext(metaPixelProperties: MetaPixelProperties): APIContext? {
+        return metaPixelProperties.accessToken?.let { APIContext(it) }
     }
 }

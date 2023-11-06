@@ -9,18 +9,16 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRec
 import dev3.blockchainapiservice.model.result.AddressBookEntry
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 @JooqTest
 @Import(JooqAddressBookRepository::class)
@@ -54,7 +52,8 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = OWNER_ADDRESS.rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
     }
@@ -78,7 +77,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         verify("address book entry is correctly fetched by ID") {
             val result = repository.getById(record.id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(record.toModel())
         }
     }
@@ -102,7 +101,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         verify("address book entry is correctly fetched by alias and user ID") {
             val result = repository.getByAliasAndUserId(ALIAS, OWNER_ID)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(record.toModel())
         }
     }
@@ -125,7 +124,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
                 walletAddress = WalletAddress("b"),
                 phoneNumber = "phone-number-2",
                 email = "email-2",
-                createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L),
+                createdAt = TestData.TIMESTAMP + 1.seconds,
                 userId = OWNER_ID
             )
         )
@@ -137,7 +136,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         verify("address book entries are correctly fetched by wallet address") {
             val result = repository.getAllByWalletAddress(OWNER_ADDRESS)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(records.map { it.toModel() })
         }
     }
@@ -159,19 +158,19 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         }
 
         verify("storing address book entry returns correct result") {
-            assertThat(storedAddressBookEntry).withMessage()
+            expectThat(storedAddressBookEntry)
                 .isEqualTo(addressBookEntry)
         }
 
         verify("address book entry was stored in database") {
             val result = repository.getById(addressBookEntry.id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(addressBookEntry)
         }
 
         verify("storing address book entry with conflicting alias throws AliasAlreadyInUseException") {
-            assertThrows<AliasAlreadyInUseException>(message) {
+            expectThrows<AliasAlreadyInUseException> {
                 repository.store(addressBookEntry.copy(id = UUID.randomUUID()))
             }
         }
@@ -199,7 +198,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
             address = WalletAddress("cafe0babe1"),
             phoneNumber = "new-phone-number",
             email = "new-email",
-            createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L),
+            createdAt = TestData.TIMESTAMP + 1.seconds,
             userId = OWNER_ID
         )
 
@@ -208,21 +207,21 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         }
 
         verify("updating address book entry returns correct result") {
-            assertThat(updatedNonNullAddressBookEntry).withMessage()
+            expectThat(updatedNonNullAddressBookEntry)
                 .isEqualTo(nonNullUpdates.copy(createdAt = addressBookEntry.createdAt))
         }
 
         verify("address book entry was updated in database") {
             val result = repository.getById(addressBookEntry.id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(nonNullUpdates.copy(createdAt = addressBookEntry.createdAt))
         }
 
         val nullUpdates = nonNullUpdates.copy(
             phoneNumber = null,
             email = null,
-            createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+            createdAt = TestData.TIMESTAMP + 1.seconds
         )
 
         val updatedNullAddressBookEntry = suppose("address book entry is updated in database with null values") {
@@ -230,14 +229,14 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         }
 
         verify("updating address book entry with null values returns correct result") {
-            assertThat(updatedNullAddressBookEntry).withMessage()
+            expectThat(updatedNullAddressBookEntry)
                 .isEqualTo(nullUpdates.copy(createdAt = addressBookEntry.createdAt))
         }
 
         verify("address book entry was updated in database with null values") {
             val result = repository.getById(addressBookEntry.id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(nullUpdates.copy(createdAt = addressBookEntry.createdAt))
         }
 
@@ -256,7 +255,7 @@ class JooqAddressBookRepositoryIntegTest : TestBase() {
         }
 
         verify("updating entry to have same alias as other entry throws AliasAlreadyInUseException") {
-            assertThrows<AliasAlreadyInUseException>(message) {
+            expectThrows<AliasAlreadyInUseException> {
                 repository.update(otherEntry.copy(alias = "new-alias"))
             }
         }

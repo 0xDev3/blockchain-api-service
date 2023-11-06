@@ -12,10 +12,7 @@ import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsRespon
 import dev3.blockchainapiservice.model.response.InfoMarkdownsResponse
 import dev3.blockchainapiservice.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.springframework.http.ResponseEntity
 
@@ -29,12 +26,12 @@ class ContractInterfacesControllerTest : TestBase() {
             name = "name",
             description = "description",
             tags = emptySet(),
-            eventDecorators = emptyList(),
-            functionDecorators = emptyList()
+            matchingEventDecorators = emptyList(),
+            matchingFunctionDecorators = emptyList()
         )
 
         suppose("some contract interfaces will be fetched") {
-            given(repository.getAll(ContractInterfaceFilters(OrList(emptyList()))))
+            call(repository.getAll(ContractInterfaceFilters(OrList(emptyList()))))
                 .willReturn(listOf(result))
         }
 
@@ -45,7 +42,7 @@ class ContractInterfacesControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractInterfaceManifestsResponse(
@@ -55,8 +52,8 @@ class ContractInterfacesControllerTest : TestBase() {
                                     name = result.name,
                                     description = result.description,
                                     tags = result.tags.toList(),
-                                    eventDecorators = result.eventDecorators,
-                                    functionDecorators = result.functionDecorators
+                                    eventDecorators = result.matchingEventDecorators,
+                                    functionDecorators = result.matchingFunctionDecorators
                                 )
                             )
                         )
@@ -71,7 +68,7 @@ class ContractInterfacesControllerTest : TestBase() {
         val result = "info-md"
 
         suppose("some contract interface info.md files will be fetched") {
-            given(repository.getAllInfoMarkdownFiles(ContractInterfaceFilters(OrList(emptyList()))))
+            call(repository.getAllInfoMarkdownFiles(ContractInterfaceFilters(OrList(emptyList()))))
                 .willReturn(listOf(result))
         }
 
@@ -82,7 +79,7 @@ class ContractInterfacesControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(InfoMarkdownsResponse(listOf(result))))
         }
     }
@@ -100,7 +97,7 @@ class ContractInterfacesControllerTest : TestBase() {
         )
 
         suppose("some contract interface will be fetched") {
-            given(repository.getById(id))
+            call(repository.getById(id))
                 .willReturn(result)
         }
 
@@ -111,7 +108,7 @@ class ContractInterfacesControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractInterfaceManifestResponse(
@@ -133,14 +130,14 @@ class ContractInterfacesControllerTest : TestBase() {
         val id = InterfaceId("example")
 
         suppose("null will be returned from the repository") {
-            given(repository.getById(id))
+            call(repository.getById(id))
                 .willReturn(null)
         }
 
         val controller = ContractInterfacesController(repository)
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 controller.getContractInterface(id.value)
             }
         }
@@ -153,7 +150,7 @@ class ContractInterfacesControllerTest : TestBase() {
         val result = "info-md"
 
         suppose("some contract interface info.md will be fetched") {
-            given(repository.getInfoMarkdownById(id))
+            call(repository.getInfoMarkdownById(id))
                 .willReturn(result)
         }
 
@@ -162,7 +159,7 @@ class ContractInterfacesControllerTest : TestBase() {
         verify("controller returns correct response") {
             val response = controller.getContractInterfaceInfoMarkdown(id.value)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(result))
         }
     }
@@ -173,14 +170,14 @@ class ContractInterfacesControllerTest : TestBase() {
         val id = InterfaceId("example")
 
         suppose("null will be returned from the repository") {
-            given(repository.getInfoMarkdownById(id))
+            call(repository.getInfoMarkdownById(id))
                 .willReturn(null)
         }
 
         val controller = ContractInterfacesController(repository)
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 controller.getContractInterfaceInfoMarkdown(id.value)
             }
         }

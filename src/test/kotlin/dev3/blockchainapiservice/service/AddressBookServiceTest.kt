@@ -8,20 +8,16 @@ import dev3.blockchainapiservice.model.result.AddressBookEntry
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.repository.AddressBookRepository
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AddressBookServiceTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("cafebabe")
         )
         private val ENTRY = AddressBookEntry(
@@ -40,21 +36,21 @@ class AddressBookServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(ENTRY.id)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(ENTRY.createdAt)
         }
 
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("address book entry will be stored into the database") {
-            given(addressBookRepository.store(ENTRY))
+            call(addressBookRepository.store(ENTRY))
                 .willReturn(ENTRY)
         }
 
@@ -75,12 +71,12 @@ class AddressBookServiceTest : TestBase() {
                 userIdentifier = USER_IDENTIFIER
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(ENTRY)
 
-            verifyMock(addressBookRepository)
-                .store(ENTRY)
-            verifyNoMoreInteractions(addressBookRepository)
+            expectInteractions(addressBookRepository) {
+                once.store(ENTRY)
+            }
         }
     }
 
@@ -89,7 +85,7 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("address book entry is fetched by id") {
-            given(addressBookRepository.getById(ENTRY.id))
+            call(addressBookRepository.getById(ENTRY.id))
                 .willReturn(ENTRY)
         }
 
@@ -101,7 +97,7 @@ class AddressBookServiceTest : TestBase() {
         )
 
         suppose("address book entry will be updated in the database") {
-            given(addressBookRepository.update(updated))
+            call(addressBookRepository.update(updated))
                 .willReturn(updated)
         }
 
@@ -123,14 +119,13 @@ class AddressBookServiceTest : TestBase() {
                 userIdentifier = USER_IDENTIFIER
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(updated)
 
-            verifyMock(addressBookRepository)
-                .getById(ENTRY.id)
-            verifyMock(addressBookRepository)
-                .update(updated)
-            verifyNoMoreInteractions(addressBookRepository)
+            expectInteractions(addressBookRepository) {
+                once.getById(ENTRY.id)
+                once.update(updated)
+            }
         }
     }
 
@@ -139,7 +134,7 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("non-owned address book entry is fetched by id") {
-            given(addressBookRepository.getById(ENTRY.id))
+            call(addressBookRepository.getById(ENTRY.id))
                 .willReturn(ENTRY.copy(userId = UUID.randomUUID()))
         }
 
@@ -150,7 +145,7 @@ class AddressBookServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.updateAddressBookEntry(
                     addressBookEntryId = ENTRY.id,
                     request = CreateOrUpdateAddressBookEntryRequest(
@@ -163,9 +158,9 @@ class AddressBookServiceTest : TestBase() {
                 )
             }
 
-            verifyMock(addressBookRepository)
-                .getById(ENTRY.id)
-            verifyNoMoreInteractions(addressBookRepository)
+            expectInteractions(addressBookRepository) {
+                once.getById(ENTRY.id)
+            }
         }
     }
 
@@ -174,7 +169,7 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("address book entry is fetched by id") {
-            given(addressBookRepository.getById(ENTRY.id))
+            call(addressBookRepository.getById(ENTRY.id))
                 .willReturn(ENTRY)
         }
 
@@ -186,7 +181,7 @@ class AddressBookServiceTest : TestBase() {
         )
 
         suppose("null will be returned when updating address book entry in the database") {
-            given(addressBookRepository.update(updated))
+            call(addressBookRepository.update(updated))
                 .willReturn(null)
         }
 
@@ -197,7 +192,7 @@ class AddressBookServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.updateAddressBookEntry(
                     addressBookEntryId = ENTRY.id,
                     request = CreateOrUpdateAddressBookEntryRequest(
@@ -210,11 +205,10 @@ class AddressBookServiceTest : TestBase() {
                 )
             }
 
-            verifyMock(addressBookRepository)
-                .getById(ENTRY.id)
-            verifyMock(addressBookRepository)
-                .update(updated)
-            verifyNoMoreInteractions(addressBookRepository)
+            expectInteractions(addressBookRepository) {
+                once.getById(ENTRY.id)
+                once.update(updated)
+            }
         }
     }
 
@@ -223,12 +217,12 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("address book entry is fetched by id") {
-            given(addressBookRepository.getById(ENTRY.id))
+            call(addressBookRepository.getById(ENTRY.id))
                 .willReturn(ENTRY)
         }
 
         suppose("address book entry is deleted by id") {
-            given(addressBookRepository.delete(ENTRY.id))
+            call(addressBookRepository.delete(ENTRY.id))
                 .willReturn(true)
         }
 
@@ -241,11 +235,10 @@ class AddressBookServiceTest : TestBase() {
         verify("address book entry is correctly deleted by id") {
             service.deleteAddressBookEntryById(ENTRY.id, USER_IDENTIFIER)
 
-            verifyMock(addressBookRepository)
-                .getById(ENTRY.id)
-            verifyMock(addressBookRepository)
-                .delete(ENTRY.id)
-            verifyNoMoreInteractions(addressBookRepository)
+            expectInteractions(addressBookRepository) {
+                once.getById(ENTRY.id)
+                once.delete(ENTRY.id)
+            }
         }
     }
 
@@ -254,12 +247,12 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("non-owned address book entry is fetched by id") {
-            given(addressBookRepository.getById(ENTRY.id))
+            call(addressBookRepository.getById(ENTRY.id))
                 .willReturn(ENTRY.copy(userId = UUID.randomUUID()))
         }
 
         suppose("address book entry is deleted by id") {
-            given(addressBookRepository.delete(ENTRY.id))
+            call(addressBookRepository.delete(ENTRY.id))
                 .willReturn(true)
         }
 
@@ -270,13 +263,13 @@ class AddressBookServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.deleteAddressBookEntryById(ENTRY.id, USER_IDENTIFIER)
             }
 
-            verifyMock(addressBookRepository)
-                .getById(ENTRY.id)
-            verifyNoMoreInteractions(addressBookRepository)
+            expectInteractions(addressBookRepository) {
+                once.getById(ENTRY.id)
+            }
         }
     }
 
@@ -285,7 +278,7 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("null is returned when fetching address book entry by id") {
-            given(addressBookRepository.getById(ENTRY.id))
+            call(addressBookRepository.getById(ENTRY.id))
                 .willReturn(null)
         }
 
@@ -296,13 +289,13 @@ class AddressBookServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.deleteAddressBookEntryById(ENTRY.id, USER_IDENTIFIER)
             }
 
-            verifyMock(addressBookRepository)
-                .getById(ENTRY.id)
-            verifyNoMoreInteractions(addressBookRepository)
+            expectInteractions(addressBookRepository) {
+                once.getById(ENTRY.id)
+            }
         }
     }
 
@@ -311,7 +304,7 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("address book entry is fetched by id") {
-            given(addressBookRepository.getById(ENTRY.id))
+            call(addressBookRepository.getById(ENTRY.id))
                 .willReturn(ENTRY)
         }
 
@@ -324,7 +317,7 @@ class AddressBookServiceTest : TestBase() {
         verify("address book entry is correctly fetched by id") {
             val result = service.getAddressBookEntryById(ENTRY.id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(ENTRY)
         }
     }
@@ -334,7 +327,7 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("null is returned when fetching address book entry by id") {
-            given(addressBookRepository.getById(ENTRY.id))
+            call(addressBookRepository.getById(ENTRY.id))
                 .willReturn(null)
         }
 
@@ -345,7 +338,7 @@ class AddressBookServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getAddressBookEntryById(ENTRY.id)
             }
         }
@@ -356,7 +349,7 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("address book entry is fetched by alias") {
-            given(addressBookRepository.getByAliasAndUserId(ENTRY.alias, ENTRY.userId))
+            call(addressBookRepository.getByAliasAndUserId(ENTRY.alias, ENTRY.userId))
                 .willReturn(ENTRY)
         }
 
@@ -369,7 +362,7 @@ class AddressBookServiceTest : TestBase() {
         verify("address book entry is correctly fetched by alias") {
             val result = service.getAddressBookEntryByAlias(ENTRY.alias, USER_IDENTIFIER)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(ENTRY)
         }
     }
@@ -379,7 +372,7 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("null is returned when fetching address book entry by alias") {
-            given(addressBookRepository.getByAliasAndUserId(ENTRY.alias, ENTRY.userId))
+            call(addressBookRepository.getByAliasAndUserId(ENTRY.alias, ENTRY.userId))
                 .willReturn(null)
         }
 
@@ -390,7 +383,7 @@ class AddressBookServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getAddressBookEntryByAlias(ENTRY.alias, USER_IDENTIFIER)
             }
         }
@@ -401,7 +394,7 @@ class AddressBookServiceTest : TestBase() {
         val addressBookRepository = mock<AddressBookRepository>()
 
         suppose("address book entries is fetched by wallet address") {
-            given(addressBookRepository.getAllByWalletAddress(USER_IDENTIFIER.walletAddress))
+            call(addressBookRepository.getAllByWalletAddress(USER_IDENTIFIER.walletAddress))
                 .willReturn(listOf(ENTRY))
         }
 
@@ -414,7 +407,7 @@ class AddressBookServiceTest : TestBase() {
         verify("address book entries are correctly fetched by wallet address") {
             val result = service.getAddressBookEntriesByWalletAddress(USER_IDENTIFIER.walletAddress)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(listOf(ENTRY))
         }
     }

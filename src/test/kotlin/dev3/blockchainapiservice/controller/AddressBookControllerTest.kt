@@ -10,20 +10,17 @@ import dev3.blockchainapiservice.model.result.AddressBookEntry
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.service.AddressBookService
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AddressBookControllerTest : TestBase() {
 
     companion object {
         private val USER_IDENTIFIER = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("cafebabe")
         )
         private val ENTRY = AddressBookEntry(
@@ -49,7 +46,7 @@ class AddressBookControllerTest : TestBase() {
         val service = mock<AddressBookService>()
 
         suppose("address book entry will be created") {
-            given(service.createAddressBookEntry(request, USER_IDENTIFIER))
+            call(service.createAddressBookEntry(request, USER_IDENTIFIER))
                 .willReturn(ENTRY)
         }
 
@@ -61,7 +58,7 @@ class AddressBookControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(AddressBookEntryResponse(ENTRY)))
         }
     }
@@ -78,7 +75,7 @@ class AddressBookControllerTest : TestBase() {
         val service = mock<AddressBookService>()
 
         suppose("address book entry will be updated") {
-            given(service.updateAddressBookEntry(ENTRY.id, request, USER_IDENTIFIER))
+            call(service.updateAddressBookEntry(ENTRY.id, request, USER_IDENTIFIER))
                 .willReturn(ENTRY)
         }
 
@@ -90,7 +87,7 @@ class AddressBookControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(AddressBookEntryResponse(ENTRY)))
         }
     }
@@ -103,9 +100,9 @@ class AddressBookControllerTest : TestBase() {
         verify("controller calls correct service method") {
             controller.deleteAddressBookEntry(ENTRY.id, USER_IDENTIFIER)
 
-            verifyMock(service)
-                .deleteAddressBookEntryById(ENTRY.id, USER_IDENTIFIER)
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.deleteAddressBookEntryById(ENTRY.id, USER_IDENTIFIER)
+            }
         }
     }
 
@@ -114,7 +111,7 @@ class AddressBookControllerTest : TestBase() {
         val service = mock<AddressBookService>()
 
         suppose("address book entry will be fetched by id") {
-            given(service.getAddressBookEntryById(ENTRY.id))
+            call(service.getAddressBookEntryById(ENTRY.id))
                 .willReturn(ENTRY)
         }
 
@@ -125,7 +122,7 @@ class AddressBookControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(AddressBookEntryResponse(ENTRY)))
         }
     }
@@ -135,7 +132,7 @@ class AddressBookControllerTest : TestBase() {
         val service = mock<AddressBookService>()
 
         suppose("address book entry will be fetched by alias") {
-            given(service.getAddressBookEntryByAlias(ENTRY.alias, USER_IDENTIFIER))
+            call(service.getAddressBookEntryByAlias(ENTRY.alias, USER_IDENTIFIER))
                 .willReturn(ENTRY)
         }
 
@@ -146,7 +143,7 @@ class AddressBookControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(ResponseEntity.ok(AddressBookEntryResponse(ENTRY)))
         }
     }
@@ -156,7 +153,7 @@ class AddressBookControllerTest : TestBase() {
         val service = mock<AddressBookService>()
 
         suppose("address book entries will be fetched for wallet address") {
-            given(service.getAddressBookEntriesByWalletAddress(USER_IDENTIFIER.walletAddress))
+            call(service.getAddressBookEntriesByWalletAddress(USER_IDENTIFIER.walletAddress))
                 .willReturn(listOf(ENTRY))
         }
 
@@ -167,7 +164,7 @@ class AddressBookControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AddressBookEntriesResponse(

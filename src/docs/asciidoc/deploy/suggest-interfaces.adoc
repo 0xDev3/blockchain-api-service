@@ -14,4 +14,4 @@ include::{snippets}/ImportContractControllerApiTest/mustCorrectlySuggestInterfac
 include::{snippets}/ImportContractControllerApiTest/mustCorrectlySuggestInterfacesForImportedSmartContractWhenContractDecoratorIsNotSpecified/http-response.adoc[]
 ====
 .Response Schema
-include::{snippets}/dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse.adoc[]
+include::{snippets}/dev3.blockchainapiservice.model.response.SuggestedContractInterfaceManifestsResponse.adoc[]

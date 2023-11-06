@@ -8,7 +8,9 @@ import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.blockchain.BlockchainService
-import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.ApiUsageProperties
+import dev3.blockchainapiservice.config.ContractManifestServiceProperties
+import dev3.blockchainapiservice.config.IpfsProperties
 import dev3.blockchainapiservice.config.WebConfig
 import dev3.blockchainapiservice.exception.IpfsUploadFailedException
 import dev3.blockchainapiservice.features.payout.util.IpfsHash
@@ -18,16 +20,15 @@ import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.repository.UserIdResolverRepository
 import dev3.blockchainapiservice.repository.UserIdentifierRepository
 import dev3.blockchainapiservice.service.FunctionEncoderService
-import dev3.blockchainapiservice.service.RandomUuidProvider
 import dev3.blockchainapiservice.service.UtcDateTimeProvider
+import dev3.blockchainapiservice.service.UuidProvider
 import dev3.blockchainapiservice.wiremock.WireMock
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.test.mock.mockito.MockBeans
@@ -35,9 +36,9 @@ import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 
 @RestClientTest
-@Import(PinataIpfsService::class, ApplicationProperties::class, WebConfig::class)
+@Import(PinataIpfsService::class, WebConfig::class)
 @MockBeans(
-    MockBean(RandomUuidProvider::class),
+    MockBean(UuidProvider::class),
     MockBean(UserIdentifierRepository::class),
     MockBean(ApiKeyRepository::class),
     MockBean(ProjectRepository::class),
@@ -48,6 +49,11 @@ import org.springframework.http.MediaType
     MockBean(UserIdResolverRepository::class)
 )
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@EnableConfigurationProperties(
+    IpfsProperties::class,
+    ApiUsageProperties::class,
+    ContractManifestServiceProperties::class
+)
 class PinataIpfsServiceIntegTest : TestBase() {
 
     @Autowired
@@ -96,7 +102,7 @@ class PinataIpfsServiceIntegTest : TestBase() {
         verify("correct IPFS hash is returned for JSON upload") {
             val result = service.pinJsonToIpfs(objectMapper.readTree(requestJson))
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(ipfsHash)
         }
     }
@@ -128,7 +134,7 @@ class PinataIpfsServiceIntegTest : TestBase() {
         }
 
         verify("exception is thrown when IPFS hash is missing in response") {
-            assertThrows<IpfsUploadFailedException>(message) {
+            expectThrows<IpfsUploadFailedException> {
                 service.pinJsonToIpfs(objectMapper.readTree(requestJson))
             }
         }
@@ -154,7 +160,7 @@ class PinataIpfsServiceIntegTest : TestBase() {
         }
 
         verify("exception is thrown when non 2xx response is returned") {
-            assertThrows<IpfsUploadFailedException>(message) {
+            expectThrows<IpfsUploadFailedException> {
                 service.pinJsonToIpfs(objectMapper.readTree(requestJson))
             }
         }

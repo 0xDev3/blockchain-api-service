@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.ExampleContract
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -17,12 +16,17 @@ import dev3.blockchainapiservice.model.json.ManifestJson
 import dev3.blockchainapiservice.model.params.StoreContractDeploymentRequestParams
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestsResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponseType
+import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractConstructor
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.model.result.ContractEvent
 import dev3.blockchainapiservice.model.result.ContractFunction
 import dev3.blockchainapiservice.model.result.ContractParameter
+import dev3.blockchainapiservice.model.result.EventParameter
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
@@ -40,7 +44,6 @@ import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -62,7 +65,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             ownerId = OWNER_ID,
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
@@ -113,9 +116,77 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf(),
+            events = listOf(
+                ContractEvent(
+                    name = "Example event",
+                    description = "Example event",
+                    solidityName = "ExampleEvent",
+                    signature = "ExampleEvent(tuple(address),tuple(address))",
+                    inputs = listOf(
+                        EventParameter(
+                            name = "Non-indexed struct",
+                            description = "Non-indexed struct",
+                            indexed = false,
+                            solidityName = "nonIndexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        ),
+                        EventParameter(
+                            name = "Indexed struct",
+                            description = "Indexed struct",
+                            indexed = true,
+                            solidityName = "indexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        )
+                    )
+                )
+            ),
             manifest = ManifestJson.EMPTY,
             artifact = ArtifactJson.EMPTY
+        )
+        private val EVENTS = listOf(
+            EventInfoResponse(
+                signature = "ExampleEvent(tuple(address),tuple(address))",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "nonIndexedStruct",
+                        type = EventArgumentResponseType.VALUE,
+                        value = listOf(WalletAddress("a").rawValue),
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "indexedStruct",
+                        type = EventArgumentResponseType.HASH,
+                        value = null,
+                        hash = "0xc65a7bb8d6351c1cf70c95a316cc6a92839c986682d98bc35f958f4883f9d2a8"
+                    )
+                )
+            )
         )
     }
 
@@ -150,7 +221,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -228,7 +300,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
@@ -264,18 +336,19 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
@@ -306,7 +379,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -365,7 +438,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
@@ -401,18 +474,19 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
@@ -443,7 +517,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -487,7 +561,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -530,7 +604,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
+            expectResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 
@@ -590,7 +664,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("contract deployment request exists in the database") {
-            assertThat(contractDeploymentRequestRepository.getById(createResponse.id))
+            expectThat(contractDeploymentRequestRepository.getById(createResponse.id))
                 .isNotNull()
         }
 
@@ -604,7 +678,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("contract deployment request does not exist in the database") {
-            assertThat(contractDeploymentRequestRepository.getById(createResponse.id))
+            expectThat(contractDeploymentRequestRepository.getById(createResponse.id))
                 .isNull()
         }
     }
@@ -665,7 +739,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("contract deployment request exists in the database") {
-            assertThat(contractDeploymentRequestRepository.getById(createResponse.id))
+            expectThat(contractDeploymentRequestRepository.getById(createResponse.id))
                 .isNotNull()
         }
 
@@ -679,11 +753,11 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
 
         verify("contract deployment request still exists in the database") {
-            assertThat(contractDeploymentRequestRepository.getById(createResponse.id))
+            expectThat(contractDeploymentRequestRepository.getById(createResponse.id))
                 .isNotNull()
         }
     }
@@ -698,7 +772,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -790,7 +864,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = createResponse.id,
@@ -826,15 +900,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS
                     )
                 )
 
-            assertThat(fetchResponse.deployTx.blockConfirmations)
+            expectThat(fetchResponse.deployTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.deployTx.timestamp)
+            expectThat(fetchResponse.deployTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -930,7 +1005,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = createResponse.id,
@@ -966,15 +1041,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS
                     )
                 )
 
-            assertThat(fetchResponse.deployTx.blockConfirmations)
+            expectThat(fetchResponse.deployTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.deployTx.timestamp)
+            expectThat(fetchResponse.deployTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1071,7 +1147,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = createResponse.id,
@@ -1107,15 +1183,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS
                     )
                 )
 
-            assertThat(fetchResponse.deployTx.blockConfirmations)
+            expectThat(fetchResponse.deployTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.deployTx.timestamp)
+            expectThat(fetchResponse.deployTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1215,7 +1292,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = createResponse.id,
@@ -1251,15 +1328,16 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS
                     )
                 )
 
-            assertThat(fetchResponse.deployTx.blockConfirmations)
+            expectThat(fetchResponse.deployTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.deployTx.timestamp)
+            expectThat(fetchResponse.deployTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1273,7 +1351,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -1289,7 +1367,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -1386,7 +1464,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractDeploymentRequestsResponse(
                         listOf(
@@ -1425,17 +1503,18 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                 ),
                                 imported = false,
                                 proxy = false,
-                                implementationContractAddress = null
+                                implementationContractAddress = null,
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].deployTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].deployTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].deployTx.timestamp)
+            expectThat(fetchResponse.requests[0].deployTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1537,7 +1616,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     ContractDeploymentRequestsResponse(
                         listOf(
@@ -1576,17 +1655,18 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                 ),
                                 imported = false,
                                 proxy = false,
-                                implementationContractAddress = null
+                                implementationContractAddress = null,
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].deployTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].deployTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].deployTx.timestamp)
+            expectThat(fetchResponse.requests[0].deployTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1607,7 +1687,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     constructorParams = TestData.EMPTY_JSON_ARRAY,
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,
@@ -1646,7 +1726,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
         verify("transaction info is correctly attached to contract deployment request") {
             val storedRequest = contractDeploymentRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }
@@ -1668,7 +1748,7 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                     constructorParams = TestData.EMPTY_JSON_ARRAY,
                     deployerAddress = WalletAddress("a"),
                     initialEthAmount = Balance(BigInteger.TEN),
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     projectId = PROJECT_ID,
                     createdAt = TestData.TIMESTAMP,
@@ -1702,13 +1782,13 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
+            expectResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
         verify("transaction info is not changed in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }

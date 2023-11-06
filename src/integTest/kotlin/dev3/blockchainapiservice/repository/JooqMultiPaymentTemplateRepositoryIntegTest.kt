@@ -12,7 +12,6 @@ import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -22,8 +21,8 @@ import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.test.annotation.DirtiesContext
 import java.math.BigInteger
-import java.time.Duration
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 @JooqTest
 @Import(JooqMultiPaymentTemplateRepository::class)
@@ -81,7 +80,8 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = OWNER_ADDRESS.rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
     }
@@ -93,12 +93,12 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("storing multi-payment template returns correct result") {
-            assertThat(storedTemplate).withMessage()
+            expectThat(storedTemplate)
                 .isEqualTo(TEMPLATE)
         }
 
         verify("multi-payment template is stored into the database") {
-            assertThat(repository.getById(TEMPLATE_ID)).withMessage()
+            expectThat(repository.getById(TEMPLATE_ID))
                 .isEqualTo(TEMPLATE)
         }
     }
@@ -121,12 +121,12 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("updating template returns correct result") {
-            assertThat(updatedTemplate).withMessage()
+            expectThat(updatedTemplate)
                 .isEqualTo(templateUpdate)
         }
 
         verify("template is updated in the database") {
-            assertThat(repository.getById(TEMPLATE_ID)).withMessage()
+            expectThat(repository.getById(TEMPLATE_ID))
                 .isEqualTo(templateUpdate)
         }
     }
@@ -134,7 +134,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenUpdatingNonExistentMultiPaymentTemplate() {
         verify("null is returned when updating non-existent multi-payment template") {
-            assertThat(repository.update(TEMPLATE)).withMessage()
+            expectThat(repository.update(TEMPLATE))
                 .isNull()
         }
     }
@@ -146,7 +146,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("multi-payment template is stored into the database") {
-            assertThat(repository.getById(TEMPLATE_ID)).withMessage()
+            expectThat(repository.getById(TEMPLATE_ID))
                 .isEqualTo(TEMPLATE)
         }
 
@@ -155,7 +155,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("multi-payment template was deleted from the database") {
-            assertThat(repository.getById(TEMPLATE_ID)).withMessage()
+            expectThat(repository.getById(TEMPLATE_ID))
                 .isNull()
         }
     }
@@ -163,7 +163,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenFetchingNonExistentMultiPaymentTemplateById() {
         verify("null is returned for non-existent multi-payment template") {
-            assertThat(repository.getById(TEMPLATE_ID)).withMessage()
+            expectThat(repository.getById(TEMPLATE_ID))
                 .isNull()
         }
     }
@@ -175,7 +175,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("correct multi-payment template items are returned") {
-            assertThat(repository.getItemsById(TEMPLATE_ID)).withMessage()
+            expectThat(repository.getItemsById(TEMPLATE_ID))
                 .isEqualTo(TEMPLATE.items.value)
         }
     }
@@ -187,7 +187,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("multi-payment templates are correctly fetched by wallet address") {
-            assertThat(repository.getAllByWalletAddress(OWNER_ADDRESS)).withMessage()
+            expectThat(repository.getAllByWalletAddress(OWNER_ADDRESS))
                 .isEqualTo(listOf(TEMPLATE.withoutItems()))
         }
     }
@@ -204,7 +204,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
             walletAddress = WalletAddress("abc"),
             itemName = "newItemName",
             assetAmount = Balance(BigInteger.TWO),
-            createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+            createdAt = TestData.TIMESTAMP + 1.seconds
         )
 
         val templateWithAddedItem = suppose("item is added to multi-payment template") {
@@ -212,7 +212,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("item was added to multi-payment template") {
-            assertThat(templateWithAddedItem).withMessage()
+            expectThat(templateWithAddedItem)
                 .isEqualTo(
                     TEMPLATE.copy(
                         items = WithItems(TEMPLATE.items.value + newItem),
@@ -222,7 +222,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("item was added to the database") {
-            assertThat(repository.getById(TEMPLATE_ID)).withMessage()
+            expectThat(repository.getById(TEMPLATE_ID))
                 .isEqualTo(templateWithAddedItem)
         }
     }
@@ -235,11 +235,11 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
             walletAddress = WalletAddress("abc"),
             itemName = "newItemName",
             assetAmount = Balance(BigInteger.TWO),
-            createdAt = TestData.TIMESTAMP + Duration.ofSeconds(1L)
+            createdAt = TestData.TIMESTAMP + 1.seconds
         )
 
         verify("null is returned when adding item to non-existent multi-payment template") {
-            assertThat(repository.addItem(item, TestData.TIMESTAMP)).withMessage()
+            expectThat(repository.addItem(item, TestData.TIMESTAMP))
                 .isNull()
         }
     }
@@ -261,7 +261,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("item was updated in multi-payment tempalte") {
-            assertThat(templateWithUpdatedItem).withMessage()
+            expectThat(templateWithUpdatedItem)
                 .isEqualTo(
                     TEMPLATE.copy(
                         items = WithItems(listOf(updatedItem)),
@@ -271,7 +271,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("item was updated in the database") {
-            assertThat(repository.getById(TEMPLATE_ID)).withMessage()
+            expectThat(repository.getById(TEMPLATE_ID))
                 .isEqualTo(templateWithUpdatedItem)
         }
     }
@@ -285,7 +285,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         )
 
         verify("null is returned when updating item for non-existent multi-payment template") {
-            assertThat(repository.updateItem(updatedItem, TestData.TIMESTAMP)).withMessage()
+            expectThat(repository.updateItem(updatedItem, TestData.TIMESTAMP))
                 .isNull()
         }
     }
@@ -301,7 +301,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("item was deleted from multi-payment template") {
-            assertThat(templateWithDeletedItem).withMessage()
+            expectThat(templateWithDeletedItem)
                 .isEqualTo(
                     TEMPLATE.copy(
                         items = WithItems(emptyList()),
@@ -311,7 +311,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
         }
 
         verify("item was deleted from the database") {
-            assertThat(repository.getById(TEMPLATE_ID)).withMessage()
+            expectThat(repository.getById(TEMPLATE_ID))
                 .isEqualTo(templateWithDeletedItem)
         }
     }
@@ -319,7 +319,7 @@ class JooqMultiPaymentTemplateRepositoryIntegTest : TestBase() {
     @Test
     fun mustReturnNullWhenDeletingItemFromNonExistentMultiPaymentTemplate() {
         verify("null is returned when deleting item from non-existent multi-payment template") {
-            assertThat(repository.deleteItem(UUID.randomUUID(), UUID.randomUUID(), TestData.TIMESTAMP)).withMessage()
+            expectThat(repository.deleteItem(UUID.randomUUID(), UUID.randomUUID(), TestData.TIMESTAMP))
                 .isNull()
         }
     }

@@ -15,7 +15,6 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -63,7 +62,8 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -106,7 +106,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
         verify("authorization is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AuthorizationRequest(
                         id = id,
@@ -133,7 +133,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent authorization request") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -168,7 +168,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
         verify("authorization is correctly deleted by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -259,7 +259,7 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
         verify("authorization requests are correctly fetched by project") {
             val result = repository.getAllByProjectId(PROJECT_ID)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .containsExactlyInAnyOrderElementsOf(
                     projectRequests.map {
                         AuthorizationRequest(
@@ -323,14 +323,14 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
         )
 
         verify("storing authorization request returns correct result") {
-            assertThat(storedAuthorizationRequest).withMessage()
+            expectThat(storedAuthorizationRequest)
                 .isEqualTo(expectedAuthorizationRequest)
         }
 
         verify("authorization request was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(expectedAuthorizationRequest)
         }
     }
@@ -358,14 +358,14 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting walletAddress and signedMessage will succeed") {
-            assertThat(repository.setSignedMessage(id, ACTUAL_WALLET_ADDRESS, SIGNED_MESSAGE)).withMessage()
+            expectThat(repository.setSignedMessage(id, ACTUAL_WALLET_ADDRESS, SIGNED_MESSAGE))
                 .isTrue()
         }
 
         verify("walletAddress and signedMessage were correctly set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AuthorizationRequest(
                         id = id,
@@ -410,20 +410,19 @@ class JooqAuthorizationRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting walletAddress and signedMessage will succeed") {
-            assertThat(repository.setSignedMessage(id, ACTUAL_WALLET_ADDRESS, SIGNED_MESSAGE)).withMessage()
+            expectThat(repository.setSignedMessage(id, ACTUAL_WALLET_ADDRESS, SIGNED_MESSAGE))
                 .isTrue()
         }
 
         verify("setting another walletAddress and signedMessage will not succeed") {
-            assertThat(repository.setSignedMessage(id, WalletAddress("dead"), SignedMessage("another-message")))
-                .withMessage()
+            expectThat(repository.setSignedMessage(id, WalletAddress("dead"), SignedMessage("another-message")))
                 .isFalse()
         }
 
         verify("first walletAddress and signedMessage remain in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AuthorizationRequest(
                         id = id,

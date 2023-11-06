@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.SimpleERC20
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -14,6 +13,9 @@ import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.StoreAssetSendRequestParams
 import dev3.blockchainapiservice.model.response.AssetSendRequestResponse
 import dev3.blockchainapiservice.model.response.AssetSendRequestsResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponseType
+import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.AssetSendRequest
 import dev3.blockchainapiservice.model.result.Project
@@ -27,7 +29,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,11 +52,36 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
             ownerId = OWNER_ID,
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
         private const val API_KEY = "api-key"
+        private val EVENTS = listOf(
+            EventInfoResponse(
+                signature = "Transfer(address,address,uint256)",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "from",
+                        type = EventArgumentResponseType.VALUE,
+                        value = HardhatTestContainer.ACCOUNT_ADDRESS_1,
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "to",
+                        type = EventArgumentResponseType.VALUE,
+                        value = HardhatTestContainer.ACCOUNT_ADDRESS_2,
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "value",
+                        type = EventArgumentResponseType.VALUE,
+                        value = "10",
+                        hash = null
+                    )
+                )
+            )
+        )
     }
 
     private val accounts = HardhatTestContainer.ACCOUNTS
@@ -74,7 +100,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -138,7 +165,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetSendRequestResponse(
                         id = response.id,
@@ -165,18 +192,19 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset send request is correctly stored in database") {
             val storedRequest = assetSendRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetSendRequest(
                         id = response.id,
@@ -197,7 +225,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -242,7 +270,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetSendRequestResponse(
                         id = response.id,
@@ -269,18 +297,19 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset send request is correctly stored in database") {
             val storedRequest = assetSendRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetSendRequest(
                         id = response.id,
@@ -301,7 +330,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -342,7 +371,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetSendRequestResponse(
                         id = response.id,
@@ -369,18 +398,19 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset send request is correctly stored in database") {
             val storedRequest = assetSendRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetSendRequest(
                         id = response.id,
@@ -401,7 +431,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -444,7 +474,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AssetSendRequestResponse(
                         id = response.id,
@@ -471,18 +501,19 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("asset send request is correctly stored in database") {
             val storedRequest = assetSendRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     AssetSendRequest(
                         id = response.id,
@@ -503,7 +534,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -540,7 +571,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.MISSING_TOKEN_ADDRESS)
+            expectResponseErrorCode(response, ErrorCode.MISSING_TOKEN_ADDRESS)
         }
     }
 
@@ -578,7 +609,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TOKEN_ADDRESS_NOT_ALLOWED)
+            expectResponseErrorCode(response, ErrorCode.TOKEN_ADDRESS_NOT_ALLOWED)
         }
     }
 
@@ -615,7 +646,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
+            expectResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 
@@ -693,7 +724,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestResponse(
                         id = createResponse.id,
@@ -720,15 +751,16 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
                             timestamp = fetchResponse.sendTx.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        events = EVENTS
                     )
                 )
 
-            assertThat(fetchResponse.sendTx.blockConfirmations)
+            expectThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.sendTx.timestamp)
+            expectThat(fetchResponse.sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -809,7 +841,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestResponse(
                         id = createResponse.id,
@@ -836,15 +868,16 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
                             timestamp = fetchResponse.sendTx.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        events = EVENTS
                     )
                 )
 
-            assertThat(fetchResponse.sendTx.blockConfirmations)
+            expectThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.sendTx.timestamp)
+            expectThat(fetchResponse.sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -914,7 +947,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestResponse(
                         id = createResponse.id,
@@ -941,15 +974,16 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
                             timestamp = fetchResponse.sendTx.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        events = emptyList()
                     )
                 )
 
-            assertThat(fetchResponse.sendTx.blockConfirmations)
+            expectThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.sendTx.timestamp)
+            expectThat(fetchResponse.sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1021,7 +1055,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestResponse(
                         id = createResponse.id,
@@ -1048,15 +1082,16 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
                             timestamp = fetchResponse.sendTx.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        events = emptyList()
                     )
                 )
 
-            assertThat(fetchResponse.sendTx.blockConfirmations)
+            expectThat(fetchResponse.sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.sendTx.timestamp)
+            expectThat(fetchResponse.sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1070,7 +1105,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -1148,7 +1183,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestsResponse(
                         listOf(
@@ -1178,17 +1213,18 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].sendTx.timestamp)
+            expectThat(fetchResponse.requests[0].sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1271,7 +1307,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestsResponse(
                         listOf(
@@ -1300,17 +1336,18 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].sendTx.timestamp)
+            expectThat(fetchResponse.requests[0].sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1389,7 +1426,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestsResponse(
                         listOf(
@@ -1419,17 +1456,18 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].sendTx.timestamp)
+            expectThat(fetchResponse.requests[0].sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1514,7 +1552,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestsResponse(
                         listOf(
@@ -1543,17 +1581,18 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].sendTx.timestamp)
+            expectThat(fetchResponse.requests[0].sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1632,7 +1671,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestsResponse(
                         listOf(
@@ -1662,17 +1701,18 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].sendTx.timestamp)
+            expectThat(fetchResponse.requests[0].sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1755,7 +1795,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     AssetSendRequestsResponse(
                         listOf(
@@ -1785,17 +1825,18 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].sendTx.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                events = EVENTS
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].sendTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].sendTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].sendTx.timestamp)
+            expectThat(fetchResponse.requests[0].sendTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -1810,7 +1851,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 StoreAssetSendRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     assetAmount = Balance(BigInteger.TEN),
@@ -1848,7 +1889,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
         verify("transaction info is correctly attached to asset send request") {
             val storedRequest = assetSendRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }
@@ -1864,7 +1905,7 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 StoreAssetSendRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     assetAmount = Balance(BigInteger.TEN),
@@ -1897,13 +1938,13 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
+            expectResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
         verify("transaction info is not changed in database") {
             val storedRequest = assetSendRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }

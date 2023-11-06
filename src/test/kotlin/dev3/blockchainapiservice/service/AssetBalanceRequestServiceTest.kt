@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.CannotAttachSignedMessageException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
@@ -25,15 +24,10 @@ import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AssetBalanceRequestServiceTest : TestBase() {
 
@@ -43,14 +37,14 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(uuid)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -107,7 +101,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is stored in database") {
-            given(assetBalanceRequestRepository.store(databaseParams))
+            call(assetBalanceRequestRepository.store(databaseParams))
                 .willReturn(databaseResponse)
         }
 
@@ -124,12 +118,12 @@ class AssetBalanceRequestServiceTest : TestBase() {
         )
 
         verify("asset balance request is correctly created") {
-            assertThat(service.createAssetBalanceRequest(createParams, project)).withMessage()
+            expectThat(service.createAssetBalanceRequest(createParams, project))
                 .isEqualTo(databaseResponse)
 
-            verifyMock(assetBalanceRequestRepository)
-                .store(databaseParams)
-            verifyNoMoreInteractions(assetBalanceRequestRepository)
+            expectInteractions(assetBalanceRequestRepository) {
+                once.store(databaseParams)
+            }
         }
     }
 
@@ -139,7 +133,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is not in database") {
-            given(assetBalanceRequestRepository.getById(uuid))
+            call(assetBalanceRequestRepository.getById(uuid))
                 .willReturn(null)
         }
 
@@ -156,7 +150,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getAssetBalanceRequest(uuid)
             }
         }
@@ -168,7 +162,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -185,7 +179,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is returned from database") {
-            given(assetBalanceRequestRepository.getById(uuid))
+            call(assetBalanceRequestRepository.getById(uuid))
                 .willReturn(assetBalanceRequest)
         }
 
@@ -204,7 +198,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("asset balance request with pending status is returned") {
             val result = service.getAssetBalanceRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     FullAssetBalanceRequest(
                         id = uuid,
@@ -232,7 +226,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -249,7 +243,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is returned from database") {
-            given(assetBalanceRequestRepository.getById(uuid))
+            call(assetBalanceRequestRepository.getById(uuid))
                 .willReturn(assetBalanceRequest)
         }
 
@@ -263,7 +257,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("blockchain service will return some asset balance") {
-            given(
+            call(
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = assetBalanceRequest.chainId,
@@ -291,7 +285,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("asset balance request with pending status is returned") {
             val result = service.getAssetBalanceRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     FullAssetBalanceRequest(
                         id = uuid,
@@ -319,7 +313,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -336,7 +330,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is returned from database") {
-            given(assetBalanceRequestRepository.getById(uuid))
+            call(assetBalanceRequestRepository.getById(uuid))
                 .willReturn(assetBalanceRequest)
         }
 
@@ -350,7 +344,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("blockchain service will return some asset balance") {
-            given(
+            call(
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = assetBalanceRequest.chainId,
@@ -378,7 +372,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("asset balance request with failed status is returned") {
             val result = service.getAssetBalanceRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     FullAssetBalanceRequest(
                         id = uuid,
@@ -406,7 +400,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -423,7 +417,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is returned from database") {
-            given(assetBalanceRequestRepository.getById(uuid))
+            call(assetBalanceRequestRepository.getById(uuid))
                 .willReturn(assetBalanceRequest)
         }
 
@@ -437,7 +431,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("blockchain service will return some asset balance") {
-            given(
+            call(
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = assetBalanceRequest.chainId,
@@ -453,7 +447,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return false") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = assetBalanceRequest.messageToSign,
                     signedMessage = assetBalanceRequest.signedMessage!!,
@@ -477,7 +471,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("asset balance request with failed status is returned") {
             val result = service.getAssetBalanceRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     FullAssetBalanceRequest(
                         id = uuid,
@@ -505,7 +499,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -522,7 +516,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is returned from database") {
-            given(assetBalanceRequestRepository.getById(uuid))
+            call(assetBalanceRequestRepository.getById(uuid))
                 .willReturn(assetBalanceRequest)
         }
 
@@ -536,7 +530,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("blockchain service will return some asset balance") {
-            given(
+            call(
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = assetBalanceRequest.chainId,
@@ -552,7 +546,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return true") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = assetBalanceRequest.messageToSign,
                     signedMessage = assetBalanceRequest.signedMessage!!,
@@ -576,7 +570,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("asset balance request with successful status is returned") {
             val result = service.getAssetBalanceRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     FullAssetBalanceRequest(
                         id = uuid,
@@ -604,7 +598,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -621,7 +615,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is returned from database") {
-            given(assetBalanceRequestRepository.getById(uuid))
+            call(assetBalanceRequestRepository.getById(uuid))
                 .willReturn(assetBalanceRequest)
         }
 
@@ -635,7 +629,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("blockchain service will return some asset balance") {
-            given(
+            call(
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = assetBalanceRequest.chainId,
@@ -651,7 +645,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return true") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = assetBalanceRequest.messageToSign,
                     signedMessage = assetBalanceRequest.signedMessage!!,
@@ -675,7 +669,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("asset balance request with successful status is returned") {
             val result = service.getAssetBalanceRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     FullAssetBalanceRequest(
                         id = uuid,
@@ -703,7 +697,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = null,
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -720,7 +714,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is returned from database") {
-            given(assetBalanceRequestRepository.getById(uuid))
+            call(assetBalanceRequestRepository.getById(uuid))
                 .willReturn(assetBalanceRequest)
         }
 
@@ -734,7 +728,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("blockchain service will return some asset balance") {
-            given(
+            call(
                 blockchainService.fetchAccountBalance(
                     chainSpec = ChainSpec(
                         chainId = assetBalanceRequest.chainId,
@@ -749,7 +743,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return true") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = assetBalanceRequest.messageToSign,
                     signedMessage = assetBalanceRequest.signedMessage!!,
@@ -773,7 +767,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("asset balance request with successful status is returned") {
             val result = service.getAssetBalanceRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     FullAssetBalanceRequest(
                         id = uuid,
@@ -801,7 +795,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = null,
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -818,7 +812,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is returned from database") {
-            given(assetBalanceRequestRepository.getById(uuid))
+            call(assetBalanceRequestRepository.getById(uuid))
                 .willReturn(assetBalanceRequest)
         }
 
@@ -832,7 +826,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("blockchain service will return some asset balance") {
-            given(
+            call(
                 blockchainService.fetchAccountBalance(
                     chainSpec = ChainSpec(
                         chainId = assetBalanceRequest.chainId,
@@ -847,7 +841,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return true") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = assetBalanceRequest.messageToSign,
                     signedMessage = assetBalanceRequest.signedMessage!!,
@@ -871,7 +865,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("asset balance request with successful status is returned") {
             val result = service.getAssetBalanceRequest(uuid)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     FullAssetBalanceRequest(
                         id = uuid,
@@ -899,7 +893,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequest = AssetBalanceRequest(
             id = uuid,
             projectId = UUID.randomUUID(),
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url/$uuid",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -916,7 +910,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("asset balance request is returned from database") {
-            given(assetBalanceRequestRepository.getAllByProjectId(assetBalanceRequest.projectId))
+            call(assetBalanceRequestRepository.getAllByProjectId(assetBalanceRequest.projectId))
                 .willReturn(listOf(assetBalanceRequest))
         }
 
@@ -930,7 +924,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val blockchainService = mock<BlockchainService>()
 
         suppose("blockchain service will return some asset balance") {
-            given(
+            call(
                 blockchainService.fetchErc20AccountBalance(
                     chainSpec = ChainSpec(
                         chainId = assetBalanceRequest.chainId,
@@ -946,7 +940,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val signatureCheckerService = mock<SignatureCheckerService>()
 
         suppose("signature checker will return true") {
-            given(
+            call(
                 signatureCheckerService.signatureMatches(
                     message = assetBalanceRequest.messageToSign,
                     signedMessage = assetBalanceRequest.signedMessage!!,
@@ -970,7 +964,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("asset balance request with successful status is returned") {
             val result = service.getAssetBalanceRequestsByProjectId(assetBalanceRequest.projectId)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     listOf(
                         FullAssetBalanceRequest(
@@ -1012,7 +1006,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("empty list is returned") {
             val result = service.getAssetBalanceRequestsByProjectId(projectId)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEmpty()
         }
     }
@@ -1025,7 +1019,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("signed message will be attached") {
-            given(assetBalanceRequestRepository.setSignedMessage(uuid, walletAddress, signedMessage))
+            call(assetBalanceRequestRepository.setSignedMessage(uuid, walletAddress, signedMessage))
                 .willReturn(true)
         }
 
@@ -1044,9 +1038,9 @@ class AssetBalanceRequestServiceTest : TestBase() {
         verify("wallet address and signed message are successfully attached") {
             service.attachWalletAddressAndSignedMessage(uuid, walletAddress, signedMessage)
 
-            verifyMock(assetBalanceRequestRepository)
-                .setSignedMessage(uuid, walletAddress, signedMessage)
-            verifyNoMoreInteractions(assetBalanceRequestRepository)
+            expectInteractions(assetBalanceRequestRepository) {
+                once.setSignedMessage(uuid, walletAddress, signedMessage)
+            }
         }
     }
 
@@ -1058,7 +1052,7 @@ class AssetBalanceRequestServiceTest : TestBase() {
         val assetBalanceRequestRepository = mock<AssetBalanceRequestRepository>()
 
         suppose("signed message will be attached") {
-            given(assetBalanceRequestRepository.setSignedMessage(uuid, walletAddress, signedMessage))
+            call(assetBalanceRequestRepository.setSignedMessage(uuid, walletAddress, signedMessage))
                 .willReturn(false)
         }
 
@@ -1075,31 +1069,33 @@ class AssetBalanceRequestServiceTest : TestBase() {
         )
 
         verify("CannotAttachSignedMessageException is thrown") {
-            assertThrows<CannotAttachSignedMessageException>(message) {
+            expectThrows<CannotAttachSignedMessageException> {
                 service.attachWalletAddressAndSignedMessage(uuid, walletAddress, signedMessage)
             }
 
-            verifyMock(assetBalanceRequestRepository)
-                .setSignedMessage(uuid, walletAddress, signedMessage)
-            verifyNoMoreInteractions(assetBalanceRequestRepository)
+            expectInteractions(assetBalanceRequestRepository) {
+                once.setSignedMessage(uuid, walletAddress, signedMessage)
+            }
         }
     }
 
     private fun projectRepositoryMockWithCustomRpcUrl(projectId: UUID, customRpcUrl: String?): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
-        given(projectRepository.getById(projectId))
-            .willReturn(
-                Project(
-                    id = projectId,
-                    ownerId = UUID.randomUUID(),
-                    issuerContractAddress = ContractAddress("dead"),
-                    baseRedirectUrl = BaseUrl(""),
-                    chainId = ChainId(0L),
-                    customRpcUrl = customRpcUrl,
-                    createdAt = TestData.TIMESTAMP
+        suppose("some project will be returned") {
+            call(projectRepository.getById(projectId))
+                .willReturn(
+                    Project(
+                        id = projectId,
+                        ownerId = UUID.randomUUID(),
+                        issuerContractAddress = ContractAddress("dead"),
+                        baseRedirectUrl = BaseUrl(""),
+                        chainId = ChainId(0L),
+                        customRpcUrl = customRpcUrl,
+                        createdAt = TestData.TIMESTAMP
+                    )
                 )
-            )
+        }
 
         return projectRepository
     }

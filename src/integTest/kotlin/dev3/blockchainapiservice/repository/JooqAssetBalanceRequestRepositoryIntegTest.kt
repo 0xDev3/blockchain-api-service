@@ -16,7 +16,6 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -66,7 +65,8 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -110,7 +110,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
         verify("asset balance request is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetBalanceRequest(
                         id = id,
@@ -138,7 +138,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent asset balance request") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -233,7 +233,7 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
         verify("asset balance requests are correctly fetched by project") {
             val result = repository.getAllByProjectId(PROJECT_ID)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .containsExactlyInAnyOrderElementsOf(
                     projectRequests.map {
                         AssetBalanceRequest(
@@ -300,14 +300,14 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
         )
 
         verify("storing asset balance request returns correct result") {
-            assertThat(storedAssetBalanceRequest).withMessage()
+            expectThat(storedAssetBalanceRequest)
                 .isEqualTo(expectedAssetBalanceRequest)
         }
 
         verify("asset balance request was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(expectedAssetBalanceRequest)
         }
     }
@@ -336,14 +336,14 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting walletAddress and signedMessage will succeed") {
-            assertThat(repository.setSignedMessage(id, ACTUAL_WALLET_ADDRESS, SIGNED_MESSAGE)).withMessage()
+            expectThat(repository.setSignedMessage(id, ACTUAL_WALLET_ADDRESS, SIGNED_MESSAGE))
                 .isTrue()
         }
 
         verify("walletAddress and signedMessage were correctly set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetBalanceRequest(
                         id = id,
@@ -390,20 +390,19 @@ class JooqAssetBalanceRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting walletAddress and signedMessage will succeed") {
-            assertThat(repository.setSignedMessage(id, ACTUAL_WALLET_ADDRESS, SIGNED_MESSAGE)).withMessage()
+            expectThat(repository.setSignedMessage(id, ACTUAL_WALLET_ADDRESS, SIGNED_MESSAGE))
                 .isTrue()
         }
 
         verify("setting another walletAddress and signedMessage will not succeed") {
-            assertThat(repository.setSignedMessage(id, WalletAddress("dead"), SignedMessage("another-message")))
-                .withMessage()
+            expectThat(repository.setSignedMessage(id, WalletAddress("dead"), SignedMessage("another-message")))
                 .isFalse()
         }
 
         verify("first walletAddress and signedMessage remain in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     AssetBalanceRequest(
                         id = id,

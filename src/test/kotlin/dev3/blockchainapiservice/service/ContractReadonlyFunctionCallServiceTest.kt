@@ -27,9 +27,7 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UintType
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithDeployedContractIdAndAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import org.web3j.abi.datatypes.generated.Uint256
 import java.math.BigInteger
@@ -92,7 +90,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
         val createParams = CREATE_PARAMS
 
         suppose("function will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = createParams.functionName,
                     arguments = createParams.functionParams
@@ -104,7 +102,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
         val contractDeploymentRequestRepository = mock<ContractDeploymentRequestRepository>()
 
         suppose("deployed contract is returned from database") {
-            given(contractDeploymentRequestRepository.getById(DEPLOYED_CONTRACT_ID))
+            call(contractDeploymentRequestRepository.getById(DEPLOYED_CONTRACT_ID))
                 .willReturn(DEPLOYED_CONTRACT)
         }
 
@@ -117,7 +115,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
         )
 
         suppose("blockchain service will return some value for readonly function call") {
-            given(
+            call(
                 blockchainService.callReadonlyFunction(
                     chainSpec = CHAIN_SPEC,
                     params = ExecuteReadonlyFunctionCallParams(
@@ -139,16 +137,15 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
         )
 
         verify("contract readonly function call is correctly executed") {
-            assertThat(
+            expectThat(
                 service.callReadonlyContractFunction(createParams, PROJECT)
-            ).withMessage()
-                .isEqualTo(
-                    WithDeployedContractIdAndAddress(
-                        value = readonlyFunctionCallResult,
-                        deployedContractId = DEPLOYED_CONTRACT_ID,
-                        contractAddress = CONTRACT_ADDRESS
-                    )
+            ).isEqualTo(
+                WithDeployedContractIdAndAddress(
+                    value = readonlyFunctionCallResult,
+                    deployedContractId = DEPLOYED_CONTRACT_ID,
+                    contractAddress = CONTRACT_ADDRESS
                 )
+            )
         }
     }
 

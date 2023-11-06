@@ -39,14 +39,24 @@ data class InterfaceManifestJsonWithId(
     val description: String?,
     @JsonDeserialize(`as` = LinkedHashSet::class)
     val tags: Set<String>,
-    val eventDecorators: List<EventDecorator>,
-    val functionDecorators: List<FunctionDecorator>
+    val matchingEventDecorators: List<EventDecorator>,
+    val matchingFunctionDecorators: List<FunctionDecorator>
 )
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
 data class TypeDecorator(
     val name: String,
     val description: String,
+    val recommendedTypes: List<String>,
+    val parameters: List<TypeDecorator>?,
+    val hints: List<Any>?
+)
+
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)
+data class EventTypeDecorator(
+    val name: String,
+    val description: String,
+    val indexed: Boolean,
     val recommendedTypes: List<String>,
     val parameters: List<TypeDecorator>?,
     val hints: List<Any>?
@@ -71,7 +81,7 @@ data class EventDecorator(
     override val signature: String,
     val name: String,
     val description: String,
-    val parameterDecorators: List<TypeDecorator>
+    val parameterDecorators: List<EventTypeDecorator>
 ) : OverridableDecorator
 
 @JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy::class)

@@ -121,6 +121,7 @@ dependencies {
     implementation("com.github.AMPnet:jwt:${Versions.Dependencies.jwt}")
     implementation("io.sentry:sentry-spring-boot-starter:${Versions.Dependencies.sentry}")
     implementation("com.facebook.business.sdk:facebook-java-business-sdk:${Versions.Dependencies.facebookSdk}")
+    implementation("com.stripe:stripe-java:${Versions.Dependencies.stripe}")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
@@ -259,7 +260,7 @@ jooq {
                             ForcedType().apply {
                                 userType = "dev3.blockchainapiservice.util.FunctionData"
                                 converter = "dev3.blockchainapiservice.util.FunctionDataConverter"
-                                includeExpression = "tx_data"
+                                includeExpression = "tx_data|function_data"
                                 includeTypes = "BYTEA"
                             },
                             ForcedType().apply {

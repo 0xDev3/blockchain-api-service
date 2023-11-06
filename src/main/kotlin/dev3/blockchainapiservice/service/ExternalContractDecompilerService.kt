@@ -1,6 +1,6 @@
 package dev3.blockchainapiservice.service
 
-import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.ContractManifestServiceProperties
 import dev3.blockchainapiservice.exception.CannotDecompileContractBinaryException
 import dev3.blockchainapiservice.exception.ContractDecompilationTemporarilyUnavailableException
 import dev3.blockchainapiservice.model.json.DecompiledContractJson
@@ -13,17 +13,17 @@ import org.springframework.web.client.RestTemplate
 @Service
 class ExternalContractDecompilerService(
     private val externalContractDecompilerServiceRestTemplate: RestTemplate,
-    private val applicationProperties: ApplicationProperties
+    private val contractManifestServiceProperties: ContractManifestServiceProperties
 ) : ContractDecompilerService {
 
     companion object {
-        data class Request(val bytecode: String)
+        private data class Request(val bytecode: String)
     }
 
     override fun decompile(contractBinary: ContractBinaryData): DecompiledContractJson =
         try {
             externalContractDecompilerServiceRestTemplate.postForEntity(
-                applicationProperties.contractManifestService.decompileContractPath,
+                contractManifestServiceProperties.decompileContractPath,
                 Request(contractBinary.value),
                 DecompiledContractJson::class.java
             ).body ?: throw ContractDecompilationTemporarilyUnavailableException()

@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.JsonSchemaDocumentation
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateAssetBalanceRequestParams
 import dev3.blockchainapiservice.model.request.AttachSignedMessageRequest
@@ -26,15 +25,11 @@ import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AssetBalanceRequestControllerTest : TestBase() {
 
@@ -77,7 +72,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
         val service = mock<AssetBalanceRequestService>()
 
         suppose("asset balance request will be created") {
-            given(service.createAssetBalanceRequest(params, project))
+            call(service.createAssetBalanceRequest(params, project))
                 .willReturn(result)
         }
 
@@ -98,7 +93,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetBalanceRequestResponse(
@@ -131,7 +126,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
             id = id,
             projectId = UUID.randomUUID(),
             status = Status.SUCCESS,
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -153,7 +148,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
         )
 
         suppose("some asset balance request will be fetched") {
-            given(service.getAssetBalanceRequest(id))
+            call(service.getAssetBalanceRequest(id))
                 .willReturn(result)
         }
 
@@ -164,7 +159,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetBalanceRequestResponse(
@@ -205,7 +200,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
             id = id,
             projectId = projectId,
             status = Status.SUCCESS,
-            chainId = Chain.MATIC_TESTNET_MUMBAI.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url",
             tokenAddress = ContractAddress("abc"),
             blockNumber = BlockNumber(BigInteger.TEN),
@@ -227,7 +222,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
         )
 
         suppose("some asset balance requests will be fetched by project ID") {
-            given(service.getAssetBalanceRequestsByProjectId(projectId))
+            call(service.getAssetBalanceRequestsByProjectId(projectId))
                 .willReturn(listOf(result))
         }
 
@@ -238,7 +233,7 @@ class AssetBalanceRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetBalanceRequestsResponse(
@@ -290,10 +285,9 @@ class AssetBalanceRequestControllerTest : TestBase() {
         }
 
         verify("signed message is correctly attached") {
-            verifyMock(service)
-                .attachWalletAddressAndSignedMessage(id, walletAddress, signedMessage)
-
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.attachWalletAddressAndSignedMessage(id, walletAddress, signedMessage)
+            }
         }
     }
 }

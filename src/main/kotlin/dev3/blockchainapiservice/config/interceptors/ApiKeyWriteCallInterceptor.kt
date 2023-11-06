@@ -141,7 +141,7 @@ class ApiKeyWriteCallInterceptor(
         if (idType == IdType.PROJECT_ID) {
             request.getHeader(CustomHeaders.API_KEY_HEADER)
                 ?.let { apiKeyRepository.getByValue(it)?.projectId }
-                ?.let { userIdResolverRepository.getByProjectId(it) }
+                ?.let { userIdResolverRepository.getUserId(idType, it) }
         } else {
             UserIdResolver.resolve(
                 userIdResolverRepository = userIdResolverRepository,

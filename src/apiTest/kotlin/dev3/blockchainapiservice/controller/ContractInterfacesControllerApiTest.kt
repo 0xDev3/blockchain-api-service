@@ -12,7 +12,6 @@ import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsRespon
 import dev3.blockchainapiservice.model.response.InfoMarkdownsResponse
 import dev3.blockchainapiservice.repository.ContractInterfacesRepository
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -88,7 +87,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractInterfaceManifestsResponse(
                         listOf(
@@ -126,7 +125,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(InfoMarkdownsResponse(listOf(INFO_MD)))
         }
     }
@@ -148,7 +147,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractInterfaceManifestResponse(
                         id = ID.value,
@@ -171,7 +170,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -192,7 +191,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(INFO_MD)
         }
     }
@@ -206,7 +205,7 @@ class ContractInterfacesControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 }

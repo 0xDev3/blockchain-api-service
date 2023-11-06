@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.service
 
+import dev3.blockchainapiservice.exception.AbiDecodingException
 import dev3.blockchainapiservice.util.AbiType
 import dev3.blockchainapiservice.util.AddressType
 import dev3.blockchainapiservice.util.BoolType
@@ -28,7 +29,16 @@ class EthereumAbiDecoderService : AbiDecoderService {
         private val MAX_UINT_256 = BigInteger("f".repeat(VALUE_LENGTH), HEX_RADIX)
     }
 
+    @Suppress("TooGenericExceptionCaught")
     override fun decode(types: List<AbiType>, encodedInput: String): List<Any> {
+        try {
+            return unsafeDecode(types, encodedInput)
+        } catch (e: RuntimeException) {
+            throw AbiDecodingException(types, e)
+        }
+    }
+
+    private fun unsafeDecode(types: List<AbiType>, encodedInput: String): List<Any> {
         val withoutPrefix = encodedInput.removePrefix("0x")
         var index = 0
 

@@ -1,7 +1,7 @@
 package dev3.blockchainapiservice.controller
 
 import dev3.blockchainapiservice.ControllerTestBase
-import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.model.response.ApiKeyResponse
@@ -19,7 +19,6 @@ import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -54,7 +53,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateProject() {
         val issuerContractAddress = ContractAddress("a")
         val baseRedirectUrl = BaseUrl("base-redirect-url")
-        val chainId = Chain.HARDHAT_TESTNET.id
+        val chainId = TestData.CHAIN_ID
         val customRpcUrl = "custom-rpc-url"
 
         val response = suppose("request to create project is made") {
@@ -79,7 +78,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ProjectResponse(
                         id = response.id,
@@ -94,10 +93,11 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("user is correctly stored into the database") {
-            assertThat(userIdentifierRepository.getById(response.ownerId)).withMessage()
+            expectThat(userIdentifierRepository.getById(response.ownerId))
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = response.ownerId,
+                        stripeClientId = null,
                         walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
                     )
                 )
@@ -106,7 +106,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         verify("project is correctly stored into the database") {
             val storedProject = projectRepository.getById(response.id)!!
 
-            assertThat(storedProject)
+            expectThat(storedProject)
                 .isEqualTo(
                     Project(
                         id = response.id,
@@ -119,9 +119,9 @@ class ProjectControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedProject.createdAt.value)
+            expectThat(storedProject.createdAt.value)
                 .isCloseTo(response.createdAt, WITHIN_TIME_TOLERANCE)
-            assertThat(storedProject.createdAt.value)
+            expectThat(storedProject.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -131,7 +131,8 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectByApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
-            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
+            walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1),
+            stripeClientId = null
         )
 
         suppose("some user identifier exists in database") {
@@ -143,7 +144,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -175,7 +176,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ProjectResponse(
                         id = project.id,
@@ -188,9 +189,9 @@ class ProjectControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseTo(project.createdAt.value, WITHIN_TIME_TOLERANCE)
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -200,6 +201,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectById() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -212,7 +214,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -232,7 +234,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ProjectResponse(
                         id = project.id,
@@ -245,9 +247,9 @@ class ProjectControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseTo(project.createdAt.value, WITHIN_TIME_TOLERANCE)
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -262,7 +264,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -271,6 +273,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonOwnedProjectId() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("0cafe0babe")
         )
 
@@ -283,7 +286,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -299,7 +302,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -308,6 +311,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectByIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -320,7 +324,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -342,7 +346,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ProjectResponse(
                         id = project.id,
@@ -355,9 +359,9 @@ class ProjectControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseTo(project.createdAt.value, WITHIN_TIME_TOLERANCE)
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -372,7 +376,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -381,6 +385,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForNonOwnedProjectIssuer() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress("0cafe0babe")
         )
 
@@ -393,7 +398,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -411,7 +416,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -420,6 +425,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnAllProjectsForSomeUser() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -432,7 +438,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -441,7 +447,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("b"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -462,7 +468,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ProjectsResponse(
                         listOf(
@@ -488,13 +494,13 @@ class ProjectControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.projects[0].createdAt)
+            expectThat(response.projects[0].createdAt)
                 .isCloseTo(project1.createdAt.value, WITHIN_TIME_TOLERANCE)
-            assertThat(response.projects[0].createdAt)
+            expectThat(response.projects[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(response.projects[1].createdAt)
+            expectThat(response.projects[1].createdAt)
                 .isCloseTo(project2.createdAt.value, WITHIN_TIME_TOLERANCE)
-            assertThat(response.projects[1].createdAt)
+            expectThat(response.projects[1].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -504,6 +510,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyReturnProjectApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -516,7 +523,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -547,7 +554,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ApiKeyResponse(
                         id = apiKey.id,
@@ -557,9 +564,9 @@ class ProjectControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseTo(apiKey.createdAt.value, WITHIN_TIME_TOLERANCE)
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -569,6 +576,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundForProjectWithoutApiKey() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -581,7 +589,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -597,7 +605,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -606,6 +614,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustCorrectlyCreateApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -618,7 +627,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -638,7 +647,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ApiKeyResponse(
                         id = response.id,
@@ -652,7 +661,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
         verify("API key is correctly stored into the database") {
             val apiKey = apiKeyRepository.getById(response.id)!!
 
-            assertThat(apiKey)
+            expectThat(apiKey)
                 .isEqualTo(
                     ApiKey(
                         id = response.id,
@@ -662,9 +671,9 @@ class ProjectControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(apiKey.createdAt.value)
+            expectThat(apiKey.createdAt.value)
                 .isCloseTo(response.createdAt, WITHIN_TIME_TOLERANCE)
-            assertThat(apiKey.createdAt.value)
+            expectThat(apiKey.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -674,6 +683,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn400BadRequestWhenCreatingAnotherApiKeyForSomeProject() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -686,7 +696,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -713,7 +723,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.API_KEY_ALREADY_EXISTS)
+            expectResponseErrorCode(response, ErrorCode.API_KEY_ALREADY_EXISTS)
         }
     }
 
@@ -722,6 +732,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
     fun mustReturn404NotFoundWhenCreatingApiKeyByNonProjectOwner() {
         val userIdentifier = UserWalletAddressIdentifier(
             id = UUID.randomUUID(),
+            stripeClientId = null,
             walletAddress = WalletAddress(HardhatTestContainer.ACCOUNT_ADDRESS_1)
         )
 
@@ -734,7 +745,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
             ownerId = userIdentifier.id,
             issuerContractAddress = ContractAddress("a"),
             baseRedirectUrl = BaseUrl("base-redirect-url"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url",
             createdAt = UtcDateTime(OffsetDateTime.now())
         )
@@ -750,7 +761,7 @@ class ProjectControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 }

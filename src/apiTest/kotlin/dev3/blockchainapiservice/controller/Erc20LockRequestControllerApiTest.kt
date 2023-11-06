@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.SimpleLockManager
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -29,7 +28,6 @@ import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,7 +49,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             ownerId = OWNER_ID,
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
@@ -74,7 +72,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -139,7 +138,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = response.id,
@@ -167,18 +166,19 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("ERC20 lock request is correctly stored in database") {
             val storedRequest = erc20LockRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     Erc20LockRequest(
                         id = response.id,
@@ -200,7 +200,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -246,7 +246,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = response.id,
@@ -274,18 +274,19 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = null,
                             timestamp = null
                         ),
-                        createdAt = response.createdAt
+                        createdAt = response.createdAt,
+                        events = null
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("ERC20 lock request is correctly stored in database") {
             val storedRequest = erc20LockRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     Erc20LockRequest(
                         id = response.id,
@@ -307,7 +308,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -347,7 +348,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
+            expectResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 
@@ -428,7 +429,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = createResponse.id,
@@ -438,7 +439,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
                         lockDurationInSeconds = lockDuration.rawValue,
-                        unlocksAt = (fetchResponse.lockTx.timestamp!! + lockDuration.toDuration()),
+                        unlocksAt = fetchResponse.lockTx.timestamp!! + lockDuration.toJavaDuration(),
                         lockContractAddress = lockContractAddress.rawValue,
                         senderAddress = senderAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
@@ -456,15 +457,16 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
                             timestamp = fetchResponse.lockTx.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        events = emptyList()
                     )
                 )
 
-            assertThat(fetchResponse.lockTx.blockConfirmations)
+            expectThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.lockTx.timestamp)
+            expectThat(fetchResponse.lockTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -548,7 +550,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     Erc20LockRequestResponse(
                         id = createResponse.id,
@@ -558,7 +560,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                         tokenAddress = tokenAddress.rawValue,
                         amount = amount.rawValue,
                         lockDurationInSeconds = lockDuration.rawValue,
-                        unlocksAt = (fetchResponse.lockTx.timestamp!! + lockDuration.toDuration()),
+                        unlocksAt = fetchResponse.lockTx.timestamp!! + lockDuration.toJavaDuration(),
                         lockContractAddress = lockContractAddress.rawValue,
                         senderAddress = senderAddress.rawValue,
                         arbitraryData = createResponse.arbitraryData,
@@ -577,15 +579,16 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
                             timestamp = fetchResponse.lockTx.timestamp
                         ),
-                        createdAt = fetchResponse.createdAt
+                        createdAt = fetchResponse.createdAt,
+                        events = emptyList()
                     )
                 )
 
-            assertThat(fetchResponse.lockTx.blockConfirmations)
+            expectThat(fetchResponse.lockTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.lockTx.timestamp)
+            expectThat(fetchResponse.lockTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.createdAt)
+            expectThat(fetchResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -667,7 +670,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     Erc20LockRequestsResponse(
                         listOf(
@@ -679,7 +682,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                 tokenAddress = tokenAddress.rawValue,
                                 amount = amount.rawValue,
                                 lockDurationInSeconds = lockDuration.rawValue,
-                                unlocksAt = (fetchResponse.requests[0].lockTx.timestamp!! + lockDuration.toDuration()),
+                                unlocksAt = fetchResponse.requests[0].lockTx.timestamp!! +
+                                    lockDuration.toJavaDuration(),
                                 lockContractAddress = lockContractAddress.rawValue,
                                 senderAddress = senderAddress.rawValue,
                                 arbitraryData = createResponse.arbitraryData,
@@ -698,17 +702,18 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].lockTx.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                events = emptyList()
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].lockTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].lockTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].lockTx.timestamp)
+            expectThat(fetchResponse.requests[0].lockTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -792,7 +797,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(fetchResponse).withMessage()
+            expectThat(fetchResponse)
                 .isEqualTo(
                     Erc20LockRequestsResponse(
                         listOf(
@@ -804,7 +809,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                 tokenAddress = tokenAddress.rawValue,
                                 amount = amount.rawValue,
                                 lockDurationInSeconds = lockDuration.rawValue,
-                                unlocksAt = (fetchResponse.requests[0].lockTx.timestamp!! + lockDuration.toDuration()),
+                                unlocksAt = fetchResponse.requests[0].lockTx.timestamp!! +
+                                    lockDuration.toJavaDuration(),
                                 lockContractAddress = lockContractAddress.rawValue,
                                 senderAddress = senderAddress.rawValue,
                                 arbitraryData = createResponse.arbitraryData,
@@ -823,17 +829,18 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
                                     timestamp = fetchResponse.requests[0].lockTx.timestamp
                                 ),
-                                createdAt = fetchResponse.requests[0].createdAt
+                                createdAt = fetchResponse.requests[0].createdAt,
+                                events = emptyList()
                             )
                         )
                     )
                 )
 
-            assertThat(fetchResponse.requests[0].lockTx.blockConfirmations)
+            expectThat(fetchResponse.requests[0].lockTx.blockConfirmations)
                 .isNotZero()
-            assertThat(fetchResponse.requests[0].lockTx.timestamp)
+            expectThat(fetchResponse.requests[0].lockTx.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
-            assertThat(fetchResponse.requests[0].createdAt)
+            expectThat(fetchResponse.requests[0].createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -847,7 +854,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -861,7 +868,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 StoreErc20LockRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     tokenAmount = Balance(BigInteger.TEN),
@@ -900,7 +907,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
         verify("transaction info is correctly attached to ERC20 lock request") {
             val storedRequest = erc20LockRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }
@@ -916,7 +923,7 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 StoreErc20LockRequestParams(
                     id = id,
                     projectId = PROJECT_ID,
-                    chainId = Chain.HARDHAT_TESTNET.id,
+                    chainId = TestData.CHAIN_ID,
                     redirectUrl = "https://example.com/$id",
                     tokenAddress = ContractAddress("a"),
                     tokenAmount = Balance(BigInteger.TEN),
@@ -950,13 +957,13 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
+            expectResponseErrorCode(response, ErrorCode.TX_INFO_ALREADY_SET)
         }
 
         verify("transaction info is not changed in database") {
             val storedRequest = erc20LockRequestRepository.getById(id)
 
-            assertThat(storedRequest?.txHash)
+            expectThat(storedRequest?.txHash)
                 .isEqualTo(txHash)
         }
     }

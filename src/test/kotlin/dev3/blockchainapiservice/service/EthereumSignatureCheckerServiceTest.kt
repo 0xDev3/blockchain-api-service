@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.util.SignedMessage
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class EthereumSignatureCheckerServiceTest : TestBase() {
@@ -40,7 +39,7 @@ class EthereumSignatureCheckerServiceTest : TestBase() {
         val service = EthereumSignatureCheckerService()
 
         verify("signature matches") {
-            assertThat(service.signatureMatches(MESSAGE, METAMASK_SIGNATURE, METAMASK_WALLET)).withMessage()
+            expectThat(service.signatureMatches(MESSAGE, METAMASK_SIGNATURE, METAMASK_WALLET))
                 .isTrue()
         }
     }
@@ -50,7 +49,7 @@ class EthereumSignatureCheckerServiceTest : TestBase() {
         val service = EthereumSignatureCheckerService()
 
         verify("signature matches") {
-            assertThat(service.signatureMatches(MESSAGE, LEDGER_SIGNATURE, LEDGER_WALLET)).withMessage()
+            expectThat(service.signatureMatches(MESSAGE, LEDGER_SIGNATURE, LEDGER_WALLET))
                 .isTrue()
         }
     }
@@ -60,7 +59,7 @@ class EthereumSignatureCheckerServiceTest : TestBase() {
         val service = EthereumSignatureCheckerService()
 
         verify("signature does not match") {
-            assertThat(service.signatureMatches(MESSAGE, OTHER_SIGNATURE, METAMASK_WALLET)).withMessage()
+            expectThat(service.signatureMatches(MESSAGE, OTHER_SIGNATURE, METAMASK_WALLET))
                 .isFalse()
         }
     }
@@ -70,7 +69,7 @@ class EthereumSignatureCheckerServiceTest : TestBase() {
         val service = EthereumSignatureCheckerService()
 
         verify("signature does not match") {
-            assertThat(service.signatureMatches(MESSAGE, TOO_SHORT_SIGNATURE, METAMASK_WALLET)).withMessage()
+            expectThat(service.signatureMatches(MESSAGE, TOO_SHORT_SIGNATURE, METAMASK_WALLET))
                 .isFalse()
         }
     }
@@ -80,7 +79,7 @@ class EthereumSignatureCheckerServiceTest : TestBase() {
         val service = EthereumSignatureCheckerService()
 
         verify("signature does not match") {
-            assertThat(service.signatureMatches(MESSAGE, INVALID_SIGNATURE, METAMASK_WALLET)).withMessage()
+            expectThat(service.signatureMatches(MESSAGE, INVALID_SIGNATURE, METAMASK_WALLET))
                 .isFalse()
         }
     }

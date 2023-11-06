@@ -11,12 +11,10 @@ import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.BaseUrl
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
@@ -54,7 +52,8 @@ class JooqProjectRepositoryIntegTest : TestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
     }
@@ -80,7 +79,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         verify("project is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     Project(
                         id = id,
@@ -100,7 +99,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent project") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -126,7 +125,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         verify("project is correctly fetched by issuer contract address") {
             val result = repository.getByIssuer(ISSUER_CONTRACT_ADDRESS, CHAIN_ID)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     Project(
                         id = id,
@@ -146,7 +145,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent project") {
             val result = repository.getByIssuer(ContractAddress("dead"), ChainId(0L))
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -179,7 +178,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         verify("projects are correctly fetched by user ID") {
             val result = repository.getAllByOwnerId(OWNER_ID)
 
-            assertThat(result.map { it.issuerContractAddress }).withMessage()
+            expectThat(result.map { it.issuerContractAddress })
                 .isEqualTo(
                     listOf(ContractAddress("a1"), ContractAddress("a2"))
                 )
@@ -204,14 +203,14 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         }
 
         verify("storing project returns correct result") {
-            assertThat(storedProject).withMessage()
+            expectThat(storedProject)
                 .isEqualTo(project)
         }
 
         verify("project was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(project)
         }
     }
@@ -233,7 +232,7 @@ class JooqProjectRepositoryIntegTest : TestBase() {
         }
 
         verify("storing project with duplicate issuer and chainId throws DuplicateIssuerContractAddressException") {
-            assertThrows<DuplicateIssuerContractAddressException>(message) {
+            expectThrows<DuplicateIssuerContractAddressException> {
                 repository.store(
                     Project(
                         id = UUID.randomUUID(),

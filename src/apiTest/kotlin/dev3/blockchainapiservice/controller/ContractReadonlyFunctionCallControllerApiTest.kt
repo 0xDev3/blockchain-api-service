@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.controller
 import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.ReadonlyFunctionCallsContract
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -24,7 +23,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.ContractId
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,7 +44,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
             ownerId = OWNER_ID,
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
@@ -60,7 +58,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
             constructorParams = TestData.EMPTY_JSON_ARRAY,
             deployerAddress = null,
             initialEthAmount = Balance.ZERO,
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             redirectUrl = "redirect-url",
             projectId = PROJECT_ID,
             createdAt = TestData.TIMESTAMP,
@@ -100,7 +98,8 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -187,7 +186,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ReadonlyFunctionCallResponse(
                         deployedContractId = DEPLOYED_CONTRACT.id,
@@ -200,7 +199,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.timestamp)
+            expectThat(response.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -266,7 +265,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ReadonlyFunctionCallResponse(
                         deployedContractId = DEPLOYED_CONTRACT.id,
@@ -279,7 +278,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.timestamp)
+            expectThat(response.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -338,7 +337,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ReadonlyFunctionCallResponse(
                         deployedContractId = null,
@@ -351,7 +350,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.timestamp)
+            expectThat(response.timestamp)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -389,7 +388,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INVALID_REQUEST_BODY)
+            expectResponseErrorCode(response, ErrorCode.INVALID_REQUEST_BODY)
         }
     }
 
@@ -423,7 +422,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.INVALID_REQUEST_BODY)
+            expectResponseErrorCode(response, ErrorCode.INVALID_REQUEST_BODY)
         }
     }
 
@@ -452,7 +451,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -481,7 +480,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -514,7 +513,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_NOT_DEPLOYED)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_NOT_DEPLOYED)
         }
     }
 
@@ -547,7 +546,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_NOT_DEPLOYED)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_NOT_DEPLOYED)
         }
     }
 
@@ -576,7 +575,7 @@ class ContractReadonlyFunctionCallControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
+            expectResponseErrorCode(response, ErrorCode.NON_EXISTENT_API_KEY)
         }
     }
 }

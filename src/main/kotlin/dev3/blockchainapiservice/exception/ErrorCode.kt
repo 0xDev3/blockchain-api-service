@@ -31,6 +31,9 @@ enum class ErrorCode {
     @Description("The signed message has already been set for the requested resource and it cannot be overridden")
     SIGNED_MESSAGE_ALREADY_SET,
 
+    @Description("Access to the provided resource is not allowed for the current user")
+    ACCESS_FORBIDDEN,
+
     @Description("Provided authentication token has invalid format")
     BAD_AUTHENTICATION,
 
@@ -89,5 +92,29 @@ enum class ErrorCode {
     CONTRACT_INTERFACE_NOT_FOUND,
 
     @Description("Indicates that file upload to IPFS has failed")
-    IPFS_UPLOAD_FAILED
+    IPFS_UPLOAD_FAILED,
+
+    @Description(
+        "Indicates that error occurred while decoding ABI-encoded response. This is most likely caused by" +
+            " incompatible ABI types (e.g. decoding an int as a string)"
+    )
+    ABI_DECODING_FAILED,
+
+    @Description("Indicates that customer has already been created for the authenticated wallet")
+    CUSTOMER_ALREADY_EXISTS,
+
+    @Description("Indicates that customer has failed created due to an error")
+    CUSTOMER_CREATION_FAILED,
+
+    @Description("Indicates that customer has not been created yet for the authenticated wallet")
+    CUSTOMER_NOT_YET_CREATED,
+
+    @Description("Indicates that customer has an already active subscription")
+    SUBSCRIPTION_ALREADY_ACTIVE,
+
+    @Description("Indicates that the requested promo code has expired")
+    PROMO_CODE_EXPIRED,
+
+    @Description("Indicates that the user has already used the requested promo code before")
+    PROMO_CODE_ALREADY_USED
 }

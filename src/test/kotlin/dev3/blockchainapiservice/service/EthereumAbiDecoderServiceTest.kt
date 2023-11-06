@@ -13,7 +13,6 @@ import dev3.blockchainapiservice.util.StringType
 import dev3.blockchainapiservice.util.Tuple
 import dev3.blockchainapiservice.util.TupleType
 import dev3.blockchainapiservice.util.UintType
-import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.ListAssert
 import org.junit.jupiter.api.Test
 import java.math.BigInteger
@@ -903,7 +902,7 @@ class EthereumAbiDecoderServiceTest : TestBase() {
     }
 
     private fun Companion.VerifyMessage.decoding(types: List<AbiType>, encodedInput: String) =
-        assertThat(decoder.decode(types, encodedInput)).withMessage()
+        expectThat(decoder.decode(types, encodedInput))
 
     private fun ListAssert<Any>.returns(vararg expected: Any) = isEqualTo(expected.toList())
 

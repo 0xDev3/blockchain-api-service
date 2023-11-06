@@ -49,7 +49,7 @@ public class ReadonlyFunctionCallsContract extends Contract {
 
     public RemoteFunctionCall<BigInteger> returningUint(BigInteger input) {
         final Function function = new Function(FUNC_RETURNINGUINT, 
-                Arrays.<Type>asList(new org.web3j.abi.datatypes.generated.Uint256(input)), 
+                Arrays.<Type>asList(new Uint256(input)),
                 Arrays.<TypeReference<?>>asList(new TypeReference<Uint256>() {}));
         return executeRemoteCallSingleValueReturn(function, BigInteger.class);
     }

@@ -32,15 +32,11 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithTransactionData
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class ContractDeploymentRequestControllerTest : TestBase() {
 
@@ -95,7 +91,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         val service = mock<ContractDeploymentRequestService>()
 
         suppose("contract deployment request will be created") {
-            given(service.createContractDeploymentRequest(params, project))
+            call(service.createContractDeploymentRequest(params, project))
                 .willReturn(result)
         }
 
@@ -117,7 +113,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDeploymentRequestResponse(
@@ -151,7 +147,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                             ),
                             imported = result.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = null
                         )
                     )
                 )
@@ -177,8 +174,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         verify("correct service call is made") {
             controller.markContractDeploymentRequestAsDeleted(project, id)
 
-            verifyMock(service)
-                .markContractDeploymentRequestAsDeleted(id, project.id)
+            expectInteractions(service) {
+                once.markContractDeploymentRequestAsDeleted(id, project.id)
+            }
         }
     }
 
@@ -223,12 +221,13 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
         suppose("some contract deployment request will be fetched") {
-            given(service.getContractDeploymentRequest(id))
+            call(service.getContractDeploymentRequest(id))
                 .willReturn(result)
         }
 
@@ -239,7 +238,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDeploymentRequestResponse(
@@ -273,7 +272,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                             ),
                             imported = result.value.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = emptyList()
                         )
                     )
                 )
@@ -321,7 +321,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
@@ -333,7 +334,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         )
 
         suppose("some contract deployment requests will be fetched by project ID and filters") {
-            given(service.getContractDeploymentRequestsByProjectIdAndFilters(projectId, filters))
+            call(service.getContractDeploymentRequestsByProjectIdAndFilters(projectId, filters))
                 .willReturn(listOf(result))
         }
 
@@ -350,7 +351,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDeploymentRequestsResponse(
@@ -386,7 +387,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                     ),
                                     imported = result.value.imported,
                                     proxy = false,
-                                    implementationContractAddress = null
+                                    implementationContractAddress = null,
+                                    events = emptyList()
                                 )
                             )
                         )
@@ -437,12 +439,13 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 data = FunctionData("00"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
         suppose("some contract deployment request will be fetched") {
-            given(service.getContractDeploymentRequestByProjectIdAndAlias(projectId, alias))
+            call(service.getContractDeploymentRequestByProjectIdAndAlias(projectId, alias))
                 .willReturn(result)
         }
 
@@ -453,7 +456,7 @@ class ContractDeploymentRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         ContractDeploymentRequestResponse(
@@ -487,7 +490,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                             ),
                             imported = result.value.imported,
                             proxy = false,
-                            implementationContractAddress = null
+                            implementationContractAddress = null,
+                            events = emptyList()
                         )
                     )
                 )
@@ -510,10 +514,9 @@ class ContractDeploymentRequestControllerTest : TestBase() {
         }
 
         verify("transaction info is correctly attached") {
-            verifyMock(service)
-                .attachTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
-
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.attachTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
+            }
         }
     }
 }

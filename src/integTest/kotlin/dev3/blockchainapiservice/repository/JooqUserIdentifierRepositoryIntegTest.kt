@@ -6,7 +6,6 @@ import dev3.blockchainapiservice.generated.jooq.tables.records.UserIdentifierRec
 import dev3.blockchainapiservice.model.result.UserWalletAddressIdentifier
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -51,7 +50,8 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 UserIdentifierRecord(
                     id = id,
                     userIdentifier = USER_WALLET_ADDRESS.rawValue,
-                    identifierType = IDENTIFIER_TYPE
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = null
                 )
             )
         }
@@ -59,10 +59,11 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("user identifier is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
+                        stripeClientId = null,
                         walletAddress = USER_WALLET_ADDRESS
                     )
                 )
@@ -74,7 +75,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent user identifier") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -88,7 +89,8 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 UserIdentifierRecord(
                     id = id,
                     userIdentifier = USER_WALLET_ADDRESS.rawValue,
-                    identifierType = IDENTIFIER_TYPE
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = null
                 )
             )
         }
@@ -96,10 +98,11 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("user identifier is correctly fetched by identifier") {
             val result = repository.getByUserIdentifier(USER_WALLET_ADDRESS.rawValue, IDENTIFIER_TYPE)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
+                        stripeClientId = null,
                         walletAddress = USER_WALLET_ADDRESS
                     )
                 )
@@ -111,7 +114,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent user identifier") {
             val result = repository.getByUserIdentifier("???", IDENTIFIER_TYPE)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -126,7 +129,8 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
                 UserIdentifierRecord(
                     id = id,
                     userIdentifier = walletAddress.rawValue,
-                    identifierType = IDENTIFIER_TYPE
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = null
                 )
             )
         }
@@ -134,10 +138,11 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("user identifier is correctly fetched by identifier") {
             val result = repository.getByWalletAddress(walletAddress)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     UserWalletAddressIdentifier(
                         id = id,
+                        stripeClientId = null,
                         walletAddress = walletAddress
                     )
                 )
@@ -149,7 +154,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent user identifier") {
             val result = repository.getByWalletAddress(WalletAddress("dead"))
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -159,6 +164,7 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         val id = UUID.randomUUID()
         val userIdentifier = UserWalletAddressIdentifier(
             id = id,
+            stripeClientId = null,
             walletAddress = USER_WALLET_ADDRESS
         )
 
@@ -167,15 +173,85 @@ class JooqUserIdentifierRepositoryIntegTest : TestBase() {
         }
 
         verify("storing user identifier returns correct result") {
-            assertThat(storedUserIdentifier).withMessage()
+            expectThat(storedUserIdentifier)
                 .isEqualTo(userIdentifier)
         }
 
         verify("user identifier was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(userIdentifier)
+        }
+    }
+
+    @Test
+    fun mustCorrectlyFetchUserByStripeClientId() {
+        val id = UUID.randomUUID()
+        val clientId = "client-id"
+
+        suppose("some user identifier is stored in database") {
+            dslContext.executeInsert(
+                UserIdentifierRecord(
+                    id = id,
+                    userIdentifier = USER_WALLET_ADDRESS.rawValue,
+                    identifierType = IDENTIFIER_TYPE,
+                    stripeClientId = clientId
+                )
+            )
+        }
+
+        verify("user identifier is correctly fetched by Stripe client ID") {
+            val result = repository.getByStripeClientId(clientId)
+
+            expectThat(result)
+                .isEqualTo(
+                    UserWalletAddressIdentifier(
+                        id = id,
+                        stripeClientId = clientId,
+                        walletAddress = USER_WALLET_ADDRESS
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustReturnNullWhenFetchingUserByNonExistentStripeClientId() {
+        verify("null is returned when fetching non-existent Stripe client ID") {
+            val result = repository.getByStripeClientId("non-existent")
+
+            expectThat(result)
+                .isNull()
+        }
+    }
+
+    @Test
+    fun mustCorrectlySetStripeClientId() {
+        val id = UUID.randomUUID()
+        val userIdentifier = UserWalletAddressIdentifier(
+            id = id,
+            stripeClientId = null,
+            walletAddress = USER_WALLET_ADDRESS
+        )
+
+        suppose("user identifier is stored in database") {
+            repository.store(userIdentifier)
+        }
+
+        val stripeClientId = "stripe-client-id"
+
+        val updateStatus = suppose("stripe client id is set in the database") {
+            repository.setStripeClientId(id, stripeClientId)
+        }
+
+        verify("stripe client id was stored in database") {
+            expectThat(updateStatus)
+                .isTrue()
+
+            val result = repository.getById(id)
+
+            expectThat(result)
+                .isEqualTo(userIdentifier.copy(stripeClientId = stripeClientId))
         }
     }
 }

@@ -62,7 +62,8 @@ class DeployedContractIdentifierResolverServiceImpl(
             ethCommonService.fetchTransactionInfo(
                 txHash = txHash,
                 chainId = chainId,
-                customRpcUrl = project.customRpcUrl
+                customRpcUrl = project.customRpcUrl,
+                events = emptyList()
             )?.deployedContractAddress?.let {
                 contractDeploymentRequestRepository.setContractAddress(id, it)
                 copy(contractAddress = it)

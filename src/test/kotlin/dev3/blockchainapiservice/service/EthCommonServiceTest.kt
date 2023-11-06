@@ -3,7 +3,6 @@ package dev3.blockchainapiservice.service
 import dev3.blockchainapiservice.TestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.BlockchainService
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
 import dev3.blockchainapiservice.model.params.ParamsFactory
@@ -17,10 +16,7 @@ import dev3.blockchainapiservice.util.FunctionData
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
 import java.math.BigInteger
 import java.util.UUID
@@ -42,14 +38,14 @@ class EthCommonServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be returned") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(uuid)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
@@ -72,7 +68,7 @@ class EthCommonServiceTest : TestBase() {
         verify("correct result is returned") {
             val result = service.createDatabaseParams(Factory, params, project)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(OutParams(uuid, params, project, TestData.TIMESTAMP))
         }
     }
@@ -89,7 +85,7 @@ class EthCommonServiceTest : TestBase() {
         verify("correct result is returned") {
             val output = service.fetchResource(input, "message")
 
-            assertThat(output).withMessage()
+            expectThat(output)
                 .isEqualTo(input)
         }
     }
@@ -103,7 +99,7 @@ class EthCommonServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.fetchResource(null, "message")
             }
         }
@@ -112,7 +108,7 @@ class EthCommonServiceTest : TestBase() {
     @Test
     fun mustCorrectlyFetchTransactionInfoWhenTxHashIsNotNull() {
         val chainSpec = ChainSpec(
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = "custom-rpc-url"
         )
         val txHash = TransactionHash("tx-hash")
@@ -125,13 +121,14 @@ class EthCommonServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ZERO,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
 
         val blockchainService = mock<BlockchainService>()
 
         suppose("some transaction info is fetched from blockchain") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, txHash))
+            call(blockchainService.fetchTransactionInfo(chainSpec, txHash, emptyList()))
                 .willReturn(transactionInfo)
         }
 
@@ -145,10 +142,11 @@ class EthCommonServiceTest : TestBase() {
             val result = service.fetchTransactionInfo(
                 txHash = txHash,
                 chainId = chainSpec.chainId,
-                customRpcUrl = chainSpec.customRpcUrl
+                customRpcUrl = chainSpec.customRpcUrl,
+                events = emptyList()
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(transactionInfo)
         }
     }
@@ -164,11 +162,12 @@ class EthCommonServiceTest : TestBase() {
         verify("null is returned") {
             val result = service.fetchTransactionInfo(
                 txHash = null,
-                chainId = Chain.HARDHAT_TESTNET.id,
-                customRpcUrl = null
+                chainId = TestData.CHAIN_ID,
+                customRpcUrl = null,
+                events = emptyList()
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }

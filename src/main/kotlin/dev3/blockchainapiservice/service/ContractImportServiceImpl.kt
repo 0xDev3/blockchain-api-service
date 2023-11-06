@@ -6,6 +6,8 @@ import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.exception.ContractDecoratorBinaryMismatchException
 import dev3.blockchainapiservice.exception.ContractNotFoundException
 import dev3.blockchainapiservice.exception.ResourceNotFoundException
+import dev3.blockchainapiservice.features.contract.abi.service.AbiProviderService
+import dev3.blockchainapiservice.model.DeserializableEvent
 import dev3.blockchainapiservice.model.json.ArtifactJson
 import dev3.blockchainapiservice.model.json.DecompiledContractJson
 import dev3.blockchainapiservice.model.json.ManifestJson
@@ -37,12 +39,14 @@ import dev3.blockchainapiservice.util.ZeroAddress
 import mu.KLogging
 import org.springframework.stereotype.Service
 import java.util.UUID
+import kotlin.math.min
 
 @Service
 @Suppress("LongParameterList", "TooManyFunctions")
 class ContractImportServiceImpl(
     private val abiDecoderService: AbiDecoderService,
     private val contractDecompilerService: ContractDecompilerService,
+    private val abiProviderService: AbiProviderService,
     private val functionEncoderService: FunctionEncoderService,
     private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,
     private val contractMetadataRepository: ContractMetadataRepository,
@@ -260,7 +264,11 @@ class ContractImportServiceImpl(
             chainId = project.chainId,
             customRpcUrl = project.customRpcUrl
         )
-        val contractDeploymentTransactionInfo = findContractDeploymentTransaction(params.contractAddress, chainSpec)
+        val contractDeploymentTransactionInfo = findContractDeploymentTransaction(
+            contractAddress = params.contractAddress,
+            chainSpec = chainSpec,
+            events = contractDecorator.getDeserializableEvents(objectMapper)
+        )
 
         val decoratorBinary = contractDecorator.binary.withPrefix
         val deployedBinary = when (contractDeploymentTransactionInfo) {
@@ -294,7 +302,11 @@ class ContractImportServiceImpl(
         projectId: UUID,
         previewDecorator: Boolean
     ): DecompiledContract {
-        val contractDeploymentTransactionInfo = findContractDeploymentTransaction(importContractAddress, chainSpec)
+        val contractDeploymentTransactionInfo = findContractDeploymentTransaction(
+            contractAddress = importContractAddress,
+            chainSpec = chainSpec,
+            events = emptyList()
+        )
 
         val (fullBinary, shortBinary) = when (contractDeploymentTransactionInfo) {
             is FullContractDeploymentTransactionInfo ->
@@ -303,19 +315,23 @@ class ContractImportServiceImpl(
             is ContractBinaryInfo ->
                 Pair(contractDeploymentTransactionInfo.binary.value, contractDeploymentTransactionInfo.binary.value)
         }
-        val constructorParamsStart = fullBinary.indexOf(shortBinary) + shortBinary.length
+        val constructorParamsStart = min(fullBinary.indexOf(shortBinary) + shortBinary.length, fullBinary.length)
 
         val constructorParams = fullBinary.substring(constructorParamsStart)
 
-        val (decompiledContract, implementationAddress) = contractDecompilerService
-            .decompile(ContractBinaryData(shortBinary)).let {
-                it.copy(
-                    artifact = it.artifact.copy(
-                        bytecode = FunctionData(fullBinary).withoutPrefix.removeSuffix(constructorParams),
-                        deployedBytecode = shortBinary
-                    )
-                ).resolveProxyContract(importContractAddress, chainSpec)
-            }
+        val (decompiledContract, implementationAddress) = getOrDecompileAbi(
+            bytecode = fullBinary,
+            deployedBytecode = ContractBinaryData(shortBinary),
+            contractAddress = importContractAddress,
+            chainSpec = chainSpec
+        ).let {
+            it.copy(
+                artifact = it.artifact.copy(
+                    bytecode = FunctionData(fullBinary).withoutPrefix.removeSuffix(constructorParams),
+                    deployedBytecode = shortBinary
+                )
+            ).resolveProxyContract(importContractAddress, chainSpec)
+        }
         val contractAddress = contractDeploymentTransactionInfo.deployedContractAddress
         val contractId = ContractId("imported-${contractAddress.rawValue}-${chainSpec.chainId.value}")
 
@@ -383,11 +399,15 @@ class ContractImportServiceImpl(
         )
     }
 
-    private fun findContractDeploymentTransaction(contractAddress: ContractAddress, chainSpec: ChainSpec) =
-        blockchainService.findContractDeploymentTransaction(
-            chainSpec = chainSpec,
-            contractAddress = contractAddress
-        ) ?: throw ContractNotFoundException(contractAddress)
+    private fun findContractDeploymentTransaction(
+        contractAddress: ContractAddress,
+        chainSpec: ChainSpec,
+        events: List<DeserializableEvent>
+    ) = blockchainService.findContractDeploymentTransaction(
+        chainSpec = chainSpec,
+        contractAddress = contractAddress,
+        events = events
+    ) ?: throw ContractNotFoundException(contractAddress)
 
     private fun DecompiledContractJson.resolveProxyContract(
         importContractAddress: ContractAddress,
@@ -395,8 +415,17 @@ class ContractImportServiceImpl(
     ): Pair<DecompiledContractJson, ContractAddress?> =
         if (this.manifest.functionDecorators.any { it.signature == "$PROXY_FUNCTION_NAME()" }) {
             val implementationAddress = findContractProxyImplementation(importContractAddress, chainSpec)
-            val implementationTransactionInfo = findContractDeploymentTransaction(implementationAddress, chainSpec)
-            val decompiledImplementation = contractDecompilerService.decompile(implementationTransactionInfo.binary)
+            val implementationTransactionInfo = findContractDeploymentTransaction(
+                contractAddress = implementationAddress,
+                chainSpec = chainSpec,
+                events = emptyList()
+            )
+            val decompiledImplementation = getOrDecompileAbi(
+                bytecode = implementationTransactionInfo.binary.value,
+                deployedBytecode = implementationTransactionInfo.binary,
+                contractAddress = implementationAddress,
+                chainSpec = chainSpec
+            )
 
             val implManifest = decompiledImplementation.manifest
             val eventDecorators = this.manifest.eventDecorators + implManifest.eventDecorators
@@ -550,4 +579,17 @@ class ContractImportServiceImpl(
             is Tuple -> mapFn(this)
             else -> this
         }
+
+    private fun getOrDecompileAbi(
+        bytecode: String,
+        deployedBytecode: ContractBinaryData,
+        contractAddress: ContractAddress,
+        chainSpec: ChainSpec
+    ): DecompiledContractJson =
+        abiProviderService.getContractAbi(
+            bytecode = bytecode,
+            deployedBytecode = deployedBytecode.value,
+            contractAddress = contractAddress,
+            chainSpec = chainSpec
+        ) ?: contractDecompilerService.decompile(deployedBytecode)
 }

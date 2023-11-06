@@ -9,8 +9,8 @@ import org.web3j.protocol.Web3jService
 import org.web3j.protocol.core.Request
 import org.web3j.protocol.core.methods.response.VoidResponse
 import org.web3j.protocol.http.HttpService
-import java.time.Duration
-import java.time.temporal.ChronoUnit
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 class HardhatTestContainer : GenericContainer<HardhatTestContainer>("gluwa/hardhat-dev:1.0.0") {
 
@@ -53,7 +53,7 @@ class HardhatTestContainer : GenericContainer<HardhatTestContainer>("gluwa/hardh
         waitStrategy = LogMessageWaitStrategy()
             .withRegEx("Started HTTP and WebSocket JSON-RPC server at .*")
             .withTimes(1)
-            .withStartupTimeout(Duration.of(60, ChronoUnit.SECONDS))
+            .withStartupTimeout(60.seconds.toJavaDuration())
 
         addExposedPort(HARDHAT_PORT)
         start()

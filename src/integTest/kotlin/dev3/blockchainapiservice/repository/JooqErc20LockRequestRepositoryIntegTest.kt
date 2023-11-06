@@ -17,7 +17,6 @@ import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.DurationSeconds
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -68,7 +67,8 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -113,7 +113,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         verify("ERC20 lock request is correctly fetched by ID") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     Erc20LockRequest(
                         id = id,
@@ -142,7 +142,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         verify("null is returned when fetching non-existent ERC20 lock request") {
             val result = repository.getById(UUID.randomUUID())
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isNull()
         }
     }
@@ -241,7 +241,7 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         verify("ERC20 lock requests are correctly fetched by project") {
             val result = repository.getAllByProjectId(PROJECT_ID)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .containsExactlyInAnyOrderElementsOf(
                     projectRequests.map {
                         Erc20LockRequest(
@@ -312,14 +312,14 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         )
 
         verify("storing ERC20 lock request returns correct result") {
-            assertThat(storedErc20LockRequest).withMessage()
+            expectThat(storedErc20LockRequest)
                 .isEqualTo(expectedErc20LockRequest)
         }
 
         verify("ERC20 lock request was stored in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(expectedErc20LockRequest)
         }
     }
@@ -350,14 +350,14 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("txInfo is correctly set in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     Erc20LockRequest(
                         id = id,
@@ -408,14 +408,14 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
 
         verify("setting txInfo will succeed") {
             val ignoredTokenSender = WalletAddress("f")
-            assertThat(repository.setTxInfo(id, TX_HASH, ignoredTokenSender)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, ignoredTokenSender))
                 .isTrue()
         }
 
         verify("txHash was correctly set while token sender was not updated") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     Erc20LockRequest(
                         id = id,
@@ -465,24 +465,24 @@ class JooqErc20LockRequestRepositoryIntegTest : TestBase() {
         }
 
         verify("setting txInfo will succeed") {
-            assertThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS)).withMessage()
+            expectThat(repository.setTxInfo(id, TX_HASH, TOKEN_SENDER_ADDRESS))
                 .isTrue()
         }
 
         verify("setting another txInfo will not succeed") {
-            assertThat(
+            expectThat(
                 repository.setTxInfo(
                     id,
                     TransactionHash("different-tx-hash"),
                     TOKEN_SENDER_ADDRESS
                 )
-            ).withMessage().isFalse()
+            ).isFalse()
         }
 
         verify("first txHash remains in database") {
             val result = repository.getById(id)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     Erc20LockRequest(
                         id = id,

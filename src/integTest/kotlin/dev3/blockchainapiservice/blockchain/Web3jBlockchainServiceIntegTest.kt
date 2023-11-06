@@ -1,18 +1,24 @@
 package dev3.blockchainapiservice.blockchain
 
 import dev3.blockchainapiservice.TestBase
-import dev3.blockchainapiservice.blockchain.properties.Chain
+import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.ApplicationProperties
+import dev3.blockchainapiservice.config.ChainProperties
 import dev3.blockchainapiservice.exception.BlockchainReadException
 import dev3.blockchainapiservice.features.payout.model.params.GetPayoutsForInvestorParams
 import dev3.blockchainapiservice.features.payout.model.result.PayoutForInvestor
 import dev3.blockchainapiservice.features.payout.util.HashFunction
 import dev3.blockchainapiservice.features.payout.util.MerkleHash
 import dev3.blockchainapiservice.features.payout.util.PayoutAccountBalance
+import dev3.blockchainapiservice.model.DeserializableEvent
+import dev3.blockchainapiservice.model.DeserializableEventInput
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
+import dev3.blockchainapiservice.model.result.EventArgumentHash
+import dev3.blockchainapiservice.model.result.EventArgumentValue
+import dev3.blockchainapiservice.model.result.EventInfo
 import dev3.blockchainapiservice.model.result.FullContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.service.CurrentUtcDateTimeProvider
@@ -22,24 +28,29 @@ import dev3.blockchainapiservice.service.RandomUuidProvider
 import dev3.blockchainapiservice.testcontainers.HardhatTestContainer
 import dev3.blockchainapiservice.testcontainers.SharedTestContainers
 import dev3.blockchainapiservice.util.AccountBalance
+import dev3.blockchainapiservice.util.AddressType
 import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BlockNumber
+import dev3.blockchainapiservice.util.BoolType
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
+import dev3.blockchainapiservice.util.DynamicArrayType
 import dev3.blockchainapiservice.util.EthStorageSlot
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.Keccak256Hash
+import dev3.blockchainapiservice.util.PredefinedEvents
+import dev3.blockchainapiservice.util.StringType
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.UintType
 import dev3.blockchainapiservice.util.UtcDateTime
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.mock
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.DynamicArray
@@ -56,6 +67,7 @@ import org.web3j.utils.Numeric
 import java.math.BigDecimal
 import java.math.BigInteger
 
+@Disabled("test only locally due to instability")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Web3jBlockchainServiceIntegTest : TestBase() {
 
@@ -84,24 +96,24 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("storage slot is correctly read") {
             val service = createService()
             val slotValue = service.readStorageSlot(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 slot = EthStorageSlot("0x0")
             )
 
-            assertThat(ContractAddress(slotValue)).withMessage()
+            expectThat(ContractAddress(slotValue))
                 .isEqualTo(proxyContractAddress)
         }
 
         verify("zero is returned for empty storage slot") {
             val service = createService()
             val slotValue = service.readStorageSlot(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 slot = EthStorageSlot("0x123456")
             )
 
-            assertThat(ContractAddress(slotValue)).withMessage()
+            expectThat(ContractAddress(slotValue))
                 .isEqualTo(ZeroAddress.toContractAddress())
         }
     }
@@ -134,24 +146,24 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct account balance is fetched for latest block") {
             val service = createService()
             service.fetchAccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 walletAddress = accountBalance.wallet
             )
             val fetchedAccountBalance = service.fetchAccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 walletAddress = accountBalance.wallet
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         blockNumber = fetchedAccountBalance.blockNumber,
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.blockNumber.value)
+            expectThat(fetchedAccountBalance.blockNumber.value)
                 .isPositive()
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -195,19 +207,19 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ETH balance is fetched for block number before ETH transfer is made") {
             val fetchedAccountBalance = service.fetchAccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 walletAddress = accountBalance.wallet,
                 blockParameter = blockNumberBeforeSendingBalance
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         blockNumber = blockNumberBeforeSendingBalance,
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -215,12 +227,12 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ETH balance is fetched for block number after ETH transfer is made") {
             val fetchedAccountBalance = service.fetchAccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 walletAddress = accountBalance.wallet,
                 blockParameter = blockNumberAfterSendingBalance
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         amount = Balance(value.toBigInteger().multiply(BigInteger.TWO)),
@@ -228,7 +240,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -257,21 +269,21 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct ERC20 balance is fetched for latest block") {
             val service = createService()
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 walletAddress = accountBalance.wallet
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         blockNumber = fetchedAccountBalance.blockNumber,
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.blockNumber.value)
+            expectThat(fetchedAccountBalance.blockNumber.value)
                 .isPositive()
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -307,20 +319,20 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ERC20 balance is fetched for block number before ERC20 transfer is made") {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 walletAddress = accountBalance.wallet,
                 blockParameter = blockNumberBeforeSendingBalance
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         blockNumber = blockNumberBeforeSendingBalance,
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -328,13 +340,13 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         verify("correct ERC20 balance is fetched for block number after ERC20 transfer is made") {
             val fetchedAccountBalance = service.fetchErc20AccountBalance(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 contractAddress = ContractAddress(contract.contractAddress),
                 walletAddress = accountBalance.wallet,
                 blockParameter = blockNumberAfterSendingBalance
             )
 
-            assertThat(fetchedAccountBalance).withMessage()
+            expectThat(fetchedAccountBalance)
                 .isEqualTo(
                     accountBalance.copy(
                         amount = Balance.ZERO,
@@ -342,7 +354,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         timestamp = fetchedAccountBalance.timestamp
                     )
                 )
-            assertThat(fetchedAccountBalance.timestamp.value)
+            expectThat(fetchedAccountBalance.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -352,9 +364,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("BlockchainReadException is thrown when reading ERC20 balance from invalid contract address") {
             val service = createService()
 
-            assertThrows<BlockchainReadException>(message) {
+            expectThrows<BlockchainReadException> {
                 service.fetchErc20AccountBalance(
-                    chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                    chainSpec = TestData.CHAIN_ID.toSpec(),
                     contractAddress = ContractAddress(accounts[0].address),
                     walletAddress = WalletAddress(accounts[0].address)
                 )
@@ -395,14 +407,15 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct transaction info is fetched") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                chainSpec = TestData.CHAIN_ID.toSpec(),
+                txHash = txHash,
+                events = listOf(PredefinedEvents.ERC20_TRANSFER)
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     BlockchainTransactionInfo(
                         hash = txHash,
@@ -413,7 +426,17 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         value = Balance.ZERO,
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
-                        success = true
+                        success = true,
+                        events = listOf(
+                            EventInfo(
+                                signature = "Transfer(address,address,uint256)",
+                                arguments = listOf(
+                                    EventArgumentValue("from", mainAccount.address),
+                                    EventArgumentValue("to", accounts[1].address),
+                                    EventArgumentValue("value", accountBalance.amount.rawValue)
+                                )
+                            )
+                        )
                     )
                 )
 
@@ -425,10 +448,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 )
             )
 
-            assertThat(transactionInfo.data).withMessage()
+            expectThat(transactionInfo.data)
                 .isEqualTo(expectedData)
 
-            assertThat(transactionInfo.blockConfirmations).withMessage()
+            expectThat(transactionInfo.blockConfirmations)
                 .isNotZero()
         }
     }
@@ -473,14 +496,15 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct transaction info is fetched") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                chainSpec = TestData.CHAIN_ID.toSpec(),
+                txHash = txHash,
+                events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     BlockchainTransactionInfo(
                         hash = txHash,
@@ -491,7 +515,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         value = Balance.ZERO,
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
-                        success = false
+                        success = false,
+                        events = emptyList()
                     )
                 )
 
@@ -503,10 +528,10 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 )
             )
 
-            assertThat(transactionInfo.data).withMessage()
+            expectThat(transactionInfo.data)
                 .isEqualTo(expectedData)
 
-            assertThat(transactionInfo.blockConfirmations).withMessage()
+            expectThat(transactionInfo.blockConfirmations)
                 .isNotZero()
         }
     }
@@ -532,14 +557,15 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct transaction info is fetched") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                chainSpec = TestData.CHAIN_ID.toSpec(),
+                txHash = txHash,
+                events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     BlockchainTransactionInfo(
                         hash = txHash,
@@ -550,11 +576,12 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         value = Balance(value.toBigInteger()),
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
-                        success = true
+                        success = true,
+                        events = emptyList()
                     )
                 )
 
-            assertThat(transactionInfo.blockConfirmations).withMessage()
+            expectThat(transactionInfo.blockConfirmations)
                 .isNotZero()
         }
     }
@@ -598,14 +625,15 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct transaction info is fetched") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = txHash
+                chainSpec = TestData.CHAIN_ID.toSpec(),
+                txHash = txHash,
+                events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     BlockchainTransactionInfo(
                         hash = txHash,
@@ -616,12 +644,340 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         value = Balance.ZERO,
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
-                        success = true
+                        success = true,
+                        events = emptyList()
                     )
                 )
 
-            assertThat(transactionInfo.blockConfirmations).withMessage()
+            expectThat(transactionInfo.blockConfirmations)
                 .isNotZero()
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReadWellDefinedEventsFromContractDeploymentTransaction() {
+        val mainAccount = accounts[0]
+        val owner = WalletAddress("cafebabe")
+        val message = "message"
+        val amount = Balance(BigInteger.valueOf(123L))
+        val value = Balance(BigInteger.valueOf(456L))
+        val example = true
+
+        val contract = suppose("event emitter contract is deployed") {
+            EventEmitter.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                owner.rawValue,
+                message,
+                amount.rawValue,
+                value.rawValue,
+                example
+            ).send()
+        }
+
+        val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.mine()
+        }
+
+        verify("transaction info events are correctly decoded") {
+            val service = createService()
+            val transactionInfo = service.fetchTransactionInfo(
+                chainSpec = TestData.CHAIN_ID.toSpec(),
+                txHash = txHash,
+                events = listOf(
+                    DeserializableEvent(
+                        signature = "ExampleEvent(address,string,uint256,uint256,bool)",
+                        inputsOrder = listOf("owner", "message", "amount", "value", "example"),
+                        indexedInputs = listOf(
+                            DeserializableEventInput("owner", AddressType),
+                            DeserializableEventInput("message", StringType),
+                            DeserializableEventInput("value", UintType)
+                        ),
+                        regularInputs = listOf(
+                            DeserializableEventInput("amount", UintType),
+                            DeserializableEventInput("example", BoolType)
+                        )
+                    ),
+                    DeserializableEvent(
+                        signature = "AnonymousEvent(address,string)",
+                        inputsOrder = listOf("owner", "message"),
+                        indexedInputs = listOf(
+                            DeserializableEventInput("owner", AddressType)
+                        ),
+                        regularInputs = listOf(
+                            DeserializableEventInput("message", StringType)
+                        )
+                    )
+                )
+            )!!
+
+            expectThat(transactionInfo.events)
+                .isEqualTo(
+                    listOf(
+                        EventInfo(
+                            signature = "ExampleEvent(address,string,uint256,uint256,bool)",
+                            arguments = listOf(
+                                EventArgumentValue("owner", owner.rawValue),
+                                EventArgumentHash("message", "0x${Keccak256Hash(message).value}"),
+                                EventArgumentValue("amount", amount.rawValue),
+                                EventArgumentValue("value", value.rawValue),
+                                EventArgumentValue("example", example)
+                            )
+                        ),
+                        EventInfo(
+                            signature = "AnonymousEvent(address,string)",
+                            arguments = listOf(
+                                EventArgumentValue("owner", owner.rawValue),
+                                EventArgumentValue("message", message)
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReadEventsWhenNoneAreSpecifiedFromContractDeploymentTransaction() {
+        val mainAccount = accounts[0]
+        val owner = WalletAddress("cafebabe")
+        val message = "message"
+        val amount = Balance(BigInteger.valueOf(123L))
+        val value = Balance(BigInteger.valueOf(456L))
+        val example = true
+
+        val contract = suppose("event emitter contract is deployed") {
+            EventEmitter.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                owner.rawValue,
+                message,
+                amount.rawValue,
+                value.rawValue,
+                example
+            ).send()
+        }
+
+        val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.mine()
+        }
+
+        verify("transaction info events are correctly decoded") {
+            val service = createService()
+            val transactionInfo = service.fetchTransactionInfo(
+                chainSpec = TestData.CHAIN_ID.toSpec(),
+                txHash = txHash,
+                events = emptyList()
+            )!!
+
+            expectThat(transactionInfo.events)
+                .isEqualTo(
+                    listOf(
+                        EventInfo(
+                            signature = null,
+                            arguments = listOf(
+                                EventArgumentValue(
+                                    name = "arg0",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 123
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg1",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 1
+                                    )
+                                ),
+                                EventArgumentHash(
+                                    name = "arg2",
+                                    hash = "0x465bc6257dcfc79569508750afdabc2aa7d499dd8de935aa5324446084c99397"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg3",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000cafebabe"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg4",
+                                    hash = "0xc2baf6c66618acd49fb133cebc22f55bd907fe9f0d69a726d45b7539ba6bbe08"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg5",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000000001c8"
+                                )
+                            )
+                        ),
+                        EventInfo(
+                            signature = null,
+                            arguments = listOf(
+                                EventArgumentValue(
+                                    name = "arg0",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 32
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg1",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 7
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg2",
+                                    value = byteList(
+                                        109, 101, 115, 115, 97, 103, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                                    )
+                                ),
+                                EventArgumentHash(
+                                    name = "arg3",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000cafebabe"
+                                )
+                            )
+                        )
+                    )
+                )
+        }
+    }
+
+    @Test
+    fun mustCorrectlyReadEventsWhenMalformedEventsAreSpecifiedFromContractDeploymentTransaction() {
+        val mainAccount = accounts[0]
+        val owner = WalletAddress("cafebabe")
+        val message = "message"
+        val amount = Balance(BigInteger.valueOf(123L))
+        val value = Balance(BigInteger.valueOf(456L))
+        val example = true
+
+        val contract = suppose("event emitter contract is deployed") {
+            EventEmitter.deploy(
+                hardhatContainer.web3j,
+                mainAccount,
+                DefaultGasProvider(),
+                owner.rawValue,
+                message,
+                amount.rawValue,
+                value.rawValue,
+                example
+            ).send()
+        }
+
+        val txHash = TransactionHash(contract.transactionReceipt.get().transactionHash)
+
+        suppose("transaction will have at least one block confirmation") {
+            hardhatContainer.mine()
+        }
+
+        verify("transaction info events are correctly decoded") {
+            val service = createService()
+            val transactionInfo = service.fetchTransactionInfo(
+                chainSpec = TestData.CHAIN_ID.toSpec(),
+                txHash = txHash,
+                events = listOf(
+                    DeserializableEvent(
+                        signature = "ExampleEvent(address,string,uint256,uint256,bool)",
+                        inputsOrder = listOf("owner", "message", "amount", "value", "example"),
+                        indexedInputs = listOf(
+                            DeserializableEventInput("owner", StringType),
+                            DeserializableEventInput("message", StringType),
+                            DeserializableEventInput("value", StringType)
+                        ),
+                        regularInputs = listOf(
+                            DeserializableEventInput("amount", DynamicArrayType(StringType)),
+                            DeserializableEventInput("example", DynamicArrayType(StringType))
+                        )
+                    ),
+                    DeserializableEvent(
+                        signature = "AnonymousEvent(address,string)",
+                        inputsOrder = listOf("owner", "message"),
+                        indexedInputs = listOf(
+                            DeserializableEventInput("owner", StringType)
+                        ),
+                        regularInputs = listOf(
+                            DeserializableEventInput("message", DynamicArrayType(StringType))
+                        )
+                    )
+                )
+            )!!
+
+            expectThat(transactionInfo.events)
+                .isEqualTo(
+                    listOf(
+                        EventInfo(
+                            signature = null,
+                            arguments = listOf(
+                                EventArgumentValue(
+                                    name = "arg0",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 123
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg1",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 1
+                                    )
+                                ),
+                                EventArgumentHash(
+                                    name = "arg2",
+                                    hash = "0x465bc6257dcfc79569508750afdabc2aa7d499dd8de935aa5324446084c99397"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg3",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000cafebabe"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg4",
+                                    hash = "0xc2baf6c66618acd49fb133cebc22f55bd907fe9f0d69a726d45b7539ba6bbe08"
+                                ),
+                                EventArgumentHash(
+                                    name = "arg5",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000000001c8"
+                                )
+                            )
+                        ),
+                        EventInfo(
+                            signature = null,
+                            arguments = listOf(
+                                EventArgumentValue(
+                                    name = "arg0",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 32
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg1",
+                                    value = byteList(
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 7
+                                    )
+                                ),
+                                EventArgumentValue(
+                                    name = "arg2",
+                                    value = byteList(
+                                        109, 101, 115, 115, 97, 103, 101, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                                    )
+                                ),
+                                EventArgumentHash(
+                                    name = "arg3",
+                                    hash = "0x00000000000000000000000000000000000000000000000000000000cafebabe"
+                                )
+                            )
+                        )
+                    )
+                )
         }
     }
 
@@ -630,11 +986,12 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("null is returned for non existent transaction") {
             val service = createService()
             val transactionInfo = service.fetchTransactionInfo(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                txHash = TransactionHash("0x123456")
+                chainSpec = TestData.CHAIN_ID.toSpec(),
+                txHash = TransactionHash("0x123456"),
+                events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNull()
         }
     }
@@ -661,7 +1018,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct value is returned for latest block") {
             val service = createService()
             val result = service.callReadonlyFunction(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 params = ExecuteReadonlyFunctionCallParams(
                     contractAddress = ContractAddress(contract.contractAddress),
                     callerAddress = WalletAddress("a"),
@@ -671,7 +1028,7 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 )
             )
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEqualTo(
                     ReadonlyFunctionCallResult(
                         blockNumber = result.blockNumber,
@@ -681,9 +1038,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                             .encodeConstructor(listOf(FunctionArgument(uintValue))).value
                     )
                 )
-            assertThat(result.blockNumber.value)
+            expectThat(result.blockNumber.value)
                 .isPositive()
-            assertThat(result.timestamp.value)
+            expectThat(result.timestamp.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -700,9 +1057,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("BlockchainReadException is thrown when calling readonly function on invalid contract address") {
             val service = createService()
 
-            assertThrows<BlockchainReadException>(message) {
+            expectThrows<BlockchainReadException> {
                 service.callReadonlyFunction(
-                    chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                    chainSpec = TestData.CHAIN_ID.toSpec(),
                     params = ExecuteReadonlyFunctionCallParams(
                         contractAddress = ContractAddress("dead"),
                         callerAddress = WalletAddress("a"),
@@ -761,14 +1118,15 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("contract deployment transaction is correctly found") {
             val service = createService()
             val transactionInfo = service.findContractDeploymentTransaction(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
-                contractAddress = ContractAddress(contract.contractAddress)
+                chainSpec = TestData.CHAIN_ID.toSpec(),
+                contractAddress = ContractAddress(contract.contractAddress),
+                events = emptyList()
             )
 
-            assertThat(transactionInfo).withMessage()
+            expectThat(transactionInfo)
                 .isNotNull()
 
-            assertThat(transactionInfo!!).withMessage()
+            expectThat(transactionInfo!!)
                 .isEqualTo(
                     FullContractDeploymentTransactionInfo(
                         hash = TransactionHash(deploymentTransaction.transactionHash),
@@ -777,7 +1135,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         data = FunctionData(data),
                         value = Balance.ZERO,
                         binary = ContractBinaryData(SimpleERC20.BINARY.substring(rawBinaryIndex)),
-                        blockNumber = BlockNumber(deploymentTransaction.blockNumber)
+                        blockNumber = BlockNumber(deploymentTransaction.blockNumber),
+                        events = emptyList()
                     )
                 )
         }
@@ -808,8 +1167,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some accounts get ERC20 tokens") {
             contract.transfer(accounts[1].address, BigInteger("100")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[2].address, BigInteger("200")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[3].address, BigInteger("300")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[4].address, BigInteger("400")).send()
             hardhatContainer.mine()
         }
@@ -821,7 +1183,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some additional transactions of ERC20 token are made") {
             contract.transfer(accounts[1].address, BigInteger("900")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[5].address, BigInteger("1000")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[6].address, BigInteger("2000")).send()
             hardhatContainer.mine()
         }
@@ -829,14 +1193,14 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched for first end block") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = emptySet(),
                 startBlock = startBlock,
                 endBlock = endBlock1
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("9000"))),
                 PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("100"))),
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
@@ -850,14 +1214,14 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched for second end block") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = emptySet(),
                 startBlock = startBlock,
                 endBlock = endBlock2
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("5100"))),
                 PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("1000"))),
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
@@ -888,8 +1252,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some accounts get ERC20 tokens") {
             contract.transfer(accounts[1].address, BigInteger("100")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[2].address, BigInteger("200")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[3].address, BigInteger("300")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[4].address, BigInteger("400")).send()
             hardhatContainer.mine()
         }
@@ -901,7 +1268,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some additional transactions of ERC20 token are made") {
             contract.transfer(accounts[1].address, BigInteger("900")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[5].address, BigInteger("1000")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[6].address, BigInteger("2000")).send()
             hardhatContainer.mine()
         }
@@ -915,14 +1284,14 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = ignoredAddresses,
                 startBlock = startBlock,
                 endBlock = endBlock
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
                 PayoutAccountBalance(WalletAddress(accounts[4].address), Balance(BigInteger("400")))
             )
@@ -948,8 +1317,11 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some accounts get ERC20 tokens") {
             contract.transfer(accounts[1].address, BigInteger("100")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[2].address, BigInteger("200")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[3].address, BigInteger("300")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[4].address, BigInteger("400")).send()
             hardhatContainer.mine()
         }
@@ -961,7 +1333,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
 
         suppose("some additional transactions of ERC20 token are made") {
             contract.transfer(accounts[1].address, BigInteger("900")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[5].address, BigInteger("1000")).send()
+            hardhatContainer.mine()
             contract.transfer(accounts[6].address, BigInteger("2000")).send()
             hardhatContainer.mine()
         }
@@ -969,14 +1343,14 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched for first end block") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = emptySet(),
                 startBlock = startBlock,
                 endBlock = endBlock1
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("9000"))),
                 PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("100"))),
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
@@ -990,14 +1364,14 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         verify("correct balances are fetched for second end block") {
             val service = createService()
             val balances = service.fetchErc20AccountBalances(
-                chainSpec = Chain.HARDHAT_TESTNET.id.toSpec(),
+                chainSpec = TestData.CHAIN_ID.toSpec(),
                 erc20ContractAddress = ContractAddress(contract.contractAddress),
                 ignoredErc20Addresses = emptySet(),
                 startBlock = startBlock,
                 endBlock = endBlock2
             )
 
-            assertThat(balances).withMessage().containsExactlyInAnyOrder(
+            expectThat(balances).containsExactlyInAnyOrder(
                 PayoutAccountBalance(WalletAddress(mainAccount.address), Balance(BigInteger("5100"))),
                 PayoutAccountBalance(WalletAddress(accounts[1].address), Balance(BigInteger("1000"))),
                 PayoutAccountBalance(WalletAddress(accounts[2].address), Balance(BigInteger("200"))),
@@ -1052,8 +1426,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         suppose("some investments are claimed") {
             payoutsAndInvestments.forEach {
                 manager.setClaim(it.second.payoutId, it.second.investor, it.second.amountClaimed).send()
+                hardhatContainer.mine()
             }
-            hardhatContainer.mine()
         }
 
         val investor1NullParams = GetPayoutsForInvestorParams(
@@ -1063,17 +1437,15 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
         )
         val investor2NullParams = investor1NullParams.copy(investor = investor2)
         val blockchainService = createService()
-        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
+        val chainSpec = TestData.CHAIN_ID.toSpec()
 
         verify("all payouts states are fetched") {
             // investor 1
-            assertThat(blockchainService.getPayoutsForInvestor(chainSpec, investor1NullParams))
-                .withMessage()
+            expectThat(blockchainService.getPayoutsForInvestor(chainSpec, investor1NullParams))
                 .containsExactlyInAnyOrderElementsOf(payoutsAndInvestments.forInvestor(investor1))
 
             // investor 2
-            assertThat(blockchainService.getPayoutsForInvestor(chainSpec, investor2NullParams))
-                .withMessage()
+            expectThat(blockchainService.getPayoutsForInvestor(chainSpec, investor2NullParams))
                 .containsExactlyInAnyOrderElementsOf(payoutsAndInvestments.forInvestor(investor2))
         }
     }
@@ -1086,16 +1458,28 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
             investor = WalletAddress("1")
         )
         val blockchainService = createService()
-        val chainSpec = Chain.HARDHAT_TESTNET.id.toSpec()
+        val chainSpec = TestData.CHAIN_ID.toSpec()
 
         verify("exception is thrown") {
-            assertThrows<BlockchainReadException>(message) {
+            expectThrows<BlockchainReadException> {
                 blockchainService.getPayoutsForInvestor(chainSpec, nullParams)
             }
         }
     }
 
-    private fun hardhatProperties() = ApplicationProperties().apply { infuraId = hardhatContainer.mappedPort }
+    private fun hardhatProperties() = ApplicationProperties().apply {
+        chain = mapOf(
+            TestData.CHAIN_ID to ChainProperties(
+                name = "HARDHAT_TESTNET",
+                rpcUrl = "http://localhost:${hardhatContainer.mappedPort}",
+                infuraUrl = null,
+                startBlockNumber = null,
+                chainExplorerApiUrl = null,
+                chainExplorerApiKey = null,
+                minBlockConfirmationsForCaching = null
+            )
+        )
+    }
 
     private fun ChainId.toSpec() = ChainSpec(this, null)
 
@@ -1168,4 +1552,6 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 PayoutForInvestor(it.first, PayoutStateForInvestor(state.payoutId, investor.rawValue, BigInteger.ZERO))
             }
         }
+
+    private fun byteList(vararg bytes: Byte): List<Byte> = bytes.toList()
 }

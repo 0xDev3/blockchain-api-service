@@ -2,13 +2,17 @@ package dev3.blockchainapiservice.util
 
 import org.web3j.abi.datatypes.Address
 import org.web3j.abi.datatypes.Uint
+import org.web3j.crypto.Hash
 import org.web3j.protocol.core.DefaultBlockParameter
 import org.web3j.protocol.core.DefaultBlockParameterName
 import java.math.BigInteger
-import java.time.Duration
 import java.time.Instant
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 @JvmInline
 value class UtcDateTime private constructor(val value: OffsetDateTime) {
@@ -20,13 +24,14 @@ value class UtcDateTime private constructor(val value: OffsetDateTime) {
         )
     }
 
-    operator fun plus(duration: Duration): UtcDateTime = UtcDateTime(value + duration)
-    operator fun minus(duration: Duration): UtcDateTime = UtcDateTime(value - duration)
+    operator fun plus(duration: Duration): UtcDateTime = UtcDateTime(value + duration.toJavaDuration())
+    operator fun minus(duration: Duration): UtcDateTime = UtcDateTime(value - duration.toJavaDuration())
 
-    operator fun plus(duration: DurationSeconds): UtcDateTime = UtcDateTime(value + duration.toDuration())
-    operator fun minus(duration: DurationSeconds): UtcDateTime = UtcDateTime(value - duration.toDuration())
+    operator fun plus(duration: DurationSeconds): UtcDateTime = UtcDateTime(value + duration.toJavaDuration())
+    operator fun minus(duration: DurationSeconds): UtcDateTime = UtcDateTime(value - duration.toJavaDuration())
 
-    fun isAfter(other: UtcDateTime): Boolean = value.isAfter(other.value)
+    val iso: String
+        get() = DateTimeFormatter.ISO_DATE_TIME.format(value)
 }
 
 sealed interface EthereumAddress {
@@ -79,7 +84,8 @@ value class Balance(override val value: Uint) : EthereumUint {
 value class DurationSeconds(override val value: Uint) : EthereumUint {
     constructor(value: BigInteger) : this(Uint(value))
 
-    fun toDuration(): Duration = Duration.ofSeconds(rawValue.longValueExact())
+    fun toDuration(): Duration = rawValue.longValueExact().seconds
+    fun toJavaDuration(): java.time.Duration = toDuration().toJavaDuration()
 }
 
 @JvmInline
@@ -91,7 +97,7 @@ sealed interface BlockParameter {
 
 @JvmInline
 value class BlockNumber(val value: BigInteger) : BlockParameter {
-    override fun toWeb3Parameter() = DefaultBlockParameter.valueOf(value)
+    override fun toWeb3Parameter(): DefaultBlockParameter = DefaultBlockParameter.valueOf(value)
 }
 
 enum class BlockName(private val web3BlockName: DefaultBlockParameterName) : BlockParameter {
@@ -175,6 +181,8 @@ value class InterfaceId private constructor(val value: String) {
     companion object {
         operator fun invoke(value: String) = InterfaceId(value.replace('/', '.').lowercase())
     }
+
+    fun isImported() = value.contains("imported")
 }
 
 @JvmInline
@@ -187,4 +195,12 @@ value class EthStorageSlot(val value: BigInteger) {
 
     val hex: String
         get() = "0x${value.toString(HEX_RADIX).lowercase().removePrefix("0x")}"
+}
+
+@JvmInline
+value class Keccak256Hash private constructor(val value: String) {
+    companion object {
+        operator fun invoke(value: String) = Keccak256Hash(Hash.sha3String(value).lowercase().removePrefix("0x"))
+        fun raw(value: String) = Keccak256Hash(value.lowercase().removePrefix("0x"))
+    }
 }

@@ -20,20 +20,16 @@ import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.PredefinedEvents
 import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AssetMultiSendRequestServiceTest : TestBase() {
 
@@ -113,7 +109,8 @@ class AssetMultiSendRequestServiceTest : TestBase() {
             value = Balance.ZERO,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
         private val ENCODED_DISPERSE_ETHER_DATA = FunctionData("encoded-disperse-ether")
         private val DISPERSE_ETHER_TX_INFO = BlockchainTransactionInfo(
@@ -125,13 +122,16 @@ class AssetMultiSendRequestServiceTest : TestBase() {
             value = TOTAL_TOKEN_AMOUNT,
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
-            success = true
+            success = true,
+            events = emptyList()
         )
         private val ENCODED_DISPERSE_TOKEN_DATA = FunctionData("encoded-disperse-token")
         private val DISPERSE_TOKEN_TX_INFO = DISPERSE_ETHER_TX_INFO.copy(
             data = ENCODED_DISPERSE_TOKEN_DATA,
             value = Balance.ZERO
         )
+        private val APPROVAL_EVENTS = listOf(PredefinedEvents.ERC20_APPROVAL)
+        private val TRANSFER_EVENTS = listOf(PredefinedEvents.ERC20_TRANSFER)
     }
 
     @Test
@@ -139,21 +139,21 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(ID)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -168,7 +168,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
 
         suppose("asset multi-send request is stored in database") {
-            given(assetMultiSendRequestRepository.store(STORE_PARAMS))
+            call(assetMultiSendRequestRepository.store(STORE_PARAMS))
                 .willReturn(STORED_REQUEST)
         }
 
@@ -184,12 +184,12 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request is correctly created") {
-            assertThat(service.createAssetMultiSendRequest(CREATE_PARAMS, PROJECT)).withMessage()
+            expectThat(service.createAssetMultiSendRequest(CREATE_PARAMS, PROJECT))
                 .isEqualTo(WithFunctionDataOrEthValue(STORED_REQUEST, ENCODED_APPROVE_DATA, null))
 
-            verifyMock(assetMultiSendRequestRepository)
-                .store(STORE_PARAMS)
-            verifyNoMoreInteractions(assetMultiSendRequestRepository)
+            expectInteractions(assetMultiSendRequestRepository) {
+                once.store(STORE_PARAMS)
+            }
         }
     }
 
@@ -198,21 +198,21 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val uuidProvider = mock<UuidProvider>()
 
         suppose("some UUID will be generated") {
-            given(uuidProvider.getUuid())
+            call(uuidProvider.getUuid())
                 .willReturn(ID)
         }
 
         val utcDateTimeProvider = mock<UtcDateTimeProvider>()
 
         suppose("some timestamp will be returned") {
-            given(utcDateTimeProvider.getUtcDateTime())
+            call(utcDateTimeProvider.getUtcDateTime())
                 .willReturn(TestData.TIMESTAMP)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -230,7 +230,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null)
 
         suppose("asset multi-send request is stored in database") {
-            given(assetMultiSendRequestRepository.store(storeParams))
+            call(assetMultiSendRequestRepository.store(storeParams))
                 .willReturn(storedRequest)
         }
 
@@ -246,13 +246,12 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request is correctly created") {
-            assertThat(service.createAssetMultiSendRequest(CREATE_PARAMS.copy(tokenAddress = null), PROJECT))
-                .withMessage()
+            expectThat(service.createAssetMultiSendRequest(CREATE_PARAMS.copy(tokenAddress = null), PROJECT))
                 .isEqualTo(WithFunctionDataOrEthValue(storedRequest, ENCODED_DISPERSE_ETHER_DATA, TOTAL_TOKEN_AMOUNT))
 
-            verifyMock(assetMultiSendRequestRepository)
-                .store(storeParams)
-            verifyNoMoreInteractions(assetMultiSendRequestRepository)
+            expectInteractions(assetMultiSendRequestRepository) {
+                once.store(storeParams)
+            }
         }
     }
 
@@ -261,7 +260,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
 
         suppose("asset multi-send request does not exist in database") {
-            given(assetMultiSendRequestRepository.getById(any()))
+            call(assetMultiSendRequestRepository.getById(any()))
                 .willReturn(null)
         }
 
@@ -277,7 +276,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("ResourceNotFoundException is thrown") {
-            assertThrows<ResourceNotFoundException>(message) {
+            expectThrows<ResourceNotFoundException> {
                 service.getAssetMultiSendRequest(id = UUID.randomUUID())
             }
         }
@@ -288,14 +287,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(STORED_REQUEST)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -319,7 +318,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with pending approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     STORED_REQUEST.withMultiTransactionData(
                         approveStatus = Status.PENDING,
@@ -340,14 +339,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -371,7 +370,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with pending disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -392,7 +391,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -400,14 +399,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(storedRequest.chainId, null)
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(null)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -431,7 +430,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with pending approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.PENDING,
@@ -452,7 +451,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null, disperseTxHash = DISPERSE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -460,14 +459,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(storedRequest.chainId, null)
 
         suppose("transaction is not yet mined") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(null)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -491,7 +490,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with pending disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -512,7 +511,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -521,14 +520,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(success = false)
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -552,7 +551,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.FAILED,
@@ -573,7 +572,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null, disperseTxHash = DISPERSE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -582,14 +581,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(success = false)
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -613,7 +612,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -634,7 +633,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -643,14 +642,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(hash = TransactionHash("wrong"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -674,7 +673,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.FAILED,
@@ -695,7 +694,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null, disperseTxHash = DISPERSE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -704,14 +703,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(hash = TransactionHash("wrong"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -735,7 +734,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -756,7 +755,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -765,14 +764,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(from = WalletAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -796,7 +795,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.FAILED,
@@ -817,7 +816,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null, disperseTxHash = DISPERSE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -826,14 +825,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(from = WalletAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -857,7 +856,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -878,7 +877,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -887,14 +886,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(to = WalletAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -918,7 +917,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.FAILED,
@@ -939,7 +938,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null, disperseTxHash = DISPERSE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -948,14 +947,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(to = WalletAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -979,7 +978,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -1000,7 +999,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1009,14 +1008,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(deployedContractAddress = ContractAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -1040,7 +1039,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.FAILED,
@@ -1061,7 +1060,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null, disperseTxHash = DISPERSE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1070,14 +1069,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(deployedContractAddress = ContractAddress("dead"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -1101,7 +1100,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -1122,7 +1121,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1131,14 +1130,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(data = FunctionData("mismatching"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -1162,7 +1161,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.FAILED,
@@ -1183,7 +1182,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null, disperseTxHash = DISPERSE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1192,14 +1191,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(data = FunctionData("mismatching"))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -1223,7 +1222,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -1244,7 +1243,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1253,14 +1252,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO.copy(value = Balance(BigInteger.ONE))
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -1284,7 +1283,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.FAILED,
@@ -1305,7 +1304,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null, disperseTxHash = DISPERSE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1314,14 +1313,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO.copy(value = Balance.ZERO)
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -1345,7 +1344,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with failed disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -1366,7 +1365,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1375,14 +1374,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded for approve transaction") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -1395,7 +1394,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         }
 
         suppose("function data will be encoded for disperse transaction") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseToken",
                     arguments = listOf(
@@ -1420,7 +1419,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with successful approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.SUCCESS,
@@ -1441,7 +1440,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(tokenAddress = null, disperseTxHash = DISPERSE_TX_HASH)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1450,14 +1449,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -1481,7 +1480,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with successful disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -1502,7 +1501,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val storedRequest = STORED_REQUEST.copy(approveTxHash = APPROVE_TX_HASH, assetSenderAddress = null)
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1511,14 +1510,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = APPROVE_TX_INFO
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded for approve transaction") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -1531,7 +1530,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         }
 
         suppose("function data will be encoded for disperse transaction") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseToken",
                     arguments = listOf(
@@ -1556,7 +1555,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with pending successful status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.SUCCESS,
@@ -1581,7 +1580,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1590,14 +1589,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val transactionInfo = DISPERSE_ETHER_TX_INFO
 
         suppose("transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(transactionInfo)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseEther",
                     arguments = listOf(
@@ -1621,7 +1620,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with successful disperse status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = null,
@@ -1645,7 +1644,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getById(ID))
+            call(assetMultiSendRequestRepository.getById(ID))
                 .willReturn(storedRequest)
         }
 
@@ -1653,19 +1652,19 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val chainSpec = ChainSpec(storedRequest.chainId, null)
 
         suppose("approve transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, APPROVE_TX_HASH, APPROVAL_EVENTS))
                 .willReturn(APPROVE_TX_INFO)
         }
 
         suppose("disperse transaction is returned") {
-            given(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH))
+            call(blockchainService.fetchTransactionInfo(chainSpec, DISPERSE_TX_HASH, TRANSFER_EVENTS))
                 .willReturn(DISPERSE_TOKEN_TX_INFO)
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded for approve transaction") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -1678,7 +1677,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         }
 
         suppose("function data will be encoded for disperse transaction") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "disperseToken",
                     arguments = listOf(
@@ -1703,7 +1702,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with successful approve status is returned") {
-            assertThat(service.getAssetMultiSendRequest(ID)).withMessage()
+            expectThat(service.getAssetMultiSendRequest(ID))
                 .isEqualTo(
                     storedRequest.withMultiTransactionData(
                         approveStatus = Status.SUCCESS,
@@ -1723,14 +1722,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getAllByProjectId(PROJECT.id))
+            call(assetMultiSendRequestRepository.getAllByProjectId(PROJECT.id))
                 .willReturn(listOf(STORED_REQUEST))
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -1754,8 +1753,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request is returned") {
-            assertThat(service.getAssetMultiSendRequestsByProjectId(PROJECT.id))
-                .withMessage()
+            expectThat(service.getAssetMultiSendRequestsByProjectId(PROJECT.id))
                 .isEqualTo(
                     listOf(
                         STORED_REQUEST.withMultiTransactionData(
@@ -1789,7 +1787,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         verify("empty list is returned") {
             val result = service.getAssetMultiSendRequestsByProjectId(projectId)
 
-            assertThat(result).withMessage()
+            expectThat(result)
                 .isEmpty()
         }
     }
@@ -1799,14 +1797,14 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val assetMultiSendRequestRepository = mock<AssetMultiSendRequestRepository>()
 
         suppose("asset multi-send request exists in database") {
-            given(assetMultiSendRequestRepository.getBySender(STORED_REQUEST.assetSenderAddress!!))
+            call(assetMultiSendRequestRepository.getBySender(STORED_REQUEST.assetSenderAddress!!))
                 .willReturn(listOf(STORED_REQUEST))
         }
 
         val functionEncoderService = mock<FunctionEncoderService>()
 
         suppose("function data will be encoded") {
-            given(
+            call(
                 functionEncoderService.encode(
                     functionName = "approve",
                     arguments = listOf(
@@ -1830,7 +1828,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("asset multi-send request with successful status is returned") {
-            assertThat(service.getAssetMultiSendRequestsBySender(STORED_REQUEST.assetSenderAddress!!)).withMessage()
+            expectThat(service.getAssetMultiSendRequestsBySender(STORED_REQUEST.assetSenderAddress!!))
                 .isEqualTo(
                     listOf(
                         STORED_REQUEST.withMultiTransactionData(
@@ -1854,7 +1852,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("approve txInfo will be successfully attached to the request") {
-            given(assetMultiSendRequestRepository.setApproveTxInfo(id, APPROVE_TX_HASH, caller))
+            call(assetMultiSendRequestRepository.setApproveTxInfo(id, APPROVE_TX_HASH, caller))
                 .willReturn(true)
         }
 
@@ -1872,9 +1870,9 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         verify("approve txInfo was successfully attached") {
             service.attachApproveTxInfo(id, APPROVE_TX_HASH, caller)
 
-            verifyMock(assetMultiSendRequestRepository)
-                .setApproveTxInfo(id, APPROVE_TX_HASH, caller)
-            verifyNoMoreInteractions(assetMultiSendRequestRepository)
+            expectInteractions(assetMultiSendRequestRepository) {
+                once.setApproveTxInfo(id, APPROVE_TX_HASH, caller)
+            }
         }
     }
 
@@ -1885,7 +1883,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching approve txInfo will fail") {
-            given(assetMultiSendRequestRepository.setApproveTxInfo(id, APPROVE_TX_HASH, caller))
+            call(assetMultiSendRequestRepository.setApproveTxInfo(id, APPROVE_TX_HASH, caller))
                 .willReturn(false)
         }
 
@@ -1901,13 +1899,13 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("CannotAttachTxInfoException is thrown") {
-            assertThrows<CannotAttachTxInfoException>(message) {
+            expectThrows<CannotAttachTxInfoException> {
                 service.attachApproveTxInfo(id, APPROVE_TX_HASH, caller)
             }
 
-            verifyMock(assetMultiSendRequestRepository)
-                .setApproveTxInfo(id, APPROVE_TX_HASH, caller)
-            verifyNoMoreInteractions(assetMultiSendRequestRepository)
+            expectInteractions(assetMultiSendRequestRepository) {
+                once.setApproveTxInfo(id, APPROVE_TX_HASH, caller)
+            }
         }
     }
 
@@ -1918,7 +1916,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("disperse txInfo will be successfully attached to the request") {
-            given(assetMultiSendRequestRepository.setDisperseTxInfo(id, DISPERSE_TX_HASH, caller))
+            call(assetMultiSendRequestRepository.setDisperseTxInfo(id, DISPERSE_TX_HASH, caller))
                 .willReturn(true)
         }
 
@@ -1936,9 +1934,9 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         verify("disperse txInfo was successfully attached") {
             service.attachDisperseTxInfo(id, DISPERSE_TX_HASH, caller)
 
-            verifyMock(assetMultiSendRequestRepository)
-                .setDisperseTxInfo(id, DISPERSE_TX_HASH, caller)
-            verifyNoMoreInteractions(assetMultiSendRequestRepository)
+            expectInteractions(assetMultiSendRequestRepository) {
+                once.setDisperseTxInfo(id, DISPERSE_TX_HASH, caller)
+            }
         }
     }
 
@@ -1949,7 +1947,7 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         val caller = WalletAddress("0xbc25524e0daacB1F149BA55279f593F5E3FB73e9")
 
         suppose("attaching disperse txInfo will fail") {
-            given(assetMultiSendRequestRepository.setDisperseTxInfo(id, APPROVE_TX_HASH, caller))
+            call(assetMultiSendRequestRepository.setDisperseTxInfo(id, APPROVE_TX_HASH, caller))
                 .willReturn(false)
         }
 
@@ -1965,31 +1963,33 @@ class AssetMultiSendRequestServiceTest : TestBase() {
         )
 
         verify("CannotAttachTxInfoException is thrown") {
-            assertThrows<CannotAttachTxInfoException>(message) {
+            expectThrows<CannotAttachTxInfoException> {
                 service.attachDisperseTxInfo(id, APPROVE_TX_HASH, caller)
             }
 
-            verifyMock(assetMultiSendRequestRepository)
-                .setDisperseTxInfo(id, APPROVE_TX_HASH, caller)
-            verifyNoMoreInteractions(assetMultiSendRequestRepository)
+            expectInteractions(assetMultiSendRequestRepository) {
+                once.setDisperseTxInfo(id, APPROVE_TX_HASH, caller)
+            }
         }
     }
 
     private fun projectRepositoryMock(projectId: UUID): ProjectRepository {
         val projectRepository = mock<ProjectRepository>()
 
-        given(projectRepository.getById(projectId))
-            .willReturn(
-                Project(
-                    id = projectId,
-                    ownerId = UUID.randomUUID(),
-                    issuerContractAddress = ContractAddress("dead"),
-                    baseRedirectUrl = BaseUrl(""),
-                    chainId = ChainId(0L),
-                    customRpcUrl = null,
-                    createdAt = TestData.TIMESTAMP
+        suppose("some project will be returned") {
+            call(projectRepository.getById(projectId))
+                .willReturn(
+                    Project(
+                        id = projectId,
+                        ownerId = UUID.randomUUID(),
+                        issuerContractAddress = ContractAddress("dead"),
+                        baseRedirectUrl = BaseUrl(""),
+                        chainId = ChainId(0L),
+                        customRpcUrl = null,
+                        createdAt = TestData.TIMESTAMP
+                    )
                 )
-            )
+        }
 
         return projectRepository
     }

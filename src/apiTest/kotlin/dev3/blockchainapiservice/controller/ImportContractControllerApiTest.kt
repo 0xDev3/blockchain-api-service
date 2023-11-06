@@ -4,7 +4,6 @@ import dev3.blockchainapiservice.ControllerTestBase
 import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.blockchain.DummyProxy
 import dev3.blockchainapiservice.blockchain.ExampleContract
-import dev3.blockchainapiservice.blockchain.properties.Chain
 import dev3.blockchainapiservice.config.CustomHeaders
 import dev3.blockchainapiservice.exception.ErrorCode
 import dev3.blockchainapiservice.generated.jooq.enums.UserIdentifierType
@@ -22,14 +21,19 @@ import dev3.blockchainapiservice.model.json.TypeDecorator
 import dev3.blockchainapiservice.model.response.ContractDecoratorResponse
 import dev3.blockchainapiservice.model.response.ContractDeploymentRequestResponse
 import dev3.blockchainapiservice.model.response.ContractInterfaceManifestResponse
-import dev3.blockchainapiservice.model.response.ContractInterfaceManifestsResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponse
+import dev3.blockchainapiservice.model.response.EventArgumentResponseType
+import dev3.blockchainapiservice.model.response.EventInfoResponse
 import dev3.blockchainapiservice.model.response.ImportPreviewResponse
+import dev3.blockchainapiservice.model.response.SuggestedContractInterfaceManifestsResponse
 import dev3.blockchainapiservice.model.response.TransactionResponse
 import dev3.blockchainapiservice.model.result.ContractConstructor
 import dev3.blockchainapiservice.model.result.ContractDecorator
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
+import dev3.blockchainapiservice.model.result.ContractEvent
 import dev3.blockchainapiservice.model.result.ContractFunction
 import dev3.blockchainapiservice.model.result.ContractParameter
+import dev3.blockchainapiservice.model.result.EventParameter
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.repository.ContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
@@ -51,7 +55,6 @@ import dev3.blockchainapiservice.util.Status
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.ZeroAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -73,7 +76,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
             ownerId = OWNER_ID,
             issuerContractAddress = ContractAddress("0"),
             baseRedirectUrl = BaseUrl("https://example.com/"),
-            chainId = Chain.HARDHAT_TESTNET.id,
+            chainId = TestData.CHAIN_ID,
             customRpcUrl = null,
             createdAt = TestData.TIMESTAMP
         )
@@ -124,7 +127,56 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     readOnly = true
                 )
             ),
-            events = listOf(),
+            listOf(
+                ContractEvent(
+                    name = "Example event",
+                    description = "Example event",
+                    solidityName = "ExampleEvent",
+                    signature = "ExampleEvent(tuple(address),tuple(address))",
+                    inputs = listOf(
+                        EventParameter(
+                            name = "Non-indexed struct",
+                            description = "Non-indexed struct",
+                            indexed = false,
+                            solidityName = "nonIndexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        ),
+                        EventParameter(
+                            name = "Indexed struct",
+                            description = "Indexed struct",
+                            indexed = true,
+                            solidityName = "indexedStruct",
+                            solidityType = "tuple",
+                            recommendedTypes = emptyList(),
+                            parameters = listOf(
+                                ContractParameter(
+                                    name = "Owner address",
+                                    description = "Contract owner address",
+                                    solidityName = "owner",
+                                    solidityType = "address",
+                                    recommendedTypes = emptyList(),
+                                    parameters = null,
+                                    hints = null
+                                )
+                            ),
+                            hints = null
+                        )
+                    )
+                )
+            ),
             manifest = ManifestJson.EMPTY,
             artifact = ArtifactJson.EMPTY
         )
@@ -188,6 +240,44 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 )
             )
         )
+        private val EVENTS_1 = listOf(
+            EventInfoResponse(
+                signature = "ExampleEvent(tuple(address),tuple(address))",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "nonIndexedStruct",
+                        type = EventArgumentResponseType.VALUE,
+                        value = listOf(WalletAddress("a").rawValue),
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "indexedStruct",
+                        type = EventArgumentResponseType.HASH,
+                        value = null,
+                        hash = "0xc65a7bb8d6351c1cf70c95a316cc6a92839c986682d98bc35f958f4883f9d2a8"
+                    )
+                )
+            )
+        )
+        private val EVENTS_2 = listOf(
+            EventInfoResponse(
+                signature = "ExampleEvent(tuple(address),tuple(address))",
+                arguments = listOf(
+                    EventArgumentResponse(
+                        name = "nonIndexedStruct",
+                        type = EventArgumentResponseType.VALUE,
+                        value = listOf("0x35e13c4870077f4610b74f23e887cbb10e21c19f"),
+                        hash = null
+                    ),
+                    EventArgumentResponse(
+                        name = "indexedStruct",
+                        type = EventArgumentResponseType.HASH,
+                        value = null,
+                        hash = "0xe412d7b15343cf0762057bcdfc6e0e1196c887a6e48273443abb85a65433a9e2"
+                    )
+                )
+            )
+        )
     }
 
     private val accounts = HardhatTestContainer.ACCOUNTS
@@ -233,7 +323,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = USER_IDENTIFIER,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -281,7 +372,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
             ).send()
         }
 
-        val chainId = Chain.HARDHAT_TESTNET.id
+        val chainId = TestData.CHAIN_ID
         val contractAddress = ContractAddress(contract.contractAddress)
 
         val response = suppose("request to preview smart contract import is made") {
@@ -299,7 +390,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contractAddress.rawValue}-${chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ImportPreviewResponse(
                         manifest = response.manifest,
@@ -366,7 +457,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 projectId = Constants.NIL_UUID
             )
 
-            assertThat(importedContractDecorator).withMessage()
+            expectThat(importedContractDecorator)
                 .isEqualTo(null)
         }
     }
@@ -477,7 +568,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(importResponse).withMessage()
+            expectThat(importResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = importResponse.id,
@@ -509,18 +600,19 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = false,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS_1
                     )
                 )
 
-            assertThat(importResponse.createdAt)
+            expectThat(importResponse.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(importResponse.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = importResponse.id,
@@ -551,7 +643,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -608,7 +700,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val constructorParams = listOf(TypeAndValue(type = "address", value = ownerAddress.rawValue))
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
@@ -644,18 +736,19 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = EVENTS_2
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
@@ -686,7 +779,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -745,7 +838,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
@@ -781,18 +874,19 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = response.events
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
@@ -823,7 +917,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -833,7 +927,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 projectId = PROJECT_ID
             )!!
 
-            assertThat(importedContractDecorator).withMessage()
+            expectThat(importedContractDecorator)
                 .isEqualTo(
                     CONTRACT_DECORATOR.copy(
                         id = importedContractId,
@@ -945,7 +1039,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${proxy.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = response.id,
@@ -981,18 +1075,19 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = true,
-                        implementationContractAddress = ContractAddress(contract.contractAddress).rawValue
+                        implementationContractAddress = ContractAddress(contract.contractAddress).rawValue,
+                        events = emptyList()
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("contract deployment request is correctly stored in database") {
             val storedRequest = contractDeploymentRequestRepository.getById(response.id)
 
-            assertThat(storedRequest).withMessage()
+            expectThat(storedRequest)
                 .isEqualTo(
                     ContractDeploymentRequest(
                         id = response.id,
@@ -1023,7 +1118,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedRequest.createdAt.value)
+            expectThat(storedRequest.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
@@ -1033,7 +1128,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 projectId = PROJECT_ID
             )!!
 
-            assertThat(importedContractDecorator).withMessage()
+            expectThat(importedContractDecorator)
                 .isEqualTo(
                     CONTRACT_DECORATOR.copy(
                         id = importedContractId,
@@ -1120,7 +1215,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -1155,7 +1250,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_NOT_FOUND)
         }
     }
 
@@ -1202,7 +1297,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_BINARY_MISMATCH)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_BINARY_MISMATCH)
         }
     }
 
@@ -1262,16 +1357,18 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isOk)
                 .andReturn()
 
-            objectMapper.readValue(response.response.contentAsString, ContractInterfaceManifestsResponse::class.java)
+            objectMapper.readValue(
+                response.response.contentAsString,
+                SuggestedContractInterfaceManifestsResponse::class.java
+            )
         }
 
         verify("correct interface manifests are returned") {
-            assertThat(suggestedInterfacesResponse).withMessage()
+            expectThat(suggestedInterfacesResponse)
                 .isEqualTo(
-                    ContractInterfaceManifestsResponse(
-                        listOf(
-                            ContractInterfaceManifestResponse(interfaceId, CONTRACT_INTERFACE)
-                        )
+                    SuggestedContractInterfaceManifestsResponse(
+                        manifests = listOf(ContractInterfaceManifestResponse(interfaceId, CONTRACT_INTERFACE)),
+                        bestMatchingInterfaces = listOf(interfaceId.value)
                     )
                 )
         }
@@ -1356,7 +1453,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(interfacesResponse).withMessage()
+            expectThat(interfacesResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = interfacesResponse.id,
@@ -1392,7 +1489,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = interfacesResponse.events
                     )
                 )
         }
@@ -1459,7 +1557,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
         }
     }
 
@@ -1528,7 +1626,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
         }
     }
 
@@ -1629,7 +1727,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(interfacesResponse).withMessage()
+            expectThat(interfacesResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = interfacesResponse.id,
@@ -1665,7 +1763,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = interfacesResponse.events
                     )
                 )
         }
@@ -1750,7 +1849,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
         val importedContractId = ContractId("imported-${contract.contractAddress}-${PROJECT.chainId.value}")
 
         verify("correct response is returned") {
-            assertThat(interfacesResponse).withMessage()
+            expectThat(interfacesResponse)
                 .isEqualTo(
                     ContractDeploymentRequestResponse(
                         id = interfacesResponse.id,
@@ -1786,7 +1885,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         ),
                         imported = true,
                         proxy = false,
-                        implementationContractAddress = null
+                        implementationContractAddress = null,
+                        events = interfacesResponse.events
                     )
                 )
         }
@@ -1853,7 +1953,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_INTERFACE_NOT_FOUND)
         }
     }
 
@@ -1922,7 +2022,7 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
+            expectResponseErrorCode(response, ErrorCode.CONTRACT_DECORATOR_INCOMPATIBLE)
         }
     }
 }

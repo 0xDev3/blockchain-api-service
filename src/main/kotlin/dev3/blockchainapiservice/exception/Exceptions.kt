@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.exception
 
+import dev3.blockchainapiservice.util.AbiType
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractId
@@ -87,6 +88,16 @@ class CannotAttachSignedMessageException(message: String) : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = 2487635142233013917L
+    }
+}
+
+class AccessForbiddenException(message: String) : ServiceException(
+    errorCode = ErrorCode.ACCESS_FORBIDDEN,
+    httpStatus = HttpStatus.FORBIDDEN,
+    message = message
+) {
+    companion object {
+        private const val serialVersionUID: Long = 6548344480966415539L
     }
 }
 
@@ -251,5 +262,86 @@ class IpfsUploadFailedException : ServiceException(
 ) {
     companion object {
         private const val serialVersionUID: Long = 7232463362753458703L
+    }
+}
+
+class AbiDecodingException(types: List<AbiType>, cause: Throwable) : ServiceException(
+    errorCode = ErrorCode.ABI_DECODING_FAILED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "ABI decoding failed for type list: ${types.joinToString(", ")}",
+    cause = cause
+) {
+    companion object {
+        private const val serialVersionUID: Long = -5755478462711202378L
+    }
+}
+
+class CustomerAlreadyExistsException : ServiceException(
+    errorCode = ErrorCode.CUSTOMER_ALREADY_EXISTS,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Customer already exists for the authorized wallet"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 7597674635139449827L
+    }
+}
+
+class CustomerCreationFailed(email: String) : ServiceException(
+    errorCode = ErrorCode.CUSTOMER_CREATION_FAILED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Failed creating customer with email: $email"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -1730618502241859961L
+    }
+}
+
+class CustomerNotYetCreatedException : ServiceException(
+    errorCode = ErrorCode.CUSTOMER_NOT_YET_CREATED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Customer has not yet been created for the requesting user; create the customer and then try again"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -2626102372526080893L
+    }
+}
+
+class SubscriptionAlreadyActiveException : ServiceException(
+    errorCode = ErrorCode.SUBSCRIPTION_ALREADY_ACTIVE,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Customer has an already active subscription"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -8446687908034212249L
+    }
+}
+
+class WebhookException : ServiceException(
+    errorCode = ErrorCode.INVALID_REQUEST_BODY,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Webhook data has invalid format"
+) {
+    companion object {
+        private const val serialVersionUID: Long = 7893680094807460298L
+    }
+}
+
+class PromoCodeExpiredException(code: String) : ServiceException(
+    errorCode = ErrorCode.PROMO_CODE_EXPIRED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Promo code $code has expired"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -5645213305320430242L
+    }
+}
+
+class PromoCodeAlreadyUsedException(code: String) : ServiceException(
+    errorCode = ErrorCode.PROMO_CODE_ALREADY_USED,
+    httpStatus = HttpStatus.BAD_REQUEST,
+    message = "Promo code $code has already been claimed before"
+) {
+    companion object {
+        private const val serialVersionUID: Long = -2863121442776829487L
     }
 }

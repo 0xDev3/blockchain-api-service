@@ -8,7 +8,6 @@ import dev3.blockchainapiservice.model.json.FunctionDecorator
 import dev3.blockchainapiservice.model.json.InterfaceManifestJson
 import dev3.blockchainapiservice.model.json.InterfaceManifestJsonWithId
 import dev3.blockchainapiservice.util.InterfaceId
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class InMemoryContractInterfacesRepositoryTest : TestBase() {
@@ -30,9 +29,9 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract decorator is returned") {
-            assertThat(storedInterface).withMessage()
+            expectThat(storedInterface)
                 .isEqualTo(interfaceManifest)
-            assertThat(repository.getById(id)).withMessage()
+            expectThat(repository.getById(id))
                 .isEqualTo(interfaceManifest)
         }
     }
@@ -48,9 +47,9 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interface info.md is returned") {
-            assertThat(storedInfoMd).withMessage()
+            expectThat(storedInfoMd)
                 .isEqualTo(infoMd)
-            assertThat(repository.getInfoMarkdownById(id)).withMessage()
+            expectThat(repository.getInfoMarkdownById(id))
                 .isEqualTo(infoMd)
         }
     }
@@ -72,7 +71,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interface is returned") {
-            assertThat(repository.getById(id)).withMessage()
+            expectThat(repository.getById(id))
                 .isEqualTo(interfaceManifest)
         }
 
@@ -83,7 +82,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interface info.md is returned") {
-            assertThat(repository.getInfoMarkdownById(id)).withMessage()
+            expectThat(repository.getInfoMarkdownById(id))
                 .isEqualTo(infoMd)
         }
 
@@ -92,9 +91,9 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("null is returned") {
-            assertThat(repository.getById(id)).withMessage()
+            expectThat(repository.getById(id))
                 .isNull()
-            assertThat(repository.getInfoMarkdownById(id)).withMessage()
+            expectThat(repository.getInfoMarkdownById(id))
                 .isNull()
         }
     }
@@ -127,7 +126,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interfaces are returned") {
-            assertThat(repository.getAll(ContractInterfaceFilters(OrList(emptyList())))).withMessage()
+            expectThat(repository.getAll(ContractInterfaceFilters(OrList(emptyList()))))
                 .containsExactlyInAnyOrderElementsOf(
                     listOf(
                         InterfaceManifestJsonWithId(
@@ -135,16 +134,16 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
                             name = interfaceManifest1.name,
                             description = interfaceManifest1.description,
                             tags = interfaceManifest1.tags,
-                            eventDecorators = interfaceManifest1.eventDecorators,
-                            functionDecorators = interfaceManifest1.functionDecorators
+                            matchingEventDecorators = interfaceManifest1.eventDecorators,
+                            matchingFunctionDecorators = interfaceManifest1.functionDecorators
                         ),
                         InterfaceManifestJsonWithId(
                             id = id2,
                             name = interfaceManifest2.name,
                             description = interfaceManifest2.description,
                             tags = interfaceManifest2.tags,
-                            eventDecorators = interfaceManifest2.eventDecorators,
-                            functionDecorators = interfaceManifest2.functionDecorators
+                            matchingEventDecorators = interfaceManifest2.eventDecorators,
+                            matchingFunctionDecorators = interfaceManifest2.functionDecorators
                         )
                     )
                 )
@@ -187,7 +186,7 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interfaces are returned") {
-            assertThat(repository.getAllInfoMarkdownFiles(ContractInterfaceFilters(OrList(emptyList())))).withMessage()
+            expectThat(repository.getAllInfoMarkdownFiles(ContractInterfaceFilters(OrList(emptyList()))))
                 .containsExactlyInAnyOrderElementsOf(listOf(infoMd1, infoMd2))
         }
     }
@@ -228,24 +227,23 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interfaces are returned") {
-            assertThat(
+            expectThat(
                 repository.getAllWithPartiallyMatchingInterfaces(
                     abiFunctionSignatures = setOf("function(string)"),
                     abiEventSignatures = setOf("Event(string)")
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    listOf(
-                        InterfaceManifestJsonWithId(
-                            id = id1,
-                            name = "name-1",
-                            description = "description-1",
-                            tags = interfaceManifest1.tags,
-                            eventDecorators = interfaceManifest1.eventDecorators,
-                            functionDecorators = interfaceManifest1.functionDecorators
-                        )
+            ).containsExactlyInAnyOrderElementsOf(
+                listOf(
+                    InterfaceManifestJsonWithId(
+                        id = id1,
+                        name = "name-1",
+                        description = "description-1",
+                        tags = interfaceManifest1.tags,
+                        matchingEventDecorators = interfaceManifest1.eventDecorators,
+                        matchingFunctionDecorators = interfaceManifest1.functionDecorators
                     )
                 )
+            )
         }
     }
 
@@ -285,24 +283,23 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interfaces are returned") {
-            assertThat(
+            expectThat(
                 repository.getAllWithPartiallyMatchingInterfaces(
                     abiFunctionSignatures = setOf("function(string)", "anotherFunction(string)"),
                     abiEventSignatures = setOf("Event(string)", "AnotherEvent(string)")
                 )
-            ).withMessage()
-                .containsExactlyInAnyOrderElementsOf(
-                    listOf(
-                        InterfaceManifestJsonWithId(
-                            id = id1,
-                            name = "name-1",
-                            description = "description-1",
-                            tags = interfaceManifest1.tags,
-                            eventDecorators = interfaceManifest1.eventDecorators,
-                            functionDecorators = interfaceManifest1.functionDecorators
-                        )
+            ).containsExactlyInAnyOrderElementsOf(
+                listOf(
+                    InterfaceManifestJsonWithId(
+                        id = id1,
+                        name = "name-1",
+                        description = "description-1",
+                        tags = interfaceManifest1.tags,
+                        matchingEventDecorators = interfaceManifest1.eventDecorators,
+                        matchingFunctionDecorators = interfaceManifest1.functionDecorators
                     )
                 )
+            )
         }
     }
 
@@ -342,13 +339,12 @@ class InMemoryContractInterfacesRepositoryTest : TestBase() {
         }
 
         verify("correct contract interfaces are returned") {
-            assertThat(
+            expectThat(
                 repository.getAllWithPartiallyMatchingInterfaces(
                     abiFunctionSignatures = emptySet(),
                     abiEventSignatures = emptySet()
                 )
-            ).withMessage()
-                .isEmpty()
+            ).isEmpty()
         }
     }
 

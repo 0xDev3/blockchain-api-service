@@ -2,6 +2,7 @@ package dev3.blockchainapiservice.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.exception.CannotAttachTxInfoException
+import dev3.blockchainapiservice.features.blacklist.repository.BlacklistedAddressRepository
 import dev3.blockchainapiservice.model.filters.ContractFunctionCallRequestFilters
 import dev3.blockchainapiservice.model.params.CreateContractFunctionCallRequestParams
 import dev3.blockchainapiservice.model.params.PreStoreContractFunctionCallRequestParams
@@ -9,7 +10,10 @@ import dev3.blockchainapiservice.model.params.StoreContractFunctionCallRequestPa
 import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractFunctionCallRequest
 import dev3.blockchainapiservice.model.result.Project
+import dev3.blockchainapiservice.repository.ContractDecoratorRepository
+import dev3.blockchainapiservice.repository.ContractDeploymentRequestRepository
 import dev3.blockchainapiservice.repository.ContractFunctionCallRequestRepository
+import dev3.blockchainapiservice.repository.ImportedContractDecoratorRepository
 import dev3.blockchainapiservice.repository.ProjectRepository
 import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.FunctionData
@@ -23,11 +27,15 @@ import org.springframework.stereotype.Service
 import java.util.UUID
 
 @Service
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "LongParameterList")
 class ContractFunctionCallRequestServiceImpl(
     private val functionEncoderService: FunctionEncoderService,
     private val contractFunctionCallRequestRepository: ContractFunctionCallRequestRepository,
     private val deployedContractIdentifierResolverService: DeployedContractIdentifierResolverService,
+    private val contractDeploymentRequestRepository: ContractDeploymentRequestRepository,
+    private val contractDecoratorRepository: ContractDecoratorRepository,
+    private val importedContractDecoratorRepository: ImportedContractDecoratorRepository,
+    private val blacklistedAddressRepository: BlacklistedAddressRepository,
     private val ethCommonService: EthCommonService,
     private val projectRepository: ProjectRepository,
     private val objectMapper: ObjectMapper
@@ -55,7 +63,7 @@ class ContractFunctionCallRequestServiceImpl(
                 contractAddress = contractAddress
             ),
             project = project
-        )
+        ).addCautionIfNeeded()
 
         val contractFunctionCallRequest = contractFunctionCallRequestRepository.store(databaseParams)
 
@@ -97,13 +105,24 @@ class ContractFunctionCallRequestServiceImpl(
         }
     }
 
+    private fun StoreContractFunctionCallRequestParams.addCautionIfNeeded() =
+        if (blacklistedAddressRepository.exists(contractAddress)) copy(redirectUrl = "$redirectUrl/caution") else this
+
     private fun ContractFunctionCallRequest.appendTransactionData(
         project: Project
     ): WithTransactionAndFunctionData<ContractFunctionCallRequest> {
+        val decorator = this.deployedContractId
+            ?.let { contractDeploymentRequestRepository.getById(it)?.contractId }
+            ?.let {
+                contractDecoratorRepository.getById(it)
+                    ?: importedContractDecoratorRepository.getByContractIdAndProjectId(it, projectId)
+            }
+
         val transactionInfo = ethCommonService.fetchTransactionInfo(
             txHash = txHash,
             chainId = chainId,
-            customRpcUrl = project.customRpcUrl
+            customRpcUrl = project.customRpcUrl,
+            events = decorator?.getDeserializableEvents(objectMapper).orEmpty()
         )
         val data = functionEncoderService.encode(
             functionName = functionName,

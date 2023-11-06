@@ -27,15 +27,11 @@ import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 import dev3.blockchainapiservice.util.WithFunctionDataOrEthValue
 import dev3.blockchainapiservice.util.WithMultiTransactionData
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.given
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verifyNoMoreInteractions
 import org.springframework.http.ResponseEntity
 import java.math.BigInteger
 import java.util.UUID
-import org.mockito.kotlin.verify as verifyMock
 
 class AssetMultiSendRequestControllerTest : TestBase() {
 
@@ -90,7 +86,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
         val service = mock<AssetMultiSendRequestService>()
 
         suppose("asset multi-send request will be created") {
-            given(service.createAssetMultiSendRequest(params, project))
+            call(service.createAssetMultiSendRequest(params, project))
                 .willReturn(WithFunctionDataOrEthValue(result, data, null))
         }
 
@@ -119,7 +115,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
             JsonSchemaDocumentation.createSchema(request.javaClass)
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetMultiSendRequestResponse(
@@ -153,7 +149,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                 timestamp = null
                             ),
                             disperseTx = null,
-                            createdAt = TestData.TIMESTAMP.value
+                            createdAt = TestData.TIMESTAMP.value,
+                            approveEvents = null,
+                            disperseEvents = null
                         )
                     )
                 )
@@ -199,7 +197,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("approve-data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             ),
             disperseStatus = Status.SUCCESS,
             disperseTransactionData = TransactionData(
@@ -209,12 +208,13 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("disperse-data"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
         suppose("some asset multi-send request will be fetched") {
-            given(service.getAssetMultiSendRequest(id))
+            call(service.getAssetMultiSendRequest(id))
                 .willReturn(result)
         }
 
@@ -225,7 +225,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetMultiSendRequestResponse(
@@ -267,7 +267,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                 blockConfirmations = result.disperseTransactionData?.blockConfirmations!!,
                                 timestamp = result.disperseTransactionData?.timestamp?.value!!
                             ),
-                            createdAt = TestData.TIMESTAMP.value
+                            createdAt = TestData.TIMESTAMP.value,
+                            approveEvents = emptyList(),
+                            disperseEvents = emptyList()
                         )
                     )
                 )
@@ -314,7 +316,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("approve-data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             ),
             disperseStatus = Status.SUCCESS,
             disperseTransactionData = TransactionData(
@@ -324,12 +327,13 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("disperse-data"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
         suppose("some asset multi-send request will be fetched") {
-            given(service.getAssetMultiSendRequestsByProjectId(projectId))
+            call(service.getAssetMultiSendRequestsByProjectId(projectId))
                 .willReturn(listOf(result))
         }
 
@@ -340,7 +344,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetMultiSendRequestsResponse(
@@ -384,7 +388,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.disperseTransactionData?.blockConfirmations!!,
                                         timestamp = result.disperseTransactionData?.timestamp?.value!!
                                     ),
-                                    createdAt = TestData.TIMESTAMP.value
+                                    createdAt = TestData.TIMESTAMP.value,
+                                    approveEvents = emptyList(),
+                                    disperseEvents = emptyList()
                                 )
                             )
                         )
@@ -433,7 +439,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("approve-data"),
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             ),
             disperseStatus = Status.SUCCESS,
             disperseTransactionData = TransactionData(
@@ -443,12 +450,13 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 data = FunctionData("disperse-data"),
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
-                timestamp = TestData.TIMESTAMP
+                timestamp = TestData.TIMESTAMP,
+                events = emptyList()
             )
         )
 
         suppose("some asset multi-send request will be fetched") {
-            given(service.getAssetMultiSendRequestsBySender(sender))
+            call(service.getAssetMultiSendRequestsBySender(sender))
                 .willReturn(listOf(result))
         }
 
@@ -459,7 +467,7 @@ class AssetMultiSendRequestControllerTest : TestBase() {
 
             JsonSchemaDocumentation.createSchema(response.body!!.javaClass)
 
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     ResponseEntity.ok(
                         AssetMultiSendRequestsResponse(
@@ -503,7 +511,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                         blockConfirmations = result.disperseTransactionData?.blockConfirmations!!,
                                         timestamp = result.disperseTransactionData?.timestamp?.value!!
                                     ),
-                                    createdAt = TestData.TIMESTAMP.value
+                                    createdAt = TestData.TIMESTAMP.value,
+                                    approveEvents = emptyList(),
+                                    disperseEvents = emptyList()
                                 )
                             )
                         )
@@ -528,10 +538,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
         }
 
         verify("transaction info is correctly attached") {
-            verifyMock(service)
-                .attachApproveTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
-
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.attachApproveTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
+            }
         }
     }
 
@@ -551,10 +560,9 @@ class AssetMultiSendRequestControllerTest : TestBase() {
         }
 
         verify("transaction info is correctly attached") {
-            verifyMock(service)
-                .attachDisperseTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
-
-            verifyNoMoreInteractions(service)
+            expectInteractions(service) {
+                once.attachDisperseTxInfo(id, TransactionHash(txHash), WalletAddress(caller))
+            }
         }
     }
 }

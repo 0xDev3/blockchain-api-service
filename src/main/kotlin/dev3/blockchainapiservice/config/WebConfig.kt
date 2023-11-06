@@ -38,7 +38,7 @@ class WebConfig(
     private val userIdResolverRepository: UserIdResolverRepository,
     private val projectRepository: ProjectRepository,
     private val objectMapper: ObjectMapper,
-    private val applicationProperties: ApplicationProperties
+    private val apiUsageProperties: ApiUsageProperties
 ) : WebMvcConfigurer {
 
     companion object {
@@ -46,28 +46,29 @@ class WebConfig(
             "application property blockchain-api-service.contract-manifest-service.base-url is not set"
     }
 
+    @Bean("basicJsonRestTemplate")
+    fun basicJsonRestTemplate(): RestTemplate =
+        RestTemplateBuilder()
+            .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .build()
+
     @Bean("externalContractDecompilerServiceRestTemplate")
     fun externalContractDecompilerServiceRestTemplate(
-        objectMapper: ObjectMapper,
-        applicationProperties: ApplicationProperties
-    ): RestTemplate = RestTemplateBuilder()
-        .rootUri(
-            applicationProperties.contractManifestService.baseUrl
-                ?: throw BeanCreationException(MISSING_PROPERTY_MESSAGE)
-        )
-        .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-        .build()
+        contractManifestServiceProperties: ContractManifestServiceProperties
+    ): RestTemplate =
+        RestTemplateBuilder()
+            .rootUri(contractManifestServiceProperties.baseUrl ?: throw BeanCreationException(MISSING_PROPERTY_MESSAGE))
+            .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .build()
 
     @Bean("pinataRestTemplate")
-    fun pinataRestTemplate(
-        objectMapper: ObjectMapper,
-        applicationProperties: ApplicationProperties
-    ): RestTemplate = RestTemplateBuilder()
-        .rootUri(applicationProperties.ipfs.url)
-        .defaultHeader("pinata_api_key", applicationProperties.ipfs.apiKey)
-        .defaultHeader("pinata_secret_api_key", applicationProperties.ipfs.secretApiKey)
-        .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
-        .build()
+    fun pinataRestTemplate(ipfsProperties: IpfsProperties): RestTemplate =
+        RestTemplateBuilder()
+            .rootUri(ipfsProperties.url)
+            .defaultHeader("pinata_api_key", ipfsProperties.apiKey)
+            .defaultHeader("pinata_secret_api_key", ipfsProperties.secretApiKey)
+            .additionalMessageConverters(MappingJackson2HttpMessageConverter(objectMapper))
+            .build()
 
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(UserIdentifierResolver(uuidProvider, userIdentifierRepository))
@@ -86,7 +87,7 @@ class WebConfig(
                 userIdentifierRepository = userIdentifierRepository,
                 utcDateTimeProvider = utcDateTimeProvider,
                 objectMapper = objectMapper,
-                apiUsageProperties = applicationProperties.apiUsage
+                apiUsageProperties = apiUsageProperties
             )
         )
         registry.addInterceptor(

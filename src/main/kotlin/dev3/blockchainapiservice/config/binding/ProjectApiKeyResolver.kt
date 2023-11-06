@@ -30,7 +30,6 @@ class ProjectApiKeyResolver(
         binderFactory: WebDataBinderFactory?
     ): Project {
         val httpServletRequest = nativeWebRequest.getNativeRequest(HttpServletRequest::class.java)
-        // TODO check if API has expired/used up/etc. - out of scope for MVP
         val apiKey = httpServletRequest?.getHeader(CustomHeaders.API_KEY_HEADER)
             ?.let { apiKeyRepository.getByValue(it) }
             ?: throw NonExistentApiKeyException()

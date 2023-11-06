@@ -11,7 +11,6 @@ import dev3.blockchainapiservice.model.result.AddressBookEntry
 import dev3.blockchainapiservice.repository.AddressBookRepository
 import dev3.blockchainapiservice.security.WithMockUser
 import dev3.blockchainapiservice.util.WalletAddress
-import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -44,7 +43,8 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OWNER_ID,
                 userIdentifier = WalletAddress(OWNER_ADDRESS).rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
 
@@ -52,7 +52,8 @@ class AddressBookControllerApiTest : ControllerTestBase() {
             UserIdentifierRecord(
                 id = OTHER_OWNER_ID,
                 userIdentifier = WalletAddress(OTHER_OWNER_ADDRESS).rawValue,
-                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS
+                identifierType = UserIdentifierType.ETH_WALLET_ADDRESS,
+                stripeClientId = null
             )
         )
     }
@@ -87,7 +88,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AddressBookEntryResponse(
                         id = response.id,
@@ -99,14 +100,14 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(response.createdAt)
+            expectThat(response.createdAt)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
 
         verify("address book entry is correctly stored into the database") {
             val storedEntry = addressBookRepository.getById(response.id)!!
 
-            assertThat(storedEntry).withMessage()
+            expectThat(storedEntry)
                 .isEqualTo(
                     AddressBookEntry(
                         id = response.id,
@@ -119,9 +120,9 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                     )
                 )
 
-            assertThat(storedEntry.createdAt.value)
+            expectThat(storedEntry.createdAt.value)
                 .isCloseTo(response.createdAt, WITHIN_TIME_TOLERANCE)
-            assertThat(storedEntry.createdAt.value)
+            expectThat(storedEntry.createdAt.value)
                 .isCloseToUtcNow(WITHIN_TIME_TOLERANCE)
         }
     }
@@ -170,7 +171,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AddressBookEntryResponse(
                         id = entry.id,
@@ -186,7 +187,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         verify("address book entry is correctly updated in the database") {
             val storedEntry = addressBookRepository.getById(response.id)!!
 
-            assertThat(storedEntry).withMessage()
+            expectThat(storedEntry)
                 .isEqualTo(
                     AddressBookEntry(
                         id = entry.id,
@@ -241,7 +242,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -271,7 +272,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -300,7 +301,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         }
 
         verify("address book entry is deleted from database") {
-            assertThat(addressBookRepository.getById(entry.id)).withMessage()
+            expectThat(addressBookRepository.getById(entry.id))
                 .isNull()
         }
     }
@@ -329,7 +330,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -343,7 +344,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -374,7 +375,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AddressBookEntryResponse(
                         id = entry.id,
@@ -397,7 +398,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -429,7 +430,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AddressBookEntryResponse(
                         id = entry.id,
@@ -453,7 +454,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
                 .andExpect(MockMvcResultMatchers.status().isNotFound)
                 .andReturn()
 
-            verifyResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
+            expectResponseErrorCode(response, ErrorCode.RESOURCE_NOT_FOUND)
         }
     }
 
@@ -486,7 +487,7 @@ class AddressBookControllerApiTest : ControllerTestBase() {
         }
 
         verify("correct response is returned") {
-            assertThat(response).withMessage()
+            expectThat(response)
                 .isEqualTo(
                     AddressBookEntriesResponse(
                         listOf(
