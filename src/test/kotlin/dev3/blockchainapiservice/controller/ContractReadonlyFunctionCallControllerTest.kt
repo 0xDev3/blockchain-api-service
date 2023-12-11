@@ -6,6 +6,7 @@ import dev3.blockchainapiservice.TestData
 import dev3.blockchainapiservice.config.JsonConfig
 import dev3.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
+import dev3.blockchainapiservice.model.params.FunctionNameAndParams
 import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.model.request.ReadonlyFunctionCallRequest
 import dev3.blockchainapiservice.model.response.ReadonlyFunctionCallResponse
@@ -17,6 +18,7 @@ import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.BoolType
 import dev3.blockchainapiservice.util.ChainId
 import dev3.blockchainapiservice.util.ContractAddress
+import dev3.blockchainapiservice.util.FunctionArgument
 import dev3.blockchainapiservice.util.StringType
 import dev3.blockchainapiservice.util.UintType
 import dev3.blockchainapiservice.util.WalletAddress
@@ -32,11 +34,15 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
     @Test
     fun mustCorrectlyCallContractReadonlyFunction() {
         val deployedContractId = UUID.randomUUID()
+        val functionName = "example"
+        val functionParams = emptyList<FunctionArgument>()
         val params = CreateReadonlyFunctionCallParams(
             identifier = DeployedContractIdIdentifier(deployedContractId),
             blockNumber = BlockNumber(BigInteger.TEN),
-            functionName = "example",
-            functionParams = emptyList(),
+            functionCallInfo = FunctionNameAndParams(
+                functionName = functionName,
+                functionParams = functionParams,
+            ),
             outputParams = listOf(
                 OutputParameter(StringType),
                 OutputParameter(UintType),
@@ -78,8 +84,9 @@ class ContractReadonlyFunctionCallControllerTest : TestBase() {
                 deployedContractAlias = null,
                 contractAddress = null,
                 blockNumber = params.blockNumber?.value,
-                functionName = params.functionName,
-                functionParams = params.functionParams,
+                functionName = functionName,
+                functionParams = functionParams,
+                functionCallData = null,
                 outputParams = params.outputParams,
                 callerAddress = params.callerAddress.rawValue
             )

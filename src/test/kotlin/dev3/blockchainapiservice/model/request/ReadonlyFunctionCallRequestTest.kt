@@ -48,6 +48,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = BigInteger.ZERO,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -72,6 +73,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = BigInteger.ZERO,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -95,6 +97,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = BigInteger.ZERO,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -119,6 +122,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = BigInteger.ZERO,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -143,6 +147,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = BigInteger.ZERO,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -167,6 +172,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = BigInteger.ZERO,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -190,6 +196,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = BigInteger.valueOf(-1L),
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -214,6 +221,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = BigInteger.TWO.pow(256) + BigInteger.ONE,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -238,6 +246,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = BigInteger.TWO.pow(256),
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -261,6 +270,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH + 1),
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -285,6 +295,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "a".repeat(ValidationConstants.REQUEST_BODY_MAX_STRING_LENGTH),
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -310,6 +321,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 functionParams = MutableList(ValidationConstants.REQUEST_BODY_MAX_ARGS_LENGTH + 1) {
                     FunctionArgument(Uint256.DEFAULT)
                 },
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -340,6 +352,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                         rawJson = JsonNodeConverter().from(JSON.valueOf("{\"value\":\"$tooLongValue\"}"))
                     )
                 ),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -369,6 +382,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                         rawJson = TestData.EMPTY_JSON_OBJECT
                     )
                 ),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -392,6 +406,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = MutableList(ValidationConstants.REQUEST_BODY_MAX_ARGS_LENGTH + 1) {
                     OutputParameter(UintType)
                 },
@@ -418,6 +433,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = listOf(OutputParameter(BoolType)),
                 callerAddress = WalletAddress("0").rawValue
             )
@@ -441,6 +457,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = "invalid"
             )
@@ -465,6 +482,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("a").rawValue + "b"
             )
@@ -489,6 +507,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = ""
             )
@@ -513,6 +532,7 @@ class ReadonlyFunctionCallRequestTest : TestBase() {
                 blockNumber = null,
                 functionName = "",
                 functionParams = emptyList(),
+                functionCallData = null,
                 outputParams = emptyList(),
                 callerAddress = WalletAddress("a").rawValue
             )

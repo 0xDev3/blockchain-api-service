@@ -4,6 +4,8 @@ import dev3.blockchainapiservice.blockchain.BlockchainService
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
+import dev3.blockchainapiservice.model.params.FunctionCallData
+import dev3.blockchainapiservice.model.params.FunctionNameAndParams
 import dev3.blockchainapiservice.model.result.Project
 import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.util.BlockName
@@ -18,7 +20,9 @@ class ContractReadonlyFunctionCallServiceImpl(
     private val blockchainService: BlockchainService
 ) : ContractReadonlyFunctionCallService {
 
-    companion object : KLogging()
+    companion object : KLogging() {
+        private const val UNKNOWN_FUNCTION = "<unknown function name>"
+    }
 
     override fun callReadonlyContractFunction(
         params: CreateReadonlyFunctionCallParams,
@@ -28,10 +32,15 @@ class ContractReadonlyFunctionCallServiceImpl(
 
         val (deployedContractId, contractAddress) = deployedContractIdentifierResolverService
             .resolveContractIdAndAddress(params.identifier, project)
-        val data = functionEncoderService.encode(
-            functionName = params.functionName,
-            arguments = params.functionParams
-        )
+
+        val (data, functionName) = when (params.functionCallInfo) {
+            is FunctionCallData -> params.functionCallInfo.callData to UNKNOWN_FUNCTION
+            is FunctionNameAndParams ->
+                functionEncoderService.encode(
+                    functionName = params.functionCallInfo.functionName,
+                    arguments = params.functionCallInfo.functionParams
+                ) to params.functionCallInfo.functionName
+        }
 
         val value = blockchainService.callReadonlyFunction(
             chainSpec = ChainSpec(
@@ -41,7 +50,7 @@ class ContractReadonlyFunctionCallServiceImpl(
             params = ExecuteReadonlyFunctionCallParams(
                 contractAddress = contractAddress,
                 callerAddress = params.callerAddress,
-                functionName = params.functionName,
+                functionName = functionName,
                 functionData = data,
                 outputParams = params.outputParams
             ),

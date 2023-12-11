@@ -25,14 +25,14 @@ data class ReadonlyFunctionCallRequest(
     override val contractAddress: String?,
     @field:ValidUint256
     val blockNumber: BigInteger?,
-    @field:NotNull
     @field:MaxStringSize
-    val functionName: String,
+    val functionName: String?,
     @field:Valid
-    @field:NotNull
     @field:MaxArgsSize
     @field:SchemaIgnore
-    val functionParams: List<FunctionArgument>,
+    val functionParams: List<FunctionArgument>?,
+    @field:MaxStringSize
+    val functionCallData: String?,
     @field:Valid
     @field:NotNull
     @field:MaxArgsSize

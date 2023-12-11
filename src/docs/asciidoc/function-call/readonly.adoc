@@ -7,10 +7,12 @@ invalid. The `deployed_contract_id` and `deployed_contract_alias` correspond to 
 deployed using the <<Contract Deployment Request API>>. If `contract_address` is used to specify target contract, then
 `deployed_contract_id` will have `null` value in the response.
 
-The `functionParams` field is an array of objects which must have `type` and `value` according to the table in
+The `function_params` field is an array of objects which must have `type` and `value` according to the table in
 section <<Available Function Argument Types>>.
 
-The `outputParams` field is an array of output parameter types, which correspond to the type name according to the table
+Either `function_name` and `function_params` or only `function_call_data` must be present in the request body.
+
+The `output_params` field is an array of output parameter types, which correspond to the type name according to the table
 in section <<Available Function Argument Types>>. Tuple types are constructed by providing an object instead of type
 name, for example `{"type": "tuple", "elems": ["uint", "string"]}` is a tuple with element types of `uint` and
 `string`. Tuple nesting is possible by providing the appropriate value in the `elem` array. Any array dimensions of

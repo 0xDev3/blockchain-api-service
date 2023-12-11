@@ -8,6 +8,7 @@ import dev3.blockchainapiservice.model.ScreenConfig
 import dev3.blockchainapiservice.model.params.CreateReadonlyFunctionCallParams
 import dev3.blockchainapiservice.model.params.DeployedContractIdIdentifier
 import dev3.blockchainapiservice.model.params.ExecuteReadonlyFunctionCallParams
+import dev3.blockchainapiservice.model.params.FunctionNameAndParams
 import dev3.blockchainapiservice.model.params.OutputParameter
 import dev3.blockchainapiservice.model.result.ContractDeploymentRequest
 import dev3.blockchainapiservice.model.result.Project
@@ -48,11 +49,15 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
         private val DEPLOYED_CONTRACT_ID = UUID.randomUUID()
         private val CONTRACT_ADDRESS = ContractAddress("abc123")
         private val CALLER_ADDRESS = WalletAddress("a")
+        private const val FUNCTION_NAME = "example"
+        private val FUNCTION_PARAMS = listOf(FunctionArgument(Uint256(BigInteger.TEN)))
         private val CREATE_PARAMS = CreateReadonlyFunctionCallParams(
             identifier = DeployedContractIdIdentifier(DEPLOYED_CONTRACT_ID),
             blockNumber = null,
-            functionName = "example",
-            functionParams = listOf(FunctionArgument(Uint256(BigInteger.TEN))),
+            functionCallInfo = FunctionNameAndParams(
+                functionName = FUNCTION_NAME,
+                functionParams = FUNCTION_PARAMS
+            ),
             outputParams = listOf(OutputParameter(UintType)),
             callerAddress = CALLER_ADDRESS
         )
@@ -92,8 +97,8 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
         suppose("function will be encoded") {
             call(
                 functionEncoderService.encode(
-                    functionName = createParams.functionName,
-                    arguments = createParams.functionParams
+                    functionName = FUNCTION_NAME,
+                    arguments = FUNCTION_PARAMS
                 )
             )
                 .willReturn(ENCODED_FUNCTION_DATA)
@@ -121,7 +126,7 @@ class ContractReadonlyFunctionCallServiceTest : TestBase() {
                     params = ExecuteReadonlyFunctionCallParams(
                         contractAddress = CONTRACT_ADDRESS,
                         callerAddress = CALLER_ADDRESS,
-                        functionName = createParams.functionName,
+                        functionName = FUNCTION_NAME,
                         functionData = ENCODED_FUNCTION_DATA,
                         outputParams = listOf(OutputParameter(UintType))
                     ),
