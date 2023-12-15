@@ -122,7 +122,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                                 data = data.value,
                                 value = BigInteger.ZERO,
                                 blockConfirmations = null,
-                                timestamp = null
+                                timestamp = null,
+                                rawRpcTransactionReceipt = null
                             ),
                             createdAt = TestData.TIMESTAMP.value,
                             events = null
@@ -165,7 +166,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -205,7 +207,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                                 data = result.transactionData.data?.value,
                                 value = BigInteger.ZERO,
                                 blockConfirmations = result.transactionData.blockConfirmations,
-                                timestamp = TestData.TIMESTAMP.value
+                                timestamp = TestData.TIMESTAMP.value,
+                                rawRpcTransactionReceipt = null
                             ),
                             createdAt = result.value.createdAt.value,
                             events = emptyList()
@@ -249,7 +252,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -291,7 +295,8 @@ class Erc20LockRequestControllerTest : TestBase() {
                                         data = result.transactionData.data?.value,
                                         value = BigInteger.ZERO,
                                         blockConfirmations = result.transactionData.blockConfirmations,
-                                        timestamp = TestData.TIMESTAMP.value
+                                        timestamp = TestData.TIMESTAMP.value,
+                                        rawRpcTransactionReceipt = null
                                     ),
                                     createdAt = result.value.createdAt.value,
                                     events = emptyList()

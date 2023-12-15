@@ -358,7 +358,8 @@ class ContractArbitraryCallRequestControllerApiTest : ControllerTestBase() {
                             data = functionData.value,
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = null
                         ),
                         events = null
                     )
@@ -482,7 +483,8 @@ class ContractArbitraryCallRequestControllerApiTest : ControllerTestBase() {
                             data = functionData.value,
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.arbitraryCallTx.rawRpcTransactionReceipt
                         ),
                         events = null
                     )
@@ -601,7 +603,8 @@ class ContractArbitraryCallRequestControllerApiTest : ControllerTestBase() {
                             data = functionData.value,
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.arbitraryCallTx.rawRpcTransactionReceipt
                         ),
                         events = null
                     )
@@ -727,7 +730,8 @@ class ContractArbitraryCallRequestControllerApiTest : ControllerTestBase() {
                             data = functionData.value,
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.arbitraryCallTx.rawRpcTransactionReceipt
                         ),
                         events = null
                     )
@@ -1160,7 +1164,8 @@ class ContractArbitraryCallRequestControllerApiTest : ControllerTestBase() {
                             data = functionData.value,
                             value = ethAmount.rawValue,
                             blockConfirmations = fetchResponse.arbitraryCallTx.blockConfirmations,
-                            timestamp = fetchResponse.arbitraryCallTx.timestamp
+                            timestamp = fetchResponse.arbitraryCallTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.arbitraryCallTx.rawRpcTransactionReceipt
                         ),
                         events = EVENTS
                     )
@@ -1312,7 +1317,8 @@ class ContractArbitraryCallRequestControllerApiTest : ControllerTestBase() {
                             data = functionData.value,
                             value = ethAmount.rawValue,
                             blockConfirmations = fetchResponse.arbitraryCallTx.blockConfirmations,
-                            timestamp = fetchResponse.arbitraryCallTx.timestamp
+                            timestamp = fetchResponse.arbitraryCallTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.arbitraryCallTx.rawRpcTransactionReceipt
                         ),
                         events = EVENTS
                     )
@@ -1472,7 +1478,9 @@ class ContractArbitraryCallRequestControllerApiTest : ControllerTestBase() {
                                     data = functionData.value,
                                     value = ethAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].arbitraryCallTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].arbitraryCallTx.timestamp
+                                    timestamp = fetchResponse.requests[0].arbitraryCallTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].arbitraryCallTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 events = EVENTS
                             )
@@ -1625,7 +1633,9 @@ class ContractArbitraryCallRequestControllerApiTest : ControllerTestBase() {
                                     data = functionData.value,
                                     value = ethAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].arbitraryCallTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].arbitraryCallTx.timestamp
+                                    timestamp = fetchResponse.requests[0].arbitraryCallTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].arbitraryCallTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 events = EVENTS
                             )

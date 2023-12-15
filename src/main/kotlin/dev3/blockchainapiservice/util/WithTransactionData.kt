@@ -22,7 +22,8 @@ data class TransactionData(
     val value: Balance,
     val blockConfirmations: BigInteger?,
     val timestamp: UtcDateTime?,
-    val events: List<EventInfo>?
+    val events: List<EventInfo>?,
+    val rawRpcTransactionReceipt: String?
 ) {
     constructor(
         txHash: TransactionHash?,
@@ -39,6 +40,7 @@ data class TransactionData(
         value = transactionInfo?.value ?: value ?: Balance.ZERO,
         blockConfirmations = transactionInfo?.blockConfirmations,
         timestamp = transactionInfo?.timestamp,
-        events = transactionInfo?.events
+        events = transactionInfo?.events,
+        rawRpcTransactionReceipt = transactionInfo?.rawRpcTransactionReceipt
     )
 }

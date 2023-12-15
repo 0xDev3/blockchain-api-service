@@ -332,7 +332,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             data = response.deployTx.data,
                             value = initialEthAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = false,
                         proxy = false,
@@ -470,7 +471,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             data = response.deployTx.data,
                             value = initialEthAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = false,
                         proxy = false,
@@ -896,7 +898,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.deployTx.data,
                             value = initialEthAmount.rawValue,
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
-                            timestamp = fetchResponse.deployTx.timestamp
+                            timestamp = fetchResponse.deployTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = false,
                         proxy = false,
@@ -1037,7 +1040,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.deployTx.data,
                             value = initialEthAmount.rawValue,
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
-                            timestamp = fetchResponse.deployTx.timestamp
+                            timestamp = fetchResponse.deployTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = false,
                         proxy = false,
@@ -1179,7 +1183,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.deployTx.data,
                             value = initialEthAmount.rawValue,
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
-                            timestamp = fetchResponse.deployTx.timestamp
+                            timestamp = fetchResponse.deployTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = false,
                         proxy = false,
@@ -1324,7 +1329,8 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.deployTx.data,
                             value = initialEthAmount.rawValue,
                             blockConfirmations = fetchResponse.deployTx.blockConfirmations,
-                            timestamp = fetchResponse.deployTx.timestamp
+                            timestamp = fetchResponse.deployTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = false,
                         proxy = false,
@@ -1499,7 +1505,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.deployTx.data,
                                     value = initialEthAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].deployTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].deployTx.timestamp
+                                    timestamp = fetchResponse.requests[0].deployTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].deployTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 imported = false,
                                 proxy = false,
@@ -1651,7 +1659,9 @@ class ContractDeploymentRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.deployTx.data,
                                     value = initialEthAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].deployTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].deployTx.timestamp
+                                    timestamp = fetchResponse.requests[0].deployTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].deployTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 imported = false,
                                 proxy = false,

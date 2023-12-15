@@ -27,7 +27,8 @@ interface Web3jBlockchainServiceCacheRepository {
         txHash: TransactionHash,
         blockNumber: BlockNumber,
         txInfo: BlockchainTransactionInfo,
-        eventLogs: List<EventLog>
+        eventLogs: List<EventLog>,
+        rawTransactionReceipt: String?
     )
 
     fun cacheContractDeploymentTransaction(

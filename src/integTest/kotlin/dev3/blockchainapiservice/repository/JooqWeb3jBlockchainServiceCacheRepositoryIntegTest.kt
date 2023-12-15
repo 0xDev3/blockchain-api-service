@@ -57,7 +57,8 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
             blockConfirmations = BigInteger.TEN,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = "test"
         )
         val CONTRACT_DEPLOYMENT_TRANSACTION_INFO = FullContractDeploymentTransactionInfo(
             hash = TX_INFO.hash,
@@ -149,7 +150,8 @@ class JooqWeb3jBlockchainServiceCacheRepositoryIntegTest : TestBase() {
                         data = "data",
                         topics = listOf("topic")
                     )
-                )
+                ),
+                rawTransactionReceipt = "test"
             )
         }
 

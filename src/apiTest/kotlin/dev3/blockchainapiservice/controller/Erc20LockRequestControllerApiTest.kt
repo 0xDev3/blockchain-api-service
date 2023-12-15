@@ -164,7 +164,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             data = response.lockTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.lockTx.rawRpcTransactionReceipt
                         ),
                         createdAt = response.createdAt,
                         events = null
@@ -272,7 +273,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             data = response.lockTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.lockTx.rawRpcTransactionReceipt
                         ),
                         createdAt = response.createdAt,
                         events = null
@@ -455,7 +457,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.lockTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
-                            timestamp = fetchResponse.lockTx.timestamp
+                            timestamp = fetchResponse.lockTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.lockTx.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         events = emptyList()
@@ -577,7 +580,8 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.lockTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.lockTx.blockConfirmations,
-                            timestamp = fetchResponse.lockTx.timestamp
+                            timestamp = fetchResponse.lockTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.lockTx.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         events = emptyList()
@@ -700,7 +704,9 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.lockTx.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].lockTx.timestamp
+                                    timestamp = fetchResponse.requests[0].lockTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].lockTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 events = emptyList()
@@ -827,7 +833,9 @@ class Erc20LockRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.lockTx.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].lockTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].lockTx.timestamp
+                                    timestamp = fetchResponse.requests[0].lockTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].lockTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 events = emptyList()

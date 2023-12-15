@@ -98,11 +98,12 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
         txHash: TransactionHash,
         blockNumber: BlockNumber,
         txInfo: BlockchainTransactionInfo,
-        eventLogs: List<EventLog>
+        eventLogs: List<EventLog>,
+        rawTransactionReceipt: String?
     ) {
         logger.info {
             "Caching fetchTransactionInfo call, id: $id, chainSpec: $chainSpec, txHash: $txHash," +
-                " blockNumber: $blockNumber"
+                " blockNumber: $blockNumber, rawTransactionReceipt: $rawTransactionReceipt"
         }
 
         try {
@@ -125,7 +126,8 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                             logData = it.data,
                             logTopics = it.topics.toTypedArray()
                         )
-                    }.toTypedArray()
+                    }.toTypedArray(),
+                    rawTransactionReceipt = rawTransactionReceipt
                 )
             )
         } catch (_: DuplicateKeyException) {
@@ -274,7 +276,8 @@ class JooqWeb3jBlockchainServiceCacheRepository(private val dslContext: DSLConte
                         blockConfirmations = (currentBlockNumber.value - it.blockNumber.value).max(BigInteger.ZERO),
                         timestamp = it.timestamp,
                         success = it.success,
-                        events = emptyList()
+                        events = emptyList(),
+                        rawRpcTransactionReceipt = it.rawTransactionReceipt
                     ),
                     it.eventLogs.map { l ->
                         EventLog(

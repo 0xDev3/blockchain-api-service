@@ -129,7 +129,8 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
                                 data = result.functionData.value,
                                 value = result.ethAmount.rawValue,
                                 blockConfirmations = null,
-                                timestamp = null
+                                timestamp = null,
+                                rawRpcTransactionReceipt = null
                             ),
                             events = null
                         )
@@ -173,7 +174,8 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -215,7 +217,8 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
                                 data = result.transactionData.data?.value,
                                 value = result.transactionData.value.rawValue,
                                 blockConfirmations = result.transactionData.blockConfirmations,
-                                timestamp = result.transactionData.timestamp?.value
+                                timestamp = result.transactionData.timestamp?.value,
+                                rawRpcTransactionReceipt = null
                             ),
                             events = emptyList()
                         )
@@ -259,7 +262,8 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -312,7 +316,8 @@ class ContractArbitraryCallRequestControllerTest : TestBase() {
                                         data = result.transactionData.data?.value,
                                         value = result.transactionData.value.rawValue,
                                         blockConfirmations = result.transactionData.blockConfirmations,
-                                        timestamp = result.transactionData.timestamp?.value
+                                        timestamp = result.transactionData.timestamp?.value,
+                                        rawRpcTransactionReceipt = null
                                     ),
                                     events = emptyList()
                                 )

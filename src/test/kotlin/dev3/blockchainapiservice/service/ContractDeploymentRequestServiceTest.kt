@@ -140,7 +140,8 @@ class ContractDeploymentRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
         private val OBJECT_MAPPER = JsonConfig().objectMapper()
         private val EVENTS = emptyList<DeserializableEvent>()

@@ -261,7 +261,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = response.approveTx!!.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.approveTx!!.rawRpcTransactionReceipt
                         ),
                         disperseTx = null,
                         createdAt = response.createdAt,
@@ -397,7 +398,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = response.approveTx!!.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.approveTx!!.rawRpcTransactionReceipt
                         ),
                         disperseTx = null,
                         createdAt = response.createdAt,
@@ -530,7 +532,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = response.disperseTx!!.data,
                             value = amount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.disperseTx!!.rawRpcTransactionReceipt
                         ),
                         createdAt = response.createdAt,
                         approveEvents = null,
@@ -664,7 +667,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = response.disperseTx!!.data,
                             value = amount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.disperseTx!!.rawRpcTransactionReceipt
                         ),
                         createdAt = response.createdAt,
                         approveEvents = null,
@@ -1003,7 +1007,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = fetchResponse.approveTx!!.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.approveTx!!.blockConfirmations,
-                            timestamp = fetchResponse.approveTx!!.timestamp
+                            timestamp = fetchResponse.approveTx!!.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.approveTx?.rawRpcTransactionReceipt
                         ),
                         disperseTx = TransactionResponse(
                             txHash = disperseTxHash.value,
@@ -1012,7 +1017,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = fetchResponse.disperseTx!!.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
-                            timestamp = fetchResponse.disperseTx!!.timestamp
+                            timestamp = fetchResponse.disperseTx!!.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.disperseTx?.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
@@ -1188,7 +1194,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = fetchResponse.approveTx!!.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.approveTx!!.blockConfirmations,
-                            timestamp = fetchResponse.approveTx!!.timestamp
+                            timestamp = fetchResponse.approveTx!!.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.approveTx!!.rawRpcTransactionReceipt
                         ),
                         disperseTx = TransactionResponse(
                             txHash = disperseTxHash.value,
@@ -1197,7 +1204,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = fetchResponse.disperseTx!!.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
-                            timestamp = fetchResponse.disperseTx!!.timestamp
+                            timestamp = fetchResponse.disperseTx!!.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.disperseTx!!.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
@@ -1349,7 +1357,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = fetchResponse.disperseTx!!.data,
                             value = amount.rawValue,
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
-                            timestamp = fetchResponse.disperseTx!!.timestamp
+                            timestamp = fetchResponse.disperseTx!!.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.disperseTx!!.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         approveEvents = null,
@@ -1506,7 +1515,8 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                             data = fetchResponse.disperseTx!!.data,
                             value = amount.rawValue,
                             blockConfirmations = fetchResponse.disperseTx!!.blockConfirmations,
-                            timestamp = fetchResponse.disperseTx!!.timestamp
+                            timestamp = fetchResponse.disperseTx!!.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.disperseTx!!.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         approveEvents = null,
@@ -1695,7 +1705,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     data = fetchResponse.requests[0].approveTx!!.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].approveTx!!.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].approveTx!!.timestamp
+                                    timestamp = fetchResponse.requests[0].approveTx!!.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].approveTx!!
+                                        .rawRpcTransactionReceipt
                                 ),
                                 disperseTx = TransactionResponse(
                                     txHash = disperseTxHash.value,
@@ -1704,7 +1716,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     data = fetchResponse.requests[0].disperseTx!!.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
+                                    timestamp = fetchResponse.requests[0].disperseTx!!.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].disperseTx!!
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
@@ -1880,7 +1894,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     data = fetchResponse.requests[0].approveTx!!.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].approveTx!!.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].approveTx!!.timestamp
+                                    timestamp = fetchResponse.requests[0].approveTx!!.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].approveTx!!
+                                        .rawRpcTransactionReceipt
                                 ),
                                 disperseTx = TransactionResponse(
                                     txHash = disperseTxHash.value,
@@ -1889,7 +1905,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     data = fetchResponse.requests[0].disperseTx!!.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
+                                    timestamp = fetchResponse.requests[0].disperseTx!!.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].disperseTx!!
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
@@ -2061,7 +2079,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     data = fetchResponse.requests[0].approveTx!!.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].approveTx!!.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].approveTx!!.timestamp
+                                    timestamp = fetchResponse.requests[0].approveTx!!.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].approveTx!!
+                                        .rawRpcTransactionReceipt
                                 ),
                                 disperseTx = TransactionResponse(
                                     txHash = disperseTxHash.value,
@@ -2070,7 +2090,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     data = fetchResponse.requests[0].disperseTx!!.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
+                                    timestamp = fetchResponse.requests[0].disperseTx!!.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].disperseTx!!
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),
@@ -2246,7 +2268,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     data = fetchResponse.requests[0].approveTx!!.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].approveTx!!.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].approveTx!!.timestamp
+                                    timestamp = fetchResponse.requests[0].approveTx!!.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].approveTx!!
+                                        .rawRpcTransactionReceipt
                                 ),
                                 disperseTx = TransactionResponse(
                                     txHash = disperseTxHash.value,
@@ -2255,7 +2279,9 @@ class AssetMultiSendRequestControllerApiTest : ControllerTestBase() {
                                     data = fetchResponse.requests[0].disperseTx!!.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].disperseTx!!.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].disperseTx!!.timestamp
+                                    timestamp = fetchResponse.requests[0].disperseTx!!.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].disperseTx!!
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 approveEvents = APPROVE_EVENTS.withDisperseContractAddress(disperseContractAddress),

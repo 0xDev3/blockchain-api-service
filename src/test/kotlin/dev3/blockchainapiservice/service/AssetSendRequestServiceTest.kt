@@ -434,7 +434,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = false,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -521,7 +522,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -608,7 +610,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -695,7 +698,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -782,7 +786,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -868,7 +873,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -939,7 +945,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -1011,7 +1018,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -1098,7 +1106,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -1184,7 +1193,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -1255,7 +1265,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -1327,7 +1338,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -1439,7 +1451,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -1529,7 +1542,8 @@ class AssetSendRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {

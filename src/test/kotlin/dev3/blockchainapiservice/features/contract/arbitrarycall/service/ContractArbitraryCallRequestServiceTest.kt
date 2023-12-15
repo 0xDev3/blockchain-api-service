@@ -126,7 +126,8 @@ class ContractArbitraryCallRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
         private val DEPLOYED_CONTRACT = ContractDeploymentRequest(
             id = DEPLOYED_CONTRACT_ID,

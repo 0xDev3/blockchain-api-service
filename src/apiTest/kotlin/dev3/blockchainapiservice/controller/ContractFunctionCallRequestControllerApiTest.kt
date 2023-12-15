@@ -353,7 +353,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             data = response.functionCallTx.data,
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.functionCallTx.rawRpcTransactionReceipt
                         ),
                         events = null
                     )
@@ -476,7 +477,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             data = response.functionCallTx.data,
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.functionCallTx.rawRpcTransactionReceipt
                         ),
                         events = null
                     )
@@ -594,7 +596,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             data = response.functionCallTx.data,
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.functionCallTx.rawRpcTransactionReceipt
                         ),
                         events = null
                     )
@@ -719,7 +722,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             data = response.functionCallTx.data,
                             value = ethAmount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.functionCallTx.rawRpcTransactionReceipt
                         ),
                         events = null
                     )
@@ -1151,7 +1155,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.functionCallTx.data,
                             value = ethAmount.rawValue,
                             blockConfirmations = fetchResponse.functionCallTx.blockConfirmations,
-                            timestamp = fetchResponse.functionCallTx.timestamp
+                            timestamp = fetchResponse.functionCallTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.functionCallTx.rawRpcTransactionReceipt
                         ),
                         events = EVENTS
                     )
@@ -1303,7 +1308,8 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.functionCallTx.data,
                             value = ethAmount.rawValue,
                             blockConfirmations = fetchResponse.functionCallTx.blockConfirmations,
-                            timestamp = fetchResponse.functionCallTx.timestamp
+                            timestamp = fetchResponse.functionCallTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.functionCallTx.rawRpcTransactionReceipt
                         ),
                         events = EVENTS
                     )
@@ -1463,7 +1469,9 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.functionCallTx.data,
                                     value = ethAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].functionCallTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].functionCallTx.timestamp
+                                    timestamp = fetchResponse.requests[0].functionCallTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].functionCallTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 events = EVENTS
                             )
@@ -1616,7 +1624,9 @@ class ContractFunctionCallRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.functionCallTx.data,
                                     value = ethAmount.rawValue,
                                     blockConfirmations = fetchResponse.requests[0].functionCallTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].functionCallTx.timestamp
+                                    timestamp = fetchResponse.requests[0].functionCallTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].functionCallTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 events = EVENTS
                             )

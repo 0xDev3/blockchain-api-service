@@ -146,7 +146,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                 data = data.value,
                                 value = BigInteger.ZERO,
                                 blockConfirmations = null,
-                                timestamp = null
+                                timestamp = null,
+                                rawRpcTransactionReceipt = null
                             ),
                             disperseTx = null,
                             createdAt = TestData.TIMESTAMP.value,
@@ -198,7 +199,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             ),
             disperseStatus = Status.SUCCESS,
             disperseTransactionData = TransactionData(
@@ -209,7 +211,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -256,7 +259,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                 data = result.approveTransactionData?.data?.value!!,
                                 value = BigInteger.ZERO,
                                 blockConfirmations = result.approveTransactionData?.blockConfirmations!!,
-                                timestamp = result.approveTransactionData?.timestamp?.value!!
+                                timestamp = result.approveTransactionData?.timestamp?.value!!,
+                                rawRpcTransactionReceipt = null
                             ),
                             disperseTx = TransactionResponse(
                                 txHash = disperseTxHash.value,
@@ -265,7 +269,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                 data = result.disperseTransactionData?.data?.value!!,
                                 value = BigInteger.TEN,
                                 blockConfirmations = result.disperseTransactionData?.blockConfirmations!!,
-                                timestamp = result.disperseTransactionData?.timestamp?.value!!
+                                timestamp = result.disperseTransactionData?.timestamp?.value!!,
+                                rawRpcTransactionReceipt = null
                             ),
                             createdAt = TestData.TIMESTAMP.value,
                             approveEvents = emptyList(),
@@ -317,7 +322,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             ),
             disperseStatus = Status.SUCCESS,
             disperseTransactionData = TransactionData(
@@ -328,7 +334,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -377,7 +384,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                         data = result.approveTransactionData?.data?.value!!,
                                         value = BigInteger.ZERO,
                                         blockConfirmations = result.approveTransactionData?.blockConfirmations!!,
-                                        timestamp = result.approveTransactionData?.timestamp?.value!!
+                                        timestamp = result.approveTransactionData?.timestamp?.value!!,
+                                        rawRpcTransactionReceipt = null
                                     ),
                                     disperseTx = TransactionResponse(
                                         txHash = disperseTxHash.value,
@@ -386,7 +394,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                         data = result.disperseTransactionData?.data?.value!!,
                                         value = BigInteger.TEN,
                                         blockConfirmations = result.disperseTransactionData?.blockConfirmations!!,
-                                        timestamp = result.disperseTransactionData?.timestamp?.value!!
+                                        timestamp = result.disperseTransactionData?.timestamp?.value!!,
+                                        rawRpcTransactionReceipt = null
                                     ),
                                     createdAt = TestData.TIMESTAMP.value,
                                     approveEvents = emptyList(),
@@ -440,7 +449,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 value = Balance.ZERO,
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             ),
             disperseStatus = Status.SUCCESS,
             disperseTransactionData = TransactionData(
@@ -451,7 +461,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -500,7 +511,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                         data = result.approveTransactionData?.data?.value!!,
                                         value = BigInteger.ZERO,
                                         blockConfirmations = result.approveTransactionData?.blockConfirmations!!,
-                                        timestamp = result.approveTransactionData?.timestamp?.value!!
+                                        timestamp = result.approveTransactionData?.timestamp?.value!!,
+                                        rawRpcTransactionReceipt = null
                                     ),
                                     disperseTx = TransactionResponse(
                                         txHash = disperseTxHash.value,
@@ -509,7 +521,8 @@ class AssetMultiSendRequestControllerTest : TestBase() {
                                         data = result.disperseTransactionData?.data?.value!!,
                                         value = BigInteger.TEN,
                                         blockConfirmations = result.disperseTransactionData?.blockConfirmations!!,
-                                        timestamp = result.disperseTransactionData?.timestamp?.value!!
+                                        timestamp = result.disperseTransactionData?.timestamp?.value!!,
+                                        rawRpcTransactionReceipt = null
                                     ),
                                     createdAt = TestData.TIMESTAMP.value,
                                     approveEvents = emptyList(),

@@ -143,7 +143,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 data = result.contractData.withPrefix,
                                 value = result.initialEthAmount.rawValue,
                                 blockConfirmations = null,
-                                timestamp = null
+                                timestamp = null,
+                                rawRpcTransactionReceipt = null
                             ),
                             imported = result.imported,
                             proxy = false,
@@ -222,7 +223,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -268,7 +270,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 data = result.transactionData.data?.value,
                                 value = result.transactionData.value.rawValue,
                                 blockConfirmations = result.transactionData.blockConfirmations,
-                                timestamp = result.transactionData.timestamp?.value
+                                timestamp = result.transactionData.timestamp?.value,
+                                rawRpcTransactionReceipt = null
                             ),
                             imported = result.value.imported,
                             proxy = false,
@@ -322,7 +325,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -383,7 +387,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                         data = result.transactionData.data?.value,
                                         value = result.transactionData.value.rawValue,
                                         blockConfirmations = result.transactionData.blockConfirmations,
-                                        timestamp = result.transactionData.timestamp?.value
+                                        timestamp = result.transactionData.timestamp?.value,
+                                        rawRpcTransactionReceipt = null
                                     ),
                                     imported = result.value.imported,
                                     proxy = false,
@@ -440,7 +445,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -486,7 +492,8 @@ class ContractDeploymentRequestControllerTest : TestBase() {
                                 data = result.transactionData.data?.value,
                                 value = result.transactionData.value.rawValue,
                                 blockConfirmations = result.transactionData.blockConfirmations,
-                                timestamp = result.transactionData.timestamp?.value
+                                timestamp = result.transactionData.timestamp?.value,
+                                rawRpcTransactionReceipt = null
                             ),
                             imported = result.value.imported,
                             proxy = false,

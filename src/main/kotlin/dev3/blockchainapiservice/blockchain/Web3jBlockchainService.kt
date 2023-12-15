@@ -1,5 +1,6 @@
 package dev3.blockchainapiservice.blockchain
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import dev3.blockchainapiservice.blockchain.properties.ChainPropertiesHandler
 import dev3.blockchainapiservice.blockchain.properties.ChainSpec
 import dev3.blockchainapiservice.config.ApplicationProperties
@@ -86,6 +87,8 @@ class Web3jBlockchainService(
             fun shouldInvalidate(now: UtcDateTime, cacheDuration: Duration) =
                 (cachedAt.value + cacheDuration).isBefore(now.value)
         }
+
+        private val OBJECT_WRITER = ObjectMapper().writer()
     }
 
     private val chainHandler = ChainPropertiesHandler(applicationProperties)
@@ -235,6 +238,7 @@ class Web3jBlockchainService(
                     ?.transaction?.orElse(null).bind()
                 val receipt = web3j.ethGetTransactionReceipt(txHash.value).sendSafely()
                     ?.transactionReceipt?.orElse(null).bind()
+                val rawReceipt = OBJECT_WRITER.writeValueAsString(receipt)
                 val blockConfirmations = currentBlockNumber.value - transaction.blockNumber.bind()
                 val txBlockNumber = transaction.blockNumber
                 val timestamp = web3j.ethGetBlockByNumber(DefaultBlockParameter.valueOf(txBlockNumber), false)
@@ -250,7 +254,8 @@ class Web3jBlockchainService(
                     blockConfirmations = blockConfirmations,
                     timestamp = timestamp,
                     success = receipt.isStatusOK,
-                    events = eventLogs.extractEvents(events)
+                    events = eventLogs.extractEvents(events),
+                    rawRpcTransactionReceipt = rawReceipt
                 )
 
                 if (blockchainProperties.shouldCache(blockConfirmations)) {
@@ -260,7 +265,8 @@ class Web3jBlockchainService(
                         txHash = txHash,
                         blockNumber = BlockNumber(txBlockNumber),
                         txInfo = txInfo,
-                        eventLogs = eventLogs
+                        eventLogs = eventLogs,
+                        rawTransactionReceipt = rawReceipt
                     )
                 }
 

@@ -79,7 +79,8 @@ class DeployedContractIdentifierResolverServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
         private val EVENTS = listOf<DeserializableEvent>()
     }

@@ -436,7 +436,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                                     EventArgumentValue("value", accountBalance.amount.rawValue)
                                 )
                             )
-                        )
+                        ),
+                        rawRpcTransactionReceipt = transactionInfo.rawRpcTransactionReceipt
                     )
                 )
 
@@ -516,7 +517,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
                         success = false,
-                        events = emptyList()
+                        events = emptyList(),
+                        rawRpcTransactionReceipt = transactionInfo.rawRpcTransactionReceipt
                     )
                 )
 
@@ -577,7 +579,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
                         success = true,
-                        events = emptyList()
+                        events = emptyList(),
+                        rawRpcTransactionReceipt = transactionInfo.rawRpcTransactionReceipt
                     )
                 )
 
@@ -645,7 +648,8 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                         blockConfirmations = transactionInfo.blockConfirmations,
                         timestamp = transactionInfo.timestamp,
                         success = true,
-                        events = emptyList()
+                        events = emptyList(),
+                        rawRpcTransactionReceipt = transactionInfo.rawRpcTransactionReceipt
                     )
                 )
 

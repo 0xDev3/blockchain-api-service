@@ -19,7 +19,8 @@ data class BlockchainTransactionInfo(
     val blockConfirmations: BigInteger,
     val timestamp: UtcDateTime,
     val success: Boolean,
-    val events: List<EventInfo>
+    val events: List<EventInfo>,
+    val rawRpcTransactionReceipt: String?
 ) {
     fun hashMatches(expectedHash: TransactionHash?): Boolean =
         hash == expectedHash

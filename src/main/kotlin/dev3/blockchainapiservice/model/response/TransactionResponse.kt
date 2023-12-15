@@ -15,7 +15,8 @@ data class TransactionResponse(
     val data: String?,
     val value: BigInteger,
     val blockConfirmations: BigInteger?,
-    val timestamp: OffsetDateTime?
+    val timestamp: OffsetDateTime?,
+    val rawRpcTransactionReceipt: String?
 ) {
     companion object {
         fun unmined(from: WalletAddress?, to: EthereumAddress, data: FunctionData?, value: Balance) =
@@ -26,7 +27,8 @@ data class TransactionResponse(
                 data = data?.nullIfEmpty()?.value,
                 value = value.rawValue,
                 blockConfirmations = null,
-                timestamp = null
+                timestamp = null,
+                rawRpcTransactionReceipt = null
             )
 
         private fun FunctionData.nullIfEmpty(): FunctionData? =
@@ -40,6 +42,7 @@ data class TransactionResponse(
         data = transactionData.data?.nullIfEmpty()?.value,
         value = transactionData.value.rawValue,
         blockConfirmations = transactionData.blockConfirmations,
-        timestamp = transactionData.timestamp?.value
+        timestamp = transactionData.timestamp?.value,
+        rawRpcTransactionReceipt = transactionData.rawRpcTransactionReceipt
     )
 }

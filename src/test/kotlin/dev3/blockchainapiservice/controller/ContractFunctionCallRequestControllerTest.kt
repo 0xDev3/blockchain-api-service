@@ -134,7 +134,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                                 data = result.data.value,
                                 value = result.value.ethAmount.rawValue,
                                 blockConfirmations = null,
-                                timestamp = null
+                                timestamp = null,
+                                rawRpcTransactionReceipt = null
                             ),
                             events = null
                         )
@@ -178,7 +179,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -220,7 +222,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                                 data = result.transactionData.data?.value,
                                 value = result.transactionData.value.rawValue,
                                 blockConfirmations = result.transactionData.blockConfirmations,
-                                timestamp = result.transactionData.timestamp?.value
+                                timestamp = result.transactionData.timestamp?.value,
+                                rawRpcTransactionReceipt = null
                             ),
                             events = emptyList()
                         )
@@ -264,7 +267,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                 value = Balance(BigInteger.TEN),
                 blockConfirmations = BigInteger.ONE,
                 timestamp = TestData.TIMESTAMP,
-                events = emptyList()
+                events = emptyList(),
+                rawRpcTransactionReceipt = null
             )
         )
 
@@ -317,7 +321,8 @@ class ContractFunctionCallRequestControllerTest : TestBase() {
                                         data = result.transactionData.data?.value,
                                         value = result.transactionData.value.rawValue,
                                         blockConfirmations = result.transactionData.blockConfirmations,
-                                        timestamp = result.transactionData.timestamp?.value
+                                        timestamp = result.transactionData.timestamp?.value,
+                                        rawRpcTransactionReceipt = null
                                     ),
                                     events = emptyList()
                                 )

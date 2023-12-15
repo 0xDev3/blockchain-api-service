@@ -596,7 +596,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                         deployTx = createResponse.deployTx.copy(
                             txHash = txHash.value,
                             blockConfirmations = importResponse.deployTx.blockConfirmations,
-                            timestamp = importResponse.deployTx.timestamp
+                            timestamp = importResponse.deployTx.timestamp,
+                            rawRpcTransactionReceipt = importResponse.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = false,
                         proxy = false,
@@ -732,7 +733,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             data = response.deployTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = response.deployTx.blockConfirmations,
-                            timestamp = response.deployTx.timestamp
+                            timestamp = response.deployTx.timestamp,
+                            rawRpcTransactionReceipt = response.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = true,
                         proxy = false,
@@ -870,7 +872,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             data = response.deployTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = response.deployTx.blockConfirmations,
-                            timestamp = response.deployTx.timestamp
+                            timestamp = response.deployTx.timestamp,
+                            rawRpcTransactionReceipt = response.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = true,
                         proxy = false,
@@ -1071,7 +1074,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             data = response.deployTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = response.deployTx.blockConfirmations,
-                            timestamp = response.deployTx.timestamp
+                            timestamp = response.deployTx.timestamp,
+                            rawRpcTransactionReceipt = response.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = true,
                         proxy = true,
@@ -1485,7 +1489,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             data = interfacesResponse.deployTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = interfacesResponse.deployTx.blockConfirmations,
-                            timestamp = interfacesResponse.deployTx.timestamp
+                            timestamp = interfacesResponse.deployTx.timestamp,
+                            rawRpcTransactionReceipt = interfacesResponse.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = true,
                         proxy = false,
@@ -1759,7 +1764,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             data = interfacesResponse.deployTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = interfacesResponse.deployTx.blockConfirmations,
-                            timestamp = interfacesResponse.deployTx.timestamp
+                            timestamp = interfacesResponse.deployTx.timestamp,
+                            rawRpcTransactionReceipt = interfacesResponse.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = true,
                         proxy = false,
@@ -1881,7 +1887,8 @@ class ImportContractControllerApiTest : ControllerTestBase() {
                             data = interfacesResponse.deployTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = interfacesResponse.deployTx.blockConfirmations,
-                            timestamp = interfacesResponse.deployTx.timestamp
+                            timestamp = interfacesResponse.deployTx.timestamp,
+                            rawRpcTransactionReceipt = interfacesResponse.deployTx.rawRpcTransactionReceipt
                         ),
                         imported = true,
                         proxy = false,

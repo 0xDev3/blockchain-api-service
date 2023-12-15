@@ -374,7 +374,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = false,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -464,7 +465,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -554,7 +556,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -644,7 +647,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -734,7 +738,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -824,7 +829,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -914,7 +920,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {
@@ -1004,7 +1011,8 @@ class Erc20LockRequestServiceTest : TestBase() {
             blockConfirmations = BigInteger.ONE,
             timestamp = TestData.TIMESTAMP,
             success = true,
-            events = emptyList()
+            events = emptyList(),
+            rawRpcTransactionReceipt = null
         )
 
         suppose("transaction is mined") {

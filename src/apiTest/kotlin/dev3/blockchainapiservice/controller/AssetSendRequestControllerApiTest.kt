@@ -190,7 +190,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             data = response.sendTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.sendTx.rawRpcTransactionReceipt
                         ),
                         createdAt = response.createdAt,
                         events = null
@@ -295,7 +296,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             data = response.sendTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.sendTx.rawRpcTransactionReceipt
                         ),
                         createdAt = response.createdAt,
                         events = null
@@ -396,7 +398,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             data = null,
                             value = amount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.sendTx.rawRpcTransactionReceipt
                         ),
                         createdAt = response.createdAt,
                         events = null
@@ -499,7 +502,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             data = null,
                             value = amount.rawValue,
                             blockConfirmations = null,
-                            timestamp = null
+                            timestamp = null,
+                            rawRpcTransactionReceipt = response.sendTx.rawRpcTransactionReceipt
                         ),
                         createdAt = response.createdAt,
                         events = null
@@ -749,7 +753,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.sendTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
-                            timestamp = fetchResponse.sendTx.timestamp
+                            timestamp = fetchResponse.sendTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.sendTx.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         events = EVENTS
@@ -866,7 +871,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             data = createResponse.sendTx.data,
                             value = BigInteger.ZERO,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
-                            timestamp = fetchResponse.sendTx.timestamp
+                            timestamp = fetchResponse.sendTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.sendTx.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         events = EVENTS
@@ -972,7 +978,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             data = null,
                             value = amount.rawValue,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
-                            timestamp = fetchResponse.sendTx.timestamp
+                            timestamp = fetchResponse.sendTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.sendTx.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         events = emptyList()
@@ -1080,7 +1087,8 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                             data = null,
                             value = amount.rawValue,
                             blockConfirmations = fetchResponse.sendTx.blockConfirmations,
-                            timestamp = fetchResponse.sendTx.timestamp
+                            timestamp = fetchResponse.sendTx.timestamp,
+                            rawRpcTransactionReceipt = fetchResponse.sendTx.rawRpcTransactionReceipt
                         ),
                         createdAt = fetchResponse.createdAt,
                         events = emptyList()
@@ -1211,7 +1219,9 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].sendTx.timestamp
+                                    timestamp = fetchResponse.requests[0].sendTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].sendTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 events = EVENTS
@@ -1334,7 +1344,9 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].sendTx.timestamp
+                                    timestamp = fetchResponse.requests[0].sendTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].sendTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 events = EVENTS
@@ -1454,7 +1466,9 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].sendTx.timestamp
+                                    timestamp = fetchResponse.requests[0].sendTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].sendTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 events = EVENTS
@@ -1579,7 +1593,9 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].sendTx.timestamp
+                                    timestamp = fetchResponse.requests[0].sendTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].sendTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 events = EVENTS
@@ -1699,7 +1715,9 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].sendTx.timestamp
+                                    timestamp = fetchResponse.requests[0].sendTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].sendTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 events = EVENTS
@@ -1823,7 +1841,9 @@ class AssetSendRequestControllerApiTest : ControllerTestBase() {
                                     data = createResponse.sendTx.data,
                                     value = BigInteger.ZERO,
                                     blockConfirmations = fetchResponse.requests[0].sendTx.blockConfirmations,
-                                    timestamp = fetchResponse.requests[0].sendTx.timestamp
+                                    timestamp = fetchResponse.requests[0].sendTx.timestamp,
+                                    rawRpcTransactionReceipt = fetchResponse.requests[0].sendTx
+                                        .rawRpcTransactionReceipt
                                 ),
                                 createdAt = fetchResponse.requests[0].createdAt,
                                 events = EVENTS
