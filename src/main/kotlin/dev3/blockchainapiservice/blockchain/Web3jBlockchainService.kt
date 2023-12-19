@@ -34,7 +34,10 @@ import dev3.blockchainapiservice.util.BlockParameter
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.ContractBinaryData
 import dev3.blockchainapiservice.util.EthStorageSlot
+import dev3.blockchainapiservice.util.EthereumAddress
 import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.GasEstimate
+import dev3.blockchainapiservice.util.GasPrice
 import dev3.blockchainapiservice.util.Keccak256Hash
 import dev3.blockchainapiservice.util.StaticBytesType
 import dev3.blockchainapiservice.util.TransactionHash
@@ -93,6 +96,37 @@ class Web3jBlockchainService(
 
     private val chainHandler = ChainPropertiesHandler(applicationProperties)
     private val latestBlockCache = ConcurrentHashMap<ChainSpec, CachedBlockNumber>()
+
+    override fun estimateGas(
+        chainSpec: ChainSpec,
+        from: EthereumAddress,
+        to: ContractAddress,
+        value: Balance,
+        data: FunctionData
+    ): GasEstimate { // TODO write integ test
+        logger.debug { "Estimate gas cost, chainSpec: $chainSpec, from: $from, to: $to, value: $value, data: $data" }
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
+        val estimate = blockchainProperties.web3j.ethEstimateGas(
+            Transaction(
+                from.rawValue,
+                null,
+                null,
+                null,
+                to.rawValue,
+                value.rawValue,
+                data.value
+            )
+        ).sendSafely()?.amountUsed ?: throw BlockchainReadException("Unable to estimate gas usage")
+        return GasEstimate(estimate)
+    }
+
+    override fun getGasPrice(chainSpec: ChainSpec): GasPrice { // TODO write integ test
+        logger.debug { "Get gas price, chainSpec: $chainSpec" }
+        val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
+        val gasPrice = blockchainProperties.web3j.ethGasPrice().sendSafely()?.gasPrice
+            ?: throw BlockchainReadException("Unable to get gas price")
+        return GasPrice(gasPrice)
+    }
 
     override fun readStorageSlot(
         chainSpec: ChainSpec,

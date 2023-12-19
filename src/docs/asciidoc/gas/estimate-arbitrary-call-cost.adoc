@@ -1,0 +1,38 @@
+=== Estimate Gas Cost of Contract Arbitrary Call Request
+Estimates gas cost of contract arbitrary call request with specified parameters. Parameter `caller_address` is optional.
+
+Target contract can be specified by providing `deployed_contract_id`, `deployed_contract_alias` or `contract_address` in
+the request body. Exactly one of the mentioned values must be provided, otherwise the request will be considered
+invalid. The `deployed_contract_id` and `deployed_contract_alias` correspond to ID or alias of the contract which was
+deployed using the <<Contract Deployment Request API>>. If `contract_address` is used to specify target contract, then
+`deployed_contract_id` will have `null` value in the response.
+
+*This request requires an API key present in the `X-API-KEY` header.*
+
+.Request Example (via `deployed_contract_id`)
+[%collapsible]
+====
+include::{snippets}/GasControllerApiTest/mustCorrectlyEstimateArbitraryCallGasCostViaDeployedContractId/http-request.adoc[]
+====
+.Request Example (via `deployed_contract_alias`)
+[%collapsible]
+====
+include::{snippets}/GasControllerApiTest/mustCorrectlyEstimateArbitraryCallGasCostViaDeployedContractAlias/http-request.adoc[]
+====
+.Request Example (via `contract_address`)
+[%collapsible]
+====
+include::{snippets}/GasControllerApiTest/mustCorrectlyEstimateArbitraryCallGasCostViaDeployedContractAddress/http-request.adoc[]
+====
+.Response Example
+[%collapsible]
+====
+include::{snippets}/GasControllerApiTest/mustCorrectlyEstimateArbitraryCallGasCostViaDeployedContractId/http-response.adoc[]
+====
+
+Schemas:
+
+.Request Schema
+include::{snippets}/dev3.blockchainapiservice.features.gas.model.request.EstimateGasCostForContractArbitraryCallRequest.adoc[]
+.Response Schema
+include::{snippets}/dev3.blockchainapiservice.features.gas.model.response.EstimateGasCostResponse.adoc[]

@@ -1,0 +1,16 @@
+=== Get Current Gas Price
+Fetches current gas price for the project's chain.
+
+.Request Example
+[%collapsible]
+====
+include::{snippets}/GasControllerApiTest/mustCorrectlyGetGasPrice/http-request.adoc[]
+====
+
+.Response Example
+[%collapsible]
+====
+include::{snippets}/GasControllerApiTest/mustCorrectlyGetGasPrice/http-response.adoc[]
+====
+.Response Schema
+include::{snippets}/dev3.blockchainapiservice.features.gas.model.response.GasPriceResponse.adoc[]

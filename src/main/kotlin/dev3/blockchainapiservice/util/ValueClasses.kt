@@ -81,6 +81,20 @@ value class Balance(override val value: Uint) : EthereumUint {
 }
 
 @JvmInline
+value class GasEstimate(val value: BigInteger) {
+    companion object {
+        val ZERO = GasEstimate(BigInteger.ZERO)
+    }
+}
+
+@JvmInline
+value class GasPrice(val value: BigInteger) {
+    companion object {
+        val ZERO = GasPrice(BigInteger.ZERO)
+    }
+}
+
+@JvmInline
 value class DurationSeconds(override val value: Uint) : EthereumUint {
     constructor(value: BigInteger) : this(Uint(value))
 

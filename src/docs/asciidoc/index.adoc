@@ -133,6 +133,12 @@ templates can be found in the internal API documentation.
 include::src/docs/asciidoc/multi-payment-template/fetch.adoc[]
 include::src/docs/asciidoc/multi-payment-template/fetch-by-wallet-address.adoc[]
 
+== Gas Price and Cost API
+All endpoints are public and do not require `Authorization: Bearer JWT` header.
+
+include::src/docs/asciidoc/gas/fetch-gas-price.adoc[]
+include::src/docs/asciidoc/gas/estimate-arbitrary-call-cost.adoc[]
+
 == Available Function Argument Types
 include::src/docs/asciidoc/function-arg-types.adoc[]
 

@@ -10,15 +10,30 @@ import dev3.blockchainapiservice.model.result.BlockchainTransactionInfo
 import dev3.blockchainapiservice.model.result.ContractDeploymentTransactionInfo
 import dev3.blockchainapiservice.model.result.ReadonlyFunctionCallResult
 import dev3.blockchainapiservice.util.AccountBalance
+import dev3.blockchainapiservice.util.Balance
 import dev3.blockchainapiservice.util.BlockName
 import dev3.blockchainapiservice.util.BlockNumber
 import dev3.blockchainapiservice.util.BlockParameter
 import dev3.blockchainapiservice.util.ContractAddress
 import dev3.blockchainapiservice.util.EthStorageSlot
+import dev3.blockchainapiservice.util.EthereumAddress
+import dev3.blockchainapiservice.util.FunctionData
+import dev3.blockchainapiservice.util.GasEstimate
+import dev3.blockchainapiservice.util.GasPrice
 import dev3.blockchainapiservice.util.TransactionHash
 import dev3.blockchainapiservice.util.WalletAddress
 
 interface BlockchainService {
+    fun estimateGas(
+        chainSpec: ChainSpec,
+        from: EthereumAddress,
+        to: ContractAddress,
+        value: Balance,
+        data: FunctionData
+    ): GasEstimate
+
+    fun getGasPrice(chainSpec: ChainSpec): GasPrice
+
     fun readStorageSlot(
         chainSpec: ChainSpec,
         contractAddress: ContractAddress,
