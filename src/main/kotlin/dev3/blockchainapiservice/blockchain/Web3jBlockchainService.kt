@@ -105,18 +105,29 @@ class Web3jBlockchainService(
         data: FunctionData
     ): GasEstimate { // TODO write integ test
         logger.debug { "Estimate gas cost, chainSpec: $chainSpec, from: $from, to: $to, value: $value, data: $data" }
+
         val blockchainProperties = chainHandler.getBlockchainProperties(chainSpec)
-        val estimate = blockchainProperties.web3j.ethEstimateGas(
-            Transaction(
-                from.rawValue,
-                null,
-                null,
-                null,
-                to.rawValue,
-                value.rawValue,
-                data.value
+        val fallbackBlockchainProperties = blockchainProperties.fallbackChainIdForGasEstimate?.let {
+            chainHandler.getBlockchainProperties(
+                ChainSpec(chainId = it, customRpcUrl = null)
             )
-        ).sendSafely()?.amountUsed ?: throw BlockchainReadException("Unable to estimate gas usage")
+        }
+        val transaction = Transaction(
+            from.rawValue,
+            null,
+            null,
+            null,
+            to.rawValue,
+            value.rawValue,
+            data.value
+        )
+
+        val estimate =
+            blockchainProperties.web3j.ethEstimateGas(transaction).sendSafely()?.amountUsed
+                ?: fallbackBlockchainProperties?.web3j?.ethEstimateGas(transaction)?.sendSafely()?.amountUsed
+                ?: blockchainProperties.safeGasEstimate
+                ?: throw BlockchainReadException("Unable to estimate gas usage")
+
         return GasEstimate(estimate)
     }
 

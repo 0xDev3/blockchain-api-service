@@ -22,7 +22,9 @@ class ChainPropertiesHandlerTest : TestBase() {
                 startBlockNumber = null,
                 chainExplorerApiUrl = null,
                 chainExplorerApiKey = null,
-                minBlockConfirmationsForCaching = null
+                minBlockConfirmationsForCaching = null,
+                fallbackChainIdForGasEstimate = null,
+                safeGasEstimate = null
             )
         )
     }

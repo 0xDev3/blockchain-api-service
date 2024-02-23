@@ -44,7 +44,9 @@ data class ChainProperties(
     val minBlockConfirmationsForCaching: BigInteger?,
     val chainExplorerApiUrl: String?,
     val chainExplorerApiKey: String?,
-    val latestBlockCacheDuration: Duration = 5.seconds.toJavaDuration()
+    val latestBlockCacheDuration: Duration = 5.seconds.toJavaDuration(),
+    val fallbackChainIdForGasEstimate: Long?,
+    val safeGasEstimate: BigInteger?
 )
 
 @ConstructorBinding

@@ -1480,7 +1480,9 @@ class Web3jBlockchainServiceIntegTest : TestBase() {
                 startBlockNumber = null,
                 chainExplorerApiUrl = null,
                 chainExplorerApiKey = null,
-                minBlockConfirmationsForCaching = null
+                minBlockConfirmationsForCaching = null,
+                fallbackChainIdForGasEstimate = null,
+                safeGasEstimate = null
             )
         )
     }

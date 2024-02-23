@@ -20,7 +20,9 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
             ChainPropertiesWithServices(
                 web3j = Web3j.build(HttpService(chainSpec.customRpcUrl)),
                 latestBlockCacheDuration = chainProperties?.latestBlockCacheDuration ?: Duration.ZERO,
-                minBlockConfirmationsForCaching = chainProperties?.minBlockConfirmationsForCaching
+                minBlockConfirmationsForCaching = chainProperties?.minBlockConfirmationsForCaching,
+                fallbackChainIdForGasEstimate = chainProperties?.fallbackChainIdForGasEstimate?.let(::ChainId),
+                safeGasEstimate = chainProperties?.safeGasEstimate
             )
         } else if (chainProperties != null) {
             blockchainPropertiesMap.computeIfAbsent(chainSpec.chainId) {
@@ -43,7 +45,9 @@ class ChainPropertiesHandler(private val applicationProperties: ApplicationPrope
         return ChainPropertiesWithServices(
             web3j = Web3j.build(HttpService(rpcUrl)),
             latestBlockCacheDuration = chainProperties.latestBlockCacheDuration,
-            minBlockConfirmationsForCaching = chainProperties.minBlockConfirmationsForCaching
+            minBlockConfirmationsForCaching = chainProperties.minBlockConfirmationsForCaching,
+            fallbackChainIdForGasEstimate = chainProperties.fallbackChainIdForGasEstimate?.let(::ChainId),
+            safeGasEstimate = chainProperties.safeGasEstimate
         )
     }
 }
